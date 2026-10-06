@@ -5,40 +5,113 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f5f7">
 <title>哈基米工作站</title>
-<link rel="stylesheet" href="/styles.css?v=20261007-home2">
+<link rel="stylesheet" href="/styles.css?v=20261007-official3">
 <link rel="stylesheet" href="/cms.css?v=20261006-g1">
 </head>
 <body>
-<div id="portalHome" class="portal-home">
-<header class="global-nav"><div class="global-nav-inner">
-<a class="global-brand" href="/">hajimi</a>
-<nav class="global-links">
-<a href="/">首页</a><a href="/bl">病历模板</a><a href="/duty">值班</a><a href="/bl">其他科室</a><a href="/tools">临床工具</a><span data-auth-slot></span>
-</nav></div></header>
-<main class="portal-main">
-<section class="portal-hero">
-  <div class="portal-hero-glow portal-hero-glow-a"></div>
-  <div class="portal-hero-glow portal-hero-glow-b"></div>
-  <div class="portal-hero-inner">
-    <p class="portal-kicker">HAJIMI · CLINICAL WORKSPACE</p>
-    <h1 class="portal-title"><span>临床资料，</span><span>一个入口。</span></h1>
-    <p class="portal-subtitle">病历模板、值班资料、其他科室内容和常用工具，统一从这里进入。</p>
-    <div class="portal-actions">
-      <a class="portal-btn portal-btn-primary" href="/bl">进入病历模板 <span>→</span></a>
-      <a class="portal-btn portal-btn-secondary" href="/tools">打开临床工具 <span>↗</span></a>
-    </div>
-    <div class="portal-trustline">
-      <span>模板集中管理</span><i></i><span>多科室扩展</span><i></i><span>浏览 / 开发者模式分离</span>
+<div id="portalHome" class="portal-home official-home">
+<header class="global-nav official-nav">
+  <div class="global-nav-inner official-nav-inner">
+    <a class="global-brand official-brand" href="/">
+      <span class="official-brand-mark" aria-hidden="true">H</span>
+      <span class="official-brand-text"><strong>哈基米工作站</strong><small>hajimi Clinical Workspace</small></span>
+    </a>
+    <nav class="global-links official-links" aria-label="主导航">
+      <a class="active" href="/">首页</a>
+      <a href="/bl">病历模板</a>
+      <a href="/duty">值班资料</a>
+      <a href="/bl">其他科室</a>
+      <a href="/tools">临床工具</a>
+    </nav>
+    <div class="official-nav-right">
+      <a class="official-search" href="/bl" aria-label="搜索模板">⌕ <span>搜索资料</span></a>
+      <span class="official-auth" data-auth-slot></span>
     </div>
   </div>
-</section>
-<section class="apple-grid">
-<a class="apple-tile tile-records" href="/bl"><div><span class="tile-badge">核心资料</span><h2>病历模板</h2><p>按科室 → 疾病/术式 → 入院、术前、术中、术后浏览。</p></div><div class="records-visual"><div class="record-sheet rs-back"></div><div class="record-sheet rs-mid"></div><div class="record-sheet rs-front"><b>病历模板</b><span></span><span></span><span></span></div></div></a>
-<a class="apple-tile" href="/duty"><div><span class="tile-badge">预留</span><h2>值班工作台</h2><p>值班资料、常用流程和交班内容后续从这里进入。</p></div><div class="duty-clock"><span>24h</span><small>On Call</small></div></a>
-<a class="apple-tile tile-dept" href="/bl"><div><span class="tile-badge">多科室</span><h2>其他科室</h2><p>普外科、肾内科、妇科等与骨科同级管理。</p></div><div class="dept-visual"><div>骨</div><div>外</div><div>肾</div><div>妇</div></div></a>
-<a class="apple-tile tile-tools" href="/tools"><div><span class="tile-badge">临床计算</span><h2>临床工具</h2><p>BMI、eGFR、Wells、NEWS2、RCRI 与官方风险工具入口。</p></div><div class="tools-visual"><span class="tool-pill">BMI</span><span class="tool-pill">eGFR</span><span class="tool-pill">Wells</span></div></a>
-</section>
-</main></div>
+</header>
+
+<main class="official-main">
+  <section class="official-hero">
+    <div class="official-hero-bg" aria-hidden="true">
+      <span class="bg-orb bg-orb-a"></span>
+      <span class="bg-orb bg-orb-b"></span>
+    </div>
+    <div class="official-hero-copy">
+      <p class="official-kicker">HAJIMI CLINICAL WORKSPACE</p>
+      <h1>临床资料，<span>一个入口。</span></h1>
+      <p class="official-lead">病历模板、值班资料、其他科室内容和常用临床工具，统一整理，打开即用，持续更新。</p>
+      <div class="official-hero-actions">
+        <a class="official-cta primary" href="/bl"><span class="cta-icon">▣</span>进入病历模板 <b>→</b></a>
+        <a class="official-cta secondary" href="/tools"><span class="cta-icon">⌘</span>打开临床工具 <b>→</b></a>
+      </div>
+      <div class="official-meta">
+        <span>模板集中管理</span><i></i><span>多科室扩展</span><i></i><span>浏览 / 开发者模式分离</span>
+      </div>
+    </div>
+
+    <div class="clinical-scene" aria-hidden="true">
+      <div class="scene-glass"></div>
+      <div class="scene-laptop">
+        <div class="scene-screen">
+          <div class="screen-top"><span>哈基米工作站</span><i></i></div>
+          <div class="screen-layout">
+            <div class="screen-side">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="screen-body">
+              <small>骨科病历模板</small>
+              <strong>264</strong>
+              <div class="screen-chips"><b>关节置换</b><b>创伤骨科</b><b>康复记录</b></div>
+              <div class="screen-cards"><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+        </div>
+        <div class="scene-base"></div>
+      </div>
+      <div class="scene-stethoscope"><span></span><b></b></div>
+      <div class="scene-books"><span>Orthopedics</span><span>Trauma</span><span>Arthroplasty</span></div>
+    </div>
+  </section>
+
+  <section class="official-feature-grid" aria-label="主要功能">
+    <a class="official-feature card-records" href="/bl">
+      <div class="feature-icon blue">▤</div>
+      <div class="feature-copy"><span class="feature-eyebrow">核心资料</span><h2>病历模板</h2><p>各类病历书写模板，按科室、疾病/术式和住院阶段整理。</p></div>
+      <div class="feature-art records-art"><i></i><i></i><i></i></div>
+      <div class="feature-enter">进入 <span>→</span></div>
+    </a>
+    <a class="official-feature card-duty" href="/duty">
+      <div class="feature-icon green">▦</div>
+      <div class="feature-copy"><span class="feature-eyebrow">值班工作台</span><h2>值班资料</h2><p>值班相关资料、流程规范、交班内容和常见问题处理。</p></div>
+      <div class="feature-art duty-art"><i></i><b></b><b></b><b></b></div>
+      <div class="feature-enter">进入 <span>→</span></div>
+    </a>
+    <a class="official-feature card-departments" href="/bl">
+      <div class="feature-icon purple">▥</div>
+      <div class="feature-copy"><span class="feature-eyebrow">多科室</span><h2>其他科室</h2><p>普外科、肾内科、妇科等与骨科同级管理，便于持续扩展。</p></div>
+      <div class="feature-art hospital-art"><div class="hospital-main">＋</div><i></i><i></i></div>
+      <div class="feature-enter">进入 <span>→</span></div>
+    </a>
+    <a class="official-feature card-tools" href="/tools">
+      <div class="feature-icon orange">⌘</div>
+      <div class="feature-copy"><span class="feature-eyebrow">临床计算</span><h2>临床工具</h2><p>常用医学公式、风险评分与床旁计算，集中调用提高效率。</p></div>
+      <div class="feature-art tools-art"><span>BMI</span><span>eGFR</span><span>Wells</span></div>
+      <div class="feature-enter">进入 <span>→</span></div>
+    </a>
+  </section>
+
+  <section class="official-stats" aria-label="工作站概览">
+    <div><span class="stat-icon blue">▤</span><strong>274</strong><small>病历模板</small></div>
+    <div><span class="stat-icon green">▦</span><strong>4</strong><small>科室分类</small></div>
+    <div><span class="stat-icon purple">◆</span><strong>56</strong><small>临床工具</small></div>
+    <div><span class="stat-icon orange">●</span><strong class="stat-text">持续更新</strong><small>不断完善中</small></div>
+  </section>
+
+  <footer class="official-footer">
+    <span></span><p>哈基米工作站</p><i>专注临床 · 汇聚资料 · 提高效率</i><span></span>
+  </footer>
+</main>
+</div>
 
 <div id="dutyPage" class="portal-home" hidden>
 <header class="global-nav"><div class="global-nav-inner"><a class="global-brand" href="/">hajimi</a><nav class="global-links"><a href="/">首页</a><a href="/bl">病历模板</a><a href="/tools">临床工具</a><span data-auth-slot></span></nav></div></header>
