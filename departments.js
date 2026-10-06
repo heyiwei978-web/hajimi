@@ -111,7 +111,23 @@
     function allDisease(dep){return diseaseMap[dep]||[...new Set(listForDept(dep).map((t)=>t.group))];}
     function deptCard(dep){
       const d=departments.find((x)=>x.name===dep),n=departmentCount(dep);
-      return `<article class="department-card" data-department="${dep}" role="button" tabindex="0"><div class="department-card-top"><span>科室</span><strong>${n} 份</strong></div><h3>${dep}</h3><p>${d?.desc||'病历模板'}</p><div class="department-card-open">进入科室 <span>→</span></div></article>`;
+      const meta={
+        '骨科':{icon:'骨',cls:'dept-ortho',eyebrow:'ORTHOPAEDICS',hint:'创伤 · 关节置换 · 围手术期'},
+        '普外科':{icon:'外',cls:'dept-surgery',eyebrow:'GENERAL SURGERY',hint:'腹部外科 · 常见外科病历'},
+        '肾内科':{icon:'肾',cls:'dept-nephro',eyebrow:'NEPHROLOGY',hint:'AKI · 肾功能 · 内科记录'},
+        '妇科':{icon:'妇',cls:'dept-gyn',eyebrow:'GYNAECOLOGY',hint:'妇科疾病 · 围手术期'}
+      }[dep]||{icon:'科',cls:'dept-generic',eyebrow:'DEPARTMENT',hint:'病历模板'};
+      return `<article class="department-card library-department-card ${meta.cls}" data-department="${dep}" role="button" tabindex="0">
+        <div class="department-visual">
+          <span class="department-icon">${meta.icon}</span>
+          <span class="department-eyebrow">${meta.eyebrow}</span>
+        </div>
+        <div class="department-card-top"><span>科室模板</span><strong>${n} 份</strong></div>
+        <h3>${dep}</h3>
+        <p>${d?.desc||'病历模板'}</p>
+        <small>${meta.hint}</small>
+        <div class="department-card-open">进入科室 <span>→</span></div>
+      </article>`;
     }
     function diseaseCard(dep,g){
       const items=listForDept(dep).filter((t)=>t.group===g);
@@ -149,7 +165,7 @@
       });
     }
     function renderOrthoIndex(){
-      document.body.classList.remove('department-no-sidebar');
+      document.body.classList.remove('department-no-sidebar','library-root-page');
       setBrand();
       const list=listForDept('骨科');
       const title=document.getElementById('resultTitle');
@@ -220,17 +236,52 @@
       return `<div class="department-toolbar"><button class="btn ghost" id="departmentBack">← ${root?'返回首页':'返回科室'}</button><span>${label}</span></div>`;
     }
     function renderDepartmentRoot(){
-      currentDept=null;resetState();setBrand();document.body.classList.add('department-no-sidebar');
+      currentDept=null;resetState();setBrand();
+      document.body.classList.add('department-no-sidebar','library-root-page');
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
-      if(title)title.textContent='选择科室';if(num)num.textContent=departments.length+' 个科室 · '+templates.length+' 份模板';if(empty)empty.hidden=true;
-      if(grid)grid.innerHTML='<div class="department-grid">'+departments.map((d)=>deptCard(d.name)).join('')+'</div>';
+      const orthoCount=departmentCount('骨科');
+      const otherCount=templates.length-orthoCount;
+      if(title)title.textContent='选择科室';
+      if(num)num.textContent=departments.length+' 个科室 · '+templates.length+' 份模板';
+      if(empty)empty.hidden=true;
+      if(grid)grid.innerHTML=`
+        <section class="library-overview">
+          <div class="library-overview-copy">
+            <span>CLINICAL TEMPLATE LIBRARY</span>
+            <h2>从科室进入，快速找到需要的病历。</h2>
+            <p>按科室、疾病或术式、住院阶段和记录类型组织。现有内容保持不变，后续可继续增加科室、疾病、案例影像和专项记录。</p>
+          </div>
+          <div class="library-overview-stats">
+            <div><strong>${templates.length}</strong><span>全部模板</span></div>
+            <div><strong>${departments.length}</strong><span>科室分类</span></div>
+            <div><strong>${orthoCount}</strong><span>骨科模板</span></div>
+            <div><strong>${otherCount}</strong><span>其他科室</span></div>
+          </div>
+        </section>
+        <div class="library-section-heading">
+          <div><span>01</span><h3>科室入口</h3><p>选择科室后，再进入具体疾病或术式。</p></div>
+          <strong>${departments.length} 个科室</strong>
+        </div>
+        <div class="department-grid library-department-grid">${departments.map((d)=>deptCard(d.name)).join('')}</div>
+        <section class="library-quick-panel">
+          <div class="library-quick-head"><span>02</span><div><h3>后续扩展</h3><p>为新增内容预留固定位置，后续添加不会打乱现有结构。</p></div></div>
+          <div class="library-quick-grid">
+            <div><b>新增科室</b><span>继续增加内科、外科及其他专业模板</span></div>
+            <div><b>病例与影像</b><span>脱敏案例、DR、CT、MRI及术前术后对照</span></div>
+            <div><b>专项记录</b><span>会诊、沟通、检查理由、并发症和康复路径</span></div>
+            <div><b>常用收藏</b><span>预留最近使用和个人常用模板入口</span></div>
+          </div>
+        </section>`;
       document.querySelectorAll('[data-department]').forEach((c)=>{
         const go=()=>navigateDepartment(c.dataset.department);
         c.onclick=go;c.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
       });
-      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=templates.length;if(ac)ac.textContent=templates.length;
+      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');
+      if(tc)tc.textContent=templates.length;
+      if(ac)ac.textContent=templates.length;
     }
     function renderDepartmentIndex(){
+      document.body.classList.remove('library-root-page');
       if(currentDept==='骨科'){renderOrthoIndex();return;}
       document.body.classList.toggle('department-no-sidebar',currentDept!=='骨科');setBrand();
       const list=listForDept(currentDept);
@@ -246,6 +297,7 @@
       const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=list.length;if(ac)ac.textContent=list.length;
     }
     function renderDisease(){
+      document.body.classList.remove('library-root-page');
       document.body.classList.toggle('department-no-sidebar',currentDept!=='骨科');setBrand();
       const list=(coreFiltered?coreFiltered():templates).filter((t)=>t.department===currentDept&&t.group===state.group);
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
