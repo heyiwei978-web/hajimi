@@ -1,0 +1,1 @@
+(function(){document.addEventListener('click',function(e){var x=e.target.closest('[data-module="临床工具"]');if(!x)return;e.preventDefault();e.stopImmediatePropagation();location.href='/tools'},true)})();

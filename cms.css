@@ -1,0 +1,17 @@
+
+.cms-auth-slot{display:inline-flex;align-items:center;gap:8px}
+.cms-login-btn,.cms-logout-btn{border:0;background:none;color:#06c;font-size:12px;cursor:pointer;padding:4px 0}
+.cms-admin-badge{font-size:11px;font-weight:650;color:#137333;background:#e6f4ea;border-radius:999px;padding:5px 8px;white-space:nowrap}
+.cms-dialog{border:0;border-radius:18px;padding:0;width:min(520px,calc(100vw - 28px));box-shadow:0 25px 80px rgba(0,0,0,.22)}
+.cms-dialog::backdrop{background:rgba(0,0,0,.36);backdrop-filter:blur(4px)}
+.cms-dialog form{padding:22px}
+.cms-dialog-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px}
+.cms-dialog-head strong{font-size:20px}
+.cms-dialog-head span{display:block;color:#777;font-size:12px;margin-top:4px}
+.cms-x{border:0;background:#f1f1f3;width:32px;height:32px;min-width:32px;flex:0 0 32px;border-radius:50%;padding:0;display:grid;place-items:center;font:400 22px/1 Arial,sans-serif;color:#3a3a3c;cursor:pointer;appearance:none}
+.cms-x:hover{background:#e5e5e8}
+.cms-x:active{transform:scale(.96)}
+.cms-dialog label{display:block;font-size:12px;color:#555;margin:13px 0}
+.cms-dialog input[type=text],.cms-dialog input[type=password],.cms-dialog input:not([type]),.cms-dialog textarea{width:100%;box-sizing:border-box;margin-top:6px;border:1px solid #ddd;border-radius:10px;padding:10px 12px;font:inherit;background:#fff}
+.cms-edit-dialog{width:min(850px,calc(100vw - 28px))}
+.cms-edit-dialog textarea{min-height:55vh;white-spac¶»§q«^

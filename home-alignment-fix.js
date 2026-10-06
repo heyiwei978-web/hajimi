@@ -1,0 +1,49 @@
+(function(){
+  var st=document.createElement('style');
+  st.id='home-alignment-fix-style';
+  st.textContent=`
+    html,body{max-width:100%;overflow-x:hidden}
+    .portal-home{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+    .portal-main{
+      width:100%!important;
+      max-width:1400px!important;
+      margin-left:auto!important;
+      margin-right:auto!important;
+      box-sizing:border-box!important;
+    }
+    .portal-hero{
+      width:100%!important;
+      max-width:100%!important;
+      margin-left:auto!important;
+      margin-right:auto!important;
+      padding-left:24px!important;
+      padding-right:24px!important;
+      box-sizing:border-box!important;
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:center!important;
+      justify-content:center!important;
+      text-align:center!important;
+    }
+    .portal-hero .portal-kicker{
+      width:100%!important;
+      margin-left:auto!important;
+      margin-right:auto!important;
+      text-align:center!important;
+    }
+    .portal-hero h1{
+      width:100%!important;
+      max-width:920px!important;
+      margin-left:auto!important;
+      margin-right:auto!important;
+      padding-left:0!important;
+      padding-right:0!important;
+      text-align:center!important;
+      position:static!important;
+      left:auto!important;
+      right:auto!important;
+      transform:none!important;
+    }
+    .portal-hero .portal-subtitle{
+      width:100%!important;
+  ¶»§q«^
