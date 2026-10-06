@@ -35,7 +35,27 @@ fib4:['AASLD','FIB-4','https://www.aasld.org/liver-fellow-network/core-series/wh
 apri:['NIH','APRI','https://pmc.ncbi.nlm.nih.gov/articles/PMC3266187/'],
 meld3:['HRSA/OPTN','MELD 3.0','https://www.hrsa.gov/optn/data-calculators/allocation-calculators/meld-calculator'],
 anc:['NIH','绝对中性粒细胞计数 ANC','https://pmc.ncbi.nlm.nih.gov/articles/PMC6060634/'],
-retic:['NIH','校正网织红细胞百分比','https://www.ncbi.nlm.nih.gov/books/NBK499994/']
+retic:['NIH','校正网织红细胞百分比','https://www.ncbi.nlm.nih.gov/books/NBK499994/'],
+pp:['NIH','脉压 Pulse Pressure','https://www.ncbi.nlm.nih.gov/books/NBK482408/'],
+ci:['NIH','心脏指数 Cardiac Index','https://www.ncbi.nlm.nih.gov/books/NBK539905/'],
+svr:['NIH','系统血管阻力 SVR','https://www.ncbi.nlm.nih.gov/books/NBK556075/'],
+cpp:['NIH','脑灌注压 CPP','https://www.ncbi.nlm.nih.gov/books/NBK537271/'],
+rox:['PubMed','ROX index','https://pubmed.ncbi.nlm.nih.gov/33039213/'],
+rsbi:['NIH','浅快呼吸指数 RSBI','https://www.ncbi.nlm.nih.gov/books/NBK526012/'],
+cao2:['NIH','动脉血氧含量 CaO₂','https://www.ncbi.nlm.nih.gov/books/NBK525974/'],
+do2:['NIH','氧输送量 DO₂','https://www.ncbi.nlm.nih.gov/books/NBK525974/'],
+qsofa:['NIH','qSOFA','https://www.ncbi.nlm.nih.gov/books/NBK621512/'],
+sirs:['NIH','SIRS criteria','https://www.ncbi.nlm.nih.gov/books/NBK547669/'],
+childpugh:['NCBI','Child-Pugh','https://www.ncbi.nlm.nih.gov/books/NBK224641/'],
+maddrey:['NICE/NCBI','Maddrey DF','https://www.ncbi.nlm.nih.gov/books/NBK549995/'],
+rpi:['NIH','网织红细胞生成指数 RPI','https://www.ncbi.nlm.nih.gov/books/NBK499994/'],
+mentzer:['PubMed','Mentzer index','https://pubmed.ncbi.nlm.nih.gov/26076394/'],
+tsat:['NIH','转铁蛋白饱和度','https://www.ncbi.nlm.nih.gov/books/NBK559119/'],
+corrca:['NIH','白蛋白校正钙','https://www.ncbi.nlm.nih.gov/books/NBK482128/'],
+freewater:['NIH','自由水缺失量','https://www.ncbi.nlm.nih.gov/books/NBK441960/'],
+eag:['ADA','A1C → eAG','https://doi.org/10.2337/dc26-s006'],
+ldl:['NCBI','Friedewald LDL-C','https://www.ncbi.nlm.nih.gov/books/NBK355892/'],
+nonhdl:['NCBI','non-HDL-C','https://www.ncbi.nlm.nih.gov/books/NBK355892/']
 };
 function f(id,label,extra=''){return '<label class="field">'+label+'<input id="'+id+'" type="number" '+extra+'></label>'}
 function sel(id,label,opts){return '<label class="field">'+label+'<select id="'+id+'">'+opts.map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('')+'</select></label>'}
@@ -84,6 +104,27 @@ function body(k){
  if(k==='meld3')return finish(k,wrap(grid(sel('sex','性别',[['m','男'],['f','女']])+f('bili','总胆红素（mg/dL）','step=".01"')+f('na','血钠（mEq/L）','step=".1"')+f('inr','INR','step=".01"')+f('alb','白蛋白（g/dL）','step=".1"')+f('cr','肌酐（mg/dL）','step=".01"')+sel('dial','近7天透析≥2次或CVVHD≥24h',[['0','否'],['1','是']])),'本站按公开MELD 3.0方程显示估算值。正式移植分配必须以HRSA/OPTN系统及当期政策为准。'));
  if(k==='anc')return finish(k,wrap(grid(f('wbc','WBC（×10⁹/L）','step=".01"')+f('neut','中性粒细胞（%）','step=".1"')+f('band','杆状核（%）','value="0" step=".1"'))));
  if(k==='retic')return finish(k,wrap(grid(f('retic','网织红细胞（%）','step=".1"')+f('hct','患者Hct（%）','step=".1"')+f('refhct','参考Hct（%）','value="45" step=".1"')),'校正网织红细胞百分比不是RPI；RPI还需根据贫血程度考虑网织红细胞成熟时间。'));
+
+ if(k==='pp')return finish(k,wrap(grid(f('sbp','收缩压 SBP（mmHg）')+f('dbp','舒张压 DBP（mmHg）'))));
+ if(k==='ci')return finish(k,wrap(grid(f('co','心排量 CO（L/min）','step=".01"')+f('bsa','体表面积 BSA（m²）','step=".01"'))));
+ if(k==='svr')return finish(k,wrap(grid(f('mapv','MAP（mmHg）','step=".1"')+f('cvp','CVP（mmHg）','step=".1"')+f('co','心排量 CO（L/min）','step=".01"')),'SVR计算依赖同时、可靠的压力和心排量测量。'));
+ if(k==='cpp')return finish(k,wrap(grid(f('mapv','MAP（mmHg）','step=".1"')+f('icp','ICP（mmHg）','step=".1"')),'MAP与ICP应尽量为同期可靠测量；目标CPP需结合具体神经重症情境。'));
+ if(k==='rox')return finish(k,wrap(grid(f('spo2','SpO₂（%）','step=".1"')+f('fio2','FiO₂（%）','min="21" max="100" step=".1"')+f('rr','呼吸频率（/min）','step=".1"')),'ROX主要用于HFNC患者的趋势和风险辅助判断，不应以单次值替代临床评估。'));
+ if(k==='rsbi')return finish(k,wrap(grid(f('rr','呼吸频率（/min）','step=".1"')+f('vt','潮气量 VT（mL）','step="1"')),'RSBI = f/VT(L)。脱机判断还需综合气体交换、呼吸肌力、意识和血流动力学。'));
+ if(k==='cao2')return finish(k,wrap(grid(f('hb','Hb（g/dL）','step=".1"')+f('sao2','SaO₂（%）','step=".1"')+f('pao2','PaO₂（mmHg）','step=".1"'))));
+ if(k==='do2')return finish(k,wrap(grid(f('co','心排量 CO（L/min）','step=".01"')+f('hb','Hb（g/dL）','step=".1"')+f('sao2','SaO₂（%）','step=".1"')+f('pao2','PaO₂（mmHg）','step=".1"')),'DO₂为估算值，取决于心排量和动脉血氧含量。'));
+ if(k==='qsofa')return finish(k,wrap(grid(f('rr','呼吸频率（/min）')+f('sbp','收缩压（mmHg）'))+'<div class="checks span-all">'+ck('q','意识状态改变 / GCS <15',1)+'</div>','qSOFA用于感染患者床旁风险提示，不等同于脓毒症诊断。'));
+ if(k==='sirs')return finish(k,wrap(grid(f('temp','体温（℃）','step=".1"')+f('hr','心率（/min）')+f('rr','呼吸频率（/min）')+f('paco2','PaCO₂（mmHg，可留空）','step=".1"')+f('wbc','WBC（×10⁹/L）','step=".1"')+f('band','未成熟杆状核（%，可留空）','step=".1"')),'SIRS敏感但不特异，不等同于感染或脓毒症诊断。'));
+ if(k==='childpugh')return finish(k,wrap(grid(f('bili','总胆红素（mg/dL）','step=".1"')+f('alb','白蛋白（g/dL）','step=".1"')+f('inr','INR','step=".01"')+sel('ascites','腹水',[['1','无'],['2','轻度/利尿剂可控制'],['3','中重度/难控制']])+sel('enceph','肝性脑病',[['1','无'],['2','I–II级'],['3','III–IV级']])),'常规非胆汁淤积性肝病阈值；胆汁淤积性肝病胆红素分档可不同。'));
+ if(k==='maddrey')return finish(k,wrap(grid(f('pt','患者PT（秒）','step=".1"')+f('controlpt','对照PT（秒）','step=".1"')+f('bili','总胆红素（mg/dL）','step=".1"')),'Maddrey DF用于酒精相关肝炎严重度辅助评估；治疗决策还需结合感染、出血、肾功能等。'));
+ if(k==='rpi')return finish(k,wrap(grid(f('retic','网织红细胞（%）','step=".1"')+f('hct','患者Hct（%）','step=".1"')+f('refhct','参考Hct（%）','value="45" step=".1"')+sel('maturation','成熟因子',[['1','1.0（Hct约45%）'],['1.5','1.5（Hct约35%）'],['2','2.0（Hct约25%）'],['2.5','2.5（Hct约15%）']])),'RPI = 校正网织红细胞% / 成熟因子。参考Hct及成熟因子应结合患者性别与贫血程度。'));
+ if(k==='mentzer')return finish(k,wrap(grid(f('mcv','MCV（fL）','step=".1"')+f('rbc','RBC（×10¹²/L）','step=".01"')),'Mentzer指数仅用于小细胞性贫血的初步鉴别辅助，不能替代铁蛋白、血红蛋白电泳/基因检测。'));
+ if(k==='tsat')return finish(k,wrap(grid(f('iron','血清铁（μg/dL）','step=".1"')+f('tibc','TIBC（μg/dL）','step=".1"'))));
+ if(k==='corrca')return finish(k,wrap(grid(f('ca','总钙（mg/dL）','step=".01"')+f('alb','白蛋白（g/dL）','step=".1"')),'校正钙仅为粗略估算；危重、CKD或明显酸碱紊乱时应优先直接测离子钙。'));
+ if(k==='freewater')return finish(k,wrap(grid(sel('sex','性别',[['m','男'],['f','女']])+f('w','体重（kg）','step=".1"')+f('na','血钠（mmol/L）','step=".1"')),'采用TBW≈0.6×体重（男）或0.5×体重（女）；高龄、肥胖、容量状态异常时系数可能需要调整。自由水缺失仅是初始估算，纠钠速度必须动态监测。'));
+ if(k==='eag')return finish(k,wrap(grid(f('a1c','HbA1c（%）','step=".1"')),'eAG是群体回归估计，个体CGM/指尖血糖与A1C可能不完全一致。'));
+ if(k==='ldl')return finish(k,wrap(grid(f('tc','总胆固醇 TC（mg/dL）','step=".1"')+f('hdl','HDL-C（mg/dL）','step=".1"')+f('tg','甘油三酯 TG（mg/dL）','step=".1"')),'Friedewald公式在TG≥400 mg/dL时不可靠，非空腹、高TG和极低LDL时也可能偏差明显。'));
+ if(k==='nonhdl')return finish(k,wrap(grid(f('tc','总胆固醇 TC（mg/dL）','step=".1"')+f('hdl','HDL-C（mg/dL）','step=".1"'))));
  return '<div class="body">该工具暂不可用。</div>';
 }
 function newsScore(){
@@ -138,6 +179,27 @@ function bind(k){
  else if(k==='meld3')go.onclick=()=>{if(!allPositive('#bili','#na','#inr','#alb','#cr'))return result('<strong>请完整输入</strong>');let b=Math.max(1,num('#bili')),n=Math.min(137,Math.max(125,num('#na'))),i=Math.max(1,num('#inr')),a=Math.min(3.5,Math.max(1.5,num('#alb'))),c=$('#dial').value==='1'?3:Math.min(3,Math.max(1,num('#cr')));let m=($('#sex').value==='f'?1.33:0)+4.56*Math.log(b)+.82*(137-n)-.24*(137-n)*Math.log(b)+9.09*Math.log(i)+11.14*Math.log(c)+1.85*(3.5-a)-1.83*(3.5-a)*Math.log(c)+6;m=Math.max(6,Math.min(40,Math.round(m)));result('<strong>MELD 3.0 = '+m+'</strong><span>已按公开规则限制：胆红素/INR/肌酐下限1；Na 125–137；Alb 1.5–3.5；肌酐上限3或满足透析条件取3。正式分配以OPTN系统为准。</span>')};
  else if(k==='anc')go.onclick=()=>{const w=num('#wbc'),n=num('#neut'),b=num('#band');if(!(w>0&&n>=0&&b>=0))return result('<strong>请检查输入</strong>');const e=w*1000*(n+b)/100;result('<strong>'+e.toFixed(0)+' /µL</strong><span>等于 '+(e/1000).toFixed(3)+' ×10⁹/L。ANC = WBC × (中性粒细胞% + 杆状核%)/100。</span>')};
  else if(k==='retic')go.onclick=()=>{if(!allPositive('#retic','#hct','#refhct'))return result('<strong>请完整输入</strong>');const e=num('#retic')*num('#hct')/num('#refhct');result('<strong>'+e.toFixed(2)+'%</strong><span>校正网织红细胞% = Retic% × 患者Hct / 参考Hct。</span>')};
+
+ else if(k==='pp')go.onclick=()=>{if(!allPositive('#sbp','#dbp'))return result('<strong>请完整输入</strong>');const e=num('#sbp')-num('#dbp');result('<strong>'+e.toFixed(1)+' mmHg</strong><span>Pulse Pressure = SBP − DBP。</span>')};
+ else if(k==='ci')go.onclick=()=>{if(!allPositive('#co','#bsa'))return result('<strong>请完整输入</strong>');const e=num('#co')/num('#bsa');result('<strong>'+e.toFixed(2)+' L/min/m²</strong><span>Cardiac Index = CO / BSA。</span>')};
+ else if(k==='svr')go.onclick=()=>{if(!allPositive('#mapv','#co')||num('#cvp')<0)return result('<strong>请检查输入</strong>');const e=80*(num('#mapv')-num('#cvp'))/num('#co');result('<strong>'+e.toFixed(0)+' dyn·s/cm⁵</strong><span>SVR = 80 × (MAP − CVP) / CO。</span>')};
+ else if(k==='cpp')go.onclick=()=>{if(!allPositive('#mapv')||num('#icp')<0)return result('<strong>请检查输入</strong>');const e=num('#mapv')-num('#icp');result('<strong>'+e.toFixed(1)+' mmHg</strong><span>CPP = MAP − ICP。</span>')};
+ else if(k==='rox')go.onclick=()=>{if(!allPositive('#spo2','#fio2','#rr'))return result('<strong>请完整输入</strong>');const e=(num('#spo2')/(num('#fio2')/100))/num('#rr');result('<strong>'+e.toFixed(2)+'</strong><span>ROX = (SpO₂/FiO₂) / RR。</span>')};
+ else if(k==='rsbi')go.onclick=()=>{if(!allPositive('#rr','#vt'))return result('<strong>请完整输入</strong>');const e=num('#rr')/(num('#vt')/1000);result('<strong>'+e.toFixed(1)+' breaths/min/L</strong><span>RSBI = respiratory rate / tidal volume(L)。</span>')};
+ else if(k==='cao2')go.onclick=()=>{if(!allPositive('#hb','#sao2','#pao2'))return result('<strong>请完整输入</strong>');const e=1.34*num('#hb')*(num('#sao2')/100)+.003*num('#pao2');result('<strong>'+e.toFixed(2)+' mL O₂/dL</strong><span>CaO₂ = 1.34×Hb×SaO₂ + 0.003×PaO₂。</span>')};
+ else if(k==='do2')go.onclick=()=>{if(!allPositive('#co','#hb','#sao2','#pao2'))return result('<strong>请完整输入</strong>');const ca=1.34*num('#hb')*(num('#sao2')/100)+.003*num('#pao2'),e=num('#co')*ca*10;result('<strong>'+e.toFixed(0)+' mL O₂/min</strong><span>CaO₂ '+ca.toFixed(2)+' mL/dL；DO₂ = CO × CaO₂ ×10。</span>')};
+ else if(k==='qsofa')go.onclick=()=>{if(!allPositive('#rr','#sbp'))return result('<strong>请完整输入</strong>');let s=score('q');if(num('#rr')>=22)s++;if(num('#sbp')<=100)s++;result('<strong>qSOFA '+s+' 分</strong><span>RR≥22、SBP≤100、意识改变各1分。仅用于风险提示。</span>')};
+ else if(k==='sirs')go.onclick=()=>{if(!allPositive('#temp','#hr','#rr','#wbc'))return result('<strong>请填写体温、心率、呼吸频率和WBC</strong>');let s=0;if(num('#temp')>38||num('#temp')<36)s++;if(num('#hr')>90)s++;if(num('#rr')>20||(num('#paco2')>0&&num('#paco2')<32))s++;if(num('#wbc')>12||num('#wbc')<4||num('#band')>10)s++;result('<strong>SIRS '+s+' 项</strong><span>传统定义通常≥2项；SIRS不等同于感染或脓毒症。</span>')};
+ else if(k==='childpugh')go.onclick=()=>{if(!allPositive('#bili','#alb','#inr'))return result('<strong>请完整输入</strong>');let s=0,b=num('#bili'),a=num('#alb'),i=num('#inr');s+=b<2?1:b<=3?2:3;s+=a>3.5?1:a>=2.8?2:3;s+=i<1.7?1:i<=2.3?2:3;s+=num('#ascites')+num('#enceph');const cls=s<=6?'A':s<=9?'B':'C';result('<strong>Child-Pugh '+s+' 分 · '+cls+'级</strong><span>非胆汁淤积性肝病常用分档。</span>')};
+ else if(k==='maddrey')go.onclick=()=>{if(!allPositive('#pt','#controlpt','#bili'))return result('<strong>请完整输入</strong>');const e=4.6*(num('#pt')-num('#controlpt'))+num('#bili');result('<strong>Maddrey DF '+e.toFixed(1)+'</strong><span>传统上≥32提示重症酒精相关肝炎，但治疗决策需综合禁忌证和当前指南。</span>')};
+ else if(k==='rpi')go.onclick=()=>{if(!allPositive('#retic','#hct','#refhct'))return result('<strong>请完整输入</strong>');const corr=num('#retic')*num('#hct')/num('#refhct'),e=corr/num('#maturation');result('<strong>RPI '+e.toFixed(2)+'</strong><span>校正网织红细胞 '+corr.toFixed(2)+'%；RPI = 校正值 / 成熟因子。</span>')};
+ else if(k==='mentzer')go.onclick=()=>{if(!allPositive('#mcv','#rbc'))return result('<strong>请完整输入</strong>');const e=num('#mcv')/num('#rbc');result('<strong>'+e.toFixed(2)+'</strong><span>Mentzer = MCV/RBC。经典经验：<13偏向地中海贫血携带状态，>13偏向缺铁，但诊断不能只依赖该指数。</span>')};
+ else if(k==='tsat')go.onclick=()=>{if(!allPositive('#iron','#tibc'))return result('<strong>请完整输入</strong>');const e=num('#iron')/num('#tibc')*100;result('<strong>'+e.toFixed(1)+'%</strong><span>TSAT = serum iron / TIBC ×100%。</span>')};
+ else if(k==='corrca')go.onclick=()=>{if(!allPositive('#ca','#alb'))return result('<strong>请完整输入</strong>');const e=num('#ca')+.8*(4-num('#alb'));result('<strong>'+e.toFixed(2)+' mg/dL</strong><span>Corrected Ca = measured Ca + 0.8×(4−albumin)。危重/CKD/酸碱紊乱优先离子钙。</span>')};
+ else if(k==='freewater')go.onclick=()=>{if(!allPositive('#w','#na'))return result('<strong>请完整输入</strong>');const tbw=($('#sex').value==='m'?.6:.5)*num('#w'),e=tbw*(num('#na')/140-1);result('<strong>'+e.toFixed(2)+' L</strong><span>TBW≈'+tbw.toFixed(1)+' L；自由水缺失 = TBW×(Na/140−1)。仅作初始估算。</span>')};
+ else if(k==='eag')go.onclick=()=>{if(!allPositive('#a1c'))return result('<strong>请输入HbA1c</strong>');const mg=28.7*num('#a1c')-46.7;result('<strong>'+mg.toFixed(0)+' mg/dL</strong><span>约 '+(mg/18).toFixed(1)+' mmol/L；eAG = 28.7×A1C − 46.7。</span>')};
+ else if(k==='ldl')go.onclick=()=>{if(!allPositive('#tc','#hdl','#tg'))return result('<strong>请完整输入</strong>');if(num('#tg')>=400)return result('<strong>不建议使用Friedewald</strong><span>TG≥400 mg/dL时公式不可靠，考虑直接LDL-C或其他经验证方法。</span>');const e=num('#tc')-num('#hdl')-num('#tg')/5;result('<strong>'+e.toFixed(1)+' mg/dL</strong><span>LDL-C = TC − HDL-C − TG/5。</span>')};
+ else if(k==='nonhdl')go.onclick=()=>{if(!allPositive('#tc','#hdl'))return result('<strong>请完整输入</strong>');const e=num('#tc')-num('#hdl');result('<strong>'+e.toFixed(1)+' mg/dL</strong><span>non-HDL-C = TC − HDL-C。</span>')};
 }
 $$('.card[data-tool]').forEach(c=>c.addEventListener('click',e=>{if(e.target.closest('a'))return;openTool(c.dataset.tool)}));
 $('#close').onclick=()=>$('#dlg').close();
