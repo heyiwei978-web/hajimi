@@ -53,3 +53,19 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   font-kerning:none;
 }
 @media(max-width:800px){.portal-hero h1.portal-title{font-size:45px}}
+
+/* exact CJK title grid: two 5-character lines share the same left edge */
+.portal-hero h1.portal-title{
+  display:block;
+  width:5em;
+  max-width:none;
+  margin-left:auto;
+  margin-right:auto;
+  text-align:left;
+}
+.portal-hero h1.portal-title>span{
+  display:block;
+  width:100%;
+  text-align:left;
+  white-space:nowrap;
+}
