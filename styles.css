@@ -19,19 +19,21 @@
 /* 2026-10-06: requested presentation-only refinements */
 a,a:visited,a:hover,a:active{text-decoration:none!important}
 .portal-title{
-  display:grid;
-  width:max-content;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  width:100%;
   margin:0 auto;
-  justify-items:start;
-  text-align:left;
+  text-align:center;
   font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
   font-weight:700;
   font-size:64px;
   line-height:1.08;
   letter-spacing:0;
-  font-kerning:none;
+  font-kerning:normal;
 }
-.portal-title span{display:block;white-space:nowrap}
+.portal-title span{display:block;white-space:nowrap;text-align:center}
 @media(max-width:800px){
   .portal-title{font-size:45px}
 }
