@@ -35,3 +35,19 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 @media(max-width:800px){
   .portal-title{font-size:45px}
 }
+
+/* alignment correction after visual QA */
+.portal-hero h1.portal-title{
+  display:grid;
+  width:max-content;
+  margin:0 auto;
+  justify-items:start;
+  text-align:left;
+  font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+  font-weight:700;
+  font-size:64px;
+  line-height:1.08;
+  letter-spacing:0;
+  font-kerning:none;
+}
+@media(max-width:800px){.portal-hero h1.portal-title{font-size:45px}}
