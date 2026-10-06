@@ -164,7 +164,7 @@
       if(empty)empty.hidden=true;
       if(grid){
         grid.innerHTML=`
-          ${toolbar('骨科 · ${list.length} 份模板',false)}
+          ${toolbar(`骨科 · ${list.length} 份模板`,false)}
           <section class="ortho-hero">
             <div class="ortho-hero-copy">
               <div class="ortho-eyebrow">ORTHOPAEDICS · TEMPLATE WORKSPACE</div>
