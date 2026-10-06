@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/tools",
+      "destination": "/tools.html"
+    },
+    {
+      "source": "/tools/",
+      "destination": "/tools.html"
+    },
+    {
       "source": "/bl",
       "destination": "/index.html"
     },
@@ -9,12 +17,8 @@
       "destination": "/index.html"
     },
     {
-      "source": "/tools",
-      "destination": "/tools.html"
-    },
-    {
-      "source": "/tools/",
-      "destination": "/tools.html"
+      "source": "/duty",
+      "destination": "/index.html"
     }
   ],
   "headers": [
@@ -24,42 +28,6 @@
         {
           "key": "Cache-Control",
           "value": "no-store"
-        }
-      ]
-    },
-    {
-      "source": "/cms.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        }
-      ]
-    },
-    {
-      "source": "/departments.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        }
-      ]
-    },
-    {
-      "source": "/department-layout-fix.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        }
-      ]
-    },
-    {
-      "source": "/tools-entry.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
         }
       ]
     },

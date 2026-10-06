@@ -1,40 +1,357 @@
-(function departmentModule(seed){
+(function departmentRouter(seed){
   try{
-    if(typeof templates==="undefined"||!Array.isArray(templates)) return;
-    const originalCount=templates.length;
-    templates.forEach((t)=>{if(!t.department)t.department="骨科";});
+    if(typeof templates==='undefined'||!Array.isArray(templates))return;
+
+    templates.forEach((t)=>{if(!t.department)t.department='骨科';});
     const existing=new Set(templates.map((t)=>t.name));
     seed.forEach((t)=>{if(!existing.has(t.name))templates.push(t);});
 
-    if(typeof generate==="function"){
+    if(typeof generate==='function'){
       const baseGenerate=generate;
       generate=function(t){return t&&t.sourceBody?t.sourceBody:baseGenerate(t);};
     }
 
-    ["入院记录","首次病程","主治查房","主任查房"].forEach((v)=>{
-      const sel=document.getElementById("typeFilter");
+    ['入院记录','首次病程','主治查房','主任查房'].forEach((v)=>{
+      const sel=document.getElementById('typeFilter');
       if(sel&&!Array.from(sel.options).some((o)=>o.value===v)){
-        const o=document.createElement("option");o.value=v;o.textContent=v;sel.appendChild(o);
+        const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);
       }
     });
 
-    const departments=["骨科","普外科","肾内科","妇科"];
+    const departments=[
+      {name:'骨科',slug:'guke',desc:'创伤、关节置换及围手术期模板'},
+      {name:'普外科',slug:'puwai',desc:'腹部外科及常见外科病历模板'},
+      {name:'肾内科',slug:'shennei',desc:'肾脏内科、AKI及透析相关模板'},
+      {name:'妇科',slug:'fuke',desc:'妇科常见疾病及围手术期模板'}
+    ];
     const diseaseMap={
-      "普外科":["肝脓肿"],
-      "肾内科":["化疗药物性肾功能损伤"],
-      "妇科":["妊娠组织物残留"]
+      '骨科':[...groups,'通用场景'],
+      '普外科':['肝脓肿'],
+      '肾内科':['化疗药物性肾功能损伤'],
+      '妇科':['妊娠组织物残留']
     };
-    let current=null;
-    const coreFiltered=typeof filtered==="function"?filtered:null;
-    const coreRender=typeof render==="function"?render:null;
+    const slugToDept=Object.fromEntries(departments.map((d)=>[d.slug,d.name]));
+    const deptToSlug=Object.fromEntries(departments.map((d)=>[d.name,d.slug]));
+    const coreFiltered=typeof filtered==='function'?filtered:null;
+    let currentDept=null;
 
-    if(coreFiltered){
-      filtered=function(){
-        const list=coreFiltered();
-        return current?list.filter((t)=>t.department===current):list;
-      };
+    function pathState(){
+      const p=location.pathname.split('/').filter(Boolean);
+      if(!p.length)return {page:'home'};
+      if(p[0]==='duty')return {page:'duty'};
+      if(p[0]!=='bl')return {page:'home'};
+      if(!p[1])return {page:'departments'};
+      const dep=slugToDept[p[1]]||null;
+      let disease=null;
+      if(dep&&p[2]){try{disease=decodeURIComponent(p.slice(2).join('/'));}catch{disease=p.slice(2).join('/');}}
+      return {page:'library',department:dep,disease};
+    }
+    function setShell(page){
+      const home=document.getElementById('portalHome'),duty=document.getElementById('dutyPage'),lib=document.getElementById('libraryShell');
+      home.hidden=page!=='home';duty.hidden=page!=='duty';lib.hidden=!(page==='departments'||page==='library');
+      document.body.classList.toggle('portal-mode',page==='home'||page==='duty');
+    }
+    function setBrand(){
+      const strong=document.querySelector('#libraryShell .brand strong');
+      const small=document.querySelector('#libraryShell .brand small');
+      const h=document.getElementById('libraryTitle'),lead=document.getElementById('libraryLead');
+      if(!currentDept){
+        if(strong)strong.textContent='病历模板';
+        if(small)small.textContent='Clinical Template Library';
+        if(h)h.textContent='病历模板库';
+        if(lead)lead.textContent='先选择科室，再进入疾病或术式查看具体模板。';
+      }else{
+        if(strong)strong.textContent=currentDept+'病历模板';
+        if(small)small.textContent=currentDept+' · Clinical Template Library';
+        if(h)h.textContent=currentDept+'病历模板库';
+        if(lead)lead.textContent='按疾病/术式、阶段和记录类型浏览'+currentDept+'模板。';
+      }
+    }
+    function resetState(){
+      state.group='all';state.stage='all';state.type='all';state.q='';
+      const q=document.getElementById('searchInput'),s=document.getElementById('stageFilter'),t=document.getElementById('typeFilter');
+      if(q)q.value='';if(s)s.value='all';if(t)t.value='all';
+    }
+    function departmentCount(dep){return templates.filter((t)=>t.department===dep).length;}
+    function listForDept(dep){return templates.filter((t)=>t.department===dep);}
+    function allDisease(dep){return diseaseMap[dep]||[...new Set(listForDept(dep).map((t)=>t.group))];}
+    function deptCard(dep){
+      const d=departments.find((x)=>x.name===dep),n=departmentCount(dep);
+      return `<article class="department-card" data-department="${dep}" role="button" tabindex="0"><div class="department-card-top"><span>科室</span><strong>${n} 份</strong></div><h3>${dep}</h3><p>${d?.desc||'病历模板'}</p><div class="department-card-open">进入科室 <span>→</span></div></article>`;
+    }
+    function diseaseCard(dep,g){
+      const items=listForDept(dep).filter((t)=>t.group===g);
+      const chips=['入院','术前','术中','术后'].map((s)=>{const n=items.filter((t)=>t.stage===s).length;return n?`<span>${s} ${n}</span>`:''}).join('');
+      return `<article class="project-card disease-card" data-disease="${encodeURIComponent(g)}" role="button" tabindex="0"><div class="project-card-top"><span class="project-kind">${dep}</span><strong>${items.length} 份</strong></div><h3>${labelFor(g)}</h3><p>点击进入查看该疾病/术式的病历记录。</p><div class="project-stage-chips">${chips}</div><div class="project-open">打开项目 <span>→</span></div></article>`;
+    }
+    function toolbar(label,root){
+      return `<div class="department-toolbar"><button class="btn ghost" id="departmentBack">← ${root?'返回首页':'返回科室'}</button><span>${label}</span></div>`;
+    }
+    function renderDepartmentRoot(){
+      currentDept=null;resetState();setBrand();document.body.classList.add('department-no-sidebar');
+      const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
+      if(title)title.textContent='选择科室';if(num)num.textContent=departments.length+' 个科室 · '+templates.length+' 份模板';if(empty)empty.hidden=true;
+      if(grid)grid.innerHTML='<div class="department-grid">'+departments.map((d)=>deptCard(d.name)).join('')+'</div>';
+      document.querySelectorAll('[data-department]').forEach((c)=>{
+        const go=()=>navigateDepartment(c.dataset.department);
+        c.onclick=go;c.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
+      });
+      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=templates.length;if(ac)ac.textContent=templates.length;
+    }
+    function renderDepartmentIndex(){
+      document.body.classList.toggle('department-no-sidebar',currentDept!=='骨科');setBrand();
+      const list=listForDept(currentDept);
+      const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
+      const diseases=allDisease(currentDept);
+      if(title)title.textContent=currentDept+' · 疾病/术式';if(num)num.textContent=diseases.length+' 个项目 · '+list.length+' 份模板';if(empty)empty.hidden=true;
+      if(grid)grid.innerHTML=toolbar(currentDept+' · '+list.length+' 份模板',false)+'<div class="project-grid">'+diseases.map((g)=>diseaseCard(currentDept,g)).join('')+'</div>';
+      const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateRoot();
+      document.querySelectorAll('[data-disease]').forEach((c)=>{
+        const go=()=>navigateDisease(decodeURIComponent(c.dataset.disease));
+        c.onclick=go;c.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
+      });
+      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=list.length;if(ac)ac.textContent=list.length;
+    }
+    function renderDisease(){
+      document.body.classList.toggle('department-no-sidebar',currentDept!=='骨科');setBrand();
+      const list=(coreFiltered?coreFiltered():templates).filter((t)=>t.department===currentDept&&t.group===state.group);
+      const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
+      if(title)title.textContent=currentDept+' · '+labelFor(state.group);if(num)num.textContent=list.length+' 份';if(empty)empty.hidden=list.length>0;
+      const stages=['入院','术前','术中','术后'];
+      const sections=stages.map((stage)=>{
+        const items=list.filter((t)=>t.stage===stage);if(!items.length)return '';
+        return `<section class="stage-section"><div class="stage-section-head"><div><span class="stage-dot"></span><h3>${stage}</h3></div><span>${items.length} 份</span></div><div class="stage-template-list">${items.map(templateCard).join('')}</div></section>`;
+      }).join('');
+      if(grid)grid.innerHTML=toolbar(currentDept+' · '+labelFor(state.group),false)+'<div class="source-template-note">模板为脱敏整理/标准化辅助内容，使用前必须结合真实患者情况核对并修改。</div>'+sections;
+      const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateDepartment(currentDept);
+      bindTemplateActions();
+      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=list.length;if(ac)ac.textContent=departmentCount(currentDept);
+    }
+    function navigateRoot(){history.pushState({},'', '/bl');applyRoute();}
+    function navigateDepartment(dep){history.pushState({},'', '/bl/'+deptToSlug[dep]);applyRoute();}
+    function navigateDisease(g){history.pushState({},'', '/bl/'+deptToSlug[currentDept]+'/'+encodeURIComponent(g));applyRoute();}
+    function applyRoute(){
+      const r=pathState();setShell(r.page);
+      if(r.page==='home'||r.page==='duty')return;
+      if(r.page==='departments'){renderDepartmentRoot();return;}
+      currentDept=r.department||null;if(!currentDept){renderDepartmentRoot();return;}
+      resetState();
+      if(r.disease&&allDisease(currentDept).includes(r.disease)){state.group=r.disease;renderDisease();}
+      else renderDepartmentIndex();
     }
 
-    const style=document.createElement("style");
-    style.textContent=`
-      .department-no-sidebar .sidebar{display:none!i���q�^
+    const originalRender=typeof render==='function'?render:null;
+    render=function(){
+      const r=pathState();
+      if(r.page!=='library'&&r.page!=='departments'){setShell(r.page);return;}
+      if(r.page==='departments'){renderDepartmentRoot();return;}
+      currentDept=r.department||currentDept;
+      if(!currentDept){renderDepartmentRoot();return;}
+      if(state.group==='all'&&!state.q.trim()&&state.stage==='all'&&state.type==='all'){renderDepartmentIndex();return;}
+      if(state.group!=='all'){renderDisease();return;}
+      const list=(coreFiltered?coreFiltered():templates).filter((t)=>t.department===currentDept);
+      document.body.classList.toggle('department-no-sidebar',currentDept!=='骨科');setBrand();
+      const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
+      if(title)title.textContent=currentDept+' · 搜索结果';if(num)num.textContent=list.length+' 份';if(grid)grid.innerHTML=toolbar(currentDept+' · 搜索结果',false)+list.map(templateCard).join('');if(empty)empty.hidden=list.length>0;
+      const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateDepartment(currentDept);bindTemplateActions();
+    };
+
+    const reset=document.getElementById('resetFilters');if(reset)reset.onclick=()=>{resetState();render();};
+    const menu=document.getElementById('menuBtn'),sidebar=document.getElementById('sidebar'),mask=document.getElementById('drawerMask');
+    if(menu&&sidebar&&mask){
+      const close=()=>{sidebar.classList.remove('open');mask.classList.remove('show');};
+      menu.onclick=()=>{sidebar.classList.toggle('open');mask.classList.toggle('show');};
+      mask.onclick=close;
+      sidebar.addEventListener('click',(e)=>{if(e.target.closest('.nav-item')&&innerWidth<=900)close();});
+    }
+    window.addEventListener('popstate',applyRoute);
+    window.hajimiNavigateDepartment=navigateDepartment;
+    window.hajimiNavigateRoot=navigateRoot;
+    applyRoute();
+  }catch(e){console.error('department router failed',e);}
+})([
+  {department:'普外科',group:'肝脓肿',stage:'入院',type:'入院记录',short:'入院记录',name:'肝脓肿 · 入院记录',desc:'脱敏整理版：肝右叶肝脓肿入院记录。',sourceBody:`住院号：0000000001
+姓名：张某某
+性别：女
+年龄：48岁
+病史记录日期：[日期]
+入院日期：[日期]
+
+主诉：右上腹痛20天，加重1天。
+
+现病史：患者20天前无明显诱因出现右上腹持续性胀痛，1天前腹痛加重来院。腹部CT平扫+增强提示肝右叶约4.5cm×4.2cm不规则低密度/液性区，结合炎症指标考虑肝脓肿，收入普外科进一步治疗。入院时可伴发热、右上腹隐痛、口干、纳差等，具体以实际病史为准。
+
+既往史、个人史、过敏史、婚育史等：按实际询问记录。
+
+体格检查：生命体征按实际填写。腹软，右上腹轻压痛，可伴反跳痛；肝脾肋下未触及；胆囊未及；双肾区叩击痛按实际记录。
+
+专科检查：腹平坦，右上腹压痛，必要时记录反跳痛；无明显腹膜刺激征或包块。
+
+辅助检查：腹部CT提示肝右叶脓肿样改变；血常规及CRP/PCT等按实际检查填写。
+
+初步诊断：肝右叶肝脓肿。
+
+住院医师：李某某
+主治医师：陈某某`},
+  {department:'普外科',group:'肝脓肿',stage:'入院',type:'首次病程',short:'首次病程',name:'肝脓肿 · 首次病程',desc:'脱敏整理版：肝脓肿首次病程记录。',sourceBody:`住院号：0000000001
+姓名：张某某
+
+首次病程记录
+
+一、病例特点
+患者因右上腹痛加重入院。腹部CT提示肝右叶约4.5cm×4.2cm脓肿样病灶；炎症指标升高。查体可见右上腹压痛，余腹部体征按实际记录。
+
+二、拟诊讨论
+初步诊断：肝右叶肝脓肿。
+诊断依据：症状、右上腹体征、腹部增强CT及炎症指标支持。
+鉴别诊断：肝恶性肿瘤、化脓性胆管炎、肝血管瘤等，结合增强影像、肿瘤标志物及胆道病史鉴别。
+
+三、诊疗计划
+1. 按腹部外科护理常规。
+2. 完善血常规、肝肾功能、电解质、凝血、血培养/脓液培养等针对性检查。
+3. 根据病情给予补液、抗感染及对症处理。
+4. 评估脓肿大小、液化程度及穿刺引流指征。
+
+住院医师：李某某
+主治医师：陈某某`},
+  {department:'普外科',group:'肝脓肿',stage:'入院',type:'主治查房',short:'主治查房',name:'肝脓肿 · 主治查房',desc:'脱敏整理版：肝脓肿主治医师查房记录。',sourceBody:`住院号：0000000001
+姓名：张某某
+
+主治医师查房记录
+
+患者神志清楚，右上腹疼痛，生命体征及腹部查体按实际记录。辅助检查提示炎症指标升高，并可伴肝功能异常、电解质紊乱。
+
+主治医师查房后指示：
+一、结合病史、体征及腹部CT，目前诊断考虑肝右叶肝脓肿。
+二、脓肿直径较大或单纯药物治疗效果有限时，应评估超声/CT引导下经皮穿刺置管引流；引流液送培养及药敏。
+三、经验性抗感染方案应结合当地耐药谱、肝肾功能和培养结果调整，避免固定套用。
+四、补液及营养支持，动态复查电解质、肝功能、体温、白细胞、CRP/PCT和引流量，评估疗效。
+
+住院医师：李某某
+主治医师：陈某某`},
+  {department:'普外科',group:'肝脓肿',stage:'入院',type:'主任查房',short:'主任查房',name:'肝脓肿 · 主任查房',desc:'脱敏整理版：肝脓肿主任医师查房记录。',sourceBody:`住院号：0000000001
+姓名：张某某
+
+主任医师查房记录
+
+患者右上腹疼痛较前【减轻/无明显变化】，穿刺引流管固定在位，引流液性质及量按实际记录。复查血常规、CRP、PCT、肝功能及影像学结果按实际填写。
+
+主任医师查房后指示：
+1. 维持引流管通畅并记录24小时引流量，结合培养及药敏调整抗感染治疗。
+2. 加强营养与水电解质管理。
+3. 拔管应综合症状、体温、炎症指标、引流量及影像学脓腔缩小情况判断，不机械套用单一阈值。
+4. 若规范抗感染及经皮引流后仍无改善、引流不畅、合并腹膜炎/胸膜炎或复杂多房脓肿，应重新评估手术或其他介入方案。
+
+住院医师：李某某
+主任医师：薛某某`},
+  {department:'肾内科',group:'化疗药物性肾功能损伤',stage:'入院',type:'入院记录',short:'入院记录',name:'化疗药物性肾功能损伤 · 入院记录',desc:'脱敏整理版：药物相关急性肾损伤入院记录。',sourceBody:`住院号：0000000001
+姓名：张某某
+性别：女
+年龄：48岁
+病史记录日期：[日期]
+入院日期：[日期]
+
+主诉：血肌酐升高伴恶心、呕吐3天。
+
+现病史：患者既往曾出现急性肾损伤并接受临时血液透析，肾功能后恢复。此次3天前再次出现恶心呕吐、尿量减少及右侧腰部不适，来院检查提示血钾约6.9mmol/L、血肌酐显著升高，拟“急性肾损伤”收入院。
+
+既往史：有肿瘤手术及含铂化疗史，既往行双侧输尿管支架置入；有长期NSAIDs使用史。其余按实际记录。
+
+体格检查：全身水肿、心肺、腹部及双肾区体征按实际记录。
+
+辅助检查：血肌酐、尿素氮、血钾、酸碱平衡、尿常规及泌尿系影像按实际填写。
+
+初步诊断：急性肾损伤；伴高钾血症/代谢性酸中毒者据实记录。
+
+住院医师：李某某
+主治医师：陈某某`},
+  {department:'肾内科',group:'化疗药物性肾功能损伤',stage:'入院',type:'首次病程',short:'首次病程',name:'化疗药物性肾功能损伤 · 首次病程',desc:'脱敏整理版：药物相关急性肾损伤首次病程。',sourceBody:`住院号：0000000001
+姓名：张某某
+
+首次病程记录
+
+一、病例特点
+患者有既往AKI及含铂化疗、NSAIDs使用史，本次因恶心呕吐、尿量减少、血肌酐明显升高及高钾血症入院。查体无明显全身水肿，双肾区体征按实际记录。
+
+二、拟诊讨论
+初步诊断：急性肾损伤。
+诊断依据：短期内血肌酐显著升高并伴尿量减少、恶心呕吐等尿毒症相关表现。
+鉴别诊断：感染相关肾损伤、急性肾小球肾炎、尿路梗阻性肾损伤等，结合尿常规、免疫学、泌尿系影像及感染指标鉴别。
+
+三、诊疗计划
+1. 严密监测尿量、出入量、肾功能、电解质和酸碱状态。
+2. 停用潜在肾毒性药物并进行容量状态评估。
+3. 出现严重高钾、重度酸中毒、容量负荷或尿毒症并发症时，评估紧急肾脏替代治疗指征。
+4. 针对高钾及酸中毒进行标准化处理，并动态复查。
+
+住院医师：李某某
+主治医师：陈某某`},
+  {department:'肾内科',group:'化疗药物性肾功能损伤',stage:'入院',type:'主治查房',short:'主治查房',name:'化疗药物性肾功能损伤 · 主治查房',desc:'脱敏整理版：药物相关急性肾损伤主治医师查房。',sourceBody:`住院号：0000000001
+姓名：张某某
+
+主治医师查房记录
+
+患者恶心呕吐、尿量减少及右侧腰部不适。辅助检查提示血肌酐、尿素氮明显升高，可伴高钾血症及代谢性酸中毒。泌尿系影像需评估双J管位置、肾积水及梗阻情况。
+
+主治医师查房后指示：
+一、目前考虑肾性急性肾损伤，并评估药物相关肾小管/间质损伤可能。
+二、鉴别尿路梗阻、肾小球疾病及感染相关肾损伤。
+三、持续监测神志、血压、心率、SpO₂、小时尿量和24小时出入量；复查血常规、肾功能、电解质、血气等。
+四、严重高钾或酸中毒时按急症处理并评估透析；容量管理、营养支持及肾毒性药物停用同步进行。
+
+住院医师：唐某某
+主治医师：薛某某`},
+  {department:'肾内科',group:'化疗药物性肾功能损伤',stage:'入院',type:'主任查房',short:'主任查房',name:'化疗药物性肾功能损伤 · 主任查房',desc:'脱敏整理版：药物相关急性肾损伤主任医师查房。',sourceBody:`住院号：0000000001
+姓名：张某某
+
+主任医师查房记录
+
+患者急性发病，以恶心呕吐、腰部不适及尿量减少为主要表现，入院时血肌酐显著升高，可伴高钾血症和代谢性酸中毒。
+
+主任医师查房后指示：
+1. AKI诊断及分期依据血肌酐变化和尿量标准综合判断。
+2. 结合含铂化疗史、长期NSAIDs使用史及尿检、影像结果，评估药物相关肾小管/间质损伤可能，同时排除梗阻、感染和肾小球性疾病。
+3. 对严重高钾、重度酸中毒、容量负荷、尿毒症症状等按肾脏替代治疗指征处理。
+4. 高钾治疗、碳酸氢盐使用、利尿剂及其他药物均应结合容量状态、心电图和动态实验室结果个体化调整。
+
+住院医师：唐某某
+主任医师：薛某某`},
+  {department:'妇科',group:'妊娠组织物残留',stage:'入院',type:'首次病程',short:'首次病程',name:'妊娠组织物残留 · 首次病程',desc:'脱敏整理版：妊娠组织物残留首次病程记录。',sourceBody:`住院号：0000000001
+姓名：张某某
+
+首次病程记录
+
+一、病例特点
+育龄期女性，药物流产后复查超声提示宫腔异常团块，周边可见丰富血流信号，尿妊娠试验仍阳性，伴少量阴道流血。日期等隐私信息统一使用占位符。
+
+二、妇科检查
+外阴、阴道、宫颈、子宫及双附件情况按实际检查记录；重点记录阴道流血量、宫颈口情况、子宫压痛及附件区压痛/包块。
+
+三、拟诊讨论
+中医诊断：胎堕不全（血瘀证）【如实际采用】。
+西医诊断：妊娠组织物残留。
+鉴别诊断：早期妊娠相关异常、妊娠滋养细胞疾病等，结合HCG动态、超声及病理结果鉴别。
+
+四、诊疗计划
+1. 观察阴道流血及生命体征。
+2. 完善血常规、血型、凝血、肝肾功能、HCG及必要的妇科超声。
+3. 根据残留物大小、血流、症状及生育需求评估期待治疗、药物治疗、清宫或宫腔镜治疗。
+
+住院医师：李某某
+主治医师：陈某某`},
+  {department:'妇科',group:'妊娠组织物残留',stage:'入院',type:'主任查房',short:'主任查房',name:'妊娠组织物残留 · 主任查房',desc:'脱敏整理版：妊娠组织物残留主任医师查房记录。',sourceBody:`住院号：0000000001
+姓名：张某某
+
+主任医师查房记录
+
+患者少量阴道流血，无明显发热及持续下腹痛。妇科查体及超声按实际记录。
+
+主任医师查房后指示：
+一、结合药物流产史、持续宫腔异常团块及HCG情况，考虑妊娠组织物残留。
+二、治疗方式包括期待治疗、药物治疗、清宫术及宫腔镜手术，应结合出血量、感染风险、残留物血供、生育需求及患者意愿共同决策。
+三、宫腔镜直视操作有助于定位残留组织并减少盲目搔刮，但是否选择宫腔镜需结合资源、麻醉条件和患者风险。
+四、围术期宫颈预处理、抗菌药物预防、促宫缩、复查血常规/电解质及HCG等，应依据实际适应证和医院规范执行。
+
+住院医师：唐某某
+主任医师：薛某某`}
+]);
