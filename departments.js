@@ -30,6 +30,40 @@
       '肾内科':['化疗药物性肾功能损伤'],
       '妇科':['妊娠组织物残留']
     };
+    const orthoSections=[
+      {
+        key:'joint',
+        title:'关节置换',
+        eyebrow:'ARTHROPLASTY',
+        desc:'膝、髋关节置换相关记录集中管理，从入院评估到术后康复按阶段进入。',
+        items:['TKA','THA','人工股骨头置换'],
+        reserve:['髋关节翻修','膝关节翻修']
+      },
+      {
+        key:'trauma',
+        title:'创伤骨科',
+        eyebrow:'TRAUMA',
+        desc:'常见四肢、骨盆及关节周围骨折模板，适合住院、手术与术后连续记录。',
+        items:[...traumaGroups],
+        reserve:['股骨颈骨折','肱骨外髁骨折']
+      },
+      {
+        key:'sports',
+        title:'运动医学 / 关节镜',
+        eyebrow:'SPORTS MEDICINE',
+        desc:'预留运动医学、韧带、半月板及关节镜相关模板位置，后续可持续补充。',
+        items:[],
+        reserve:['半月板损伤','前交叉韧带损伤','后交叉韧带损伤','腘窝囊肿']
+      },
+      {
+        key:'soft',
+        title:'软组织 / 其他',
+        eyebrow:'SOFT TISSUE & GENERAL',
+        desc:'围手术期通用记录、检查理由、沟通记录及软组织损伤内容统一归档。',
+        items:['通用场景'],
+        reserve:['肌腱损伤与修复','股骨头坏死','感染与清创','会诊 / 检查理由']
+      }
+    ];
     const slugToDept=Object.fromEntries(departments.map((d)=>[d.slug,d.name]));
     const deptToSlug=Object.fromEntries(departments.map((d)=>[d.name,d.slug]));
     const coreFiltered=typeof filtered==='function'?filtered:null;
@@ -84,6 +118,104 @@
       const chips=['入院','术前','术中','术后'].map((s)=>{const n=items.filter((t)=>t.stage===s).length;return n?`<span>${s} ${n}</span>`:''}).join('');
       return `<article class="project-card disease-card" data-disease="${encodeURIComponent(g)}" role="button" tabindex="0"><div class="project-card-top"><span class="project-kind">${dep}</span><strong>${items.length} 份</strong></div><h3>${labelFor(g)}</h3><p>点击进入查看该疾病/术式的病历记录。</p><div class="project-stage-chips">${chips}</div><div class="project-open">打开项目 <span>→</span></div></article>`;
     }
+    function orthoDiseaseCard(g){
+      const items=listForDept('骨科').filter((t)=>t.group===g);
+      const stageOrder=['入院','术前','术中','术后'];
+      const chips=stageOrder.map((stage)=>{
+        const n=items.filter((t)=>t.stage===stage).length;
+        return n?`<span>${stage}<b>${n}</b></span>`:'';
+      }).join('');
+      return `<article class="ortho-disease-card" data-disease="${encodeURIComponent(g)}" role="button" tabindex="0">
+        <div class="ortho-card-top"><span>模板项目</span><strong>${items.length} 份</strong></div>
+        <h3>${labelFor(g)}</h3>
+        <p>按住院阶段集中查看该疾病 / 术式的全部记录。</p>
+        <div class="ortho-stage-chips">${chips}</div>
+        <div class="ortho-open">进入项目 <span>↗</span></div>
+      </article>`;
+    }
+    function orthoReserveCard(name){
+      return `<article class="ortho-disease-card is-reserve" aria-label="${name}，预留">
+        <div class="ortho-card-top"><span>预留模块</span><strong>待补充</strong></div>
+        <h3>${name}</h3>
+        <p>结构位置已预留，后续可直接加入模板、病例图片、检查理由及康复记录。</p>
+        <div class="ortho-open muted">后续扩展 <span>＋</span></div>
+      </article>`;
+    }
+    function bindDiseaseCards(){
+      document.querySelectorAll('[data-disease]').forEach((c)=>{
+        const go=()=>navigateDisease(decodeURIComponent(c.dataset.disease));
+        c.onclick=go;
+        c.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
+      });
+    }
+    function renderOrthoIndex(){
+      document.body.classList.remove('department-no-sidebar');
+      setBrand();
+      const list=listForDept('骨科');
+      const title=document.getElementById('resultTitle');
+      const num=document.getElementById('resultCount');
+      const grid=document.getElementById('templateGrid');
+      const empty=document.getElementById('emptyState');
+      const jointCount=list.filter((t)=>['TKA','THA','人工股骨头置换'].includes(t.group)).length;
+      const traumaCount=list.filter((t)=>traumaGroups.includes(t.group)).length;
+      const diseaseCount=[...new Set(list.map((t)=>t.group))].length;
+      if(title)title.textContent='骨科模板总览';
+      if(num)num.textContent=`${diseaseCount} 个项目 · ${list.length} 份模板`;
+      if(empty)empty.hidden=true;
+      if(grid){
+        grid.innerHTML=`
+          ${toolbar('骨科 · ${list.length} 份模板',false)}
+          <section class="ortho-hero">
+            <div class="ortho-hero-copy">
+              <div class="ortho-eyebrow">ORTHOPAEDICS · TEMPLATE WORKSPACE</div>
+              <h2>骨科病历模板</h2>
+              <p>按专科方向组织疾病与术式，进入项目后再按入院、术前、术中、术后查看具体记录。现有模板内容保持不变，仅重组浏览结构。</p>
+            </div>
+            <div class="ortho-stats">
+              <div><strong>${list.length}</strong><span>全部模板</span></div>
+              <div><strong>${jointCount}</strong><span>关节置换</span></div>
+              <div><strong>${traumaCount}</strong><span>创伤骨科</span></div>
+              <div><strong>${diseaseCount}</strong><span>现有项目</span></div>
+            </div>
+          </section>
+          <nav class="ortho-jump" aria-label="骨科模板分类">
+            ${orthoSections.map((s)=>`<a href="#ortho-${s.key}"><span>${s.eyebrow}</span>${s.title}</a>`).join('')}
+          </nav>
+          <div class="ortho-sections">
+            ${orthoSections.map((section)=>`
+              <section class="ortho-category" id="ortho-${section.key}">
+                <div class="ortho-category-head">
+                  <div>
+                    <span>${section.eyebrow}</span>
+                    <h3>${section.title}</h3>
+                    <p>${section.desc}</p>
+                  </div>
+                  <strong>${section.items.reduce((sum,g)=>sum+list.filter((t)=>t.group===g).length,0)} 份模板</strong>
+                </div>
+                <div class="ortho-disease-grid">
+                  ${section.items.map(orthoDiseaseCard).join('')}
+                  ${section.reserve.map(orthoReserveCard).join('')}
+                </div>
+              </section>
+            `).join('')}
+          </div>
+          <section class="ortho-future">
+            <div><span>EXPANSION AREA</span><h3>后续扩展区</h3><p>预留病例图片、术后康复路径、检查理由、用药依据、指南链接和新增疾病模块的位置。</p></div>
+            <div class="ortho-future-grid">
+              <div><b>病例与影像</b><span>脱敏案例 / DR / CT / MRI</span></div>
+              <div><b>康复路径</b><span>ROM / 负重 / 阶段目标</span></div>
+              <div><b>检查与会诊</b><span>检查理由 / 会诊单 / 回报</span></div>
+              <div><b>新增模板</b><span>疾病 / 术式 / 记录类型</span></div>
+            </div>
+          </section>`;
+      }
+      const back=document.getElementById('departmentBack');
+      if(back)back.onclick=()=>navigateRoot();
+      bindDiseaseCards();
+      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');
+      if(tc)tc.textContent=list.length;
+      if(ac)ac.textContent=list.length;
+    }
     function toolbar(label,root){
       return `<div class="department-toolbar"><button class="btn ghost" id="departmentBack">← ${root?'返回首页':'返回科室'}</button><span>${label}</span></div>`;
     }
@@ -99,6 +231,7 @@
       const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=templates.length;if(ac)ac.textContent=templates.length;
     }
     function renderDepartmentIndex(){
+      if(currentDept==='骨科'){renderOrthoIndex();return;}
       document.body.classList.toggle('department-no-sidebar',currentDept!=='骨科');setBrand();
       const list=listForDept(currentDept);
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
@@ -120,9 +253,24 @@
       const stages=['入院','术前','术中','术后'];
       const sections=stages.map((stage)=>{
         const items=list.filter((t)=>t.stage===stage);if(!items.length)return '';
-        return `<section class="stage-section"><div class="stage-section-head"><div><span class="stage-dot"></span><h3>${stage}</h3></div><span>${items.length} 份</span></div><div class="stage-template-list">${items.map(templateCard).join('')}</div></section>`;
+        return `<section class="stage-section orthopedic-stage"><div class="stage-section-head"><div><span class="stage-dot"></span><h3>${stage}</h3></div><span>${items.length} 份</span></div><div class="stage-template-list">${items.map(templateCard).join('')}</div></section>`;
       }).join('');
-      if(grid)grid.innerHTML=toolbar(currentDept+' · '+labelFor(state.group),false)+'<div class="source-template-note">模板为脱敏整理/标准化辅助内容，使用前必须结合真实患者情况核对并修改。</div>'+sections;
+      const orthoHeader=currentDept==='骨科'?`
+        <section class="disease-hero">
+          <div>
+            <span>ORTHOPAEDICS · ${labelFor(state.group)}</span>
+            <h2>${labelFor(state.group)}</h2>
+            <p>全部记录已按住院阶段集中排列。模板正文保持原样，可直接预览、复制，并继续通过开发者模式补充案例图片。</p>
+          </div>
+          <strong>${list.length}<small>份模板</small></strong>
+        </section>`:'';
+      const future=currentDept==='骨科'?`
+        <section class="disease-extension">
+          <div><span>预留</span><b>病例与影像</b><p>后续可加入脱敏病例照片、DR、CT、MRI及术前术后对照。</p></div>
+          <div><span>预留</span><b>康复路径</b><p>后续可加入ROM、负重级别、阶段康复目标和随访记录。</p></div>
+          <div><span>预留</span><b>专项记录</b><p>后续可加入检查理由、会诊、沟通、并发症及用药依据。</p></div>
+        </section>`:'';
+      if(grid)grid.innerHTML=toolbar(currentDept+' · '+labelFor(state.group),false)+orthoHeader+'<div class="source-template-note">模板为脱敏整理/标准化辅助内容，使用前必须结合真实患者情况核对并修改。</div>'+sections+future;
       const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateDepartment(currentDept);
       bindTemplateActions();
       const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=list.length;if(ac)ac.textContent=departmentCount(currentDept);
