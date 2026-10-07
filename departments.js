@@ -563,6 +563,22 @@
       bindTemplateActions();
       const copyWhole=document.getElementById('copyWholeRecord');if(copyWhole)copyWhole.onclick=()=>copyText(recordBookText(list));
       const printWhole=document.getElementById('printWholeRecord');if(printWhole)printWhole.onclick=()=>window.print();
+
+      // Disease-book TOC is in-page navigation only. Do not create browser-history entries
+      // for every chapter click; otherwise Back appears to move through prior TOC selections.
+      document.querySelectorAll('.record-book-toc a[href^="#"], .record-back-toc[href^="#"]').forEach((link)=>{
+        link.onclick=(e)=>{
+          e.preventDefault();
+          const raw=link.getAttribute('href')||'';
+          const id=decodeURIComponent(raw.replace(/^#/,''));
+          const target=document.getElementById(id);
+          if(!target)return;
+          target.scrollIntoView({behavior:'smooth',block:'start'});
+          const next=location.pathname+location.search+(id?'#'+encodeURIComponent(id):'');
+          history.replaceState(history.state||{},'',next);
+        };
+      });
+
       document.querySelectorAll('.copy-special-case').forEach((btn)=>{
         btn.onclick=()=>{
           const g=specialBundle.groups.find((x)=>x.key===btn.dataset.specialKey);
