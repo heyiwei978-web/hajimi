@@ -36,7 +36,9 @@
   };
 
   function header(c,short,date,time='09:00'){
-    return `记录名称：${short}\n患者：${c.name}，${c.sex}，${c.age}岁，床号：${c.bed}，住院号：${c.no}\n入院日期：${c.ad}    出院日期：${c.dd}\n记录时间：${date} ${time}\n主诊断：${c.diagnosis}\n\n`;
+    let dates=`入院日期：${c.ad}\n`;
+    if(/出院小结|出院记录/.test(short))dates+=`出院日期：${c.dd}\n`;
+    return `记录名称：${short}\n患者：${c.name}，${c.sex}，${c.age}岁，床号：${c.bed}，住院号：${c.no}\n${dates}记录时间：${date} ${time}\n主诊断：${c.diagnosis}\n\n`;
   }
   function addDays(s,n){const d=new Date(s+'T00:00:00+08:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function commonPast(){return '既往体健，否认高血压、冠心病、糖尿病、慢性肝肾疾病等基础病史；无明确药物、食物过敏史。';}
