@@ -1,6 +1,9 @@
 (function(){
   if(typeof templates==='undefined'||!Array.isArray(templates)||!window.HAJIMI_IDEAL_CASES||!window.HAJIMI_IDEAL_CASES.seeds)return;
   var seeds=window.HAJIMI_IDEAL_CASES.seeds;
+  function isLower(c){
+    return c&&(c.kind==='lower-fracture'||c.kind==='joint-knee'||c.kind==='joint-hip');
+  }
 
   function postopLab(c){
     var map={
