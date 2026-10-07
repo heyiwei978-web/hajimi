@@ -46,4 +46,7 @@
     }
     .portal-hero .portal-subtitle{
       width:100%!important;
-  ¶»§q«^
+    }
+  `;
+  document.head.appendChild(st);
+})();

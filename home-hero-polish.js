@@ -1,5 +1,5 @@
 (function(){
-  var hero=document.querySelector('.portal-hero h1');
+  var hero=document.querySelector('#portalHome .portal-hero h1');
   if(hero){
     hero.innerHTML='<span class="hero-line hero-line-1">临床资料，</span><span class="hero-line hero-line-2">一个入口。</span>';
   }
@@ -44,4 +44,6 @@
       padding:0!important;
       transform-origin:center center!important;
     }
-    .portal���q�^
+  `;
+  document.head.appendChild(st);
+})();

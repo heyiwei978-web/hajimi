@@ -1,17 +1,18 @@
-const fs=require('fs');
-const path=require('path');
-const vm=require('vm');
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
 
-module.exports=(req,res)=>{
+export default function handler(req,res){
   try{
     const root=process.cwd();
     const files=[
       'ideal-cases.js',
       'orthopedic-expansion-a.js','orthopedic-expansion-b.js','orthopedic-expansion-c.js','orthopedic-expansion-d.js','orthopedic-expansion-e.js',
+      'orthopedic-expansion-f.js','orthopedic-expansion-g.js',
       'record-quality-v3.js','record-quality-v4.js','record-quality-v5.js','record-quality-v6.js','record-quality-v7.js','record-quality-v8.js',
       'record-quality-v9.js','record-quality-v10.js','record-quality-v11.js','record-quality-v12.js','record-quality-v13.js','record-quality-v14.js',
       'record-quality-v15.js','record-quality-v16.js','record-quality-v17.js','record-quality-v18.js','record-quality-v19.js','record-quality-v20.js',
-      'record-quality-v21.js','record-quality-v22.js','record-quality-v23.js'
+      'record-quality-v21.js','record-quality-v22.js','record-quality-v24.js','record-quality-v23.js'
     ];
     const traumaGroups=[
       '股骨转子间骨折','股骨大粗隆骨折','股骨干骨折','胫骨干骨折','胫骨平台骨折','踝关节三踝骨折',
@@ -61,4 +62,4 @@ module.exports=(req,res)=>{
   }catch(e){
     res.status(500).json({ok:false,error:String(e&&e.stack||e)});
   }
-};
+}

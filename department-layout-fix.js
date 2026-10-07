@@ -25,4 +25,7 @@
 
     .department-index-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important;margin-top:10px}
     .department-index-card{border:1px solid #e5e7eb;border-radius:16px;background:#fff;min-height:190px;padding:22px;display:flex;flex-direction:column;cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
-    .department-index-card:hover{transform:transl¶»§q«^
+    .department-index-card:hover{transform:translateY(-2px)}
+  `;
+  document.head.appendChild(style);
+})();

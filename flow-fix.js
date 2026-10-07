@@ -42,4 +42,8 @@
     }
     @media(max-width:620px){
       .guide-section .steps li{grid-template-columns:28px minmax(0,1fr)!important;column-gap:10px!important}
-      .guide-section .steps li::before{width:28px!important;m¶»§q«^
+      .guide-section .steps li::before{width:28px!important;min-width:28px!important}
+    }
+  `;
+  document.head.appendChild(st);
+})();
