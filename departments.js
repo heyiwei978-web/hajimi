@@ -30,38 +30,93 @@
       '肾内科':['化疗药物性肾功能损伤'],
       '妇科':['妊娠组织物残留']
     };
+    const orthoSeedMap=(window.HAJIMI_IDEAL_CASES&&window.HAJIMI_IDEAL_CASES.seeds)||{};
+    const byOrthoCategory=(name)=>groups.filter((g)=>orthoSeedMap[g]&&orthoSeedMap[g].category===name);
+    const uniq=(arr)=>[...new Set(arr.filter(Boolean))];
+    const jointGroups=uniq(['TKA','THA','人工股骨头置换',...byOrthoCategory('关节置换')]);
+    const pediatricGroups=uniq(byOrthoCategory('儿童骨科'));
+    const adultTraumaGroups=uniq(traumaGroups.filter((g)=>!pediatricGroups.includes(g)&&(!orthoSeedMap[g]||!orthoSeedMap[g].category||orthoSeedMap[g].category==='创伤骨科')));
+    const sportsGroups=uniq(byOrthoCategory('运动医学'));
+    const handGroups=uniq(byOrthoCategory('手外科'));
+    const spineGroups=uniq(byOrthoCategory('脊柱外科'));
+    const footGroups=uniq(byOrthoCategory('足踝外科'));
+    const boneDiseaseGroups=uniq([
+      ...byOrthoCategory('骨病与保髋'),
+      ...byOrthoCategory('骨感染'),
+      ...byOrthoCategory('骨肿瘤与骨病')
+    ]);
     const orthoSections=[
       {
         key:'joint',
-        title:'关节置换',
+        title:'关节置换 / 翻修',
         eyebrow:'ARTHROPLASTY',
-        desc:'膝、髋关节置换相关记录集中管理，从入院评估到术后康复按阶段进入。',
-        items:['TKA','THA','人工股骨头置换'],
-        reserve:['髋关节翻修','膝关节翻修']
+        desc:'膝、髋初次置换、单髁置换、翻修及假体周围感染病例，均按完整住院时间线管理。',
+        items:jointGroups,
+        reserve:[]
       },
       {
         key:'trauma',
-        title:'创伤骨科',
+        title:'成人创伤骨科',
         eyebrow:'TRAUMA',
-        desc:'常见四肢、骨盆及关节周围骨折模板，适合住院、手术与术后连续记录。',
-        items:[...traumaGroups],
-        reserve:['股骨颈骨折','肱骨外髁骨折']
+        desc:'上肢、下肢、骨盆及关节周围骨折脱位，覆盖常见内固定术式与围手术期记录。',
+        items:adultTraumaGroups,
+        reserve:[]
+      },
+      {
+        key:'pediatric',
+        title:'儿童骨科 / 儿童创伤',
+        eyebrow:'PEDIATRIC ORTHOPAEDICS',
+        desc:'儿童常见骨折按骨骺保护、复位固定和功能恢复特点单独归档。',
+        items:pediatricGroups,
+        reserve:[]
       },
       {
         key:'sports',
         title:'运动医学 / 关节镜',
         eyebrow:'SPORTS MEDICINE',
-        desc:'预留运动医学、韧带、半月板及关节镜相关模板位置，后续可持续补充。',
-        items:[],
-        reserve:['半月板损伤','前交叉韧带损伤','后交叉韧带损伤','腘窝囊肿']
+        desc:'半月板、交叉韧带、髌骨不稳、肩关节镜、踝韧带与肌腱损伤完整病例。',
+        items:sportsGroups,
+        reserve:[]
+      },
+      {
+        key:'hand',
+        title:'手外科 / 周围神经',
+        eyebrow:'HAND & PERIPHERAL NERVE',
+        desc:'肌腱修复、腕管/肘管、腱鞘炎、囊肿及指端软组织修复病例。',
+        items:handGroups,
+        reserve:[]
+      },
+      {
+        key:'foot',
+        title:'足踝外科',
+        eyebrow:'FOOT & ANKLE',
+        desc:'拇外翻、距骨骨软骨损伤、踝关节退变及成人获得性扁平足等择期病例。',
+        items:footGroups,
+        reserve:[]
+      },
+      {
+        key:'spine',
+        title:'脊柱外科',
+        eyebrow:'SPINE',
+        desc:'腰椎间盘、椎管狭窄、滑脱、颈椎脊髓病、后纵韧带骨化及脊柱侧弯。',
+        items:spineGroups,
+        reserve:[]
+      },
+      {
+        key:'bone',
+        title:'骨感染 / 骨肿瘤 / 骨病',
+        eyebrow:'BONE DISEASE & TUMOR',
+        desc:'保髋、骨髓炎、化脓性关节炎、良恶性骨肿瘤及病理性骨折病例。',
+        items:boneDiseaseGroups,
+        reserve:[]
       },
       {
         key:'soft',
-        title:'软组织 / 其他',
-        eyebrow:'SOFT TISSUE & GENERAL',
-        desc:'围手术期通用记录、检查理由、沟通记录及软组织损伤内容统一归档。',
+        title:'通用场景 / 并发症',
+        eyebrow:'GENERAL & COMPLICATIONS',
+        desc:'检查理由、会诊、沟通记录以及术后并发症内容继续作为各病种的扩展章节归档。',
         items:['通用场景'],
-        reserve:['肌腱损伤与修复','股骨头坏死','感染与清创','会诊 / 检查理由']
+        reserve:[]
       }
     ];
     const slugToDept=Object.fromEntries(departments.map((d)=>[d.slug,d.name]));
@@ -177,8 +232,8 @@
       const num=document.getElementById('resultCount');
       const grid=document.getElementById('templateGrid');
       const empty=document.getElementById('emptyState');
-      const jointCount=list.filter((t)=>['TKA','THA','人工股骨头置换'].includes(t.group)).length;
-      const traumaCount=list.filter((t)=>traumaGroups.includes(t.group)).length;
+      const jointCount=list.filter((t)=>jointGroups.includes(t.group)).length;
+      const traumaCount=list.filter((t)=>adultTraumaGroups.includes(t.group)).length;
       const diseaseCount=[...new Set(list.map((t)=>t.group))].length;
       if(title)title.textContent='骨科模板总览';
       if(num)num.textContent=`${diseaseCount} 个项目 · ${list.length} 份模板`;
