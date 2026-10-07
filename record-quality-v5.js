@@ -5,6 +5,14 @@
     return c&&(c.kind==='lower-fracture'||c.kind==='joint-knee'||c.kind==='joint-hip');
   }
 
+  function needsPod1Lab(c){
+    if(!c)return false;
+    if(c.age>=65)return true;
+    if(c.kind==='joint-knee'||c.kind==='joint-hip')return true;
+    if(['股骨转子间骨折','股骨大粗隆骨折','股骨干骨折','胫骨干骨折','胫骨平台骨折','踝关节三踝骨折','跟骨骨折','肱骨近端骨折','肱骨干骨折','尺桡骨干骨折','髌骨骨折','骨盆骨折'].includes(c.group))return true;
+    return Number(c.bloodloss||0)>=50;
+  }
+
   function postopLab(c){
     var map={
       'TKA':{wbc:'9.6',hb:116},
@@ -38,7 +46,7 @@
       :drop>=7
         ?'血红蛋白较术前轻度下降，与围手术期失血相符；患者生命体征稳定、无活动性出血表现，继续观察即可。'
         :'血红蛋白与术前接近，未见有临床意义的术后贫血。';
-    return '复查血常规：WBC '+x.wbc+'×10^9/L，Hb '+x.hb+'g/L，PLT 218×10^9/L；肾功能及电解质正常。白细胞轻度波动与术后应激相符，当前无发热及切口感染征象。'+analysis;
+    return '复查血常规：WBC '+x.wbc+'×10^9/L，Hb '+x.hb+'g/L，PLT 218×10^9/L；肾功能及电解质正常。白细胞处于术后可接受范围，当前无发热及切口感染征象。'+analysis;
   }
 
   function drainPlan(c,day){
@@ -136,6 +144,11 @@
     var c=seeds[t.group];
     if(!c||!t.sourceBody)return;
     var b=String(t.sourceBody);
+    if((t.short==='手术记录'||t.short==='术后首次病程记录')&&!needsPod1Lab(c)){
+      b=b.replace('术后第1天复查血常规和电解质，并根据手术稳定性开始康复；','术后根据临床表现决定是否复查血常规及生化指标，不常规重复检查；根据手术稳定性开始康复；');
+      b=b.replace('术后第1天复查血常规及电解质；','术后根据临床表现决定是否复查血常规及生化指标；');
+    }
+
     var m=String(t.short||'').match(/^术后第(\d+)天病程$/);
     if(m){
       var day=+m[1];
@@ -146,7 +159,11 @@
         return '查体：'+drainPlan(c,day)+' '+(c.side||'左')+'侧患肢末梢血运、感觉及主动运动正常。';
       });
       if(day===1){
-        b=b.replace(/辅助检查：复查血常规[^\n]+/, '辅助检查：'+postopLab(c));
+        if(needsPod1Lab(c)){
+          b=b.replace(/辅助检查：复查血常规[^\n]+/, '辅助检查：'+postopLab(c));
+        }else{
+          b=b.replace(/辅助检查：复查血常规[^\n]+/, '辅助检查：患者生命体征平稳，术中失血少，切口无活动性渗血，暂无常规重复血常规及生化检查指征；如出现发热、进行性渗血、头晕乏力等情况再针对性复查。');
+        }
       }
       b=b.replace(/康复进展：[^\n]+/, '康复进展：'+functionState(c,day));
       if(!isLower(c)){
@@ -155,6 +172,7 @@
       if(c.drain){
         if(day<removalDay(c)){
           b=b.replace(/今日引流量已明显减少，切口无活动性渗血，拔除引流管后局部敷料清洁干燥。/,'引流液逐日减少，当前尚保留引流管，继续观察24小时引流量及切口渗血情况。');
+          b=b.replace(/引流管理：近24小时引流量已明显减少、颜色转淡，切口无活动性渗血，符合拔管条件；(?:今日)?拔?管?后?继续观察局部渗血、血肿及肿胀。/,'引流管理：引流液量较前减少、颜色转淡，但当前继续保留引流管，记录24小时引流量并观察切口渗血、血肿及局部肿胀。');
         }else if(day===removalDay(c)&&!b.includes('今日拔除引流管')){
           b+='\n\n引流管处理：'+drainPlan(c,day);
         }
