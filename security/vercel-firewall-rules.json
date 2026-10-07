@@ -1,0 +1,174 @@
+{
+  "rules": [
+    {
+      "name": "hajimi-login-limit",
+      "active": true,
+      "conditionGroup": [
+        {
+          "conditions": [
+            {
+              "type": "path",
+              "op": "eq",
+              "value": "/api/login"
+            },
+            {
+              "type": "method",
+              "op": "eq",
+              "value": "POST"
+            }
+          ]
+        }
+      ],
+      "action": {
+        "mitigate": {
+          "action": "rate_limit",
+          "rateLimit": {
+            "algo": "fixed_window",
+            "window": 60,
+            "limit": 10,
+            "keys": [
+              "ip"
+            ],
+            "action": "deny"
+          }
+        }
+      }
+    },
+    {
+      "name": "hajimi-upload-limit",
+      "active": true,
+      "conditionGroup": [
+        {
+          "conditions": [
+            {
+              "type": "path",
+              "op": "eq",
+              "value": "/api/upload"
+            },
+            {
+              "type": "method",
+              "op": "eq",
+              "value": "POST"
+            }
+          ]
+        }
+      ],
+      "action": {
+        "mitigate": {
+          "action": "rate_limit",
+          "rateLimit": {
+            "algo": "fixed_window",
+            "window": 60,
+            "limit": 30,
+            "keys": [
+              "ip"
+            ],
+            "action": "deny"
+          }
+        }
+      }
+    },
+    {
+      "name": "hajimi-admin-write-limit",
+      "active": true,
+      "conditionGroup": [
+        {
+          "conditions": [
+            {
+              "type": "path",
+              "op": "eq",
+              "value": "/api/content"
+            },
+            {
+              "type": "method",
+              "op": "eq",
+              "value": "PUT"
+            }
+          ]
+        },
+        {
+          "conditions": [
+            {
+              "type": "path",
+              "op": "eq",
+              "value": "/api/logout"
+            },
+            {
+              "type": "method",
+              "op": "eq",
+              "value": "POST"
+            }
+          ]
+        }
+      ],
+      "action": {
+        "mitigate": {
+          "action": "rate_limit",
+          "rateLimit": {
+            "algo": "fixed_window",
+            "window": 60,
+            "limit": 60,
+            "keys": [
+              "ip"
+            ],
+            "action": "deny"
+          }
+        }
+      }
+    },
+    {
+      "name": "hajimi-audit-limit",
+      "active": true,
+      "conditionGroup": [
+        {
+          "conditions": [
+            {
+              "type": "path",
+              "op": "eq",
+              "value": "/api/ortho-audit-runtime"
+            },
+            {
+              "type": "method",
+              "op": "eq",
+              "value": "GET"
+            }
+          ]
+        }
+      ],
+      "action": {
+        "mitigate": {
+          "action": "rate_limit",
+          "rateLimit": {
+            "algo": "fixed_window",
+            "window": 60,
+            "limit": 3,
+            "keys": [
+              "ip"
+            ],
+            "action": "deny"
+          }
+        }
+      }
+    },
+    {
+      "name": "hajimi-block-scanner-paths",
+      "active": true,
+      "conditionGroup": [
+        {
+          "conditions": [
+            {
+              "type": "path",
+              "op": "re",
+              "value": "^/(?:wp-admin(?:/|$)|wp-login\\.php$|xmlrpc\\.php$|phpmyadmin(?:/|$)|\\.git(?:/|$)|\\.env(?:[./]|$))"
+            }
+          ]
+        }
+      ],
+      "action": {
+        "mitigate": {
+          "action": "deny"
+        }
+      }
+    }
+  ]
+}

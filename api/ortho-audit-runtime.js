@@ -1,8 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
+import {guardRequest} from './_security.js';
 
 export default function handler(req,res){
+  if(!guardRequest(req,res,{methods:['GET'],admin:true}))return;
   try{
     const root=process.cwd();
     const files=[
@@ -60,6 +62,7 @@ export default function handler(req,res){
       runtime
     });
   }catch(e){
-    res.status(500).json({ok:false,error:String(e&&e.stack||e)});
+    console.error('Orthopedic runtime audit failed',e);
+    res.status(500).json({ok:false,error:'审计执行失败'});
   }
 }

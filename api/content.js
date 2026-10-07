@@ -1,1 +1,28 @@
-import {get,put} from '@vercel/blob';import {isAdmin,requirePostHeader} from './_auth.js';const P='cms/content.json';const E=()=>({version:1,templateOverrides:{},cases:[]});async function read(){try{const r=await get(P,{access:'private',useCache:false});if(!r||r.statusCode!==200)return E();const d=JSON.parse(await new Response(r.stream).text());return {version:1,templateOverrides:d.templateOverrides||{},cases:Array.isArray(d.cases)?d.cases:[]}}catch{return E()}}export default async function handler(req,res){res.setHeader('Cache-Control','no-store');if(req.method==='GET')return res.status(200).json(await read());if(req.method!=='PUT')return res.status(405).json({error:'Method not allowed'});if(!isAdmin(req)||!requirePostHeader(req))return res.status(401).json({error:'未登录或会话已失效'});const b=typeof req.body==='string'?JSON.parse(req.body||'{}'):(req.body||{}),c={version:1,templateOverrides:b.templateOverrides&&typeof b.templateOverrides==='object'?b.templateOverrides:{},cases:Array.isArray(b.cases)?b.cases.slice(0,500):[]},t=JSON.stringify(c);if(Buffer.byteLength(t)>1500000)return res.status(413).json({error:'内容数据过大'});await put(P,t,{access:'private',allowOverwrite:true,contentType:'application/json; charset=utf-8'});return res.status(200).json(c)}
+import {get,put} from '@vercel/blob';
+import {guardRequest} from './_security.js';
+
+const P = 'cms/content.json';
+const empty = () => ({version:1,templateOverrides:{},cases:[]});
+async function read() {
+  try {
+    const result = await get(P,{access:'private',useCache:false});
+    if (!result || result.statusCode !== 200) return empty();
+    const data = JSON.parse(await new Response(result.stream).text());
+    return {version:1,templateOverrides:data.templateOverrides || {},cases:Array.isArray(data.cases) ? data.cases : []};
+  } catch { return empty(); }
+}
+
+export default async function handler(req,res) {
+  if (!guardRequest(req,res,{methods:['GET','PUT'],admin:req.method === 'PUT',json:req.method === 'PUT',bodyLimit:1500000})) return;
+  if (req.method === 'GET') return res.status(200).json(await read());
+  const body = req.body;
+  const content = {
+    version:1,
+    templateOverrides:body.templateOverrides && typeof body.templateOverrides === 'object' && !Array.isArray(body.templateOverrides) ? body.templateOverrides : {},
+    cases:Array.isArray(body.cases) ? body.cases.slice(0,500) : []
+  };
+  const text = JSON.stringify(content);
+  if (Buffer.byteLength(text) > 1500000) return res.status(413).json({error:'内容数据过大'});
+  await put(P,text,{access:'private',allowOverwrite:true,contentType:'application/json; charset=utf-8'});
+  return res.status(200).json(content);
+}

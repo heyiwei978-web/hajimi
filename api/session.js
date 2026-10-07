@@ -1,1 +1,1 @@
-import {readSession} from './_auth.js';export default async function handler(req,res){const s=readSession(req);res.setHeader('Cache-Control','no-store');return res.status(200).json({authenticated:!!s,user:s?.u||null})}
+import {readSession} from './_auth.js';import {guardRequest} from './_security.js';export default async function handler(req,res){if(!guardRequest(req,res,{methods:['GET']}))return;const s=readSession(req);return res.status(200).json({authenticated:!!s,user:s?.u||null})}

@@ -1,9 +1,17 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
+import crypto from 'node:crypto';
+import {createSession} from '../api/_auth.js';
 import handler from '../api/ortho-audit-runtime.js';
 
-test('runtime audit covers the orthopedic scripts loaded by the current site', () => {
+test('runtime audit covers the orthopedic scripts loaded by the current site', t => {
+  const previousSecret = process.env.HAJIMI_SESSION_SECRET;
+  process.env.HAJIMI_SESSION_SECRET = crypto.randomBytes(32).toString('hex');
+  t.after(() => {
+    if (previousSecret === undefined) delete process.env.HAJIMI_SESSION_SECRET;
+    else process.env.HAJIMI_SESSION_SECRET = previousSecret;
+  });
   const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const expectedFiles = [...html.matchAll(/<script\s+src="\/([^?"]+)(?:\?[^"]*)?"/g)]
     .map(match => match[1])
@@ -11,11 +19,12 @@ test('runtime audit covers the orthopedic scripts loaded by the current site', (
   let status;
   let result;
   const response = {
+    setHeader() {},
     status(code) { status = code; return this; },
     json(body) { result = body; }
   };
 
-  handler({}, response);
+  handler({method:'GET',headers:{cookie:'hajimi_session='+createSession(process.env.HAJIMI_ADMIN_USER || 'admin')}}, response);
 
   assert.equal(status, 200, result?.error);
   assert.equal(result.ok, true);

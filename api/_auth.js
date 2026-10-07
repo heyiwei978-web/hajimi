@@ -1,4 +1,49 @@
 import crypto from 'node:crypto';
-function pc(req){const s=req.headers.cookie||'';return Object.fromEntries(s.split(';').map(v=>v.trim()).filter(Boolean).map(v=>{const i=v.indexOf('=');return [decodeURIComponent(i<0?v:v.slice(0,i)),decodeURIComponent(i<0?'':v.slice(i+1))]}))}
-function b64(s){return Buffer.from(s).toString('base64url')}function ub(s){return Buffer.from(s,'base64url').toString()}function sg(v){return crypto.createHmac('sha256',process.env.HAJIMI_SESSION_SECRET||'').update(v).digest('base64url')}
-export function createSession(u){const p=b64(JSON.stringify({u,exp:Date.now()+604800000}));return p+'.'+sg(p)}export function readSession(req){try{const t=pc(req).hajimi_session;if(!t)return null;const [p,s]=t.split('.'),a=Buffer.from(sg(p)),b=Buffer.from(s);if(a.length!==b.length||!crypto.timingSafeEqual(a,b))return null;const d=JSON.parse(ub(p));return Date.now()<d.exp?d:null}catch{return null}}export const isAdmin=req=>!!readSession(req);export const sha256=s=>crypto.createHash('sha256').update(String(s||'')).digest('hex');export function safeEqHex(a,b){try{const x=Buffer.from(a,'hex'),y=Buffer.from(b,'hex');return x.length===y.length&&crypto.timingSafeEqual(x,y)}catch{return false}}export const requirePostHeader=req=>req.headers['x-hajimi-admin']==='1';
+
+function cookies(req) {
+  const raw = req.headers.cookie || '';
+  return Object.fromEntries(raw.split(';').map(value => value.trim()).filter(Boolean).map(value => {
+    const index = value.indexOf('=');
+    return [decodeURIComponent(index < 0 ? value : value.slice(0, index)), decodeURIComponent(index < 0 ? '' : value.slice(index + 1))];
+  }));
+}
+
+function sessionSecret() {
+  const secret = process.env.HAJIMI_SESSION_SECRET;
+  return typeof secret === 'string' && secret.trim() ? secret : null;
+}
+
+function sign(value, secret) {
+  return crypto.createHmac('sha256', secret).update(value).digest('base64url');
+}
+
+export function createSession(user) {
+  const secret = sessionSecret();
+  if (!secret) throw new Error('Session signing is not configured');
+  const payload = Buffer.from(JSON.stringify({u: user, exp: Date.now() + 604800000})).toString('base64url');
+  return payload + '.' + sign(payload, secret);
+}
+
+export function readSession(req) {
+  const secret = sessionSecret();
+  if (!secret) return null;
+  try {
+    const token = cookies(req).hajimi_session;
+    if (!token) return null;
+    const parts = token.split('.');
+    if (parts.length !== 2 || !/^[A-Za-z0-9_-]+$/.test(parts[0]) || !/^[A-Za-z0-9_-]{43}$/.test(parts[1])) return null;
+    const [payload, signature] = parts;
+    if (!crypto.timingSafeEqual(Buffer.from(sign(payload, secret)), Buffer.from(signature))) return null;
+    const data = JSON.parse(Buffer.from(payload, 'base64url').toString());
+    if (data.u !== (process.env.HAJIMI_ADMIN_USER || 'admin') || !Number.isFinite(data.exp) || Date.now() >= data.exp) return null;
+    return data;
+  } catch { return null; }
+}
+
+export const isAdmin = req => !!readSession(req);
+export const sha256 = value => crypto.createHash('sha256').update(String(value || '')).digest('hex');
+export function safeEqHex(a, b) {
+  if (!/^[a-f0-9]{64}$/i.test(a) || !/^[a-f0-9]{64}$/i.test(b)) return false;
+  return crypto.timingSafeEqual(Buffer.from(a, 'hex'), Buffer.from(b, 'hex'));
+}
+export const requirePostHeader = req => req.headers['x-hajimi-admin'] === '1';

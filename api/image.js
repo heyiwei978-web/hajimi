@@ -1,1 +1,19 @@
-import {get} from '@vercel/blob';export default async function handler(req,res){const p=String(req.query.path||'');if(!p.startsWith('cases/')||p.includes('..'))return res.status(400).end();try{const r=await get(p,{access:'private',useCache:true});if(!r||r.statusCode!==200)return res.status(404).end();const ab=await new Response(r.stream).arrayBuffer();res.setHeader('Content-Type',r.blob.contentType||'image/jpeg');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Cache-Control','public,max-age=3600');return res.status(200).end(Buffer.from(ab))}catch{return res.status(404).end()}}
+import {get} from '@vercel/blob';
+import {guardRequest} from './_security.js';
+
+export default async function handler(req,res) {
+  if (!guardRequest(req,res,{methods:['GET']})) return;
+  const pathname = req.query.path;
+  if (typeof pathname !== 'string' || !/^cases\/[A-Za-z0-9_/-]+\.(?:jpe?g|png|webp)$/.test(pathname) || pathname.includes('..')) return res.status(400).end();
+  try {
+    const result = await get(pathname,{access:'private',useCache:true});
+    if (!result || result.statusCode !== 200) return res.status(404).end();
+    const contentType = result.blob.contentType;
+    if (!/^image\/(jpeg|png|webp)$/.test(contentType)) return res.status(404).end();
+    const buffer = await new Response(result.stream).arrayBuffer();
+    res.setHeader('Content-Type',contentType);
+    res.setHeader('X-Content-Type-Options','nosniff');
+    res.setHeader('Cache-Control','public,max-age=3600');
+    return res.status(200).end(Buffer.from(buffer));
+  } catch { return res.status(404).end(); }
+}
