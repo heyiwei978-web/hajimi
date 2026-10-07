@@ -1,7 +1,7 @@
 (function(){
   if(typeof templates==='undefined'||!window.HAJIMI_IDEAL_CASES||!window.HAJIMI_IDEAL_CASES.seeds)return;
   var seeds=window.HAJIMI_IDEAL_CASES.seeds;
-  function addDays(s,n){var d=new Date(s+'T00:00:00+08:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function addDays(s,n){var p=String(s).split('-').map(Number);var d=new Date(Date.UTC(p[0],p[1]-1,p[2]+n));return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');}
   function ad(c){return '2026-09-'+String((+String(c.no).slice(-2)%18)+1).padStart(2,'0');}
   function sd(c){return addDays(ad(c),c.kind&&c.kind.indexOf('joint')===0?2:(c.kind==='upper-fracture'?2:3));}
   function dd(c){return addDays(ad(c),c.stay||6);}
