@@ -138,6 +138,7 @@
     try{const s=await fetch('/api/session',{credentials:'same-origin'}).then((r)=>r.json());CMS.auth=!!s.authenticated;CMS.user=s.user||null;}catch{}
     try{const c=await fetch('/api/content',{credentials:'same-origin',cache:'no-store'}).then((r)=>r.json());CMS.data={templateOverrides:c.templateOverrides||{},cases:c.cases||[]};}catch{}
     syncAuthUI();patchTemplates();
+    window.dispatchEvent(new CustomEvent('hajimi:cms-ready'));
   }
   init();
 })();
