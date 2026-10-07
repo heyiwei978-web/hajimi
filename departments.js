@@ -361,18 +361,23 @@
       if(num)num.textContent='1 套完整病历 · '+list.length+' 个现有章节';
       if(empty)empty.hidden=list.length>0;
 
-      const toc=list.map((t,i)=>`<a href="#${recordBookId(t,i)}"><span>${String(i+1).padStart(2,'0')}</span><b>${t.short||t.name}</b><small>${t.stage}</small></a>`).join('');
-      const chapters=list.map(recordChapter).join('');
-      const hasDischarge=list.some((t)=>/出院小结|出院记录|出院病历/.test((t.short||'')+' '+(t.name||'')));
+      const isDischarge=(t)=>/出院小结|出院记录|出院病历/.test((t.short||'')+' '+(t.name||''));
+      const beforeDischarge=list.filter((t)=>!isDischarge(t));
+      const dischargeItems=list.filter(isDischarge);
+      const tocBefore=beforeDischarge.map((t)=>{const i=list.indexOf(t);return `<a href="#${recordBookId(t,i)}"><span>${String(i+1).padStart(2,'0')}</span><b>${t.short||t.name}</b><small>${t.stage}</small></a>`;}).join('');
+      const tocDischarge=dischargeItems.map((t)=>{const i=list.indexOf(t);return `<a href="#${recordBookId(t,i)}"><span>${String(i+1).padStart(2,'0')}</span><b>${t.short||t.name}</b><small>${t.stage}</small></a>`;}).join('');
+      const chaptersBefore=beforeDischarge.map((t)=>recordChapter(t,list.indexOf(t))).join('');
+      const chaptersDischarge=dischargeItems.map((t)=>recordChapter(t,list.indexOf(t))).join('');
+      const hasDischarge=dischargeItems.length>0;
       const complicationId='record-complications-reserved';
       const dischargeReserve=!hasDischarge?`
         <article class="record-book-section record-book-reserved" id="record-discharge-reserved">
           <header class="record-book-section-head"><div class="record-chapter-no">＋</div><div class="record-chapter-title"><span>出院 · 预留</span><h3>出院小结 / 出院记录</h3></div></header>
           <div class="record-reserve-copy">本病种后续补充出院小结、出院医嘱、功能状态及随访计划时，统一放在这里，保持整套病历连续。</div>
           <a class="record-back-toc" href="#recordBookToc">↑ 回到目录</a>
-        </article>`:'';      
-      const reserveToc=`<a class="is-reserved" href="#${complicationId}"><span>＋</span><b>术后并发症 / 特殊情况</b><small>预留</small></a>`+
-        (!hasDischarge?`<a class="is-reserved" href="#record-discharge-reserved"><span>＋</span><b>出院小结 / 出院记录</b><small>预留</small></a>`:'');
+        </article>`:'';
+      const reserveToc=`<a class="is-reserved" href="#${complicationId}"><span>＋</span><b>术后并发症 / 特殊情况</b><small>预留</small></a>`;
+      const toc=tocBefore+reserveToc+(hasDischarge?tocDischarge:`<a class="is-reserved" href="#record-discharge-reserved"><span>＋</span><b>出院小结 / 出院记录</b><small>预留</small></a>`);
 
       const hero=`
         <section class="disease-hero record-book-hero">
@@ -393,14 +398,14 @@
             <nav>${toc}${reserveToc}</nav>
           </aside>
           <div class="record-book-content">
-            ${chapters}
+            ${chaptersBefore}
             <article class="record-book-section record-book-reserved complication-reserve" id="${complicationId}">
               <header class="record-book-section-head"><div class="record-chapter-no">＋</div><div class="record-chapter-title"><span>术后 · 固定预留</span><h3>术后并发症 / 特殊情况</h3></div></header>
               <div class="record-reserve-copy"><strong>该章节永久保留在本病种内。</strong><br>以后发生切口渗液/愈合不良、感染、下肢静脉血栓、贫血、发热、神经血管异常、再手术、特殊会诊或其他术后问题时，相关病程记录继续添加到本疾病页面，不再单独拆成新的病种模板。</div>
               <div class="record-reserve-slots"><span>并发症首次记录</span><span>检查与结果分析</span><span>处理措施及依据</span><span>复查 / 转归</span></div>
               <a class="record-back-toc" href="#recordBookToc">↑ 回到目录</a>
             </article>
-            ${dischargeReserve}
+            ${hasDischarge?chaptersDischarge:dischargeReserve}
           </div>
         </div>`;
 
