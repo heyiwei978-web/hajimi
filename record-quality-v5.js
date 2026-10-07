@@ -5,6 +5,13 @@
     return c&&(c.kind==='lower-fracture'||c.kind==='joint-knee'||c.kind==='joint-hip');
   }
 
+  function vteMode(c){
+    if(!c)return 'routine';
+    if(['TKA','THA','人工股骨头置换','股骨转子间骨折','股骨干骨折','胫骨干骨折','胫骨平台骨折','骨盆骨折'].includes(c.group))return 'high';
+    if(['踝关节三踝骨折','跟骨骨折','髌骨骨折','跖骨骨折','趾骨骨折'].includes(c.group))return 'risk-based';
+    return 'routine';
+  }
+
   function needsPod1Lab(c){
     if(!c)return false;
     if(c.age>=65)return true;
@@ -144,6 +151,27 @@
     var c=seeds[t.group];
     if(!c||!t.sourceBody)return;
     var b=String(t.sourceBody);
+    if(vteMode(c)==='risk-based'){
+      b=b.replace(
+        'VTE风险：下肢/骨盆手术、术后活动受限，围手术期VTE风险较高；目前无活动性出血，凝血及肾功能无明显异常，术后在止血稳定后实施药物联合早期活动/机械预防。',
+        'VTE风险：本例存在下肢手术及阶段性活动受限，但无既往VTE、恶性肿瘤等额外高危因素；围手术期进行动态风险评估，以踝泵、早期安全活动为基础，是否加用药物预防根据风险评分、出血风险及院内路径决定。'
+      );
+      b=b.replace(
+        '术后第1天在确认无活动性出血后开始静脉血栓预防；',
+        '术后持续评估VTE及出血风险，以踝泵和早期安全活动为基础，达到药物预防指征时按院内路径启用；'
+      );
+      b=b.replace(
+        '术后第1天开始规范静脉血栓预防；',
+        '术后持续评估VTE及出血风险，以踝泵和早期安全活动为基础，达到药物预防指征时按院内路径启用；'
+      );
+      b=b.replace(
+        /静脉血栓预防：下肢\/骨盆手术且术后活动受限，VTE风险较高；确认无活动性出血且肾功能正常后按院内方案继续药物预防，并配合踝泵、早期离床(?:及机械预防|；如存在药物预防暂时禁忌或按院内路径需要时采用机械预防)。每日复评切口出血、血红蛋白及下肢症状后调整方案。/,
+        '静脉血栓预防：本例按下肢手术患者进行动态VTE风险评估，当前以踝泵、允许范围内早期活动为基础；是否使用药物预防根据风险评分、出血风险及院内路径决定，并每日根据切口、活动度及新增危险因素复评。'
+      );
+    }else{
+      b=b.replace('并配合踝泵、早期离床及机械预防。','并配合踝泵及早期离床；按院内路径及患者耐受选择机械预防。');
+    }
+
     if((t.short==='手术记录'||t.short==='术后首次病程记录')&&!needsPod1Lab(c)){
       b=b.replace('术后第1天复查血常规和电解质，并根据手术稳定性开始康复；','术后根据临床表现决定是否复查血常规及生化指标，不常规重复检查；根据手术稳定性开始康复；');
       b=b.replace('术后第1天复查血常规及电解质；','术后根据临床表现决定是否复查血常规及生化指标；');
@@ -217,9 +245,9 @@
     var c=seeds[t.group];
     if(!c||!t.sourceBody)return;
     var b=String(t.sourceBody);
-    if(/^术后第1天病程$/.test(t.short)){
+    if(/^术后第1天病程$/.test(t.short)&&needsPod1Lab(c)){
       var hb=(b.match(/Hb (\d+)g\/L/)||[])[1];
-      if(!hb)issues.push(t.group+'：术后第1天缺血红蛋白');
+      if(!hb)issues.push(t.group+'：术后第1天应复查但缺血红蛋白');
     }
     if(c.drain&&t.short==='术后第1天病程'&&!/引流约\d+ml/.test(b))issues.push(t.group+'：术后第1天缺引流量');
     if(/手指\/足趾/.test(b))issues.push(t.group+' / '+t.short+'：存在泛化肢体表述');
