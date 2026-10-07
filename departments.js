@@ -310,10 +310,13 @@
       if(/选择治疗方案|沟通记录/.test(s))return 45;
       if(/术前主刀查房/.test(s))return 50;
       if(/术前讨论|多学科术前讨论/.test(s))return 60;
+      if(/手术知情同意/.test(s))return 64;
+      if(/麻醉术前访视/.test(s))return 66;
       if(/术前小结/.test(s))return 70;
       if(/会诊申请/.test(s))return 72;
       if(/会诊回报|会诊记录/.test(s))return 73;
       if(/完整手术记录|手术记录/.test(s))return 80;
+      if(/手术安全核查/.test(s))return 85;
       if(/术后主刀查房/.test(s))return 95;
       if(day){
         const map={'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10};
@@ -323,6 +326,7 @@
       if(/康复评估|康复记录|训练记录/.test(s))return 250;
       if(/影像复查|检查理由|复查申请/.test(s))return 260;
       if(/并发症|切口渗液|切口愈合不良|感染|血栓|发热|贫血|神经损伤|再手术/.test(s))return 400;
+      if(/出院前主治医师查房/.test(s))return 450;
       if(/出院小结|出院记录|出院病历/.test(s))return 500;
       if(t.stage==='入院')return 25;
       if(t.stage==='术前')return 65;
@@ -407,7 +411,7 @@
         `<div class="record-book-layout">
           <aside class="record-book-toc" id="recordBookToc">
             <div class="record-book-toc-head"><span>CONTENTS</span><h3>病历目录</h3><p>按病历时间顺序排列</p></div>
-            <nav>${toc}${reserveToc}</nav>
+            <nav>${toc}</nav>
           </aside>
           <div class="record-book-content">
             ${chaptersBefore}
