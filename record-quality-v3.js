@@ -58,7 +58,7 @@
   }
   function h(c,r,d,t){
     var x='记录名称：'+r+'\n患者：'+c.name+'，'+c.sex+'，'+c.age+'岁，床号：'+c.bed+'，住院号：'+c.no+'\n科别：骨科\n入院日期：'+ad(c)+'\n';
-    if((r.indexOf('手术记录')>=0||r.indexOf('术后')>=0||r.indexOf('康复')>=0||r.indexOf('影像复查')>=0||r.indexOf('出院小结')>=0)&&r.indexOf('术前')<0)x+='手术日期：'+sd(c)+'\n';
+    if((r.indexOf('手术记录')>=0||r.indexOf('手术安全核查')>=0||r.indexOf('手术清点')>=0||r==='麻醉记录'||r.indexOf('术后')>=0||r.indexOf('康复')>=0||r.indexOf('影像复查')>=0||r.indexOf('出院小结')>=0)&&r.indexOf('术前')<0)x+='手术日期：'+sd(c)+'\n';
     if(r.indexOf('出院小结')>=0)x+='出院日期：'+dd(c)+'\n';
     return x+'记录时间：'+d+' '+t+'\n主诊断：'+c.diagnosis+'\n\n';
   }
