@@ -302,18 +302,19 @@
       const s=((t.short||'')+' '+(t.name||'')+' '+(t.type||'')).replace(/\s+/g,'');
       const day=s.match(/术后第([0-9一二三四五六七八九十]+)天/);
       if(/入院记录/.test(s)&&!/首次病程/.test(s))return 10;
-      if(/入院首次病程|首次病程/.test(s))return 20;
+      if(/术后首次病程/.test(s))return 90;
+      if(/首次病程/.test(s))return 20;
       if(/主治医师首次查房|主治首次查房/.test(s))return 30;
       if(/主任医师首次查房|主任首次查房/.test(s))return 40;
-      if(/入院期间查房/.test(s))return 45;
+      if(/入院期间查房/.test(s))return 42;
+      if(/选择治疗方案|沟通记录/.test(s))return 45;
       if(/术前主刀查房/.test(s))return 50;
       if(/术前讨论|多学科术前讨论/.test(s))return 60;
       if(/术前小结/.test(s))return 70;
       if(/会诊申请/.test(s))return 72;
       if(/会诊回报|会诊记录/.test(s))return 73;
-      if(/选择治疗方案|沟通记录/.test(s))return 74;
       if(/完整手术记录|手术记录/.test(s))return 80;
-      if(/术后首次病程/.test(s))return 90;
+      if(/术后主刀查房/.test(s))return 95;
       if(day){
         const map={'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10};
         const raw=day[1];const n=/^\d+$/.test(raw)?+raw:(map[raw]||11);
@@ -328,6 +329,12 @@
       if(t.stage==='术中')return 85;
       if(t.stage==='术后')return 200;
       return 300;
+    }
+    function recordTimestamp(t){
+      const body=String(typeof generate==='function'?generate(t):(t.sourceBody||''));
+      const m=body.match(/记录时间[:：]\s*(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{2})/);
+      if(!m)return NaN;
+      return Date.UTC(+m[1],+m[2]-1,+m[3],+m[4]-8,+m[5]);
     }
     function recordBookId(t,i){
       return 'record-'+i+'-'+String(t.short||t.name||'section').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]+/g,'-').slice(0,40);
@@ -355,7 +362,12 @@
       document.body.classList.add('department-no-sidebar','disease-book-page');
       setBrand();
       const raw=(coreFiltered?coreFiltered():templates).filter((t)=>t.department===currentDept&&t.group===state.group);
-      const list=[...raw].sort((a,b)=>recordPriority(a)-recordPriority(b)||templates.indexOf(a)-templates.indexOf(b));
+      const list=[...raw].sort((a,b)=>{
+        const ta=recordTimestamp(a),tb=recordTimestamp(b);
+        if(Number.isFinite(ta)&&Number.isFinite(tb)&&ta!==tb)return ta-tb;
+        if(Number.isFinite(ta)!==Number.isFinite(tb))return Number.isFinite(ta)?-1:1;
+        return recordPriority(a)-recordPriority(b)||templates.indexOf(a)-templates.indexOf(b);
+      });
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
       if(title)title.textContent=currentDept+' · '+labelFor(state.group);
       if(num)num.textContent='1 套完整病历 · '+list.length+' 个现有章节';
