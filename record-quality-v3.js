@@ -3,7 +3,15 @@
   var seeds=window.HAJIMI_IDEAL_CASES.seeds;
   function addDays(s,n){var p=String(s).split('-').map(Number);var d=new Date(Date.UTC(p[0],p[1]-1,p[2]+n));return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');}
   function ad(c){return '2026-09-'+String((+String(c.no).slice(-2)%18)+1).padStart(2,'0');}
-  function surgeryOffset(c){return c.kind&&c.kind.indexOf('joint')===0?2:(c.kind==='upper-fracture'?2:3);}
+  function surgeryOffset(c){
+    var stay=c.stay||6,base=3;
+    if(c.category==='骨感染')base=1;
+    else if(c.category==='手外科'||c.category==='运动医学'||c.category==='足踝外科'||c.category==='骨肿瘤与骨病'||c.category==='骨病与保髋')base=1;
+    else if(c.category==='脊柱外科'||c.category==='儿童骨科'||c.category==='关节置换')base=2;
+    else if(c.kind&&c.kind.indexOf('joint')===0)base=2;
+    else if(c.kind==='upper-fracture')base=2;
+    return Math.max(1,Math.min(base,Math.max(1,stay-1)));
+  }
   function sd(c){return addDays(ad(c),surgeryOffset(c));}
   function dd(c){return addDays(ad(c),c.stay||6);}
   function postopDays(c){return Math.max(1,(c.stay||6)-surgeryOffset(c));}
