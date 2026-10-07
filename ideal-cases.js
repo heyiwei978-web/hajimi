@@ -31,10 +31,7 @@
     '骨盆骨折':{name:'彭某某',sex:'男',age:45,side:'左',bed:'22',no:'26090122',diagnosis:'骨盆骨折',chief:'高处坠落后骨盆疼痛伴翻身及行走困难6小时。',history:'患者6小时前自约2米高处坠落，臀部着地后出现骨盆及左腹股沟区疼痛，翻身及站立困难。急诊生命体征平稳，腹部查体无明显异常，影像提示骨盆环不稳定损伤，收入院治疗。',image:'骨盆X线及CT三维重建示左侧骶髂关节前方压缩并左耻骨上下支骨折，骨盆环轻度旋转不稳定，符合LC-1型不稳定损伤。',surgery:'骨盆骨折闭合复位经皮内固定术',anesthesia:'全身麻醉',position:'仰卧位',procedure:'透视引导下闭合复位骨盆环，恢复骶髂关节及前环关系。经皮置入骶髂螺钉固定后环，并于前环置入经皮螺钉固定耻骨支。多体位透视确认螺钉位置安全、骨盆环对位满意。',bloodloss:50,drain:false,stay:8,kind:'lower-fracture',rehab:'术后进行踝泵、下肢等长收缩及床上翻身转移训练；助行器保护下患侧部分负重，逐步增加站立及步行时间。'}
   };
 
-  function addDays(dateStr,n){
-    const d=new Date(dateStr+'T00:00:00+08:00'); d.setDate(d.getDate()+n);
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  }
+  function addDays(s,n){var p=String(s).split('-').map(Number);var d=new Date(Date.UTC(p[0],p[1]-1,p[2]+n));return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');}
   function normalLabs(c){
     const hb=c.sex==='男'?142:128;
     return `血常规：WBC 6.7×10^9/L，Hb ${hb}g/L，PLT 228×10^9/L；肝肾功能、电解质、凝血功能均未见明显异常；空腹血糖5.1mmol/L。心电图示窦性心律。胸部影像未见影响手术的急性异常。`;
