@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f5f7">
+<title>网站管理 · 哈基米工作站</title>
+<link rel="stylesheet" href="/styles.css?v=20261007-library4">
+<link rel="stylesheet" href="/cms.css?v=20261006-g1">
+<link rel="stylesheet" href="/admin.css?v=20261007-a1">
+</head>
+<body class="admin-page">
+<header class="global-nav official-nav">
+  <div class="global-nav-inner official-nav-inner">
+    <a class="global-brand official-brand" href="/">
+      <span class="official-brand-mark" aria-hidden="true">H</span>
+      <span class="official-brand-text"><strong>哈基米工作站</strong><small>hajimi Clinical Workspace</small></span>
+    </a>
+    <nav class="global-links official-links" aria-label="主导航">
+      <a href="/">首页</a>
+      <a href="/bl">病历模板</a>
+      <a href="/tools">临床工具</a>
+      <a class="active" href="/admin">管理入口</a>
+    </nav>
+  </div>
+</header>
+
+<main class="admin-main">
+  <section class="admin-hero">
+    <div>
+      <p class="admin-kicker">HAJIMI ADMIN CONSOLE</p>
+      <h1>网站管理入口</h1>
+      <p>以后从这里进入现有网站的管理模式，不再新建网站。登录后可直接进入模板管理、案例资料管理和源码管理。</p>
+    </div>
+    <div class="admin-status" id="adminStatus">
+      <span class="status-dot"></span>
+      <strong>正在检查登录状态…</strong>
+      <small>管理权限仅用于本站内容维护</small>
+    </div>
+  </section>
+
+  <section id="loginPanel" class="admin-login-card" hidden>
+    <div class="admin-card-head">
+      <div><span>管理员验证</span><h2>进入开发者模式</h2></div>
+    </div>
+    <form id="adminLoginForm" class="admin-login-form">
+      <label>用户名<input name="username" autocomplete="username" value="admin"></label>
+      <label>密码<input name="password" type="password" autocomplete="current-password" required></label>
+      <p id="adminLoginError" class="admin-error" hidden></p>
+      <button class="admin-primary" type="submit">登录管理后台</button>
+    </form>
+  </section>
+
+  <section id="dashboardPanel" hidden>
+    <div class="admin-overview">
+      <div><span>模板自定义修改</span><strong id="overrideCount">0</strong><small>已保存覆盖内容</small></div>
+      <div><span>案例资料</span><strong id="caseCount">0</strong><small>已保存案例</small></div>
+      <div><span>当前模式</span><strong class="admin-mode-text">开发者</strong><small>登录状态有效</small></div>
+    </div>
+
+    <div class="admin-grid">
+      <a class="admin-tool-card primary" href="/bl">
+        <span class="admin-card-icon">▤</span>
+        <div><small>最常用</small><h2>病历模板管理</h2><p>进入模板库，打开任一模板预览后可直接“编辑正文”，也可添加案例和图片。</p></div>
+        <b>进入管理 →</b>
+      </a>
+
+      <a class="admin-tool-card" href="/tools">
+        <span class="admin-card-icon">⌘</span>
+        <div><small>临床工具</small><h2>工具页面检查</h2><p>查看现有临床工具页面和手机端显示效果；结构性修改继续基于同一正式项目更新。</p></div>
+        <b>打开页面 →</b>
+      </a>
+
+      <a class="admin-tool-card" href="https://github.com/heyiwei978-web/hajimi" target="_blank" rel="noopener">
+        <span class="admin-card-icon">‹/›</span>
+        <div><small>高级维护</small><h2>源码管理</h2><p>打开现有私有 GitHub 项目。Vercel 继续从 main 分支自动部署到正式域名。</p></div>
+        <b>打开 GitHub →</b>
+      </a>
+
+      <a class="admin-tool-card" href="/">
+        <span class="admin-card-icon">H</span>
+        <div><small>正式站点</small><h2>返回网站首页</h2><p>检查修改后的首页、病历模板、科室页面及临床工具是否正常。</p></div>
+        <b>返回首页 →</b>
+      </a>
+    </div>
+
+    <section class="admin-guide">
+      <div class="admin-card-head"><div><span>固定维护流程</span><h2>以后都从这一套站点修改</h2></div><button id="adminLogout" type="button" class="admin-secondary">退出登录</button></div>
+      <ol>
+        <li><strong>普通模板内容：</strong>进入“病历模板管理” → 打开模板 → 点击“编辑正文”保存。</li>
+        <li><strong>病例图片/案例：</strong>模板预览中点击“添加案例/图片”，上传前先完成脱敏。</li>
+        <li><strong>新增疾病、术式、页面布局或功能：</strong>继续修改同一个 <code>heyiwei978-web/hajimi</code> 项目，不再创建新网站。</li>
+        <li><strong>正式发布：</strong>提交到 <code>main</code> 后由 Vercel 自动部署，正式地址保持不变。</li>
+      </ol>
+    </section>
+  </section>
+</main>
+
+<div id="adminToast" class="portal-toast"></div>
+<script src="/admin.js?v=20261007-a1"></script>
+</body>
+</html>
