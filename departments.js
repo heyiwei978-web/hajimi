@@ -137,15 +137,19 @@
     }
     function orthoDiseaseCard(g){
       const items=listForDept('骨科').filter((t)=>t.group===g);
+      const standardItems=items.filter((t)=>!t.specialCase);
+      const specialCases=[...new Set(items.filter((t)=>t.specialCase).map((t)=>t.specialCaseKey).filter(Boolean))];
       const stageOrder=['入院','术前','术中','术后'];
       const chips=stageOrder.map((stage)=>{
-        const n=items.filter((t)=>t.stage===stage).length;
+        const n=standardItems.filter((t)=>t.stage===stage).length;
         return n?`<span>${stage}<b>${n}</b></span>`:'';
       }).join('');
+      const meta=specialCases.length?`1 套标准 · ${specialCases.length} 个特殊病例`:`1 套 · ${standardItems.length} 章节`;
+      const copy=specialCases.length?'标准病历与术后特殊病例分开归档，特殊病例按各自真实时间线连续阅读。':'全部记录整合到同一病种页面，按病历顺序连续阅读并通过目录快速跳转。';
       return `<article class="ortho-disease-card" data-disease="${encodeURIComponent(g)}" role="button" tabindex="0">
-        <div class="ortho-card-top"><span>完整病历</span><strong>1 套 · ${items.length} 章节</strong></div>
+        <div class="ortho-card-top"><span>完整病历</span><strong>${meta}</strong></div>
         <h3>${labelFor(g)}</h3>
-        <p>全部记录整合到同一病种页面，按病历顺序连续阅读并通过目录快速跳转。</p>
+        <p>${copy}</p>
         <div class="ortho-stage-chips">${chips}</div>
         <div class="ortho-open">打开完整病历 <span>↗</span></div>
       </article>`;
@@ -365,21 +369,91 @@
         <a class="record-back-toc" href="#recordBookToc">↑ 回到目录</a>
       </article>`;
     }
-    function renderDisease(){
-      document.body.classList.remove('library-root-page');
-      document.body.classList.add('department-no-sidebar','disease-book-page');
-      setBrand();
-      const raw=(coreFiltered?coreFiltered():templates).filter((t)=>t.department===currentDept&&t.group===state.group);
-      const list=[...raw].sort((a,b)=>{
+    function sortRecordList(raw){
+      return [...raw].sort((a,b)=>{
+        if(Number.isFinite(a.recordOrder)||Number.isFinite(b.recordOrder)){
+          const ao=Number.isFinite(a.recordOrder)?a.recordOrder:9999;
+          const bo=Number.isFinite(b.recordOrder)?b.recordOrder:9999;
+          if(ao!==bo)return ao-bo;
+        }
         const ta=recordTimestamp(a),tb=recordTimestamp(b);
         if(Number.isFinite(ta)&&Number.isFinite(tb)&&ta!==tb)return ta-tb;
         if(Number.isFinite(ta)!==Number.isFinite(tb))return Number.isFinite(ta)?-1:1;
         return recordPriority(a)-recordPriority(b)||templates.indexOf(a)-templates.indexOf(b);
       });
+    }
+    function specialRecordId(t,i,key){
+      return 'special-'+String(key||'case').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]+/g,'-').slice(0,42)+'-'+i+'-'+String(t.short||t.name||'section').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]+/g,'-').slice(0,32);
+    }
+    function specialRecordChapter(t,i,key){
+      const id=specialRecordId(t,i,key),idx=templates.indexOf(t);
+      return `<article class="record-book-section special-record-section" id="${id}" data-record-index="${idx}">
+        <header class="record-book-section-head">
+          <div class="record-chapter-no">${String(i+1).padStart(2,'0')}</div>
+          <div class="record-chapter-title"><span>${t.stage} · ${t.type}</span><h3>${t.short||t.name}</h3></div>
+          <div class="record-chapter-actions">
+            <button class="btn ghost preview" data-index="${idx}" type="button">查看 / 编辑</button>
+            <button class="btn primary copy" data-index="${idx}" type="button">复制本章节</button>
+          </div>
+        </header>
+        <div class="record-book-body">${escapeHtml(String(generate(t)))}</div>
+        <a class="record-back-toc" href="#special-cases-top">↑ 回到特殊病例</a>
+      </article>`;
+    }
+    function buildSpecialCaseBooks(specialRaw){
+      const byKey=new Map();
+      specialRaw.forEach((t)=>{
+        const key=t.specialCaseKey||t.specialCaseTitle||'special';
+        if(!byKey.has(key))byKey.set(key,[]);
+        byKey.get(key).push(t);
+      });
+      const groups=[...byKey.entries()].map(([key,items])=>({
+        key,
+        title:items[0]?.specialCaseTitle||'特殊病例',
+        summary:items[0]?.specialCaseSummary||'',
+        order:items[0]?.specialCaseOrder||999,
+        records:sortRecordList(items)
+      })).sort((a,b)=>a.order-b.order);
+      if(!groups.length)return {html:'',groups:[]};
+      const html=`<section class="special-case-library" id="special-cases-top">
+        <div class="special-case-library-head">
+          <span>SPECIAL CASES · TKA</span>
+          <h3>膝关节置换 · 特殊病例</h3>
+          <p>特殊病例不与标准理想病例混排，按每个患者自身的住院时间线归档。重点保留并发症判断、再手术决策、处理依据与转归。</p>
+          <strong>${groups.length} 个病例 · ${specialRaw.length} 个章节</strong>
+        </div>
+        ${groups.map((g,caseIndex)=>`<details class="special-case-book" ${caseIndex===0?'open':''}>
+          <summary class="special-case-summary">
+            <div><span>CASE ${String(caseIndex+1).padStart(2,'0')}</span><h4>${escapeHtml(g.title)}</h4><p>${escapeHtml(g.summary)}</p></div>
+            <div class="special-case-summary-meta"><strong>${g.records.length}</strong><small>个连续章节</small></div>
+          </summary>
+          <div class="special-case-actions"><button class="btn primary copy-special-case" data-special-key="${escapeHtml(g.key)}" type="button">复制该特殊病例整套记录</button></div>
+          <div class="special-case-layout">
+            <aside class="special-case-toc">
+              <div><span>CASE CONTENTS</span><b>本病例目录</b></div>
+              <nav>${g.records.map((t,i)=>`<a href="#${specialRecordId(t,i,g.key)}"><span>${String(i+1).padStart(2,'0')}</span><b>${escapeHtml(t.short||t.name)}</b><small>${t.stage}</small></a>`).join('')}</nav>
+            </aside>
+            <div class="special-case-records">${g.records.map((t,i)=>specialRecordChapter(t,i,g.key)).join('')}</div>
+          </div>
+        </details>`).join('')}
+      </section>`;
+      return {html,groups};
+    }
+    function renderDisease(){
+      document.body.classList.remove('library-root-page');
+      document.body.classList.add('department-no-sidebar','disease-book-page');
+      setBrand();
+      const raw=(coreFiltered?coreFiltered():templates).filter((t)=>t.department===currentDept&&t.group===state.group);
+      const specialRaw=raw.filter((t)=>t.specialCase);
+      const standardRaw=raw.filter((t)=>!t.specialCase);
+      const list=sortRecordList(standardRaw);
+      const specialBundle=buildSpecialCaseBooks(specialRaw);
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
       if(title)title.textContent=currentDept+' · '+labelFor(state.group);
-      if(num)num.textContent='1 套完整病历 · '+list.length+' 个现有章节';
-      if(empty)empty.hidden=list.length>0;
+      if(num)num.textContent=specialBundle.groups.length
+        ?'1 套标准病历 · '+list.length+' 个章节 · '+specialBundle.groups.length+' 个特殊病例'
+        :'1 套完整病历 · '+list.length+' 个现有章节';
+      if(empty)empty.hidden=(list.length+specialRaw.length)>0;
 
       const isDischarge=(t)=>/出院小结|出院记录|出院病历/.test((t.short||'')+' '+(t.name||''));
       const beforeDischarge=list.filter((t)=>!isDischarge(t));
@@ -407,7 +481,7 @@
             <p>一个疾病只保留一个连续病历页面。顺序参照住院病历书写流程，目录可直接跳转到首次病程、查房、术前讨论、手术记录和术后各日病程。</p>
             <div class="record-book-hero-actions"><button id="copyWholeRecord" class="btn primary" type="button">复制完整病历</button><button id="printWholeRecord" class="btn ghost" type="button">打印整套病历</button></div>
           </div>
-          <strong>1<small>套完整病历 · ${list.length} 个现有章节</small></strong>
+          <strong>1<small>套标准病历 · ${list.length} 个现有章节${specialBundle.groups.length?' · '+specialBundle.groups.length+'个特殊病例':''}</small></strong>
         </section>`;
 
       if(grid)grid.innerHTML=toolbar(currentDept+' · '+labelFor(state.group),false)+hero+
@@ -427,13 +501,20 @@
             </article>
             ${hasDischarge?chaptersDischarge:dischargeReserve}
           </div>
-        </div>`;
+        </div>
+        ${specialBundle.html}`;
 
       const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateDepartment(currentDept);
       bindTemplateActions();
       const copyWhole=document.getElementById('copyWholeRecord');if(copyWhole)copyWhole.onclick=()=>copyText(recordBookText(list));
       const printWhole=document.getElementById('printWholeRecord');if(printWhole)printWhole.onclick=()=>window.print();
-      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent='1 套';if(ac)ac.textContent=departmentCount(currentDept);
+      document.querySelectorAll('.copy-special-case').forEach((btn)=>{
+        btn.onclick=()=>{
+          const g=specialBundle.groups.find((x)=>x.key===btn.dataset.specialKey);
+          if(g)copyText(recordBookText(g.records));
+        };
+      });
+      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=specialBundle.groups.length?'1 套 + '+specialBundle.groups.length+' 特殊':'1 套';if(ac)ac.textContent=departmentCount(currentDept);
     }
     function navigateRoot(){history.pushState({},'', '/bl');applyRoute();}
     function navigateDepartment(dep){history.pushState({},'', '/bl/'+deptToSlug[dep]);applyRoute();}
