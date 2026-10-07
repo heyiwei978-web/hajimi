@@ -81,6 +81,7 @@
       return {page:'library',department:dep,disease};
     }
     function setShell(page){
+      if(page==='home'||page==='duty')document.body.classList.remove('disease-book-page');
       const home=document.getElementById('portalHome'),duty=document.getElementById('dutyPage'),lib=document.getElementById('libraryShell');
       home.hidden=page!=='home';duty.hidden=page!=='duty';lib.hidden=!(page==='departments'||page==='library');
       document.body.classList.toggle('portal-mode',page==='home'||page==='duty');
@@ -132,7 +133,7 @@
     function diseaseCard(dep,g){
       const items=listForDept(dep).filter((t)=>t.group===g);
       const chips=['入院','术前','术中','术后'].map((s)=>{const n=items.filter((t)=>t.stage===s).length;return n?`<span>${s} ${n}</span>`:''}).join('');
-      return `<article class="project-card disease-card" data-disease="${encodeURIComponent(g)}" role="button" tabindex="0"><div class="project-card-top"><span class="project-kind">${dep}</span><strong>${items.length} 份</strong></div><h3>${labelFor(g)}</h3><p>点击进入查看该疾病/术式的病历记录。</p><div class="project-stage-chips">${chips}</div><div class="project-open">打开项目 <span>→</span></div></article>`;
+      return `<article class="project-card disease-card" data-disease="${encodeURIComponent(g)}" role="button" tabindex="0"><div class="project-card-top"><span class="project-kind">${dep}</span><strong>1 套完整病历</strong></div><h3>${labelFor(g)}</h3><p>一个病种一个连续病历页面，目录可直达术前讨论、手术记录及术后各日病程。</p><div class="project-stage-chips">${chips}</div><div class="project-open">打开完整病历 <span>→</span></div></article>`;
     }
     function orthoDiseaseCard(g){
       const items=listForDept('骨科').filter((t)=>t.group===g);
@@ -142,11 +143,11 @@
         return n?`<span>${stage}<b>${n}</b></span>`:'';
       }).join('');
       return `<article class="ortho-disease-card" data-disease="${encodeURIComponent(g)}" role="button" tabindex="0">
-        <div class="ortho-card-top"><span>模板项目</span><strong>${items.length} 份</strong></div>
+        <div class="ortho-card-top"><span>完整病历</span><strong>1 套 · ${items.length} 章节</strong></div>
         <h3>${labelFor(g)}</h3>
-        <p>按住院阶段集中查看该疾病 / 术式的全部记录。</p>
+        <p>全部记录整合到同一病种页面，按病历顺序连续阅读并通过目录快速跳转。</p>
         <div class="ortho-stage-chips">${chips}</div>
-        <div class="ortho-open">进入项目 <span>↗</span></div>
+        <div class="ortho-open">打开完整病历 <span>↗</span></div>
       </article>`;
     }
     function orthoReserveCard(name){
@@ -165,7 +166,7 @@
       });
     }
     function renderOrthoIndex(){
-      document.body.classList.remove('department-no-sidebar','library-root-page');
+      document.body.classList.remove('department-no-sidebar','library-root-page','disease-book-page');
       setBrand();
       const list=listForDept('骨科');
       const title=document.getElementById('resultTitle');
@@ -236,6 +237,7 @@
       return `<div class="department-toolbar"><button class="btn ghost" id="departmentBack">← ${root?'返回首页':'返回科室'}</button><span>${label}</span></div>`;
     }
     function renderDepartmentRoot(){
+      document.body.classList.remove('disease-book-page');
       currentDept=null;resetState();setBrand();
       document.body.classList.add('department-no-sidebar','library-root-page');
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
@@ -281,7 +283,7 @@
       if(ac)ac.textContent=templates.length;
     }
     function renderDepartmentIndex(){
-      document.body.classList.remove('library-root-page');
+      document.body.classList.remove('library-root-page','disease-book-page');
       if(currentDept==='骨科'){renderOrthoIndex();return;}
       document.body.classList.toggle('department-no-sidebar',currentDept!=='骨科');setBrand();
       const list=listForDept(currentDept);
@@ -296,36 +298,117 @@
       });
       const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=list.length;if(ac)ac.textContent=list.length;
     }
+    function recordPriority(t){
+      const s=((t.short||'')+' '+(t.name||'')+' '+(t.type||'')).replace(/\s+/g,'');
+      const day=s.match(/术后第([0-9一二三四五六七八九十]+)天/);
+      if(/入院记录/.test(s)&&!/首次病程/.test(s))return 10;
+      if(/入院首次病程|首次病程/.test(s))return 20;
+      if(/主治医师首次查房|主治首次查房/.test(s))return 30;
+      if(/主任医师首次查房|主任首次查房/.test(s))return 40;
+      if(/入院期间查房/.test(s))return 45;
+      if(/术前主刀查房/.test(s))return 50;
+      if(/术前讨论|多学科术前讨论/.test(s))return 60;
+      if(/术前小结/.test(s))return 70;
+      if(/会诊申请/.test(s))return 72;
+      if(/会诊回报|会诊记录/.test(s))return 73;
+      if(/选择治疗方案|沟通记录/.test(s))return 74;
+      if(/完整手术记录|手术记录/.test(s))return 80;
+      if(/术后首次病程/.test(s))return 90;
+      if(day){
+        const map={'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10};
+        const raw=day[1];const n=/^\d+$/.test(raw)?+raw:(map[raw]||11);
+        return 100+n;
+      }
+      if(/康复评估|康复记录|训练记录/.test(s))return 250;
+      if(/影像复查|检查理由|复查申请/.test(s))return 260;
+      if(/并发症|切口渗液|切口愈合不良|感染|血栓|发热|贫血|神经损伤|再手术/.test(s))return 400;
+      if(/出院小结|出院记录|出院病历/.test(s))return 500;
+      if(t.stage==='入院')return 25;
+      if(t.stage==='术前')return 65;
+      if(t.stage==='术中')return 85;
+      if(t.stage==='术后')return 200;
+      return 300;
+    }
+    function recordBookId(t,i){
+      return 'record-'+i+'-'+String(t.short||t.name||'section').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]+/g,'-').slice(0,40);
+    }
+    function recordBookText(list){
+      return list.map((t,i)=>`第${String(i+1).padStart(2,'0')}章  ${t.short||t.name}\n${generate(t)}`).join('\n\n========================================\n\n');
+    }
+    function recordChapter(t,i){
+      const id=recordBookId(t,i),idx=templates.indexOf(t);
+      return `<article class="record-book-section" id="${id}" data-record-index="${idx}">
+        <header class="record-book-section-head">
+          <div class="record-chapter-no">${String(i+1).padStart(2,'0')}</div>
+          <div class="record-chapter-title"><span>${t.stage} · ${t.type}</span><h3>${t.short||t.name}</h3></div>
+          <div class="record-chapter-actions">
+            <button class="btn ghost preview" data-index="${idx}" type="button">查看 / 编辑</button>
+            <button class="btn primary copy" data-index="${idx}" type="button">复制本章节</button>
+          </div>
+        </header>
+        <div class="record-book-body">${escapeHtml(String(generate(t)))}</div>
+        <a class="record-back-toc" href="#recordBookToc">↑ 回到目录</a>
+      </article>`;
+    }
     function renderDisease(){
       document.body.classList.remove('library-root-page');
-      document.body.classList.toggle('department-no-sidebar',currentDept!=='骨科');setBrand();
-      const list=(coreFiltered?coreFiltered():templates).filter((t)=>t.department===currentDept&&t.group===state.group);
+      document.body.classList.add('department-no-sidebar','disease-book-page');
+      setBrand();
+      const raw=(coreFiltered?coreFiltered():templates).filter((t)=>t.department===currentDept&&t.group===state.group);
+      const list=[...raw].sort((a,b)=>recordPriority(a)-recordPriority(b)||templates.indexOf(a)-templates.indexOf(b));
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
-      if(title)title.textContent=currentDept+' · '+labelFor(state.group);if(num)num.textContent=list.length+' 份';if(empty)empty.hidden=list.length>0;
-      const stages=['入院','术前','术中','术后'];
-      const sections=stages.map((stage)=>{
-        const items=list.filter((t)=>t.stage===stage);if(!items.length)return '';
-        return `<section class="stage-section orthopedic-stage"><div class="stage-section-head"><div><span class="stage-dot"></span><h3>${stage}</h3></div><span>${items.length} 份</span></div><div class="stage-template-list">${items.map(templateCard).join('')}</div></section>`;
-      }).join('');
-      const orthoHeader=currentDept==='骨科'?`
-        <section class="disease-hero">
+      if(title)title.textContent=currentDept+' · '+labelFor(state.group);
+      if(num)num.textContent='1 套完整病历 · '+list.length+' 个现有章节';
+      if(empty)empty.hidden=list.length>0;
+
+      const toc=list.map((t,i)=>`<a href="#${recordBookId(t,i)}"><span>${String(i+1).padStart(2,'0')}</span><b>${t.short||t.name}</b><small>${t.stage}</small></a>`).join('');
+      const chapters=list.map(recordChapter).join('');
+      const hasDischarge=list.some((t)=>/出院小结|出院记录|出院病历/.test((t.short||'')+' '+(t.name||'')));
+      const complicationId='record-complications-reserved';
+      const dischargeReserve=!hasDischarge?`
+        <article class="record-book-section record-book-reserved" id="record-discharge-reserved">
+          <header class="record-book-section-head"><div class="record-chapter-no">＋</div><div class="record-chapter-title"><span>出院 · 预留</span><h3>出院小结 / 出院记录</h3></div></header>
+          <div class="record-reserve-copy">本病种后续补充出院小结、出院医嘱、功能状态及随访计划时，统一放在这里，保持整套病历连续。</div>
+          <a class="record-back-toc" href="#recordBookToc">↑ 回到目录</a>
+        </article>`:'';      
+      const reserveToc=`<a class="is-reserved" href="#${complicationId}"><span>＋</span><b>术后并发症 / 特殊情况</b><small>预留</small></a>`+
+        (!hasDischarge?`<a class="is-reserved" href="#record-discharge-reserved"><span>＋</span><b>出院小结 / 出院记录</b><small>预留</small></a>`:'');
+
+      const hero=`
+        <section class="disease-hero record-book-hero">
           <div>
-            <span>ORTHOPAEDICS · ${labelFor(state.group)}</span>
-            <h2>${labelFor(state.group)}</h2>
-            <p>全部记录已按住院阶段集中排列。模板正文保持原样，可直接预览、复制，并继续通过开发者模式补充案例图片。</p>
+            <span>${currentDept==='骨科'?'ORTHOPAEDICS':'CLINICAL RECORD'} · COMPLETE MEDICAL RECORD</span>
+            <h2>${labelFor(state.group)} · 完整病历</h2>
+            <p>一个疾病只保留一个连续病历页面。顺序参照住院病历书写流程，目录可直接跳转到首次病程、查房、术前讨论、手术记录和术后各日病程。</p>
+            <div class="record-book-hero-actions"><button id="copyWholeRecord" class="btn primary" type="button">复制完整病历</button><button id="printWholeRecord" class="btn ghost" type="button">打印整套病历</button></div>
           </div>
-          <strong>${list.length}<small>份模板</small></strong>
-        </section>`:'';
-      const future=currentDept==='骨科'?`
-        <section class="disease-extension">
-          <div><span>预留</span><b>病例与影像</b><p>后续可加入脱敏病例照片、DR、CT、MRI及术前术后对照。</p></div>
-          <div><span>预留</span><b>康复路径</b><p>后续可加入ROM、负重级别、阶段康复目标和随访记录。</p></div>
-          <div><span>预留</span><b>专项记录</b><p>后续可加入检查理由、会诊、沟通、并发症及用药依据。</p></div>
-        </section>`:'';
-      if(grid)grid.innerHTML=toolbar(currentDept+' · '+labelFor(state.group),false)+orthoHeader+'<div class="source-template-note">模板为脱敏整理/标准化辅助内容，使用前必须结合真实患者情况核对并修改。</div>'+sections+future;
+          <strong>1<small>套完整病历 · ${list.length} 个现有章节</small></strong>
+        </section>`;
+
+      if(grid)grid.innerHTML=toolbar(currentDept+' · '+labelFor(state.group),false)+hero+
+        '<div class="source-template-note">模板为脱敏整理/标准化辅助内容，必须结合真实患者病史、查体、检查结果和实际诊疗经过修改。</div>'+
+        `<div class="record-book-layout">
+          <aside class="record-book-toc" id="recordBookToc">
+            <div class="record-book-toc-head"><span>CONTENTS</span><h3>病历目录</h3><p>按病历时间顺序排列</p></div>
+            <nav>${toc}${reserveToc}</nav>
+          </aside>
+          <div class="record-book-content">
+            ${chapters}
+            <article class="record-book-section record-book-reserved complication-reserve" id="${complicationId}">
+              <header class="record-book-section-head"><div class="record-chapter-no">＋</div><div class="record-chapter-title"><span>术后 · 固定预留</span><h3>术后并发症 / 特殊情况</h3></div></header>
+              <div class="record-reserve-copy"><strong>该章节永久保留在本病种内。</strong><br>以后发生切口渗液/愈合不良、感染、下肢静脉血栓、贫血、发热、神经血管异常、再手术、特殊会诊或其他术后问题时，相关病程记录继续添加到本疾病页面，不再单独拆成新的病种模板。</div>
+              <div class="record-reserve-slots"><span>并发症首次记录</span><span>检查与结果分析</span><span>处理措施及依据</span><span>复查 / 转归</span></div>
+              <a class="record-back-toc" href="#recordBookToc">↑ 回到目录</a>
+            </article>
+            ${dischargeReserve}
+          </div>
+        </div>`;
+
       const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateDepartment(currentDept);
       bindTemplateActions();
-      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=list.length;if(ac)ac.textContent=departmentCount(currentDept);
+      const copyWhole=document.getElementById('copyWholeRecord');if(copyWhole)copyWhole.onclick=()=>copyText(recordBookText(list));
+      const printWhole=document.getElementById('printWholeRecord');if(printWhole)printWhole.onclick=()=>window.print();
+      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent='1 套';if(ac)ac.textContent=departmentCount(currentDept);
     }
     function navigateRoot(){history.pushState({},'', '/bl');applyRoute();}
     function navigateDepartment(dep){history.pushState({},'', '/bl/'+deptToSlug[dep]);applyRoute();}
@@ -365,6 +448,7 @@
       sidebar.addEventListener('click',(e)=>{if(e.target.closest('.nav-item')&&innerWidth<=900)close();});
     }
     window.addEventListener('popstate',applyRoute);
+    window.addEventListener('hajimi:cms-ready',()=>{const r=pathState();if(r.page==='library'&&r.disease&&currentDept)renderDisease();});
     window.hajimiNavigateDepartment=navigateDepartment;
     window.hajimiNavigateRoot=navigateRoot;
     applyRoute();
