@@ -311,12 +311,16 @@
       if(/术前主刀查房/.test(s))return 50;
       if(/术前讨论|多学科术前讨论/.test(s))return 60;
       if(/手术知情同意/.test(s))return 64;
+      if(/麻醉知情同意/.test(s))return 65;
       if(/麻醉术前访视/.test(s))return 66;
       if(/术前小结/.test(s))return 70;
       if(/会诊申请/.test(s))return 72;
       if(/会诊回报|会诊记录/.test(s))return 73;
-      if(/完整手术记录|手术记录/.test(s))return 80;
-      if(/手术安全核查/.test(s))return 85;
+      if(/手术安全核查/.test(s))return 80;
+      if(/手术清点/.test(s))return 82;
+      if(/^麻醉记录|麻醉记录/.test(s))return 84;
+      if(/完整手术记录|手术记录/.test(s))return 86;
+      if(/麻醉术后访视/.test(s))return 92;
       if(/术后主刀查房/.test(s))return 95;
       if(day){
         const map={'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10};
