@@ -136,10 +136,10 @@
 
 <div id="libraryShell" hidden>
 <header class="topbar library-topbar">
-<div class="brandline"><button id="menuBtn" class="menu-btn" type="button" aria-label="菜单">☰</button><a class="site-home-mark" href="/" aria-label="返回网站首页" title="网站首页"><span class="brand-mark library-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M3.8 10.8 12 4l8.2 6.8v8.1a1.6 1.6 0 0 1-1.6 1.6h-4.4v-6h-4.4v6H5.4a1.6 1.6 0 0 1-1.6-1.6z"/></svg></span></a><a class="brand library-brand" href="/bl"><span class="library-brand-copy"><em>哈基米工作站</em><strong>病历模板</strong><small>Clinical Template Library</small></span></a></div>
+<div class="brandline"><button id="menuBtn" class="menu-btn" type="button" aria-label="打开菜单" aria-controls="sidebar" aria-expanded="false">☰</button><a class="site-home-mark" href="/" aria-label="返回网站首页" title="网站首页"><span class="brand-mark library-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M3.8 10.8 12 4l8.2 6.8v8.1a1.6 1.6 0 0 1-1.6 1.6h-4.4v-6h-4.4v6H5.4a1.6 1.6 0 0 1-1.6-1.6z"/></svg></span></a><a class="brand library-brand" href="/bl"><span class="library-brand-copy"><em>哈基米工作站</em><strong>病历模板</strong><small>Clinical Template Library</small></span></a></div>
 <div class="top-actions library-top-actions"><a class="text-action" href="/">首页</a><a class="text-action library-active-link" href="/bl">病历模板</a><a class="text-action" href="/pathway">临床路径</a><a class="text-action" href="/tools">临床工具</a><a class="text-action" href="/admin">管理入口</a><button id="patientBtn" class="text-action patient-action" type="button">患者信息</button><span data-auth-slot></span></div>
 </header>
-<div id="drawerMask" class="drawer-mask"></div>
+<div id="drawerMask" class="drawer-mask" aria-hidden="true"></div>
 <div class="page">
 <aside id="sidebar" class="sidebar">
 <div class="side-head">骨科疾病 / 术式</div>
@@ -180,39 +180,39 @@
 </dialog>
 
 <div id="toast" class="toast"></div><div id="portalToast" class="portal-toast"></div>
-<script src="/app.js?v=20261007-cases2"></script>
-<script src="/ideal-cases.js?v=20261007-complete4"></script>
-<script src="/orthopedic-expansion-a.js?v=20261007-expA"></script>
-<script src="/orthopedic-expansion-b.js?v=20261007-expB"></script>
-<script src="/orthopedic-expansion-c.js?v=20261007-expC"></script>
-<script src="/orthopedic-expansion-d.js?v=20261007-expD"></script>
-<script src="/orthopedic-expansion-e.js?v=20261007-expE"></script>
-<script src="/orthopedic-expansion-f.js?v=20261007-expF"></script>
-<script src="/orthopedic-expansion-g.js?v=20261007-expG"></script>
-<script src="/record-quality-v3.js?v=20261007-q3j"></script>
-<script src="/record-quality-v4.js?v=20261007-q4b"></script>
-<script src="/record-quality-v5.js?v=20261007-q5c"></script>
-<script src="/record-quality-v6.js?v=20261007-q6c"></script>
-<script src="/record-quality-v7.js?v=20261007-q7b"></script>
-<script src="/record-quality-v8.js?v=20261007-q8"></script>
-<script src="/record-quality-v9.js?v=20261007-q9"></script>
-<script src="/record-quality-v10.js?v=20261007-q10b"></script>
-<script src="/record-quality-v11.js?v=20261007-q11"></script>
-<script src="/record-quality-v12.js?v=20261007-q12"></script>
-<script src="/record-quality-v13.js?v=20261007-q13"></script>
-<script src="/record-quality-v14.js?v=20261007-q14"></script>
-<script src="/record-quality-v15.js?v=20261007-q15"></script>
-<script src="/record-quality-v16.js?v=20261007-q16"></script>
-<script src="/record-quality-v17.js?v=20261007-q17"></script>
-<script src="/record-quality-v18.js?v=20261007-q18"></script>
-<script src="/record-quality-v19.js?v=20261007-q19"></script>
-<script src="/record-quality-v20.js?v=20261007-q20"></script>
-<script src="/record-quality-v21.js?v=20261007-q21"></script>
-<script src="/record-quality-v22.js?v=20261007-q22b"></script>
-<script src="/record-quality-v24.js?v=20261007-q24"></script>
-<script src="/record-quality-v23.js?v=20261007-q23b"></script>
-<script src="/departments.js?v=20261008-mobile-nav2"></script>
-<script src="/ideal-other-cases.js?v=20261007-complete3"></script>
-<script src="/tka-special-cases.js?v=20261007-special5"></script>
-<script src="/cms-core.js?v=20261007-book1"></script>
+<script defer src="/app.js?v=20261007-cases2"></script>
+<script defer src="/ideal-cases.js?v=20261007-complete4"></script>
+<script defer src="/orthopedic-expansion-a.js?v=20261007-expA"></script>
+<script defer src="/orthopedic-expansion-b.js?v=20261007-expB"></script>
+<script defer src="/orthopedic-expansion-c.js?v=20261007-expC"></script>
+<script defer src="/orthopedic-expansion-d.js?v=20261007-expD"></script>
+<script defer src="/orthopedic-expansion-e.js?v=20261007-expE"></script>
+<script defer src="/orthopedic-expansion-f.js?v=20261007-expF"></script>
+<script defer src="/orthopedic-expansion-g.js?v=20261007-expG"></script>
+<script defer src="/record-quality-v3.js?v=20261007-q3j"></script>
+<script defer src="/record-quality-v4.js?v=20261007-q4b"></script>
+<script defer src="/record-quality-v5.js?v=20261007-q5c"></script>
+<script defer src="/record-quality-v6.js?v=20261007-q6c"></script>
+<script defer src="/record-quality-v7.js?v=20261007-q7b"></script>
+<script defer src="/record-quality-v8.js?v=20261007-q8"></script>
+<script defer src="/record-quality-v9.js?v=20261007-q9"></script>
+<script defer src="/record-quality-v10.js?v=20261007-q10b"></script>
+<script defer src="/record-quality-v11.js?v=20261007-q11"></script>
+<script defer src="/record-quality-v12.js?v=20261007-q12"></script>
+<script defer src="/record-quality-v13.js?v=20261007-q13"></script>
+<script defer src="/record-quality-v14.js?v=20261007-q14"></script>
+<script defer src="/record-quality-v15.js?v=20261007-q15"></script>
+<script defer src="/record-quality-v16.js?v=20261007-q16"></script>
+<script defer src="/record-quality-v17.js?v=20261007-q17"></script>
+<script defer src="/record-quality-v18.js?v=20261007-q18"></script>
+<script defer src="/record-quality-v19.js?v=20261007-q19"></script>
+<script defer src="/record-quality-v20.js?v=20261007-q20"></script>
+<script defer src="/record-quality-v21.js?v=20261007-q21"></script>
+<script defer src="/record-quality-v22.js?v=20261007-q22b"></script>
+<script defer src="/record-quality-v24.js?v=20261007-q24"></script>
+<script defer src="/record-quality-v23.js?v=20261007-q23b"></script>
+<script defer src="/departments.js?v=20261008-mobile-nav2"></script>
+<script defer src="/ideal-other-cases.js?v=20261007-complete3"></script>
+<script defer src="/tka-special-cases.js?v=20261007-special5"></script>
+<script defer src="/cms-core.js?v=20261007-book1"></script>
 </body></html>
