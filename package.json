@@ -2,5 +2,8 @@
   "type": "module",
   "dependencies": {
     "@vercel/blob": "latest"
+  },
+  "scripts": {
+    "test": "node --test"
   }
 }
