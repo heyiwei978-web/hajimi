@@ -1381,84 +1381,60 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   .special-case-records{padding:0 10px 12px}
 }
 
-
-/* 2026-10-08: mobile drawer fix for disease book pages
-   Disease pages intentionally hide the desktop sidebar via department-no-sidebar.
-   On mobile the hamburger must be allowed to reveal that same sidebar above the mask. */
+/* 2026-10-08: canonical mobile library drawer */
 @media(max-width:900px){
-  body.disease-book-page.department-no-sidebar #libraryShell .sidebar{
+  /* Reuse the desktop sidebar as an off-canvas drawer on phones. */
+  body.department-no-sidebar #libraryShell .sidebar,
+  #libraryShell .sidebar{
     display:block!important;
-    position:fixed;
-    left:0;
-    top:60px;
-    bottom:0;
-    width:min(84vw,320px);
-    height:auto;
-    z-index:120;
-    transform:translateX(-104%);
-    transition:transform .22s ease;
-    box-shadow:14px 0 36px rgba(15,23,42,.16);
-    background:#fff;
-    overflow-y:auto;
+    position:fixed!important;
+    left:0!important;
+    top:60px!important;
+    bottom:0!important;
+    width:min(84vw,320px)!important;
+    max-width:320px!important;
+    height:calc(100dvh - 60px)!important;
+    max-height:calc(100dvh - 60px)!important;
+    padding:18px 12px 28px!important;
+    overflow-y:auto!important;
     overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;
+    background:#fff!important;
+    border-right:1px solid #e5e9ef!important;
+    box-shadow:18px 0 42px rgba(15,23,42,.16)!important;
+    z-index:1100!important;
+    transform:translate3d(-105%,0,0)!important;
+    transition:transform .22s ease!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
   }
-  body.disease-book-page.department-no-sidebar #libraryShell .sidebar.open{
-    transform:translateX(0);
-  }
-  body.disease-book-page #drawerMask{
-    position:fixed;
-    inset:60px 0 0;
-    z-index:110;
-    background:rgba(15,23,42,.34);
-    backdrop-filter:blur(1px);
-    -webkit-backdrop-filter:blur(1px);
-  }
-  body.disease-book-page #drawerMask.show{
-    display:block;
-  }
-}
 
+  body.department-no-sidebar #libraryShell .sidebar.open,
+  #libraryShell .sidebar.open{
+    transform:translate3d(0,0,0)!important;
+  }
 
-/* 2026-10-08 mobile library drawer fix
-   Disease/department pages hide the desktop sidebar, but on phones the same
-   element is reused as the hamburger drawer. The open state must override the
-   desktop-only "department-no-sidebar" hide rule. */
-@media(max-width:900px){
-  #libraryShell .sidebar{
-    top:60px;
-    bottom:0;
-    width:min(84vw,320px);
-    height:calc(100dvh - 60px);
-    max-height:calc(100dvh - 60px);
-    padding:18px 12px 28px;
-    overflow-y:auto;
-    overscroll-behavior:contain;
-    background:#fff;
-    border-right:1px solid #e5e9ef;
-    box-shadow:18px 0 42px rgba(15,23,42,.16);
-    z-index:220;
-    transform:translate3d(-105%,0,0);
-    transition:transform .22s ease;
+  #libraryShell .drawer-mask{
+    display:block!important;
+    position:fixed!important;
+    inset:60px 0 0!important;
+    z-index:1090!important;
+    background:rgba(15,23,42,.34)!important;
+    opacity:0;
     visibility:hidden;
     pointer-events:none;
-  }
-  #libraryShell .sidebar.open,
-  .department-no-sidebar #libraryShell .sidebar.open,
-  .department-no-sidebar .sidebar.open{
-    display:block!important;
-    transform:translate3d(0,0,0);
-    visibility:visible;
-    pointer-events:auto;
-  }
-  #libraryShell .drawer-mask{
-    inset:60px 0 0;
-    z-index:210;
-    background:rgba(15,23,42,.34);
+    transition:opacity .2s ease,visibility .2s ease;
     backdrop-filter:blur(1.5px);
     -webkit-backdrop-filter:blur(1.5px);
   }
-  #libraryShell .drawer-mask.show{display:block}
+  #libraryShell .drawer-mask.show{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+  }
+
+  body.drawer-open{overflow:hidden}
+
   #libraryShell .side-head{
     position:sticky;
     top:-18px;
@@ -1473,6 +1449,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   }
   #libraryShell .nav-label{
     padding:18px 10px 7px;
+    color:#9aa3af;
     font-size:10px;
     font-weight:600;
     letter-spacing:.06em;
@@ -1484,80 +1461,20 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
     font-size:14px;
     line-height:1.4;
   }
+
   #libraryShell .menu-btn{
     position:relative;
-    z-index:230;
-    width:38px;
-    height:38px;
-    display:grid;
-    place-items:center;
-    padding:0;
-    margin-right:4px;
-    border-radius:10px;
-    font-size:24px;
-    line-height:1;
-    color:#111827;
-  }
-  #libraryShell .menu-btn:active{background:#f0f3f7}
-}
-
-
-/* 2026-10-08: mobile library drawer — override desktop no-sidebar state */
-@media(max-width:900px){
-  body.department-no-sidebar #libraryShell .sidebar,
-  .department-no-sidebar #libraryShell .sidebar,
-  .department-no-sidebar .sidebar{
-    display:block!important;
-    position:fixed!important;
-    left:0!important;
-    top:60px!important;
-    bottom:0!important;
-    width:min(84vw,320px)!important;
-    height:auto!important;
-    max-width:320px!important;
-    z-index:1100!important;
-    overflow-y:auto!important;
-    overscroll-behavior:contain;
-    transform:translate3d(-105%,0,0)!important;
-    transition:transform .22s ease!important;
-    box-shadow:16px 0 42px rgba(15,23,42,.16)!important;
-    background:#fff!important;
-    -webkit-overflow-scrolling:touch;
-  }
-  body.department-no-sidebar #libraryShell .sidebar.open,
-  .department-no-sidebar #libraryShell .sidebar.open,
-  .department-no-sidebar .sidebar.open,
-  #libraryShell .sidebar.open{
-    transform:translate3d(0,0,0)!important;
-  }
-  #libraryShell .drawer-mask{
-    display:block;
-    position:fixed;
-    inset:60px 0 0;
-    z-index:1090;
-    background:rgba(15,23,42,.34);
-    opacity:0;
-    visibility:hidden;
-    pointer-events:none;
-    transition:opacity .2s ease,visibility .2s ease;
-  }
-  #libraryShell .drawer-mask.show{
-    opacity:1;
-    visibility:visible;
-    pointer-events:auto;
-  }
-  body.drawer-open{overflow:hidden}
-  #libraryShell .menu-btn{
-    position:relative;
-    z-index:1201;
     width:42px;
     height:42px;
     display:grid;
     place-items:center;
+    flex:0 0 42px;
     padding:0;
     margin-right:6px;
     border-radius:10px;
+    color:#111827;
     font-size:0;
+    z-index:60;
   }
   #libraryShell .menu-btn:before{
     content:"";
@@ -1569,4 +1486,5 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
       linear-gradient(currentColor,currentColor) 0 7px/24px 2px no-repeat,
       linear-gradient(currentColor,currentColor) 0 14px/24px 2px no-repeat;
   }
+  #libraryShell .menu-btn:active{background:#f0f3f7}
 }
