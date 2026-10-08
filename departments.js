@@ -661,6 +661,7 @@
         document.body.classList.toggle('drawer-open',open);
         menu.setAttribute('aria-expanded',open?'true':'false');
         menu.setAttribute('aria-label',open?'关闭菜单':'打开菜单');
+        mask.setAttribute('aria-hidden',open?'false':'true');
       };
       const close=()=>setDrawer(false);
       menu.setAttribute('aria-expanded','false');
