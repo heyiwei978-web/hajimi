@@ -83,4 +83,38 @@ jobs:
             }
           done
 
+          echo "== Common scanner paths =="
+          check_status ".env denied" "403" "$BASE/.env"
+          check_status ".git/config denied" "403" "$BASE/.git/config"
+          check_status "wp-login denied" "403" "$BASE/wp-login.php"
+          check_status "phpMyAdmin denied" "403" "$BASE/phpmyadmin/"
+
+          echo "== Request-shape protection =="
+          check_status "missing admin marker rejected" "403" \
+            -X POST "$BASE/api/login" \
+            -H "Origin: $ORIGIN" \
+            -H "Content-Type: application/json" \
+            --data '{"username":"nobody","password":"wrong"}'
+
+          check_status "wrong content type rejected" "415" \
+            -X POST "$BASE/api/login" \
+            -H "Origin: $ORIGIN" \
+            -H "$ADMIN_HEADER" \
+            -H "Content-Type: text/plain" \
+            --data 'not-json'
+
+          check_status "malformed JSON rejected" "400" \
+            -X POST "$BASE/api/login" \
+            -H "Origin: $ORIGIN" \
+            -H "$ADMIN_HEADER" \
+            -H "Content-Type: application/json" \
+            --data '{"username":'
+
+          echo "== API cache policy =="
+          curl -sS -D /tmp/session-headers.txt -o /dev/null "$BASE/api/session"
+          tr -d '\r' </tmp/session-headers.txt | grep -qi '^cache-control:.*no-store' || {
+            echo "::error::session endpoint missing Cache-Control: no-store"
+            exit 1
+          }
+
           echo "ALL SECURITY SMOKE TESTS PASSED"
