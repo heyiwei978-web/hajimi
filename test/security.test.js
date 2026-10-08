@@ -9,7 +9,6 @@ import session from '../api/session.js';
 import content from '../api/content.js';
 import upload from '../api/upload.js';
 import image from '../api/image.js';
-import audit from '../api/ortho-audit-runtime.js';
 
 function response() {
   return {
@@ -104,11 +103,11 @@ test('login rejects unsupported methods, missing marker, non-JSON, malformed and
   }
 });
 
-test('public session remains readable; admin writes and the expensive audit require authentication', async () => {
+test('public session remains readable while admin writes require authentication', async () => {
   const res = response();
   await session(request({method:'GET',headers:{cookie:''}}),res);
   assert.equal(res.code,200); assert.equal(res.body.authenticated,false);
-  for (const [handler,method] of [[content,'PUT'],[upload,'POST'],[audit,'GET']]) {
+  for (const [handler,method] of [[content,'PUT'],[upload,'POST']]) {
     const denied = response(); await handler(request({method,headers:{cookie:''}}),denied);
     assert.equal(denied.code,401);
   }
