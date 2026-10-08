@@ -1,0 +1,80 @@
+name: Security smoke test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/security-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  security-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wait for production edge
+        run: sleep 8
+
+      - name: Run production security checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://wdyxzl.icu"
+
+          check() {
+            local expected="$1"
+            local name="$2"
+            shift 2
+            local code
+            code="$(curl --connect-timeout 10 --max-time 20 -sS -o /tmp/body -D /tmp/headers -w '%{http_code}' "$@")"
+            echo "$name => HTTP $code"
+            cat /tmp/body || true
+            echo
+            if [ "$code" != "$expected" ]; then
+              echo "::error::$name expected HTTP $expected but got $code"
+              exit 1
+            fi
+          }
+
+          check 405 "GET login rejected" "$BASE/api/login"
+
+          check 401 "Unauthenticated content write rejected"             -X PUT             -H "Origin: $BASE"             -H "X-Hajimi-Admin: 1"             -H "Content-Type: application/json"             --data '{}'             "$BASE/api/content"
+
+          check 403 "Cross-site login rejected"             -X POST             -H "Origin: https://evil.example"             -H "Sec-Fetch-Site: cross-site"             -H "X-Hajimi-Admin: 1"             -H "Content-Type: application/json"             --data '{"username":"security-smoke","password":"wrong"}'             "$BASE/api/login"
+
+          check 415 "Wrong content type rejected"             -X POST             -H "Origin: $BASE"             -H "X-Hajimi-Admin: 1"             -H "Content-Type: text/plain"             --data 'x'             "$BASE/api/login"
+
+          python3 - <<'PY' >/tmp/oversize.json
+          import json
+          print(json.dumps({"username":"security-smoke","password":"x"*5000}))
+          PY
+
+          check 413 "Oversized login body rejected"             -X POST             -H "Origin: $BASE"             -H "X-Hajimi-Admin: 1"             -H "Content-Type: application/json"             --data-binary @/tmp/oversize.json             "$BASE/api/login"
+
+          echo "Brute-force throttle test"
+          hit429=0
+          for i in $(seq 1 12); do
+            code="$(curl --connect-timeout 10 --max-time 20 -sS -o /tmp/body -D /tmp/headers -w '%{http_code}'               -X POST               -H "Origin: $BASE"               -H "X-Hajimi-Admin: 1"               -H "Content-Type: application/json"               --data "{\"username\":\"security-smoke\",\"password\":\"wrong-$i\"}"               "$BASE/api/login")"
+            retry="$(awk 'BEGIN{IGNORECASE=1} /^Retry-After:/{gsub("\r","",$2); print $2}' /tmp/headers | tail -1)"
+            if [ -z "$retry" ]; then retry="none"; fi
+            echo "attempt $i => HTTP $code retry-after=$retry"
+            if [ "$code" = "429" ]; then
+              hit429=1
+              break
+            fi
+            if [ "$code" != "401" ]; then
+              echo "::error::Unexpected brute-force response HTTP $code"
+              cat /tmp/body || true
+              exit 1
+            fi
+          done
+
+          if [ "$hit429" != "1" ]; then
+            echo "::error::Brute-force limiter never returned HTTP 429"
+            exit 1
+          fi
+
+          echo "All production security smoke tests passed."
