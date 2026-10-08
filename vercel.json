@@ -88,5 +88,26 @@
         }
       ]
     }
+  ],
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "routes": [
+    {
+      "src": "/(?:\\.env(?:\\..*)?|\\.git(?:/.*)?|wp-admin(?:/.*)?|wp-login\\.php|phpmyadmin(?:/.*)?|vendor/phpunit(?:/.*)?|cgi-bin(?:/.*)?)",
+      "mitigate": {
+        "action": "deny"
+      }
+    },
+    {
+      "src": "/api/login",
+      "methods": [
+        "GET",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "mitigate": {
+        "action": "deny"
+      }
+    }
   ]
 }
