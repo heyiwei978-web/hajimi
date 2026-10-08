@@ -196,3 +196,105 @@ body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
   .pathway-home-meta{grid-column:1/-1;justify-content:space-between}
   .pathway-home-copy h2{font-size:20px}
 }
+
+
+/* 2026-10-08: definitive mobile homepage overflow fix */
+@media(max-width:900px){
+  html,body,.official-home,.official-main{
+    max-width:100%;
+    overflow-x:clip;
+  }
+  .official-nav,
+  .official-nav-inner,
+  .official-hero,
+  .official-hero-copy,
+  .clinical-scene{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+  .official-nav-inner{
+    width:100%;
+  }
+  .official-links{
+    min-width:0;
+    max-width:100%;
+  }
+  .official-hero{
+    width:100%;
+  }
+  .official-hero-copy{
+    width:100%;
+  }
+  .clinical-scene{
+    width:min(620px,100%)!important;
+  }
+}
+@media(max-width:640px){
+  .official-nav-inner{
+    gap:8px;
+    padding:9px 14px;
+  }
+  .official-brand{
+    min-width:0!important;
+    max-width:100%;
+  }
+  .official-brand-text strong{
+    font-size:15px;
+    white-space:nowrap;
+  }
+  .official-links{
+    width:100%;
+    max-width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+    overscroll-behavior-x:contain;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .official-links::-webkit-scrollbar{display:none}
+  .official-hero{
+    grid-template-columns:minmax(0,1fr)!important;
+    padding:38px 17px 34px;
+  }
+  .official-hero h1{
+    width:100%;
+    max-width:100%;
+    font-size:clamp(36px,11vw,40px);
+    line-height:1.12;
+    letter-spacing:-.04em;
+    overflow-wrap:anywhere;
+    word-break:normal;
+  }
+  .official-hero h1 span{
+    display:inline;
+    white-space:normal;
+  }
+  .official-lead{
+    width:100%;
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+  .official-hero-actions{
+    width:100%;
+  }
+  .official-cta{
+    width:100%;
+    max-width:none;
+  }
+  .clinical-scene{
+    width:100%!important;
+    min-width:0!important;
+    height:205px;
+    transform:none;
+    margin:0 auto;
+    overflow:hidden;
+  }
+  .scene-glass{width:92%;right:0}
+  .scene-laptop{
+    width:82%;
+    max-width:100%;
+    right:2%;
+    height:205px;
+  }
+  .scene-screen{height:172px}
+}
