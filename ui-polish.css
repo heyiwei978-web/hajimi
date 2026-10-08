@@ -160,3 +160,39 @@ body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 @media print{body{background:#fff!important}.record-book-body,.record-paper{font-family:"SimSun","Songti SC",serif;font-size:12pt;line-height:1.75;color:#000}.record-book-section{border:0!important}}
+
+
+/* homepage clinical pathway feature */
+.pathway-home-banner{
+  max-width:1264px;
+  margin:14px auto 0;
+  min-height:132px;
+  display:grid;
+  grid-template-columns:64px minmax(0,1fr) auto;
+  gap:20px;
+  align-items:center;
+  padding:22px 24px;
+  border:1px solid #d7e4f1;
+  border-radius:16px;
+  background:linear-gradient(135deg,#f7fbff 0%,#eef5fc 100%);
+  color:#172033;
+  text-decoration:none;
+}
+.pathway-home-banner:hover{border-color:#b8cce0;background:linear-gradient(135deg,#f3f9ff 0%,#e9f3fc 100%)}
+.pathway-home-icon{
+  width:58px;height:58px;display:grid;place-items:center;border-radius:14px;
+  background:#173a61;color:#fff;font-size:15px;font-weight:800;letter-spacing:.08em
+}
+.pathway-home-copy>span{font-size:9px;font-weight:700;letter-spacing:.13em;color:#7190b1}
+.pathway-home-copy h2{margin:5px 0 4px;font-size:22px;letter-spacing:-.02em}
+.pathway-home-copy p{margin:0;max-width:800px;color:#627183;font-size:12px;line-height:1.65}
+.pathway-home-meta{display:flex;gap:18px;align-items:center}
+.pathway-home-meta strong{font-size:28px;color:#173a61}
+.pathway-home-meta strong small{display:block;margin-top:3px;font-size:9px;color:#7b8794;font-weight:600}
+.pathway-home-meta b{padding:10px 13px;border-radius:9px;background:#173a61;color:#fff;font-size:11px}
+@media(max-width:760px){
+  .pathway-home-banner{margin:12px 13px 0;grid-template-columns:48px 1fr;padding:18px;gap:13px}
+  .pathway-home-icon{width:46px;height:46px;border-radius:11px;font-size:12px}
+  .pathway-home-meta{grid-column:1/-1;justify-content:space-between}
+  .pathway-home-copy h2{font-size:20px}
+}
