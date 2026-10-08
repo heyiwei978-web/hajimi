@@ -1535,3 +1535,46 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
     color:rgba(255,255,255,.82);
   }
 }
+
+
+/* 2026-10-08: clearer mobile home navigation + touch drawer scrolling */
+.department-toolbar-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.library-root-home-row{display:flex;justify-content:flex-start;margin:0 0 16px}
+.site-home-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px}
+.mobile-drawer-shortcuts{display:none}
+
+@media(max-width:900px){
+  #libraryShell .sidebar{
+    touch-action:pan-y!important;
+    scrollbar-width:none!important;
+    -ms-overflow-style:none!important;
+  }
+  #libraryShell .sidebar::-webkit-scrollbar{
+    width:0!important;
+    height:0!important;
+    display:none!important;
+  }
+  .mobile-drawer-shortcuts{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin:0 0 12px;
+  }
+  .mobile-drawer-shortcuts a{
+    min-height:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #e2e7ed;
+    border-radius:10px;
+    background:#f8fafc;
+    color:#334155;
+    font-size:12px;
+    font-weight:700;
+  }
+  .mobile-drawer-shortcuts a:active{background:#eef3f8}
+  .department-toolbar-actions{width:100%}
+  .department-toolbar-actions .btn{min-height:42px}
+  .library-root-home-row{margin:0 0 14px}
+  .library-root-home-row .site-home-btn{min-height:42px}
+}
