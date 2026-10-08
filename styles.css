@@ -1578,3 +1578,37 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   .library-root-home-row{margin:0 0 14px}
   .library-root-home-row .site-home-btn{min-height:42px}
 }
+
+
+/* 2026-10-08: persistent site-home control in library sticky header */
+#libraryShell .site-home-mark{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  margin-right:10px;
+  text-decoration:none;
+}
+#libraryShell .site-home-mark .library-brand-mark{
+  display:grid;
+  place-items:center;
+}
+#libraryShell .site-home-mark svg{
+  width:17px;
+  height:17px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.9;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+#libraryShell .library-brand{gap:0}
+#libraryShell .site-home-mark:active .library-brand-mark{transform:scale(.96)}
+@media(max-width:640px){
+  #libraryShell .site-home-mark{margin-right:7px}
+  #libraryShell .site-home-mark .library-brand-mark{
+    width:34px;
+    height:34px;
+  }
+  #libraryShell .site-home-mark svg{width:16px;height:16px}
+}
