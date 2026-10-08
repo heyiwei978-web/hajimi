@@ -36,7 +36,7 @@ test('orthopedic pathway center has the national ERAS library and responsive she
   assert.equal(ready,12);
 });
 
-test('main site and TKA record both link to the pathway center',()=>{
+test('main site and completed orthopedic records link to the pathway center',()=>{
   const index=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
   const departments=fs.readFileSync(new URL('../departments.js',import.meta.url),'utf8');
   const vercel=JSON.parse(fs.readFileSync(new URL('../vercel.json',import.meta.url),'utf8'));
@@ -44,6 +44,8 @@ test('main site and TKA record both link to the pathway center',()=>{
   assert.match(index,/12 <small>国家路径已纳入/);
   assert.match(index,/href="\/pathway">临床路径/);
   assert.match(departments,/查看临床路径/);
+  for(const key of ['tka','tha','fnf','intertroch','pilon','trimalleolar','acdf','lumbarFusion']) assert.match(departments,new RegExp("'"+key+"'"));
+  assert.match(fs.readFileSync(new URL('../pathway.js',import.meta.url),'utf8'),/URLSearchParams\(location\.search\)/);
   assert(vercel.rewrites.some(entry=>entry.source==='/pathway'&&entry.destination==='/pathway.html'));
   assert(vercel.rewrites.some(entry=>entry.source==='/pathway/'&&entry.destination==='/pathway.html'));
 });
