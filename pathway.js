@@ -47,8 +47,16 @@
     if(button)button.classList.add('active');
   }
 
+  function setPathwayUrl(key){
+    const url=new URL(location.href);
+    if(!key||key==='tka')url.searchParams.delete('p');
+    else url.searchParams.set('p',key);
+    history.replaceState(history.state||{},'',url.pathname+url.search);
+  }
+
   function showTka(button){
     setActive(button||nav?.querySelector('[data-key="tka"]'));
+    setPathwayUrl('tka');
     if(tka)tka.hidden=false;
     if(dynamic){dynamic.hidden=true;dynamic.innerHTML='';}
     tka?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -61,6 +69,7 @@
       return;
     }
     setActive(button);
+    setPathwayUrl(key);
     if(tka)tka.hidden=true;
     if(dynamic){
       dynamic.hidden=false;
@@ -89,6 +98,12 @@
         else showOfficial(button.dataset.key,button);
       });
     });
+  }
+
+  const initialKey=new URLSearchParams(location.search).get('p');
+  if(initialKey&&library[initialKey]){
+    const initialButton=nav?.querySelector('[data-key="'+initialKey+'"]');
+    if(initialButton)showOfficial(initialKey,initialButton);
   }
 
   const jump=document.getElementById('jumpTka');
