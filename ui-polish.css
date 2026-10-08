@@ -298,3 +298,47 @@ body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
   }
   .scene-screen{height:172px}
 }
+
+
+/* 2026-10-08: rendering and navigation performance pass */
+html{
+  scrollbar-gutter:stable;
+}
+button,a,[role="button"]{
+  touch-action:manipulation;
+}
+.record-book-section,
+.pathway-section,
+.ortho-category{
+  scroll-margin-top:84px;
+}
+@supports (content-visibility:auto){
+  .record-book-section:not(:first-child),
+  .pathway-section:not(:first-child),
+  .ortho-category{
+    content-visibility:auto;
+    contain-intrinsic-size:auto 620px;
+  }
+}
+@media(max-width:640px){
+  .record-book-section,
+  .pathway-section,
+  .ortho-category{
+    scroll-margin-top:72px;
+  }
+  #libraryShell .menu-btn,
+  #libraryShell .site-home-mark,
+  #libraryShell .patient-action,
+  #libraryShell [data-auth-slot] a,
+  #libraryShell [data-auth-slot] button{
+    min-height:42px;
+  }
+}
+@media print{
+  .record-book-section,
+  .pathway-section,
+  .ortho-category{
+    content-visibility:visible!important;
+    contain:none!important;
+  }
+}
