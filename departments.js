@@ -617,6 +617,28 @@
     };
 
     const reset=document.getElementById('resetFilters');if(reset)reset.onclick=()=>{resetState();render();};
+
+    // Rebuild the orthopedic drawer after all expansion scripts have loaded.
+    // app.js renders the original trauma-only sidebar before later disease batches exist.
+    const orthoDrawer=document.getElementById('sidebar');
+    if(orthoDrawer){
+      orthoDrawer.innerHTML=
+        '<div class="side-head">骨科疾病 / 术式</div>'+
+        '<button class="nav-item active" type="button" data-ortho-route="__overview">骨科总览</button>'+
+        orthoSections.map((section)=>{
+          return '<div class="nav-label">'+section.title+'</div>'+
+            section.items.map((g)=>'<button class="nav-item" type="button" data-ortho-route="'+encodeURIComponent(g)+'">'+labelFor(g)+'</button>').join('');
+        }).join('');
+      orthoDrawer.querySelectorAll('[data-ortho-route]').forEach((button)=>{
+        button.onclick=()=>{
+          const value=button.dataset.orthoRoute;
+          if(value==='__overview')history.pushState({},'', '/bl/guke');
+          else history.pushState({},'', '/bl/guke/'+value);
+          applyRoute();
+        };
+      });
+    }
+
     const menu=document.getElementById('menuBtn'),sidebar=document.getElementById('sidebar'),mask=document.getElementById('drawerMask');
     if(menu&&sidebar&&mask){
       const setDrawer=(open)=>{
