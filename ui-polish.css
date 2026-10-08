@@ -342,3 +342,42 @@ button,a,[role="button"]{
     contain:none!important;
   }
 }
+
+
+/* 2026-10-08: second-stage paint and motion optimization */
+@supports (content-visibility:auto){
+  .template-card,
+  .dept-card,
+  .official-feature-card,
+  .path-step,
+  .quality-grid>div,
+  .variance-card{
+    content-visibility:auto;
+    contain-intrinsic-size:auto 180px;
+  }
+}
+.template-card,
+.dept-card,
+.official-feature-card,
+.path-step,
+.quality-grid>div,
+.variance-card{
+  contain:layout paint;
+}
+@media(hover:none){
+  .template-card:hover,
+  .dept-card:hover,
+  .official-feature-card:hover,
+  .pathway-home-banner:hover{
+    transform:none!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}
