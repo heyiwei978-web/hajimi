@@ -160,3 +160,9 @@ body.pathway-page{margin:0;background:var(--pw-bg);color:var(--pw-ink)}
   .pathway-layout{display:block}
   .pathway-section,.pathway-title-card{break-inside:avoid;box-shadow:none}
 }
+
+/* dynamic official pathway additions */
+.pathway-nav-item.is-ready small{color:#2f7d62;font-weight:700}
+.pathway-nav-item.active.is-ready small{color:#2a6a58}
+.pathway-copy{margin:0;color:#56616e;font-size:12px;line-height:1.78}
+#dynamicPathway[hidden],#tkaPathway[hidden]{display:none!important}
