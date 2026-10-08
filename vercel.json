@@ -27,6 +27,10 @@
     {
       "source": "/duty",
       "destination": "/index.html"
+    },
+    {
+      "source": "/duty/",
+      "destination": "/index.html"
     }
   ],
   "headers": [
