@@ -9,6 +9,14 @@
       "destination": "/admin.html"
     },
     {
+      "source": "/pathway",
+      "destination": "/pathway.html"
+    },
+    {
+      "source": "/pathway/",
+      "destination": "/pathway.html"
+    },
+    {
       "source": "/tools",
       "destination": "/tools.html"
     },
