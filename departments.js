@@ -527,6 +527,18 @@
         </article>`:'';
       const reserveToc=`<a class="is-reserved" href="#${complicationId}"><span>＋</span><b>术后并发症 / 特殊情况</b><small>预留</small></a>`;
       const toc=tocBefore+reserveToc+(hasDischarge?tocDischarge:`<a class="is-reserved" href="#record-discharge-reserved"><span>＋</span><b>出院小结 / 出院记录</b><small>预留</small></a>`);
+      const pathwayKeyByGroup={
+        'TKA':'tka',
+        'THA':'tha',
+        '股骨颈骨折内固定':'fnf',
+        '股骨转子间骨折':'intertroch',
+        '胫骨Pilon骨折':'pilon',
+        '踝关节三踝骨折':'trimalleolar',
+        '脊髓型颈椎病':'acdf',
+        '腰椎滑脱症':'lumbarFusion'
+      };
+      const pathwayKey=currentDept==='骨科'?pathwayKeyByGroup[state.group]:null;
+      const pathwayHref=pathwayKey?(pathwayKey==='tka'?'/pathway':'/pathway?p='+encodeURIComponent(pathwayKey)):'';
 
       const hero=`
         <section class="disease-hero record-book-hero">
@@ -534,7 +546,7 @@
             <span>${currentDept==='骨科'?'ORTHOPAEDICS':'CLINICAL RECORD'} · COMPLETE MEDICAL RECORD</span>
             <h2>${labelFor(state.group)} · 完整病历</h2>
             <p>一个疾病只保留一个连续病历页面。顺序参照住院病历书写流程，目录可直接跳转到首次病程、查房、术前讨论、手术记录和术后各日病程。</p>
-            <div class="record-book-hero-actions"><button id="copyWholeRecord" class="btn primary" type="button">复制完整病历</button><button id="printWholeRecord" class="btn ghost" type="button">打印整套病历</button>${currentDept==='骨科'&&state.group==='TKA'?'<a class="btn ghost" href="/pathway">查看临床路径</a>':''}</div>
+            <div class="record-book-hero-actions"><button id="copyWholeRecord" class="btn primary" type="button">复制完整病历</button><button id="printWholeRecord" class="btn ghost" type="button">打印整套病历</button>${pathwayHref?'<a class="btn ghost" href="'+pathwayHref+'">查看临床路径</a>':''}</div>
           </div>
           <strong>1<small>套标准病历 · ${list.length} 个现有章节${specialBundle.groups.length?' · '+specialBundle.groups.length+'个特殊病例':''}</small></strong>
         </section>`;
