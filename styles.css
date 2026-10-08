@@ -1488,3 +1488,50 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   }
   #libraryShell .menu-btn:active{background:#f0f3f7}
 }
+
+
+/* 2026-10-08: high-contrast disease-book hero actions */
+#libraryShell .record-book-hero{
+  color:#fff;
+}
+#libraryShell .record-book-hero p{
+  color:rgba(255,255,255,.78);
+}
+#libraryShell .record-book-hero>div>span{
+  color:#aec4e4;
+}
+#libraryShell .record-book-hero-actions .btn.primary{
+  background:#fff!important;
+  color:#132238!important;
+  border-color:#fff!important;
+  box-shadow:0 4px 14px rgba(0,0,0,.12);
+  font-weight:700;
+}
+#libraryShell .record-book-hero-actions .btn.ghost{
+  background:rgba(255,255,255,.11)!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.42)!important;
+  font-weight:650;
+}
+#libraryShell .record-book-hero-actions .btn.primary:hover{
+  background:#f3f7fc!important;
+}
+#libraryShell .record-book-hero-actions .btn.ghost:hover{
+  background:rgba(255,255,255,.18)!important;
+}
+@media(max-width:640px){
+  #libraryShell .record-book-hero-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  #libraryShell .record-book-hero-actions .btn{
+    min-height:46px;
+    padding:10px 12px;
+    font-size:14px;
+    border-radius:11px;
+  }
+  #libraryShell .record-book-hero p{
+    color:rgba(255,255,255,.82);
+  }
+}
