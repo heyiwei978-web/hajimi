@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f8fb">
+<title>骨科临床路径中心｜哈基米工作站</title>
+<link rel="stylesheet" href="/styles.css?v=20261008-hero-contrast1">
+<link rel="stylesheet" href="/ui-polish.css?v=20261008-1">
+<link rel="stylesheet" href="/pathway.css?v=20261008-1">
+</head>
+<body class="pathway-page">
+<header class="global-nav official-nav pathway-nav">
+  <div class="global-nav-inner official-nav-inner">
+    <a class="global-brand official-brand" href="/">
+      <span class="official-brand-mark" aria-hidden="true">H</span>
+      <span class="official-brand-text"><strong>哈基米工作站</strong><small>hajimi Clinical Workspace</small></span>
+    </a>
+    <nav class="global-links official-links" aria-label="主导航">
+      <a href="/">首页</a>
+      <a href="/bl">病历模板</a>
+      <a class="active" href="/pathway">临床路径</a>
+      <a href="/tools">临床工具</a>
+      <a href="/admin">管理入口</a>
+    </nav>
+    <div class="official-nav-right">
+      <a class="official-search" href="/bl/guke" aria-label="进入骨科病历">骨科病历</a>
+    </div>
+  </div>
+</header>
+
+<main class="pathway-shell">
+  <section class="pathway-hero">
+    <div class="pathway-hero-copy">
+      <span class="pathway-kicker">ORTHOPAEDIC CLINICAL PATHWAYS</span>
+      <h1>骨科临床路径中心</h1>
+      <p>把“什么时候该做什么”从病历模板中独立出来，按准入、术前、手术日、术后康复、出院、变异和质控组织标准诊疗流程。</p>
+      <div class="pathway-hero-actions">
+        <button id="jumpTka" class="pathway-btn primary" type="button">查看 TKA 样板路径</button>
+        <a class="pathway-btn secondary" href="/bl/guke/TKA">查看 TKA 完整病历</a>
+      </div>
+    </div>
+    <div class="pathway-hero-metrics">
+      <div><strong>1</strong><span>已完成样板</span></div>
+      <div><strong>20</strong><span>第一批规划</span></div>
+      <div><strong>2–8天</strong><span>TKA标准住院日</span></div>
+      <div><strong>2023</strong><span>国家路径版本</span></div>
+    </div>
+  </section>
+
+  <section class="pathway-note">
+    <strong>定位</strong>
+    <span>本模块用于骨科临床路径标准化辅助，不替代本院制度、医嘱系统或个体化诊疗。正式落地前应由科室临床路径实施小组结合本院流程审核。</span>
+  </section>
+
+  <div class="pathway-layout">
+    <aside class="pathway-sidebar">
+      <div class="pathway-side-head"><span>PATHWAY LIBRARY</span><h2>路径目录</h2></div>
+      <nav id="pathwayNav" aria-label="骨科临床路径目录"></nav>
+    </aside>
+
+    <article class="pathway-main" id="tkaPathway">
+      <section class="pathway-title-card">
+        <div>
+          <span class="pathway-status">已完成样板 · 国家路径底稿</span>
+          <h2>全膝关节置换术加速康复临床路径</h2>
+          <p>以国家卫生健康委《全膝关节置换术加速康复临床路径（2023年版）》为核心底稿，按临床使用场景重新组织。</p>
+        </div>
+        <div class="pathway-title-actions">
+          <a href="/bl/guke/TKA">完整病历 ↗</a>
+          <button id="printPathway" type="button">打印路径</button>
+        </div>
+      </section>
+
+      <section class="pathway-overview-grid">
+        <div><span>适用术式</span><strong>初次全膝关节置换术</strong></div>
+        <div><span>标准住院日</span><strong>2～8天</strong></div>
+        <div><span>术前准备</span><strong>住院第1～3天</strong></div>
+        <div><span>术后康复</span><strong>术后第1～6天</strong></div>
+      </section>
+
+      <section class="pathway-section" id="entry">
+        <div class="pathway-section-head"><span>01</span><div><small>ENTRY & ELIGIBILITY</small><h3>路径准入与术前目标</h3></div></div>
+        <div class="pathway-two-col">
+          <div class="pathway-panel">
+            <h4>准入核心</h4>
+            <ul>
+              <li>第一诊断属于类风湿性膝关节炎、原发性/创伤后/继发性膝关节病、膝关节退行性病变等路径适用诊断，并拟行全膝关节置换术。</li>
+              <li>诊断明确，症状明显，保守治疗无效，已显著影响正常生活和活动。</li>
+              <li>合并基础疾病者，如住院期间不需要特殊专科处理且不影响路径实施，可进入路径。</li>
+              <li>存在活动性或隐匿性感染灶、严重认知/精神障碍、不能自主控制术肢等情况时，应重新评估手术及路径适用性。</li>
+            </ul>
+          </div>
+          <div class="pathway-panel accent">
+            <h4>术前需达到的目标</h4>
+            <ul>
+              <li>精神、食欲状态良好，能够理解并配合功能训练。</li>
+              <li>血红蛋白 ≥110 g/L，白蛋白 ≥35 g/L。</li>
+              <li>股四头肌肌力 ≥3级。</li>
+              <li>合并基础疾病控制良好，ASA分级 ≤3级。</li>
+              <li>无下肢新发深静脉血栓；主要动脉通畅或侧支循环良好，肢端无缺血。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="pathway-section" id="timeline">
+        <div class="pathway-section-head"><span>02</span><div><small>PHYSICIAN PATHWAY</small><h3>医师版时间轴</h3></div></div>
+        <div class="pathway-timeline">
+          <article class="path-step">
+            <div class="path-step-time"><b>D1</b><span>住院第1天</span></div>
+            <div class="path-step-content">
+              <h4>入院评估与路径准入</h4>
+              <div class="path-step-columns">
+                <div><strong>主要诊疗工作</strong><p>询问病史、完成系统及膝关节专科查体，完成首次病程及上级医师评估；确认手术指征、路径准入条件和拟手术日期。</p></div>
+                <div><strong>患者教育</strong><p>讲解手术方式、预期效果和主要风险；完成疼痛、营养、基础疾病、心理/认知及康复能力评估，指导术前功能训练。</p></div>
+                <div><strong>必需检查</strong><p>血常规、尿常规、粪便常规+隐血；肝肾功能、电解质、血糖、凝血、血源传染病筛查、ESR/CRP；术膝正侧位、双下肢全长X线；胸部X线、心电图、双下肢静脉彩超。</p></div>
+                <div><strong>选择性检查</strong><p>根据基础疾病和症状选择血气/肺功能、动态心电图/血压、心超、冠脉评估、下肢动静脉检查、颅脑MRI/MRA、骨密度等，不作为所有患者的固定项目。</p></div>
+              </div>
+              <div class="path-check"><span>□ 路径准入完成</span><span>□ 手术指征明确</span><span>□ 检查已开立</span><span>□ 康复宣教完成</span></div>
+            </div>
+          </article>
+
+          <article class="path-step">
+            <div class="path-step-time"><b>PRE</b><span>住院第2天至术前1天</span></div>
+            <div class="path-step-content">
+              <h4>完成术前准备与多学科评估</h4>
+              <div class="path-step-columns">
+                <div><strong>主刀 / 上级医师</strong><p>复核诊断、影像、下肢力线、软组织情况及手术方案；完成术前查房、讨论及必要会诊。</p></div>
+                <div><strong>麻醉与风险</strong><p>评估ASA等级、心肺功能及基础疾病控制情况，明确麻醉方式与围手术期监测计划。</p></div>
+                <div><strong>知情与准备</strong><p>完成手术、麻醉、输血及相关材料知情同意；确认术侧标识、备血/耗材及预防感染策略。</p></div>
+                <div><strong>康复准备</strong><p>再次训练踝泵、股四头肌等长收缩、主动伸膝、助行器使用及上下床方法，明确术后早期下地目标。</p></div>
+              </div>
+              <div class="path-check"><span>□ 术前讨论</span><span>□ 麻醉评估</span><span>□ 手术同意</span><span>□ 术侧标记</span><span>□ 康复预演</span></div>
+            </div>
+          </article>
+
+          <article class="path-step major">
+            <div class="path-step-time"><b>OP</b><span>手术日</span></div>
+            <div class="path-step-content">
+              <h4>全膝关节置换术</h4>
+              <div class="path-step-columns">
+                <div><strong>术前</strong><p>按麻醉方案执行禁食禁饮；预防性抗菌药物按规范使用。国家路径提出可在切皮前或松止血带前5～10分钟静脉给予氨甲环酸20 mg/kg，禁忌者除外。</p></div>
+                <div><strong>术中</strong><p>可选择椎管内麻醉、神经阻滞或全身麻醉；实施膝关节置换，可根据情况置换或不置换髌骨；重视血液管理、切口和感染预防。</p></div>
+                <div><strong>术后即刻</strong><p>完成手术记录和术后首次病程；进行生命体征、切口、引流、肢端血运感觉运动及疼痛评估；实施多模式镇痛和VTE预防。</p></div>
+                <div><strong>早期康复</strong><p>麻醉清醒后即可开始功能锻炼，以主动伸膝肌力训练为主，并在安全前提下尽早下地。</p></div>
+              </div>
+              <div class="path-check"><span>□ 抗菌药物</span><span>□ 血液管理</span><span>□ 疼痛管理</span><span>□ VTE预防</span><span>□ 当日康复启动</span></div>
+            </div>
+          </article>
+
+          <article class="path-step">
+            <div class="path-step-time"><b>POD1–6</b><span>术后住院康复</span></div>
+            <div class="path-step-content">
+              <h4>恢复、复查与出院准备</h4>
+              <div class="path-step-columns">
+                <div><strong>每日评估</strong><p>上级医师查房，观察生命体征、切口、肿胀、疼痛、肢端循环和神经功能；记录膝关节主动伸屈、肌力、步行及日常生活能力。</p></div>
+                <div><strong>复查</strong><p>按路径复查术膝正侧位X线、双下肢全长X线；复查血常规、肝肾功能、电解质、血糖、ESR、CRP。出院前1天或出院当天复查下肢静脉彩超。</p></div>
+                <div><strong>治疗</strong><p>预防性抗菌药物通常术后使用24小时；继续预防性、多模式、个体化镇痛；无禁忌时实施药物及物理VTE预防。</p></div>
+                <div><strong>康复</strong><p>主动伸膝、屈膝训练，助行器辅助行走，上下床及日常生活训练；以功能安全和出院标准为导向逐日推进。</p></div>
+              </div>
+              <div class="path-check"><span>□ 影像评估</span><span>□ 实验室复查</span><span>□ ROM记录</span><span>□ 步行能力</span><span>□ 切口评估</span></div>
+            </div>
+          </article>
+
+          <article class="path-step discharge">
+            <div class="path-step-time"><b>DC</b><span>出院日</span></div>
+            <div class="path-step-content">
+              <h4>达到标准后出院</h4>
+              <div class="path-step-columns">
+                <div><strong>一般情况</strong><p>生命体征平稳，精神食欲恢复，大小便正常。</p></div>
+                <div><strong>切口</strong><p>切口干燥，无红肿、硬结等感染征象。</p></div>
+                <div><strong>功能</strong><p>术侧膝主动伸直0°或-5°以内，屈曲至少100°，可扶助行器自主下地行走。</p></div>
+                <div><strong>疼痛</strong><p>疼痛程度不重，口服镇痛药能够有效控制，不影响睡眠和功能训练。</p></div>
+              </div>
+              <div class="path-discharge-callout">出院后继续功能锻炼和VTE预防；国家路径提出术后总抗凝时间10～35天，并建议术后2～3周门诊复查下肢静脉彩超，具体方案仍应结合患者血栓与出血风险个体化制定。</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="pathway-section" id="variance">
+        <div class="pathway-section-head"><span>03</span><div><small>VARIANCE MANAGEMENT</small><h3>路径变异与退出</h3></div></div>
+        <div class="variance-grid">
+          <div class="variance-card"><span>01</span><h4>识别</h4><p>当日诊疗项目未按计划完成，或患者病情、并发症、手术方案、基础疾病等导致流程偏离时，标记为变异。</p></div>
+          <div class="variance-card"><span>02</span><h4>记录</h4><p>记录发生日期、原计划、实际情况、变异原因、处理措施、责任团队及是否需要退出路径。</p></div>
+          <div class="variance-card"><span>03</span><h4>分析</h4><p>经治医师与个案管理员共同分析原因；复杂或重复变异应进入科内讨论和路径修订。</p></div>
+          <div class="variance-card"><span>04</span><h4>退出</h4><p>严重并发症需改变原治疗方案、患者主动改变治疗方式、诊断错误或其他严重影响路径实施的情况，应退出路径。</p></div>
+        </div>
+        <div class="variance-example">
+          <span>变异记录示例</span>
+          <p><b>POD2：</b>计划完成助行器步行训练，患者因体位性头晕仅完成床旁站立。评估生命体征及血红蛋白变化，调整补液与训练强度；暂不退出路径，次日重新评估。</p>
+        </div>
+      </section>
+
+      <section class="pathway-section" id="patient">
+        <div class="pathway-section-head"><span>04</span><div><small>PATIENT VERSION</small><h3>患者版路径告知</h3></div></div>
+        <div class="patient-path">
+          <div><b>1</b><span>入院</span><p>完成病史、查体、影像和术前检查，确认是否适合进入路径。</p></div>
+          <i>→</i>
+          <div><b>2</b><span>术前</span><p>完成麻醉评估、手术沟通和康复训练预演。</p></div>
+          <i>→</i>
+          <div><b>3</b><span>手术</span><p>完成膝关节置换，术后即开始疼痛、血栓和康复管理。</p></div>
+          <i>→</i>
+          <div><b>4</b><span>康复</span><p>逐步恢复主动伸屈膝、站立、步行和日常生活能力。</p></div>
+          <i>→</i>
+          <div><b>5</b><span>出院</span><p>切口、疼痛和功能达到标准后出院，继续康复并按时复诊。</p></div>
+        </div>
+      </section>
+
+      <section class="pathway-section" id="quality">
+        <div class="pathway-section-head"><span>05</span><div><small>QUALITY CONTROL</small><h3>路径质控指标</h3></div></div>
+        <div class="quality-grid">
+          <div><span>过程</span><b>入组率 / 完成率 / 变异率 / 退出率</b></div>
+          <div><span>效率</span><b>术前住院日 / 总住院日</b></div>
+          <div><span>用药</span><b>预防性抗菌药物种类与使用天数</b></div>
+          <div><span>安全</span><b>并发症 / 非计划重返手术室 / 再入院</b></div>
+          <div><span>康复</span><b>ROM达标 / 步行能力 / 疼痛控制</b></div>
+          <div><span>经济</span><b>住院费用 / 药品费用 / 耗材费用</b></div>
+        </div>
+      </section>
+
+      <section class="pathway-section sources" id="sources">
+        <div class="pathway-section-head"><span>06</span><div><small>SOURCE & VERSION</small><h3>依据与版本</h3></div></div>
+        <div class="source-list">
+          <a href="https://www.nhc.gov.cn/yzygj/c100068/202310/ff33d2ec3ac6488ab8083fbd6f9c59c1.shtml" target="_blank" rel="noopener">
+            <strong>国家卫生健康委办公厅关于印发骨科有关手术加速康复临床路径（2023年版）的通知</strong>
+            <span>含全膝关节置换术等12个骨科ERAS临床路径。</span>
+          </a>
+          <a href="https://www.nhc.gov.cn/cms-search/downFiles/f6eab5cf83654565a228179bc8a4541d.pdf" target="_blank" rel="noopener">
+            <strong>附件8：全膝关节置换术加速康复临床路径（2023年版）</strong>
+            <span>本页面TKA样板的主要国家级底稿。</span>
+          </a>
+          <a href="https://www.nhc.gov.cn/zwgk/wtwj/201304/dde4228b3e0f4077937a1d5ca26641dd.shtml" target="_blank" rel="noopener">
+            <strong>临床路径管理指导原则（试行）</strong>
+            <span>医师版路径表、患者版告知单、变异管理及效果评价的管理框架。</span>
+          </a>
+        </div>
+        <p class="version-note">站内版本：TKA Pathway v1.0 · 2026-10-08。下一步根据你的意见再细化为本院执行版。</p>
+      </section>
+    </article>
+  </div>
+</main>
+
+<div id="pathToast" class="path-toast" role="status" aria-live="polite"></div>
+<script src="/pathway.js?v=20261008-1"></script>
+</body>
+</html>
