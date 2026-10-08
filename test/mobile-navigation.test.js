@@ -18,3 +18,14 @@ test('mobile orthopedic drawer uses touch scrolling without visible nested scrol
   assert.match(css,/sidebar::\-webkit-scrollbar/);
   assert.match(css,/mobile-drawer-shortcuts/);
 });
+
+
+test('sticky header exposes a permanent site-home control without losing the library-home link',()=>{
+  const index=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
+  const css=fs.readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+  assert.match(index,/class="site-home-mark" href="\/" aria-label="返回网站首页"/);
+  assert.match(index,/class="brand library-brand" href="\/bl"/);
+  assert.match(css,/persistent site-home control in library sticky header/);
+  assert.match(css,/#libraryShell \.site-home-mark/);
+  assert.match(css,/\.topbar\{[^}]*position:sticky/s);
+});
