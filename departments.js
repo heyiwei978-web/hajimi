@@ -293,7 +293,7 @@
       if(ac)ac.textContent=list.length;
     }
     function toolbar(label,root){
-      return `<div class="department-toolbar"><button class="btn ghost" id="departmentBack">← ${root?'返回首页':'返回科室'}</button><span>${label}</span></div>`;
+      return `<div class="department-toolbar"><div class="department-toolbar-actions"><a class="btn ghost site-home-btn" href="/">⌂ 网站首页</a><button class="btn ghost" id="departmentBack">← ${root?'返回病历首页':'返回科室'}</button></div><span>${label}</span></div>`;
     }
     function renderDepartmentRoot(){
       document.body.classList.remove('disease-book-page');
@@ -306,6 +306,7 @@
       if(num)num.textContent=departments.length+' 个科室 · '+templates.length+' 份模板';
       if(empty)empty.hidden=true;
       if(grid)grid.innerHTML=`
+        <div class="library-root-home-row"><a class="btn ghost site-home-btn" href="/">⌂ 返回网站首页</a></div>
         <section class="library-overview">
           <div class="library-overview-copy">
             <span>CLINICAL TEMPLATE LIBRARY</span>
@@ -635,6 +636,7 @@
     const orthoDrawer=document.getElementById('sidebar');
     if(orthoDrawer){
       orthoDrawer.innerHTML=
+        '<div class="mobile-drawer-shortcuts"><a href="/">⌂ 网站首页</a><a href="/bl">▤ 病历首页</a></div>'+ 
         '<div class="side-head">骨科疾病 / 术式</div>'+
         '<button class="nav-item active" type="button" data-ortho-route="__overview">骨科总览</button>'+
         orthoSections.map((section)=>{
