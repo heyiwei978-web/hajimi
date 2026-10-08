@@ -11,7 +11,7 @@ const traumaGroups=[
 
 function loadedClinicalScripts(){
   const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
-  return [...html.matchAll(/<script\s+src="\/([^?"]+)(?:\?[^"]*)?"/g)]
+  return [...html.matchAll(/<script\s+[^>]*?src="\/([^?"]+)(?:\?[^"]*)?"/g)]
     .map(match=>match[1])
     .filter(file=>/^(ideal-cases|orthopedic-expansion-[a-z]|record-quality-v\d+)\.js$/.test(file));
 }
