@@ -1380,3 +1380,41 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   .special-case-summary-meta{text-align:left}
   .special-case-records{padding:0 10px 12px}
 }
+
+
+/* 2026-10-08: mobile drawer fix for disease book pages
+   Disease pages intentionally hide the desktop sidebar via department-no-sidebar.
+   On mobile the hamburger must be allowed to reveal that same sidebar above the mask. */
+@media(max-width:900px){
+  body.disease-book-page.department-no-sidebar #libraryShell .sidebar{
+    display:block!important;
+    position:fixed;
+    left:0;
+    top:60px;
+    bottom:0;
+    width:min(84vw,320px);
+    height:auto;
+    z-index:120;
+    transform:translateX(-104%);
+    transition:transform .22s ease;
+    box-shadow:14px 0 36px rgba(15,23,42,.16);
+    background:#fff;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+  body.disease-book-page.department-no-sidebar #libraryShell .sidebar.open{
+    transform:translateX(0);
+  }
+  body.disease-book-page #drawerMask{
+    position:fixed;
+    inset:60px 0 0;
+    z-index:110;
+    background:rgba(15,23,42,.34);
+    backdrop-filter:blur(1px);
+    -webkit-backdrop-filter:blur(1px);
+  }
+  body.disease-book-page #drawerMask.show{
+    display:block;
+  }
+}
