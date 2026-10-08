@@ -1,39 +1,62 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
-import crypto from 'node:crypto';
-import {createSession} from '../api/_auth.js';
-import handler from '../api/ortho-audit-runtime.js';
+import vm from 'node:vm';
 
-test('runtime audit covers the orthopedic scripts loaded by the current site', t => {
-  const previousSecret = process.env.HAJIMI_SESSION_SECRET;
-  process.env.HAJIMI_SESSION_SECRET = crypto.randomBytes(32).toString('hex');
-  t.after(() => {
-    if (previousSecret === undefined) delete process.env.HAJIMI_SESSION_SECRET;
-    else process.env.HAJIMI_SESSION_SECRET = previousSecret;
-  });
-  const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  const expectedFiles = [...html.matchAll(/<script\s+src="\/([^?"]+)(?:\?[^"]*)?"/g)]
-    .map(match => match[1])
-    .filter(file => /^(ideal-cases|orthopedic-expansion-[a-z]|record-quality-v\d+)\.js$/.test(file));
-  let status;
-  let result;
-  const response = {
-    setHeader() {},
-    status(code) { status = code; return this; },
-    json(body) { result = body; }
+const traumaGroups=[
+  '股骨转子间骨折','股骨大粗隆骨折','股骨干骨折','胫骨干骨折','胫骨平台骨折','踝关节三踝骨折',
+  '跟骨骨折','桡骨远端骨折','桡骨头骨折','肱骨近端骨折','肱骨干骨折','锁骨骨折','尺桡骨干骨折',
+  '髌骨骨折','掌骨骨折','指骨骨折','跖骨骨折','趾骨骨折','骨盆骨折'
+];
+
+function loadedClinicalScripts(){
+  const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
+  return [...html.matchAll(/<script\s+src="\/([^?"]+)(?:\?[^"]*)?"/g)]
+    .map(match=>match[1])
+    .filter(file=>/^(ideal-cases|orthopedic-expansion-[a-z]|record-quality-v\d+)\.js$/.test(file));
+}
+
+test('all clinical generation scripts parse and execute in site load order',()=>{
+  const files=loadedClinicalScripts();
+  const context={
+    templates:[],
+    traumaGroups:traumaGroups.slice(),
+    groups:['TKA','THA','人工股骨头置换',...traumaGroups],
+    profile:{},
+    labelFor:(g)=>g==='TKA'?'全膝关节置换':g==='THA'?'全髋关节置换':g,
+    window:{},
+    console:{log(){},warn(){},error(){}},
+    Set,Map,Date,Math,Number,String,RegExp,Array,Object,JSON
   };
+  vm.createContext(context);
 
-  handler({method:'GET',headers:{cookie:'hajimi_session='+createSession(process.env.HAJIMI_ADMIN_USER || 'admin')}}, response);
+  const runtime=[];
+  for(const file of files){
+    const source=fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
+    assert.doesNotThrow(()=>new vm.Script(source,{filename:file}),file+' should parse');
+    try{
+      vm.runInContext(source,context,{filename:file,timeout:5000});
+      runtime.push({file,ok:true});
+    }catch(error){
+      runtime.push({file,ok:false,error:String(error?.stack||error)});
+      throw error;
+    }
+  }
 
-  assert.equal(status, 200, result?.error);
-  assert.equal(result.ok, true);
-  assert.deepEqual(result.runtime.map(entry => entry.file), expectedFiles);
-  assert(result.runtime.every(entry => entry.ok));
-  assert.equal(result.seedCount, 200);
-  assert(result.standardRecordCount > 0);
-  assert.equal(result.audit.stats.diseases, result.seedCount);
-  assert.equal(result.audit.stats.records, result.standardRecordCount);
-  assert.equal(result.audit.stats.issueCount, 0);
-  assert.deepEqual(Array.from(result.audit.issues), []);
+  assert.deepEqual(runtime.map(entry=>entry.file),files);
+  assert(runtime.every(entry=>entry.ok));
+
+  const seeds=context.window.HAJIMI_IDEAL_CASES?.seeds||{};
+  const audit=context.window.HAJIMI_RECORD_QUALITY_V23;
+  assert.equal(Object.keys(seeds).length,200);
+  assert(audit,'quality V23 audit should exist');
+  assert.equal(audit.stats.diseases,200);
+  assert.equal(audit.stats.records,context.templates.filter(t=>t.department==='骨科'&&!t.specialCase).length);
+  assert.equal(audit.stats.issueCount,0,JSON.stringify(audit.issues,null,2));
+  assert.deepEqual(Array.from(audit.issues),[]);
+});
+
+test('index contains no escaped newline artifacts between script tags',()=>{
+  const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
+  assert.equal((html.match(/\\n/g)||[]).length,0);
 });
