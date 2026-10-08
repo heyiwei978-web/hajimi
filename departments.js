@@ -619,10 +619,20 @@
     const reset=document.getElementById('resetFilters');if(reset)reset.onclick=()=>{resetState();render();};
     const menu=document.getElementById('menuBtn'),sidebar=document.getElementById('sidebar'),mask=document.getElementById('drawerMask');
     if(menu&&sidebar&&mask){
-      const close=()=>{sidebar.classList.remove('open');mask.classList.remove('show');};
-      menu.onclick=()=>{sidebar.classList.toggle('open');mask.classList.toggle('show');};
+      const setDrawer=(open)=>{
+        sidebar.classList.toggle('open',open);
+        mask.classList.toggle('show',open);
+        document.body.classList.toggle('drawer-open',open);
+        menu.setAttribute('aria-expanded',open?'true':'false');
+        menu.setAttribute('aria-label',open?'关闭菜单':'打开菜单');
+      };
+      const close=()=>setDrawer(false);
+      menu.setAttribute('aria-expanded','false');
+      menu.onclick=()=>setDrawer(!sidebar.classList.contains('open'));
       mask.onclick=close;
       sidebar.addEventListener('click',(e)=>{if(e.target.closest('.nav-item')&&innerWidth<=900)close();});
+      document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&sidebar.classList.contains('open'))close();});
+      window.addEventListener('resize',()=>{if(innerWidth>900&&sidebar.classList.contains('open'))close();},{passive:true});
     }
     window.addEventListener('popstate',applyRoute);
     window.addEventListener('hajimi:cms-ready',()=>{const r=pathState();if(r.page==='library'&&r.disease&&currentDept)renderDisease();});
