@@ -40,7 +40,12 @@
     let b=blankSeniorNames(raw);
     if((t.type==='手术记录'||/手术记录/.test(String(t.short||'')))&&!b.includes('术式专项操作细节：')){
       const details=window.HAJIMI_REVIEWED_SURGERIES?.getDetail?.(t,seedMap[t.group]);
-      if(details)b=b.replace(/(手术经过：\s*\n)/,'$1术式专项操作细节：'+details+'\n');
+      if(details){
+        // Keep the actual operative chronology: steps 1-3 precede the case-specific detail.
+        const row=/^(3\.\s*[^\n]*\n)/m;
+        if(row.test(b))b=b.replace(row,'$1术式专项操作细节：'+details+'\n');
+        else b=b.replace(/(手术经过：\s*\n)/,'$1术式专项操作细节：'+details+'\n');
+      }
     }
     if(isProgress(t))b=oneNarrativeParagraph(b);
     return b;
