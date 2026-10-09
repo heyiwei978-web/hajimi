@@ -83,7 +83,7 @@ function extractNote(t){
   // Pull trailing signature out even if a previous formatter appended it to the treatment paragraph.
   narrative=narrative.replace(/(?:\n|\s|；)*(?:医师签名|医生签名|记录医师签名|主治医师签名|主任医师签名)[：:]\s*[^\n]{0,100}\s*$/,'');
   narrative=narrative.replace(/(?:\n|\s|；)*(?:主任医师|主治医师|主刀医师)[：:]\s*_{2,}\s*$/,'');
-  narrative=narrative.replace(/^[\s；，,。.]+/,'').replace(/[\s；，,。.]+$/,'');
+  narrative=narrative.replace(/^[\s；，,。.]+/,'').replace(/[\s；，,]+$/,'');
   // Legacy inline labels are not independent paragraphs; preserve their clinical findings.
   narrative=narrative.replace(/(?:^|\n)\s*([一二三四五六七八九十])[、.．]\s*/g,'$1、');
   narrative=narrative.replace(/\n+/g,' ').replace(/[ \t]{2,}/g,' ').replace(/；\s*；/g,'；').trim();
@@ -91,6 +91,7 @@ function extractNote(t){
   const modified=fixDoctors(narrative,t);
   if(modified.changed)summary.roundingSpeech++;
   narrative=modified.text;
+  if(!/[。！？]$/.test(narrative))narrative+='。';
   const metadata=['记录名称：'+t.short,'患者：'+patient,'科别：骨科'];
   const dateLines=[admission?'入院日期：'+admission:'',surgery?'手术日期：'+surgery:'',discharge?'出院日期：'+discharge:''].filter(Boolean);
   if(dateLines.length)metadata.push(dateLines.join('    '));
@@ -112,9 +113,11 @@ function makeDischargeNote(group,reference,caseKey){
     '主诊断：'+dx,
     ''
   ];
+  const summarySituation=clean((s.match(/出院情况[：:]\s*([\s\S]*?)(?=\n\s*(?:出院诊断|出院医嘱|出院计划)[：:]|$)/)||[])[1]).replace(/\n+/g,' ');
+  const condition=summarySituation?summarySituation:'患者当日一般情况、切口状态、神经血管功能及活动能力需结合查房查体逐项核实。';
   const text=caseKey?
     '今日为拟出院评估日，需核对患者近期症状、生命体征、切口或创面状态、引流情况及神经血管功能，并据实补录查体数据、检查结果和功能恢复情况。________主治医师查房后指出：本病例既往存在特殊诊疗经过，应重点复核相关并发症控制情况、必要检查结果与治疗方案的连续性，确认出院条件是否满足；未达到条件时应继续住院观察或治疗，不得仅凭计划日期办理出院。符合条件后应向患者及家属明确告知切口护理、用药与康复限制、预警症状及复诊时间，并记录沟通反馈。':
-    '今日查房评估出院条件，患者住院期间已接受'+(c.surgery||'相应治疗')+'，继续核对主诉症状变化、生命体征、切口及局部肿胀、末梢血运和感觉运动、复查影像及康复功能状态。________主治医师查房后指出：应结合近期查体、复查结果、镇痛需求及家庭照护能力综合评估出院条件，确认无仍需院内处理的并发症后方可办理出院；出院后按照'+(c.rehab||'既定康复方案')+'继续训练，明确患肢活动与负重限制，告知切口护理、药物医嘱、门诊复查时间及发热、切口渗液、进行性肿胀、麻木无力等及时就诊指征。具体活动度、切口情况及检查结果应以出院当日实际记录为准。';
+    '今日出院前查房，患者因'+dx+'入院，住院期间已接受'+(c.surgery||'相应治疗')+'。出院前病情评估：'+condition+'术后疼痛、切口或伤口愈合、末梢血运及感觉运动情况应与实际查体核对，并结合复查影像、康复训练耐受情况及必要实验室结果综合判断。________主治医师查房后指出：根据目前住院治疗经过及出院前复评结果，需确认无仍须住院处理的并发症、患者已掌握居家护理及功能训练要求后方可办理出院；继续按照'+(c.rehab||'既定康复方案')+'安排关节活动和肌力训练，严格执行患肢活动及负重限制，向患者及家属交代切口护理、药物医嘱、定期复查及发热、渗液、肢体进行性肿胀或神经功能变化等及时就医指征。医师核实并记录出院当日的具体客观指标和沟通结果。';
   parts.push('病程记录：'+text,'','医师签名：________');
   const entry={
     department:'骨科',group,short:'出院当天查房记录',stage:'术后',type:'查房',
