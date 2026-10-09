@@ -58,6 +58,13 @@
     function make(name, approach, expose, fixation, confirm) {
       return { name:name, approach:approach, expose:expose, fixation:fixation, confirm:confirm };
     }
+    // Most-specific, specialty-reviewed operative descriptions are registered in ortho-protocols-*.js.
+    // Keep this registry ahead of the legacy common-fracture fallback.
+    var registered=window.HAJIMI_ORTHO_PROTOCOLS||[];
+    for(var i=0;i<registered.length;i++){
+      var rule=registered[i];
+      if(new RegExp(rule.pattern).test(op))return make(rule.name,rule.parts[0],rule.parts[1],rule.parts[2],rule.parts[3]);
+    }
     if (/全膝关节置换|^TKA$/.test(both))
       return make('膝前正中—内侧髌旁入路', '沿膝前正中作纵行切口，逐层切开皮肤、皮下组织及筋膜，采用内侧髌旁关节囊入路显露膝关节，保护伸膝装置和髌腱附着点，必要时适度松解内侧软组织。',
         '清除增生滑膜、残余半月板及影响操作的骨赘，辨认股骨远端、胫骨平台及髌股关节退变情况。按术前计划测量并校正下肢机械轴，定位股骨及胫骨截骨导向器，完成股骨远端、股骨髁及胫骨近端截骨；检查截骨面，分阶段平衡屈曲与伸直间隙以及内外侧韧带张力。',
