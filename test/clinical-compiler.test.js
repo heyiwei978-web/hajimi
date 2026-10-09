@@ -73,6 +73,11 @@ test('compiled catalogs and per-disease bodies preserve every original clinical 
     assert.ok(paragraphs.every(p=>p.trim().length>=45),r.short+'：每段须包含完整临床操作描述');
     assert.doesNotMatch(section[1],/^\\s*\\d+[.、．]/m,r.short+'：不能保留编号式步骤');
   }
+  // Guard against a generic operative route masking a more appropriate named approach.
+  const scoliosis=records.find(r=>r.department==='骨科'&&r.group==='脊柱侧弯'&&r.short==='手术记录');
+  if(scoliosis)assert.match(scoliosis.sourceBody,/椎体去旋转|旋棒/, '脊柱侧弯矫形术应包含矫形与去旋转技术，不得退化为普通脊柱骨折固定');
+  const haglund=records.find(r=>r.department==='骨科'&&r.group&&/Haglund/.test(r.group)&&r.short==='手术记录');
+  if(haglund)assert.match(haglund.sourceBody,/跟骨后上方|跟腱止点/,'Haglund成形不能套用单纯跟腱腱体缝合术');
   const entry=fs.readFileSync(path.join(directory,'library.html'),'utf8');
   assert(!entry.includes('/record-quality-v'));
   assert(!entry.includes('/orthopedic-expansion-'));
