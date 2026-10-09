@@ -693,7 +693,7 @@
     function navigateDisease(g){history.pushState({},'', '/bl/'+deptToSlug[currentDept]+'/'+encodeURIComponent(g));finishNavigation();}
     async function applyRoute(){
       const generation=++routeGeneration;
-      document.getElementById('templateGrid').classList.remove('search-results');
+      document.getElementById('templateGrid').classList.remove('search-results','case-search-results');
       const r=pathState();setShell(r.page);
       const title=r.page==='home'?'哈基米工作站':r.page==='duty'?'值班资料':r.page==='departments'?'病历模板库':(r.disease?labelFor(r.disease)+' · 完整病历':(r.department||'')+'病历模板库');
       document.title=title==='哈基米工作站'?title:title+' · 哈基米工作站';
@@ -775,7 +775,7 @@
 
     let searchLoading=false;
     render=function(){
-      document.getElementById('templateGrid').classList.remove('search-results');
+      document.getElementById('templateGrid').classList.remove('search-results','case-search-results');
       const r=pathState();
       if(r.page!=='library'&&r.page!=='departments'){setShell(r.page);return;}
       if(r.page==='departments'){
