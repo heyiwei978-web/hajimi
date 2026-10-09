@@ -111,7 +111,7 @@
         }else{bodyStarted=true;if(line.trim())bodyLines.push(line.trim());}
       }
       const role=/主任医师/.test(t.short)?'主任医师':/主治医师/.test(t.short)?'主治医师':/主刀医师/.test(t.short)?'主刀医师':'';
-      const namePattern=/[\u4e00-\u9fa5]{2,4}(主任医师|主治医师)(?=查房|指出|指示|认为|分析|意见|：|:)/g;
+      const namePattern=/[赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦许何吕施张孔曹严华金魏陶姜戚谢邹喻柏水窦章云苏潘葛范彭郎鲁韦昌马苗凤花方俞任袁柳唐罗薛伍余米贝姚孟顾尹江钟汪田石董梁宋杜肖贺耿][\u4e00-\u9fa5]{1,2}(主任医师|主治医师)(?=查房|指出|指示|认为|分析|意见|：|:)/g;
       const prose=bodyLines.filter(x=>!/^((主任|主治|主刀)医师)(?:签名)?[：:]/.test(x)).join(' ').replace(namePattern,'________$1');
       return (head.length?head.join('\n')+'\n\n':'')+prose+(role?'\n\n'+role+'：________':'');
     }
