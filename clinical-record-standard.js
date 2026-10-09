@@ -39,7 +39,11 @@
     if(!isOrtho(t)||typeof raw!=='string')return raw;
     let b=blankSeniorNames(raw);
     if((t.type==='手术记录'||/手术记录/.test(String(t.short||'')))&&!b.includes('术式专项操作细节：')){
-      const details=window.HAJIMI_REVIEWED_SURGERIES?.getDetail?.(t,seedMap[t.group]);
+      const caseSeed=seedMap[t.group];
+      const recordedProcedure=b.match(/手术名称\s*[:：]\s*([^\n]+)/);
+      const expectedSurgery=String(caseSeed?.surgery||'').replace(/^[左右]/,'');
+      const compatible=!recordedProcedure||!expectedSurgery||recordedProcedure[1].includes(expectedSurgery);
+      const details=compatible?window.HAJIMI_REVIEWED_SURGERIES?.getDetail?.(t,caseSeed):'';
       if(details){
         // Keep the actual operative chronology: steps 1-3 precede the case-specific detail.
         const row=/^(3\.\s*[^\n]*\n)/m;
