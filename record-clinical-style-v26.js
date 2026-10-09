@@ -22,6 +22,9 @@
     var anesthesia=String(c.anesthesia||'计划麻醉');
     var position=String(c.position||'符合手术要求的体位');
     var paragraphs=p.parts.slice();
+    // Keep every middle paragraph substantial even for short tendon/epiphysiodesis procedures.
+    if(paragraphs[1].length<45)paragraphs[1]+=' 并在直视下复核邻近神经血管、肌腱及关节结构的保护情况。';
+    if(paragraphs[2].length<45)paragraphs[2]+=' 术中同时核查处理范围、局部稳定性及周围健康组织的完整情况。';
     paragraphs[0]='患者进入手术室后核对姓名、住院号、手术名称及'+side+'侧标识，完成手术安全核查，在'+anesthesia+'满意后取'+position+'，手术区域常规消毒并铺无菌巾单。'+paragraphs[0];
     paragraphs[3]+=' 再次检查有无活动性出血，彻底冲洗术野，根据实际需要放置引流，清点器械、纱布、缝针无误后逐层缝合并覆盖无菌敷料；术后核对患肢神经血管状态及植入物追溯信息。';
     if(typeof c.bloodloss==='number')paragraphs[3]+=' 该模板原始病例记载出血约'+c.bloodloss+'ml，应用时以实际麻醉记录和手术记录为准。';
