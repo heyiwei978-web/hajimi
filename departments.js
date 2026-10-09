@@ -337,20 +337,13 @@
             <div><strong>${otherCount}</strong><span>其他科室</span></div>
           </div>
         </section>
+        <section id="libraryPersonal" class="library-quick-panel" aria-label="我的常用入口"></section>
         <div class="library-section-heading">
           <div><span>01</span><h3>科室入口</h3><p>选择科室后，再进入具体疾病或术式。</p></div>
           <strong>${departments.length} 个科室</strong>
         </div>
-        <div class="department-grid library-department-grid">${departments.map((d)=>deptCard(d.name)).join('')}</div>
-        <section class="library-quick-panel">
-          <div class="library-quick-head"><span>02</span><div><h3>后续扩展</h3><p>为新增内容预留固定位置，后续添加不会打乱现有结构。</p></div></div>
-          <div class="library-quick-grid">
-            <div><b>新增科室</b><span>继续增加内科、外科及其他专业模板</span></div>
-            <div><b>病例与影像</b><span>脱敏案例、DR、CT、MRI及术前术后对照</span></div>
-            <div><b>专项记录</b><span>会诊、沟通、检查理由、并发症和康复路径</span></div>
-            <div><b>常用收藏</b><span>预留最近使用和个人常用模板入口</span></div>
-          </div>
-        </section>`;
+        <div class="department-grid library-department-grid">${departments.map((d)=>deptCard(d.name)).join('')}</div>`;
+      window.HAJIMI_PERSONAL?.mount();
       document.querySelectorAll('[data-department]').forEach((c)=>{
         const go=()=>navigateDepartment(c.dataset.department);
         c.onclick=go;c.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
@@ -564,7 +557,7 @@
             <span>${currentDept==='骨科'?'ORTHOPAEDICS':'CLINICAL RECORD'} · COMPLETE MEDICAL RECORD</span>
             <h2>${labelFor(state.group)} · 完整病历</h2>
             <p>一个疾病只保留一个连续病历页面。顺序参照住院病历书写流程，目录可直接跳转到首次病程、查房、术前讨论、手术记录和术后各日病程。</p>
-            <div class="record-book-hero-actions"><button id="copyWholeRecord" class="btn primary" type="button">复制完整病历</button><button id="printWholeRecord" class="btn ghost" type="button">打印整套病历</button>${pathwayHref?'<a class="btn ghost" href="'+pathwayHref+'">查看临床路径</a>':''}</div>
+            <div class="record-book-hero-actions"><button id="copyWholeRecord" class="btn primary" type="button">复制完整病历</button><button id="printWholeRecord" class="btn ghost" type="button">打印整套病历</button><button id="favoriteDisease" class="btn ghost" type="button" aria-pressed="false">☆ 收藏病种</button>${pathwayHref?'<a class="btn ghost" href="'+pathwayHref+'">查看临床路径</a>':''}</div>
           </div>
           <strong>1<small>套标准病历 · ${list.length} 个现有章节${specialBundle.groups.length?' · '+specialBundle.groups.length+'个特殊病例':''}</small></strong>
         </section>`;
@@ -591,6 +584,8 @@
 
       const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateDepartment(currentDept);
       bindTemplateActions();
+      window.HAJIMI_PERSONAL?.remember(currentDept,state.group);
+      window.HAJIMI_PERSONAL?.bindFavorite(document.getElementById('favoriteDisease'),currentDept,state.group);
       const copyWhole=document.getElementById('copyWholeRecord');if(copyWhole)copyWhole.onclick=()=>copyText(recordBookText(list));
       const printWhole=document.getElementById('printWholeRecord');if(printWhole)printWhole.onclick=()=>window.print();
 

@@ -141,6 +141,41 @@ test('patient summary stays hidden until supplied and disappears after clearing'
   }finally{await context.close();}
 });
 
+test('disease favorites persist, recent visits deduplicate and another tab reflects removal',async()=>{
+  for(const width of [375,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});
+      await page.getByRole('button',{name:'患者信息',exact:true}).click();await page.locator('#patientForm input[name="name"]').fill('仅会话内的示例姓名');await page.locator('#savePatient').click();
+      const favorite=page.locator('#favoriteDisease');await favorite.click();assert.equal(await favorite.getAttribute('aria-pressed'),'true');
+      await page.reload({waitUntil:'networkidle'});assert.equal(await favorite.getAttribute('aria-pressed'),'true');
+      await page.goto(base+'/bl/guke/THA',{waitUntil:'networkidle'});
+      const other=await context.newPage();await other.goto(base+'/bl',{waitUntil:'networkidle'});
+      const columns=other.locator('#libraryPersonal .personal-column');assert.equal(await columns.nth(0).locator('a').count(),1);assert.equal(await columns.nth(1).locator('a').count(),2);
+      assert.match(await columns.nth(1).locator('a').first().innerText(),/全髋/);
+      const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('hajimi-library-personal-v1')));
+      for(const value of [...saved.favorites,...saved.recent])assert.deepEqual(Object.keys(value).sort(),['department','group']);
+      assert(!JSON.stringify(saved).includes('示例姓名'));
+      await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});
+      await other.getByRole('button',{name:'取消收藏 全膝关节置换',exact:true}).click();await page.waitForFunction(()=>document.getElementById('favoriteDisease').getAttribute('aria-pressed')==='false');
+      await other.getByRole('button',{name:'清空最近访问',exact:true}).click();assert.equal(await columns.nth(1).locator('a').count(),0);
+      assert(await other.locator('#libraryPersonal').evaluate(panel=>panel.scrollWidth<=panel.clientWidth+1));assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('blocked browser storage leaves favorites usable in the current page',async()=>{
+  const {page,context,errors}=await pageFor(375);
+  try{
+    await context.addInitScript(()=>{Storage.prototype.getItem=function(){throw new DOMException('Blocked','SecurityError');};Storage.prototype.setItem=function(){throw new DOMException('Blocked','SecurityError');};});
+    await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});await page.locator('#favoriteDisease').click();
+    assert.equal(await page.locator('#favoriteDisease').getAttribute('aria-pressed'),'true');
+    await page.locator('#departmentBack').click();await page.locator('#departmentBack').click();await page.locator('#libraryPersonal').waitFor();
+    assert.match(await page.locator('.personal-storage-status').innerText(),/暂不允许保存/);assert.equal(await page.locator('#libraryPersonal .personal-column').first().locator('a').count(),1);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('Chinese composition completes before search results are replaced',async()=>{
   const {page,context}=await pageFor();
   try {await page.goto(base+'/bl',{waitUntil:'networkidle'});
