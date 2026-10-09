@@ -38,6 +38,10 @@
   function format(t,raw){
     if(!isOrtho(t)||typeof raw!=='string')return raw;
     let b=blankSeniorNames(raw);
+    if((t.type==='手术记录'||/手术记录/.test(String(t.short||'')))&&!b.includes('术式专项操作细节：')){
+      const details=window.HAJIMI_REVIEWED_SURGERIES?.getDetail?.(t,seedMap[t.group]);
+      if(details)b=b.replace(/(手术经过：\s*\n)/,'$1术式专项操作细节：'+details+'\n');
+    }
     if(isProgress(t))b=oneNarrativeParagraph(b);
     return b;
   }
@@ -45,15 +49,8 @@
   for(const t of templates){
     if(!isOrtho(t)||typeof t.sourceBody!=='string')continue;
     const before=t.sourceBody;
-    let after=before;
-    if(t.type==='手术记录'||/手术记录/.test(String(t.short||''))){
-      const detail=window.HAJIMI_REVIEWED_SURGERIES?.getDetail?.(t,seedMap[t.group]);
-      if(detail&&!(after.includes('术式专项操作细节：'))){
-        after=after.replace(/(手术经过：\s*\n)/,'$1术式专项操作细节：'+detail+'\n');
-        if(after!==before)opnotes++;
-      }
-    }
-    after=format(t,after);
+    const after=format(t,before);
+    if((t.type==='手术记录'||/手术记录/.test(String(t.short||'')))&&after.includes('术式专项操作细节：')&&!before.includes('术式专项操作细节：'))opnotes++;
     if(isProgress(t)&&after!==before)progress++;
     if(after.includes('________主任医师')||after.includes('________主治医师'))senior++;
     t.sourceBody=after;
