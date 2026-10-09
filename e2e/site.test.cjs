@@ -204,6 +204,36 @@ test('keyboard skip link, named dialogs and Enter calculation are usable',async(
   } finally {await context.close();}
 });
 
+test('duty drafts survive refresh, export accurate handoffs and remain isolated to the tab',async()=>{
+  for(const width of [320,375,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      const requests=[];page.on('request',request=>requests.push(new URL(request.url()).pathname));
+      await page.goto(base+'/duty',{waitUntil:'networkidle'});assert(!requests.some(url=>url.startsWith('/catalog-')||url.startsWith('/records-')||url==='/api/content'));
+      await page.locator('[data-check]').first().check();await page.locator('#dutyTaskForm input[name="title"]').fill('核对待回报检查');await page.locator('#dutyTaskForm input[name="due"]').fill('2020-01-01T09:00');await page.getByRole('button',{name:'添加待办',exact:true}).click();
+      await page.locator('#dutyTaskForm input[name="title"]').fill('整理交班材料');await page.getByRole('button',{name:'添加待办',exact:true}).click();await page.getByRole('checkbox',{name:'完成 整理交班材料',exact:true}).check();await page.locator('#dutyNotes').fill('复评后更新交班记录');
+      await page.reload({waitUntil:'networkidle'});assert(await page.locator('[data-check]').first().isChecked());assert.equal(await page.locator('#dutyTaskCount').innerText(),'1 项待办');assert.match(await page.locator('.time-due').innerText(),/时间已到/);assert.equal(await page.locator('#dutyNotes').inputValue(),'复评后更新交班记录');
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      await page.getByRole('button',{name:'生成交班摘要',exact:true}).click();const summary=await page.locator('#dutySummaryText').inputValue();assert.match(summary,/交班核对：1 \/ 12 项/);assert.match(summary,/未完成事项：\n□ 核对待回报检查/);assert.match(summary,/已完成事项：\n✓ 整理交班材料/);assert.match(summary,/复评后更新交班记录/);
+      const downloading=page.waitForEvent('download');await page.getByRole('button',{name:'下载文本',exact:true}).click();const download=await downloading;assert.equal(fs.readFileSync(await download.path(),'utf8'),summary);await page.keyboard.press('Escape');
+      await page.evaluate(()=>window.dispatchEvent(new Event('beforeprint')));await page.emulateMedia({media:'print'});assert(await page.locator('#dutyPrintSummary').isVisible());assert.match(await page.locator('#dutyPrintSummary').innerText(),/核对待回报检查/);assert.equal(await page.locator('.duty-tasks').isVisible(),false);await page.emulateMedia({media:'screen'});
+      const another=await context.newPage();await another.goto(base+'/duty',{waitUntil:'networkidle'});assert.equal(await another.locator('#dutyTaskList li').count(),0);assert.equal(await another.locator('#dutyNotes').inputValue(),'');assert.equal(await page.evaluate(()=>localStorage.getItem('hajimi-duty-session-v1')),null);
+      page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'清空本班草稿',exact:true}).click();assert.equal(await page.locator('#dutyTaskList li').count(),0);assert.equal(await page.locator('#dutyNotes').inputValue(),'');assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('duty tool links open the requested calculator, and blocked storage or clipboard is explained',async()=>{
+  const {page,context,errors}=await pageFor(375);
+  try{
+    await context.addInitScript(()=>{Storage.prototype.setItem=function(){throw new DOMException('Blocked','SecurityError');};Object.defineProperty(navigator,'clipboard',{value:{writeText:async()=>{throw new Error('Blocked');}}});});
+    await page.goto(base+'/duty',{waitUntil:'networkidle'});await page.locator('#dutyNotes').fill('示例交班备注');assert(await page.locator('#dutyStorageStatus').isVisible());
+    await page.locator('#dutySummaryButton').click();await page.locator('#dutyCopy').click();assert.match(await page.locator('#dutyCopyStatus').innerText(),/系统复制/);await page.keyboard.press('Escape');
+    await page.getByRole('link',{name:/NEWS2/}).click();await page.getByRole('dialog',{name:'NEWS2',exact:true}).waitFor({state:'visible'});assert.deepEqual(errors,[]);
+    await page.goto(base+'/tools?tool=constructor',{waitUntil:'networkidle'});assert.equal(await page.locator('#dlg').isVisible(),false);
+  }finally{await context.close();}
+});
+
 test('disease navigation starts at the top, preserves record content and chapter anchors',async()=>{
   const {page,context,errors}=await pageFor(1440);
   try {await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});await page.locator('.ortho-disease-card').first().click();

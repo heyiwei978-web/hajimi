@@ -38,11 +38,11 @@
     },
     {
       "source": "/duty",
-      "destination": "/library.html"
+      "destination": "/duty.html"
     },
     {
       "source": "/duty/",
-      "destination": "/library.html"
+      "destination": "/duty.html"
     }
   ],
   "headers": [

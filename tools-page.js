@@ -221,4 +221,6 @@ function filterCards(){
  $('#formulaCount').textContent=visible+' 个工具';
 }
 search.addEventListener('input',filterCards);filterCards();
+const requestedTool=new URLSearchParams(location.search).get('tool');
+if(requestedTool&&Object.hasOwn(SRC,requestedTool))openTool(requestedTool);
 })();

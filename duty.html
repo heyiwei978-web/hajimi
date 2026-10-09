@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f8fb">
+<title>值班工作台 · 哈基米工作站</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231d67d8%22/%3E%3Cpath d=%22M10 8v16m12-16v16M10 16h12%22 stroke=%22white%22 stroke-width=%223.5%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/styles.css?v=20261008-sticky-home1">
+<link rel="stylesheet" href="/ui-polish.css?v=20261009-card-width2">
+<link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
+<link rel="stylesheet" href="/duty.css?v=20261009-duty1">
+</head>
+<body class="duty-page">
+<a class="skip-link" href="#dutyContent">跳到主要内容</a>
+<header class="global-nav official-nav"><div class="global-nav-inner official-nav-inner">
+  <a class="global-brand official-brand" href="/"><span class="official-brand-mark" aria-hidden="true">H</span><span class="official-brand-text"><strong>哈基米工作站</strong><small>Clinical Workspace</small></span></a>
+  <nav class="global-links official-links" aria-label="主导航"><a href="/">首页</a><a href="/bl">病历模板</a><a href="/pathway">临床路径</a><a class="active" href="/duty">值班资料</a><a href="/tools">临床工具</a><a href="/admin">管理入口</a></nav>
+</div></header>
+<main id="dutyContent" class="duty-main">
+  <section class="duty-hero"><div><p class="duty-kicker">ON CALL WORKSPACE</p><h1>值班工作台</h1><p>核对交班、整理待办、记录复评时间。把下一步安排交代清楚。</p></div><a class="btn ghost" href="/bl">打开病历库 →</a></section>
+  <p class="duty-privacy">草稿仅保存在当前标签页，不上传。请勿填写姓名、住院号等身份信息，交班结束后可一键清空。</p>
+  <p id="dutyStorageStatus" class="duty-storage-status" role="status" hidden></p>
+  <section class="duty-card" aria-labelledby="dutyChecklistTitle">
+    <div class="duty-card-head"><div><h2 id="dutyChecklistTitle">交班核对清单</h2><p>用于工作核对，具体流程以所在医院和科室制度为准。</p></div><span id="checklistProgress" role="status" aria-live="polite">已核对 0 / 12 项</span></div>
+    <div class="duty-check-grid">
+      <fieldset><legend>接班时</legend>
+        <label><input type="checkbox" data-check="receive-records">核对交班记录与未完成事项</label>
+        <label><input type="checkbox" data-check="receive-review">确认需重点复评的事项与时间</label>
+        <label><input type="checkbox" data-check="receive-schedule">核对当班手术、检查及会诊安排</label>
+        <label><input type="checkbox" data-check="receive-contact">确认科室联络与上报方式</label>
+      </fieldset>
+      <fieldset><legend>值班中</legend>
+        <label><input type="checkbox" data-check="shift-changes">记录新情况及后续复评安排</label>
+        <label><input type="checkbox" data-check="shift-results">核对待回报的检验与检查</label>
+        <label><input type="checkbox" data-check="shift-consults">跟进会诊与沟通待办</label>
+        <label><input type="checkbox" data-check="shift-update">更新已完成与未完成事项</label>
+      </fieldset>
+      <fieldset><legend>交班前</legend>
+        <label><input type="checkbox" data-check="handoff-tasks">逐项核对未完成事项</label>
+        <label><input type="checkbox" data-check="handoff-review">交代需复评事项及时间</label>
+        <label><input type="checkbox" data-check="handoff-records">确认当班记录与资料齐全</label>
+        <label><input type="checkbox" data-check="handoff-confirm">与接班者确认责任交接</label>
+      </fieldset>
+    </div>
+  </section>
+  <div class="duty-columns">
+    <section class="duty-card duty-tasks" aria-labelledby="dutyTasksTitle">
+      <div class="duty-card-head"><div><h2 id="dutyTasksTitle">待办与复评</h2><p>时间提示在打开本页时更新，不会发送通知。</p></div><span id="dutyTaskCount" role="status" aria-live="polite">0 项待办</span></div>
+      <form id="dutyTaskForm" class="duty-task-form"><label>事项<input name="title" maxlength="200" placeholder="例如：复核待回报检查" required></label><label>计划时间（可选）<input name="due" type="datetime-local"></label><button class="btn primary" type="submit">添加待办</button></form>
+      <p id="dutyTaskError" role="alert" hidden></p><ul id="dutyTaskList" class="duty-task-list"></ul><p id="dutyTaskEmpty" class="duty-empty">暂无待办。可添加需要跟进或复评的事项。</p>
+    </section>
+    <section class="duty-card duty-notes" aria-labelledby="dutyNotesTitle"><h2 id="dutyNotesTitle">交班备注</h2><label for="dutyNotes">补充未完成事项、复评安排与联络记录</label><textarea id="dutyNotes" rows="8" maxlength="5000" placeholder="填写需要交代的工作内容，避免身份信息。"></textarea><div class="duty-note-actions"><button id="dutySummaryButton" class="btn primary" type="button">生成交班摘要</button><button id="dutyPrint" class="btn ghost" type="button">打印摘要</button><button id="dutyClear" class="btn ghost" type="button">清空本班草稿</button></div></section>
+  </div>
+  <section class="duty-card" aria-labelledby="dutyLinksTitle"><div class="duty-card-head"><div><h2 id="dutyLinksTitle">常用资料与工具</h2><p>直接打开本站现有资料，工具页面保留原有公式与来源。</p></div></div><div class="duty-link-grid">
+    <a href="/bl/guke/%E9%80%9A%E7%94%A8%E5%9C%BA%E6%99%AF"><strong>围手术期记录</strong><span>沟通、会诊及检查理由模板 →</span></a>
+    <a href="/bl"><strong>病历库与收藏</strong><span>按科室浏览、检索常用病种 →</span></a>
+    <a href="/pathway"><strong>骨科临床路径</strong><span>查看现有路径与时间轴 →</span></a>
+    <a href="/tools?tool=news2"><strong>NEWS2</strong><span>打开现有评分工具与来源 →</span></a>
+    <a href="/tools?tool=egfr"><strong>eGFR</strong><span>打开成人 CKD-EPI 2021 工具 →</span></a>
+    <a href="/tools"><strong>全部临床工具</strong><span>搜索公式和风险评分 →</span></a>
+  </div></section>
+  <pre id="dutyPrintSummary" class="duty-print-summary"></pre>
+</main>
+<dialog id="dutySummaryDialog" class="duty-summary-dialog" aria-labelledby="dutySummaryTitle"><div class="duty-card-head"><h2 id="dutySummaryTitle">交班摘要</h2><button id="dutySummaryClose" class="icon-btn" type="button" aria-label="关闭交班摘要">×</button></div><label for="dutySummaryText">核对后复制或下载</label><textarea id="dutySummaryText" rows="16" readonly></textarea><p id="dutyCopyStatus" role="status" aria-live="polite"></p><div class="duty-note-actions"><button id="dutyCopy" class="btn primary" type="button">复制摘要</button><button id="dutyDownload" class="btn ghost" type="button">下载文本</button></div></dialog>
+<div id="dutyToast" class="portal-toast"></div>
+<script defer src="/duty.js?v=20261009-duty1"></script>
+<script defer src="/workspace.js?v=20261009-quality1"></script>
+</body>
+</html>
