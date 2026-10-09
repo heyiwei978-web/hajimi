@@ -139,7 +139,7 @@
     '锁骨骨折':'https://surgeryreference.aofoundation.org/orthopedic-trauma/adult-trauma/clavicle-fractures/approach/superior-approach-to-the-clavicle'
   };
   function getDetail(t,c){
-    if(!t||!c||!operations[t.group])return '';
+    if(!t||!c||t.specialCase||t.specialCaseKey||!operations[t.group])return '';
     // Prevent technique substitution when a case specifies a materially different procedure.
     const p=String(c.procedure||''),s=String(c.surgery||'');
     if(!p.trim()||/保守|非手术/.test(s))return '';
