@@ -1,5 +1,6 @@
 import {readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync, copyFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
+import {compileClinicalSite} from './clinical-compiler.mjs';
 
 // Keep homepage markup in index.html as the single source for both entry points.
 export function buildHome(source) {
@@ -32,7 +33,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       }
     }
     writeFileSync(new URL('index.html',directory),output);
-    copyFileSync(new URL('../index.html',import.meta.url),new URL('library.html',directory));
+    compileClinicalSite(readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);
     console.log('Built lightweight homepage and clinical library in dist/');
   }
 }

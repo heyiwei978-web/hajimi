@@ -17,13 +17,13 @@ before(async () => {
     const direct=pathname==='/'?'/index.html':pathname;
     // Match Vercel's filesystem precedence so the homepage cannot silently
     // fall back to the much heavier clinical entry point after deployment.
-    const directFile=/^\/[a-zA-Z0-9_-]+\.(?:html|js|css)$/.test(direct)&&fs.existsSync(path.join(publicRoot,direct.slice(1)));
+    const directFile=/^\/[a-zA-Z0-9_-]+\.(?:html|js|css|json)$/.test(direct)&&fs.existsSync(path.join(publicRoot,direct.slice(1)));
     const target = directFile?direct:rewrite?.destination || pathname;
-    if (!/^\/[a-zA-Z0-9_-]+\.(?:html|js|css)$/.test(target)) {res.writeHead(404);res.end();return;}
+    if (!/^\/[a-zA-Z0-9_-]+\.(?:html|js|css|json)$/.test(target)) {res.writeHead(404);res.end();return;}
     const file = path.join(publicRoot, target.slice(1));
     if (!fs.existsSync(file)) {res.writeHead(404);res.end();return;}
     for (const header of config.headers.find(rule=>rule.source==='/(.*)')?.headers || []) res.setHeader(header.key,header.value);
-    const type = target.endsWith('.css') ? 'text/css' : target.endsWith('.js') ? 'application/javascript' : 'text/html';
+    const type = target.endsWith('.css') ? 'text/css' : target.endsWith('.js') ? 'application/javascript' : target.endsWith('.json')?'application/json':'text/html';
     res.setHeader('Content-Type', type+'; charset=utf-8');
     fs.createReadStream(file).pipe(res);
   });
@@ -82,12 +82,13 @@ test('every orthopedic card keeps both borders inside its category on phones and
 test('cross-department search, filters, pagination, preview and empty-state reset work',async()=>{
   const {page,context,errors}=await pageFor(393);
   try {await page.goto(base+'/bl',{waitUntil:'networkidle'});
-    assert.equal(await page.evaluate(()=>templates.length),5159);
+    assert.equal(await page.evaluate(()=>templates.length),0);
     const search=page.getByRole('textbox',{name:'搜索病历模板'});
     await search.fill('肝脓肿');await page.waitForFunction(()=>document.querySelector('#resultTitle').textContent.includes('搜索结果'));
+    assert.equal(await page.evaluate(()=>templates.length),5159);
     assert.equal(await search.inputValue(),'肝脓肿');assert((await page.locator('#templateGrid').innerText()).includes('普外科'));
     assert(await page.locator('#templateGrid .card').evaluateAll(cards=>cards.every(card=>{const r=card.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&card.scrollWidth<=card.clientWidth+1;})));
-    await page.locator('#templateGrid .preview').first().click();assert(await page.getByRole('dialog',{name:/肝脓肿/}).isVisible());await page.keyboard.press('Escape');
+    await page.locator('#templateGrid .preview').first().click();await page.getByRole('dialog',{name:/肝脓肿/}).waitFor({state:'visible'});await page.keyboard.press('Escape');
     await search.fill('术前');await page.waitForFunction(()=>document.querySelectorAll('#templateGrid .card').length===60);
     await page.getByRole('button',{name:'显示更多',exact:true}).click();assert.equal(await page.locator('#templateGrid .card').count(),120);
     await search.fill('不存在的资料xyz');await page.waitForSelector('#emptyState:visible');assert.equal(await page.locator('#templateGrid .card').count(),0);
@@ -96,6 +97,36 @@ test('cross-department search, filters, pagination, preview and empty-state rese
     assert(await page.locator('#templateGrid .tag.stage').evaluateAll(tags=>tags.every(tag=>tag.textContent==='术中')));
     assert.deepEqual(errors,[]);
   } finally {await context.close();}
+});
+
+test('department browsing loads only its catalog; record bodies arrive on demand and can retry',async()=>{
+  const {page,context,errors}=await pageFor(393);
+  try{
+    const requests=[];page.on('request',request=>requests.push(new URL(request.url()).pathname));
+    await page.goto(base+'/bl/puwai',{waitUntil:'networkidle'});
+    assert.equal(await page.evaluate(()=>templates.length),9);
+    assert.equal(requests.filter(url=>url.startsWith('/catalog-')).length,1);
+    assert(requests.some(url=>url.startsWith('/catalog-puwai-')));assert(!requests.some(url=>url.startsWith('/records-')));
+    let failed=false;
+    await context.route('**/records-*.json',route=>{if(!failed){failed=true;return route.fulfill({status:503,json:{error:'Temporary failure'}});}return route.continue();});
+    await page.locator('[data-disease]').first().click();await page.locator('#retryRecords').waitFor({state:'visible'});
+    assert.equal(await page.locator('.record-book-body').count(),0);
+    await page.getByRole('button',{name:'重试',exact:true}).click();await page.locator('.record-book-body').first().waitFor({state:'visible'});
+    assert((await page.locator('.record-book-body').first().textContent()).length>100);assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('a slow earlier disease request cannot replace the newer selection',async()=>{
+  const {page,context,errors}=await pageFor(1440);
+  try{
+    await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
+    const url=await page.evaluate(()=>window.HAJIMI.manifest.bodies['骨科\0TKA']);
+    await context.route('**'+url,async route=>{await new Promise(resolve=>setTimeout(resolve,200));await route.continue();});
+    await page.locator('[data-ortho-route="TKA"]').click();await page.locator('[data-ortho-route="THA"]').click();
+    await page.waitForFunction(()=>document.querySelector('#resultTitle').textContent.includes('全髋'));
+    await page.waitForTimeout(250);assert((await page.locator('#resultTitle').innerText()).includes('全髋'));
+    assert.match(await page.title(),/全髋/);assert.deepEqual(errors,[]);
+  }finally{await context.close();}
 });
 
 test('patient summary stays hidden until supplied and disappears after clearing',async()=>{
@@ -141,6 +172,7 @@ test('keyboard skip link, named dialogs and Enter calculation are usable',async(
 test('disease navigation starts at the top, preserves record content and chapter anchors',async()=>{
   const {page,context,errors}=await pageFor(1440);
   try {await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});await page.locator('.ortho-disease-card').first().click();
+    await page.locator('.record-book-body').first().waitFor({state:'visible'});
     assert.equal(await page.evaluate(()=>scrollY),0);assert.match(await page.title(),/全膝关节置换/);
     assert((await page.locator('.record-book-body').first().textContent()).length>100);
     const link=page.locator('.record-book-toc a').nth(10);await link.click();await settle(page);

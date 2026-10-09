@@ -4,7 +4,7 @@
 
     templates.forEach((t)=>{if(!t.department)t.department='骨科';});
     const existing=new Set(templates.map((t)=>t.name));
-    seed.forEach((t)=>{if(!existing.has(t.name))templates.push(t);});
+    if(!window.HAJIMI_BOOTSTRAP)seed.forEach((t)=>{if(!existing.has(t.name))templates.push(t);});
 
     if(typeof generate==='function'){
       const baseGenerate=generate;
@@ -125,6 +125,7 @@
     let currentDept=null;
     let catalogSize=-1,departmentRecords=new Map(),diseaseRecords=new Map();
     let searchIndex=null,searchIndexSize=-1;
+    let routeGeneration=0;
 
     function pathState(){
       const p=location.pathname.split('/').filter(Boolean);
@@ -178,7 +179,7 @@
     }
     function listForDept(dep){ensureCatalog();return departmentRecords.get(dep)||[];}
     function recordsForDisease(dep,group){ensureCatalog();return diseaseRecords.get(dep+'\0'+group)||[];}
-    function departmentCount(dep){return listForDept(dep).length;}
+    function departmentCount(dep){return window.HAJIMI?Object.values(window.HAJIMI.manifest.departments).find(item=>item.name===dep)?.count||0:listForDept(dep).length;}
     function allDisease(dep){return diseaseMap[dep]||[...new Set(listForDept(dep).map((t)=>t.group))];}
     function deptCard(dep){
       const d=departments.find((x)=>x.name===dep),n=departmentCount(dep);
@@ -315,10 +316,11 @@
       currentDept=null;resetState();setBrand();
       document.body.classList.add('department-no-sidebar','library-root-page');
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
+      const totalCount=window.HAJIMI?.manifest.total||templates.length;
       const orthoCount=departmentCount('骨科');
-      const otherCount=templates.length-orthoCount;
+      const otherCount=totalCount-orthoCount;
       if(title)title.textContent='选择科室';
-      if(num)num.textContent=departments.length+' 个科室 · '+templates.length+' 份模板';
+      if(num)num.textContent=departments.length+' 个科室 · '+totalCount+' 份模板';
       if(empty)empty.hidden=true;
       if(grid)grid.innerHTML=`
         <div class="library-root-home-row"><a class="btn ghost site-home-btn" href="/">⌂ 返回网站首页</a></div>
@@ -329,7 +331,7 @@
             <p>按科室、疾病或术式、住院阶段和记录类型组织。现有内容保持不变，后续可继续增加科室、疾病、案例影像和专项记录。</p>
           </div>
           <div class="library-overview-stats">
-            <div><strong>${templates.length}</strong><span>全部模板</span></div>
+            <div><strong>${totalCount}</strong><span>全部模板</span></div>
             <div><strong>${departments.length}</strong><span>科室分类</span></div>
             <div><strong>${orthoCount}</strong><span>骨科模板</span></div>
             <div><strong>${otherCount}</strong><span>其他科室</span></div>
@@ -354,8 +356,8 @@
         c.onclick=go;c.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
       });
       const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');
-      if(tc)tc.textContent=templates.length;
-      if(ac)ac.textContent=templates.length;
+      if(tc)tc.textContent=totalCount;
+      if(ac)ac.textContent=totalCount;
     }
     function renderDepartmentIndex(){
       document.body.classList.remove('library-root-page','disease-book-page');
@@ -617,22 +619,36 @@
       });
       const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=specialBundle.groups.length?'1 套 + '+specialBundle.groups.length+' 特殊':'1 套';if(ac)ac.textContent=departmentCount(currentDept);
     }
-    function finishNavigation(){
-      applyRoute();
+    async function finishNavigation(){
+      const path=location.pathname;
       window.scrollTo({top:0,behavior:'instant'});
+      await applyRoute();if(path!==location.pathname)return;
       const main=document.querySelector('#libraryShell main');
       if(main){main.tabIndex=-1;main.focus({preventScroll:true});}
     }
     function navigateRoot(){history.pushState({},'', '/bl');finishNavigation();}
     function navigateDepartment(dep){history.pushState({},'', '/bl/'+deptToSlug[dep]);finishNavigation();}
     function navigateDisease(g){history.pushState({},'', '/bl/'+deptToSlug[currentDept]+'/'+encodeURIComponent(g));finishNavigation();}
-    function applyRoute(){
+    async function applyRoute(){
+      const generation=++routeGeneration;
       document.getElementById('templateGrid').classList.remove('search-results');
       const r=pathState();setShell(r.page);
       const title=r.page==='home'?'哈基米工作站':r.page==='duty'?'值班资料':r.page==='departments'?'病历模板库':(r.disease?labelFor(r.disease)+' · 完整病历':(r.department||'')+'病历模板库');
       document.title=title==='哈基米工作站'?title:title+' · 哈基米工作站';
       if(r.page==='home'||r.page==='duty')return;
       if(r.page==='departments'){renderDepartmentRoot();return;}
+      if(window.HAJIMI&&r.department){
+        const grid=document.getElementById('templateGrid');grid.innerHTML='<p class="library-loading" role="status">正在加载病历资料…</p>';
+        try{
+          await window.HAJIMI.ensureDepartment(deptToSlug[r.department]);
+          if(r.disease)await window.HAJIMI.ensureGroup(r.department,r.disease);
+        }catch(error){
+          if(generation!==routeGeneration)return;
+          grid.innerHTML='<p class="library-loading" role="alert">'+escapeHtml(error.message)+'</p><button class="btn ghost" id="retryRecords">重试</button>';
+          document.getElementById('retryRecords').onclick=applyRoute;return;
+        }
+        if(generation!==routeGeneration)return;
+      }
       currentDept=r.department||null;if(!currentDept){renderDepartmentRoot();return;}
       resetState();
       if(r.disease&&allDisease(currentDept).includes(r.disease)){state.group=r.disease;renderDisease();}
@@ -669,12 +685,20 @@
       append();
     }
 
+    let searchLoading=false;
     render=function(){
       document.getElementById('templateGrid').classList.remove('search-results');
       const r=pathState();
       if(r.page!=='library'&&r.page!=='departments'){setShell(r.page);return;}
       if(r.page==='departments'){
         currentDept=null;
+        if(window.HAJIMI&&!window.HAJIMI.hasAllDepartments()&&(state.q.trim()||state.stage!=='all'||state.type!=='all')){
+          if(searchLoading)return;
+          searchLoading=true;
+          document.getElementById('templateGrid').innerHTML='<p class="library-loading" role="status">正在加载搜索目录…</p>';
+          window.HAJIMI.ensureAllDepartments().then(()=>{searchLoading=false;if(location.pathname==='/bl'||location.pathname==='/bl/')render();}).catch(error=>{searchLoading=false;toast(error.message);});
+          return;
+        }
         if(state.q.trim()||state.stage!=='all'||state.type!=='all')renderSearchResults(null);
         else renderDepartmentRoot();
         return;
@@ -729,7 +753,7 @@
       window.addEventListener('resize',()=>{if(innerWidth>900&&sidebar.classList.contains('open'))close();},{passive:true});
     }
     window.addEventListener('popstate',applyRoute);
-    window.addEventListener('hajimi:cms-ready',()=>{const r=pathState();if(r.page==='library'&&r.disease&&currentDept)renderDisease();});
+    window.addEventListener('hajimi:cms-ready',async()=>{const r=pathState(),path=location.pathname;if(r.page==='library'&&r.disease&&currentDept){try{if(window.HAJIMI)await window.HAJIMI.ensureGroup(r.department,r.disease);if(path===location.pathname)renderDisease();}catch(error){toast(error.message);}}});
     window.hajimiNavigateDepartment=navigateDepartment;
     window.hajimiNavigateRoot=navigateRoot;
     window.HAJIMI_LIBRARY_READY=true;

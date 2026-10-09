@@ -156,6 +156,9 @@
     if(content.status==='fulfilled'){CMS.data=content.value;CMS.dataReady=true;}
     else notify('资料加载失败，请刷新页面后重试');
     syncAuthUI();patchTemplates();
+    if(typeof state!=='undefined'&&state.activeTemplate&&document.getElementById('previewDialog')?.open){
+      CMS.activeTemplate=state.activeTemplate;document.getElementById('previewContent').textContent=generate(state.activeTemplate);renderExtras(state.activeTemplate);
+    }
     window.dispatchEvent(new CustomEvent('hajimi:cms-ready'));
   }
   init();
