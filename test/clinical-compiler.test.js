@@ -60,11 +60,9 @@ test('compiled catalogs and per-disease bodies preserve every original clinical 
   assert.ok(physicianCourses.length>100,'No physician progress notes checked');
   for(const r of physicianCourses){
     const expected=/主任医师/.test(r.short)?'主任医师':'主治医师';
-    assert.match(r.sourceBody,new RegExp('\\n\\n'+expected+'：________
-  assert(!entry.includes('/record-quality-v'));assert(!entry.includes('/orthopedic-expansion-'));
-});
-),r.group+'：查房医师姓名或签名未留空');
+    assert.match(r.sourceBody,new RegExp('\\n\\n'+expected+'：________$'),r.group+'：查房医师姓名或签名未留空');
   }
   const entry=fs.readFileSync(path.join(directory,'library.html'),'utf8');
-  assert(!entry.includes('/record-quality-v'));assert(!entry.includes('/orthopedic-expansion-'));
+  assert(!entry.includes('/record-quality-v'));
+  assert(!entry.includes('/orthopedic-expansion-'));
 });
