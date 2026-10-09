@@ -35,6 +35,8 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 .case-file-sidebar .case-nav-item.is-current span{color:#1553a2}
 .case-nav-empty{font-size:11px;color:#9aa4b4;padding:3px 16px 10px;margin:0}
 .case-file-reader-wrap{min-width:0}
+.case-file-reader{scroll-margin-top:92px}
+.case-file-reader>.record-book-section{scroll-margin-top:92px}
 .case-file-tools{display:flex;justify-content:space-between;gap:16px;align-items:center;background:#fff;border:1px solid #e2e8f1;border-radius:16px;padding:15px 18px;margin-bottom:15px;box-shadow:0 7px 18px rgba(25,45,72,.04)}
 .case-file-tools>div:first-child{display:flex;flex-direction:column;gap:4px}
 .case-file-eyebrow{font-size:10px;color:#6581aa;letter-spacing:.13em;font-weight:700}
