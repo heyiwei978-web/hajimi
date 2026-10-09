@@ -64,7 +64,7 @@ jobs:
             fi
           }
 
-          check 405 "GET login rejected" "$BASE/api/login"
+          check 403 "Firewall blocks GET login" "$BASE/api/login"
 
           check 401 "Unauthenticated content write rejected"             -X PUT             -H "Origin: $BASE"             -H "X-Hajimi-Admin: 1"             -H "Content-Type: application/json"             --data '{}'             "$BASE/api/content"
 
