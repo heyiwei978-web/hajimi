@@ -66,12 +66,12 @@ test('compiled catalogs and per-disease bodies preserve every original clinical 
   const specialOperations=records.filter(r=>r.department==='骨科'&&r.specialCase&&r.type==='手术记录'&&/手术记录/.test(r.short||''));
   assert.ok(specialOperations.length>=2,'Missing the two preserved TKA operative records');
   for(const r of specialOperations){
-    const section=r.sourceBody.match(/手术经过[：:]\\s*([\\s\\S]*?)(?=\\n\\n术中出血量)/);
+    const section=r.sourceBody.match(/手术经过[：:]\s*([\s\S]*?)(?=\n\n术中出血量)/);
     assert.ok(section,r.short+'：手术过程正文缺失或结尾分隔不符合规范');
-    const paragraphs=section[1].trim().split(/\\n\\s*\\n/);
+    const paragraphs=section[1].trim().split(/\n\s*\n/);
     assert.ok(paragraphs.length>=3&&paragraphs.length<=4,r.short+'：特殊手术经过需三至四段');
     assert.ok(paragraphs.every(p=>p.trim().length>=45),r.short+'：每段须包含完整临床操作描述');
-    assert.doesNotMatch(section[1],/^\\s*\\d+[.、．]/m,r.short+'：不能保留编号式步骤');
+    assert.doesNotMatch(section[1],/^\s*\d+[.、．]/m,r.short+'：不能保留编号式步骤');
   }
   // Guard against a generic operative route masking a more appropriate named approach.
   const scoliosis=records.find(r=>r.department==='骨科'&&r.group==='脊柱侧弯'&&r.short==='手术记录');
