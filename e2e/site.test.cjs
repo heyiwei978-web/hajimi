@@ -1,0 +1,155 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const http = require('node:http');
+const {test, before, after} = require('node:test');
+const {chromium} = require('playwright');
+const root = path.resolve(__dirname, '..');
+let server, browser, base;
+
+before(async () => {
+  const config = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json')));
+  server = http.createServer((req, res) => {
+    const pathname = new URL(req.url, 'http://localhost').pathname;
+    const rewrite = config.rewrites.find(rule => rule.source.endsWith(':path*')
+      ? pathname.startsWith(rule.source.slice(0, -':path*'.length)) : pathname === rule.source);
+    const target = rewrite?.destination || pathname;
+    if (!/^\/[a-zA-Z0-9_-]+\.(?:html|js|css)$/.test(target)) {res.writeHead(404);res.end();return;}
+    const file = path.join(root, target.slice(1));
+    if (!fs.existsSync(file)) {res.writeHead(404);res.end();return;}
+    for (const header of config.headers.find(rule=>rule.source==='/(.*)')?.headers || []) res.setHeader(header.key,header.value);
+    const type = target.endsWith('.css') ? 'text/css' : target.endsWith('.js') ? 'application/javascript' : 'text/html';
+    res.setHeader('Content-Type', type+'; charset=utf-8');
+    fs.createReadStream(file).pipe(res);
+  });
+  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+  base = 'http://127.0.0.1:'+server.address().port;
+  browser = await chromium.launch({headless:true,
+    ...(process.env.CHROMIUM_EXECUTABLE_PATH ? {executablePath:process.env.CHROMIUM_EXECUTABLE_PATH} : {}),
+    args:['--no-sandbox']});
+});
+after(async()=>{await browser?.close();if(server)await new Promise(resolve=>server.close(resolve));});
+
+async function pageFor(width=1440, options={}) {
+  const context = await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce',...options});
+  // Anonymous/read-only content fixtures keep these UI tests independent of private storage.
+  // API authorization is exercised by test/security.test.js, rather than this static server.
+  await context.route('**/api/session',route=>route.fulfill({json:{authenticated:false,user:null}}));
+  await context.route('**/api/content',route=>route.fulfill({json:{version:1,templateOverrides:{},cases:[]}}));
+  const page = await context.newPage();
+  const errors=[];
+  page.on('pageerror',error=>errors.push(error.message));
+  return {page, context, errors};
+}
+async function settle(page) {await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));}
+
+test('homepage is usable without JavaScript and avoids loading clinical data', async()=>{
+  const {page,context}=await pageFor(393,{javaScriptEnabled:false});
+  try {await page.goto(base+'/');assert(await page.locator('#portalHome').isVisible());
+    assert.equal(await page.getByRole('link',{name:'病历模板',exact:true}).count(),1);
+    assert.equal(await page.locator('script[src*="app.js"],script[src*="record-quality"],#libraryShell').count(),0);
+    assert.equal(await page.locator('.official-feature').count(),4);
+  } finally {await context.close();}
+});
+
+test('every orthopedic card keeps both borders inside its category on phones and computers', {timeout:120000}, async()=>{
+  for(const width of [320,375,393,768,1280,1440,1920]) {
+    const {page,context,errors}=await pageFor(width);
+    try {await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('.ortho-disease-card').count(),201);
+      const categories=page.locator('.ortho-category');
+      for(let i=0;i<await categories.count();i++) {
+        await categories.nth(i).scrollIntoViewIfNeeded();await settle(page);
+        const cards=await categories.nth(i).evaluate(category=>{
+          const parent=category.getBoundingClientRect();
+          return [...category.querySelectorAll('.ortho-disease-card')].map(card=>{
+            const r=card.getBoundingClientRect();return {left:r.left,right:r.right,parentLeft:parent.left,parentRight:parent.right,scroll:card.scrollWidth,client:card.clientWidth};
+          });
+        });
+        for(const card of cards) {assert(card.left>card.parentLeft&&card.right<card.parentRight,`card border at ${width}px`);
+          assert(card.right<width,`right border outside viewport at ${width}px`);assert(card.scroll<=card.client+1,`card text overflow at ${width}px`);}
+      }
+      assert.deepEqual(errors,[]);
+    } finally {await context.close();}
+  }
+});
+
+test('cross-department search, filters, pagination, preview and empty-state reset work',async()=>{
+  const {page,context,errors}=await pageFor(393);
+  try {await page.goto(base+'/bl',{waitUntil:'networkidle'});
+    assert.equal(await page.evaluate(()=>templates.length),5159);
+    const search=page.getByRole('textbox',{name:'搜索病历模板'});
+    await search.fill('肝脓肿');await page.waitForFunction(()=>document.querySelector('#resultTitle').textContent.includes('搜索结果'));
+    assert.equal(await search.inputValue(),'肝脓肿');assert((await page.locator('#templateGrid').innerText()).includes('普外科'));
+    assert(await page.locator('#templateGrid .card').evaluateAll(cards=>cards.every(card=>{const r=card.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&card.scrollWidth<=card.clientWidth+1;})));
+    await page.locator('#templateGrid .preview').first().click();assert(await page.getByRole('dialog',{name:/肝脓肿/}).isVisible());await page.keyboard.press('Escape');
+    await search.fill('术前');await page.waitForFunction(()=>document.querySelectorAll('#templateGrid .card').length===60);
+    await page.getByRole('button',{name:'显示更多',exact:true}).click();assert.equal(await page.locator('#templateGrid .card').count(),120);
+    await search.fill('不存在的资料xyz');await page.waitForSelector('#emptyState:visible');assert.equal(await page.locator('#templateGrid .card').count(),0);
+    await page.getByRole('button',{name:'重置',exact:true}).click();assert.equal(await page.locator('[data-department]').count(),4);assert.equal(await search.inputValue(),'');
+    await page.locator('#stageFilter').selectOption('术中');await page.waitForFunction(()=>document.querySelectorAll('#templateGrid .card').length===60);
+    assert(await page.locator('#templateGrid .tag.stage').evaluateAll(tags=>tags.every(tag=>tag.textContent==='术中')));
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
+
+test('patient summary stays hidden until supplied and disappears after clearing',async()=>{
+  const {page,context,errors}=await pageFor(375);
+  try {await page.goto(base+'/bl',{waitUntil:'networkidle'});assert.equal(await page.locator('#patientStrip').isVisible(),false);
+    await page.getByRole('button',{name:'患者信息',exact:true}).click();
+    await page.locator('#patientForm input[name="name"]').fill('示例患者');
+    await page.locator('#savePatient').click();assert(await page.locator('#patientStrip').isVisible());
+    assert((await page.locator('#patientStrip').innerText()).includes('示例患者'));
+    await page.getByRole('button',{name:'患者信息',exact:true}).click();await page.locator('#clearPatientBtn').click();
+    assert.equal(await page.locator('#patientStrip').isVisible(),false);assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('Chinese composition completes before search results are replaced',async()=>{
+  const {page,context}=await pageFor();
+  try {await page.goto(base+'/bl',{waitUntil:'networkidle'});
+    await page.locator('#searchInput').evaluate(input=>{input.value='肝脓肿';input.dispatchEvent(new InputEvent('input',{bubbles:true,isComposing:true}));});
+    await page.waitForTimeout(160);assert.equal(await page.locator('[data-department]').count(),4);
+    await page.locator('#searchInput').dispatchEvent('compositionend');await page.waitForFunction(()=>document.querySelector('#resultTitle').textContent.includes('搜索结果'));
+    assert((await page.locator('#templateGrid').innerText()).includes('肝脓肿'));
+  } finally {await context.close();}
+});
+
+test('keyboard skip link, named dialogs and Enter calculation are usable',async()=>{
+  const {page,context,errors}=await pageFor();
+  try {await page.goto(base+'/tools',{waitUntil:'networkidle'});await page.keyboard.press('Tab');assert(await page.getByRole('link',{name:'跳到主要内容'}).evaluate(e=>e===document.activeElement));
+    await page.keyboard.press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.tagName),'MAIN');
+    for(const [name,fields,result]of [
+      ['打开 成人 BMI',{h:'180',w:'81'},/25\.0/],
+      ['打开 体表面积 · Mosteller',{h:'180',w:'81'},/2\.01/],
+      ['打开 阴离子间隙',{na:'140',cl:'104',hco3:'24'},/12/],
+      ['打开 平均动脉压 MAP',{sbp:'120',dbp:'80'},/93\.3/],
+      ['打开 休克指数 Shock Index',{hr:'90',sbp:'120'},/0\.75/]
+    ]) {await page.getByRole('button',{name,exact:true}).click();assert(await page.locator('#dlg').isVisible());
+      assert.equal(await page.evaluate(()=>document.activeElement.tagName),'INPUT');
+      for(const [id,value]of Object.entries(fields))await page.locator('#'+id).fill(value);
+      await page.keyboard.press('Enter');assert.match(await page.getByRole('status').filter({has:page.locator('strong')}).innerText(),result);await page.keyboard.press('Escape');}
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
+
+test('disease navigation starts at the top, preserves record content and chapter anchors',async()=>{
+  const {page,context,errors}=await pageFor(1440);
+  try {await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});await page.locator('.ortho-disease-card').first().click();
+    assert.equal(await page.evaluate(()=>scrollY),0);assert.match(await page.title(),/全膝关节置换/);
+    assert((await page.locator('.record-book-body').first().textContent()).length>100);
+    const link=page.locator('.record-book-toc a').nth(10);await link.click();await settle(page);
+    const top=await page.locator(await link.getAttribute('href')).evaluate(e=>e.getBoundingClientRect().top);assert(top>=60&&top<150);
+    await page.emulateMedia({media:'print'});assert.equal(await page.locator('.record-book-toc').evaluate(e=>getComputedStyle(e).display),'none');
+    assert.equal(await page.locator('.record-book-body').first().evaluate(e=>getComputedStyle(e).fontSize),'16px');assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
+
+test('failed content loading keeps administrator editing unavailable',async()=>{
+  const {page,context,errors}=await pageFor();
+  try {await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
+    await context.route('**/api/content',route=>route.fulfill({status:503,json:{error:'Temporary storage failure'}}));
+    await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});await page.locator('.record-book-section .preview').first().click();
+    assert.equal(await page.locator('#cmsEditTemplate,#cmsAddCase').count(),0);assert((await page.locator('#toast').textContent()).includes('加载失败'));assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});

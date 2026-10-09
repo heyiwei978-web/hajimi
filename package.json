@@ -4,6 +4,11 @@
     "@vercel/blob": "latest"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test test/*.test.js",
+    "build": "node scripts/build-home.mjs",
+    "test:browser": "npm run build && node --test e2e/*.test.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.61.1"
   }
 }

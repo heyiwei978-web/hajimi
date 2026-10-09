@@ -12,7 +12,7 @@ test('main application external scripts are deferred but keep source order',()=>
     assert.doesNotMatch(attrs,/\basync\b/,tag[2]+' must preserve ordered execution');
   }
   const srcs=tags.map(x=>x[2]);
-  assert(srcs.indexOf('/app.js?v=20261007-cases2')<srcs.findIndex(x=>x.startsWith('/ideal-cases.js')));
+  assert(srcs.findIndex(x=>x.startsWith('/app.js?'))<srcs.findIndex(x=>x.startsWith('/ideal-cases.js')));
   assert(srcs.findIndex(x=>x.startsWith('/record-quality-v23.js'))<srcs.findIndex(x=>x.startsWith('/departments.js')));
 });
 

@@ -60,14 +60,14 @@ nonhdl:['NCBI','non-HDL-C','https://www.ncbi.nlm.nih.gov/books/NBK355892/']
 function f(id,label,extra=''){return '<label class="field">'+label+'<input id="'+id+'" type="number" '+extra+'></label>'}
 function sel(id,label,opts){return '<label class="field">'+label+'<select id="'+id+'">'+opts.map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('')+'</select></label>'}
 function ck(g,t,v){return '<label class="check"><input type="checkbox" data-g="'+g+'" data-v="'+v+'"><span>'+t+' <b>'+(v>0?'+':'')+v+'</b></span></label>'}
-function wrap(inner,note=''){return '<div class="body">'+inner+(note?'<div class="warn">'+note+'</div>':'')+'<div id="res" class="result" hidden></div><div class="actions"><button class="calc" id="go">计算</button><button class="reset" id="clear">清空</button></div></div>'}
+function wrap(inner,note=''){return '<div class="body">'+inner+(note?'<div class="warn">'+note+'</div>':'')+'<div id="res" class="result" role="status" aria-live="polite" aria-atomic="true" hidden></div><div class="actions"><button class="calc" id="go">计算</button><button class="reset" id="clear">清空</button></div></div>'}
 function source(k){const s=SRC[k];return '<div class="cite">来源：<a href="'+s[2]+'" target="_blank" rel="noopener">'+s[0]+' · '+s[1]+' ↗</a></div>'}
 function result(h){const r=$('#res');r.hidden=false;r.innerHTML=h}
 function score(g){return $$('input[data-g="'+g+'"]:checked').reduce((a,x)=>a+Number(x.dataset.v),0)}
 function num(id){return Number($(id).value)}
 function allPositive(...ids){return ids.every(id=>Number($(id).value)>0)}
 function finish(k,html){return html.replace('</div>','</div>'+source(k))}
-function openTool(k){const t=SRC[k];if(!t)return;$('#deyebrow').textContent=t[0];$('#dtitle').textContent=t[1];$('#dbody').innerHTML=body(k);$('#dlg').showModal();bind(k)}
+function openTool(k){const t=SRC[k];if(!t)return;$('#deyebrow').textContent=t[0];$('#dtitle').textContent=t[1];$('#dbody').innerHTML=body(k);$('#dlg').showModal();bind(k);$('#dbody input,#dbody select')?.focus({preventScroll:true})}
 function body(k){
  const grid=x=>'<div class="formgrid">'+x+'</div>';
  if(k==='bmi')return finish(k,wrap(grid(f('h','身高（cm）','step=".1"')+f('w','体重（kg）','step=".1"'))));
@@ -201,14 +201,23 @@ function bind(k){
  else if(k==='ldl')go.onclick=()=>{if(!allPositive('#tc','#hdl','#tg'))return result('<strong>请完整输入</strong>');if(num('#tg')>=400)return result('<strong>不建议使用Friedewald</strong><span>TG≥400 mg/dL时公式不可靠，考虑直接LDL-C或其他经验证方法。</span>');const e=num('#tc')-num('#hdl')-num('#tg')/5;result('<strong>'+e.toFixed(1)+' mg/dL</strong><span>LDL-C = TC − HDL-C − TG/5。</span>')};
  else if(k==='nonhdl')go.onclick=()=>{if(!allPositive('#tc','#hdl'))return result('<strong>请完整输入</strong>');const e=num('#tc')-num('#hdl');result('<strong>'+e.toFixed(1)+' mg/dL</strong><span>non-HDL-C = TC − HDL-C。</span>')};
 }
-$$('.card[data-tool]').forEach(c=>c.addEventListener('click',e=>{if(e.target.closest('a'))return;openTool(c.dataset.tool)}));
+$$('.card[data-tool]').forEach(c=>{
+ const title=c.querySelector('h3')?.textContent;
+ c.querySelector('.bottom button')?.setAttribute('aria-label','打开 '+title);
+ c.addEventListener('click',e=>{if(e.target.closest('a'))return;openTool(c.dataset.tool)});
+});
+$('#dbody').addEventListener('keydown',e=>{
+ if(e.key==='Enter'&&!e.isComposing&&e.target.matches('input:not([type="checkbox"]),select')){e.preventDefault();$('#go')?.click();}
+});
 $('#close').onclick=()=>$('#dlg').close();
-$('#dlg').addEventListener('click',e=>{if(e.target===$('#dlg'))$('#dlg').close()});
+$('#dlg').addEventListener('click',e=>{const d=$('#dlg'),r=d.getBoundingClientRect();if(e.target===d&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom))d.close()});
 const search=$('#formulaSearch'),cards=$$('.card');
+const cardText=new Map(cards.map(c=>[c,c.textContent.toLowerCase()]));
+const sections=$$('.section').map(s=>({section:s,cards:cards.filter(c=>s.contains(c))}));
 function filterCards(){
  const q=(search.value||'').trim().toLowerCase();let visible=0;
- cards.forEach(c=>{const hit=!q||c.textContent.toLowerCase().includes(q);c.hidden=!hit;if(hit)visible++;});
- $$('.section').forEach(s=>{const cs=$$('.card').filter(c=>s.contains(c));if(cs.length)s.hidden=cs.every(c=>c.hidden);});
+ cards.forEach(c=>{const hit=!q||cardText.get(c).includes(q);c.hidden=!hit;if(hit)visible++;});
+ sections.forEach(({section,cards})=>{if(cards.length)section.hidden=cards.every(c=>c.hidden)});
  $('#formulaCount').textContent=visible+' 个工具';
 }
 search.addEventListener('input',filterCards);filterCards();

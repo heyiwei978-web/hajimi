@@ -1,5 +1,5 @@
 (function cmsMain(){
-  const CMS={auth:false,user:null,data:{templateOverrides:{},cases:[]},activeTemplate:null,baseGenerate:null,baseOpenPreview:null};
+  const CMS={dataReady:false,auth:false,user:null,data:{templateOverrides:{},cases:[]},activeTemplate:null,baseGenerate:null,baseOpenPreview:null};
   const esc=(s)=>String(s??'').replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   async function req(url,options={}){
     const r=await fetch(url,{credentials:'same-origin',...options,headers:{'Content-Type':'application/json','X-Hajimi-Admin':'1',...(options.headers||{})}});
@@ -16,19 +16,19 @@
   function makeDialogs(){
     if(document.getElementById('cmsLoginDialog'))return;
     document.body.insertAdjacentHTML('beforeend',`
-      <dialog id="cmsLoginDialog" class="cms-dialog"><form id="cmsLoginForm">
-        <div class="cms-dialog-head"><div><strong>开发者登录</strong><span>登录后才能修改模板、添加案例和图片</span></div><button type="button" class="cms-x" data-dialog-close aria-label="关闭">×</button></div>
+      <dialog id="cmsLoginDialog" class="cms-dialog" aria-labelledby="cmsLoginTitle"><form id="cmsLoginForm">
+        <div class="cms-dialog-head"><div><strong id="cmsLoginTitle">开发者登录</strong><span>登录后才能修改模板、添加案例和图片</span></div><button type="button" class="cms-x" data-dialog-close aria-label="关闭">×</button></div>
         <label>用户名<input name="username" autocomplete="username" value="admin"></label>
         <label>密码<input name="password" type="password" autocomplete="current-password" required></label>
-        <div id="cmsLoginError" class="cms-error" hidden></div>
+        <div id="cmsLoginError" class="cms-error" role="alert" hidden></div>
         <div class="cms-actions"><button type="button" class="btn ghost" data-dialog-close>取消</button><button type="submit" class="btn primary">登录</button></div>
       </form></dialog>
-      <dialog id="cmsEditDialog" class="cms-dialog cms-edit-dialog"><form id="cmsEditForm">
-        <div class="cms-dialog-head"><div><strong>编辑模板正文</strong><span id="cmsEditTitle"></span></div><button type="button" class="cms-x" data-dialog-close aria-label="关闭">×</button></div>
+      <dialog id="cmsEditDialog" class="cms-dialog cms-edit-dialog" aria-labelledby="cmsEditDialogTitle"><form id="cmsEditForm">
+        <div class="cms-dialog-head"><div><strong id="cmsEditDialogTitle">编辑模板正文</strong><span id="cmsEditTitle"></span></div><button type="button" class="cms-x" data-dialog-close aria-label="关闭">×</button></div>
         <textarea id="cmsEditBody" rows="24"></textarea>
         <div class="cms-actions"><button type="button" id="cmsRestoreDefault" class="btn ghost">恢复默认</button><span class="cms-spacer"></span><button type="button" class="btn ghost" data-dialog-close>取消</button><button type="submit" class="btn primary">保存修改</button></div>
       </form></dialog>
-      <dialog id="cmsCaseDialog" class="cms-dialog"><form id="cmsCaseForm">
+      <dialog id="cmsCaseDialog" class="cms-dialog" aria-labelledby="cmsCaseDialogTitle"><form id="cmsCaseForm">
         <div class="cms-dialog-head"><div><strong id="cmsCaseDialogTitle">添加案例</strong><span>案例可在浏览模式中展示</span></div><button type="button" class="cms-x" data-dialog-close aria-label="关闭">×</button></div>
         <input type="hidden" name="caseId">
         <label>案例标题<input name="title" placeholder="例如：术后第3天切口及DR复查" required></label>
@@ -75,13 +75,14 @@
     if(!CMS.baseOpenPreview){CMS.baseOpenPreview=openPreview;openPreview=function(t){CMS.activeTemplate=t;CMS.baseOpenPreview(t);renderExtras(t);};}
   }
   async function saveContent(){
+    if(!CMS.dataReady)throw new Error('内容未加载完成，请刷新页面后重试');
     const out=await req('/api/content',{method:'PUT',body:JSON.stringify(CMS.data)});
     CMS.data={templateOverrides:out.templateOverrides||{},cases:out.cases||[]};
   }
   function renderExtras(t){
     const dlg=document.getElementById('previewDialog');if(!dlg)return;
     dlg.querySelectorAll('.cms-preview-admin,#cmsCases').forEach((e)=>e.remove());
-    if(CMS.auth){
+    if(CMS.auth&&CMS.dataReady){
       const tools=dlg.querySelector('.preview-tools');
       if(tools){
         tools.insertAdjacentHTML('beforeend','<span class="cms-preview-admin"><button class="btn ghost" id="cmsEditTemplate">编辑正文</button><button class="btn ghost" id="cmsAddCase">添加案例/图片</button></span>');
@@ -91,7 +92,7 @@
     }
     const cases=CMS.data.cases.filter((c)=>c.template===t.name&&(CMS.auth||c.published!==false));if(!cases.length)return;
     const cards=cases.map((c)=>{
-      const images=(c.images||[]).map((p)=>'<a href="/api/image?path='+encodeURIComponent(p)+'" target="_blank" rel="noopener"><img src="/api/image?path='+encodeURIComponent(p)+'" loading="lazy" alt="'+esc(c.title||'案例图片')+'"></a>').join('');
+      const images=(c.images||[]).map((p)=>'<a href="/api/image?path='+encodeURIComponent(p)+'" target="_blank" rel="noopener"><img src="/api/image?path='+encodeURIComponent(p)+'" loading="lazy" decoding="async" alt="'+esc(c.title||'案例图片')+'"></a>').join('');
       const admin=CMS.auth?'<div class="cms-case-admin"><button data-edit-case="'+esc(c.id)+'">编辑</button><button data-delete-case="'+esc(c.id)+'">删除</button></div>':'';
       return '<article class="cms-case-card"><div class="cms-case-head"><div><strong>'+esc(c.title||'案例')+'</strong><span>'+esc(new Date(c.updatedAt||c.createdAt||Date.now()).toLocaleDateString())+'</span></div>'+admin+'</div>'+(c.description?'<p>'+esc(c.description).replace(/\n/g,'<br>')+'</p>':'')+(images?'<div class="cms-case-images">'+images+'</div>':'')+'</article>';
     }).join('');
@@ -135,8 +136,12 @@
   }
   async function init(){
     makeDialogs();installDialogCloseHandlers();installAuthSlots();document.getElementById('cmsLoginForm').addEventListener('submit',login);
-    try{const s=await fetch('/api/session',{credentials:'same-origin'}).then((r)=>r.json());CMS.auth=!!s.authenticated;CMS.user=s.user||null;}catch{}
-    try{const c=await fetch('/api/content',{credentials:'same-origin',cache:'no-store'}).then((r)=>r.json());CMS.data={templateOverrides:c.templateOverrides||{},cases:c.cases||[]};}catch{}
+    const [session,content]=await Promise.allSettled([
+      req('/api/session',{cache:'no-store'}),req('/api/content',{cache:'no-store'})
+    ]);
+    if(session.status==='fulfilled'){CMS.auth=!!session.value.authenticated;CMS.user=session.value.user||null;}
+    if(content.status==='fulfilled'){const c=content.value;CMS.data={templateOverrides:c.templateOverrides||{},cases:c.cases||[]};CMS.dataReady=true;}
+    else notify('资料加载失败，请刷新页面后重试');
     syncAuthUI();patchTemplates();
     window.dispatchEvent(new CustomEvent('hajimi:cms-ready'));
   }

@@ -1,0 +1,23 @@
+.patient-strip[hidden]{display:none!important}
+.skip-link{position:fixed;top:10px;left:16px;z-index:3000;padding:10px 16px;border:2px solid #1d67d8;border-radius:8px;background:#fff;color:#174d9b;font-size:16px;font-weight:700;text-decoration:none;transform:translateY(-160%)}
+.skip-link:focus{transform:none;outline:3px solid #1d67d8;outline-offset:2px}
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #1d67d8;outline-offset:3px}
+main:focus{outline:none}
+.search-more{display:flex;justify-content:center;padding:20px 0;gap:12px;align-items:center}
+.search-more span{font-size:14px;color:#606b78}
+.template-grid.search-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}
+.search-results .card{display:flex;flex-direction:column;min-width:0;padding:20px;border:1px solid #e0e6ef;border-radius:14px;background:#fff}
+.search-results .card h3{font-size:17px;overflow-wrap:anywhere}
+.search-results .card p{font-size:14px;line-height:1.75;margin-bottom:16px;overflow-wrap:anywhere}
+.search-results .tag{font-size:12px}
+.search-results .card-actions{margin-top:auto}
+.search-results .search-more{grid-column:1/-1}
+@media(max-width:700px){.template-grid.search-results{grid-template-columns:minmax(0,1fr)}.search-results .card{padding:18px}}
+@media(max-width:640px){.search-more{flex-wrap:wrap}}
+@media print{.skip-link,.search-more{display:none!important}}
+@media screen{
+  .ortho-card-top,.department-card-top,.record-chapter-title>span,.record-book-toc-head p,.record-book-toc a>span,.feature-eyebrow{color:#647184}
+  .top,.source-tag,.bottom>a:not(.openext),.sectionhead p,#formulaCount{color:#626c79}
+}
+.library-loading{padding:24px;border:1px solid #e3e7ec;border-radius:12px;background:#fff;color:#647184;font-size:15px}
+@media print{.library-loading{display:none!important}}

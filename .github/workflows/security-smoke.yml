@@ -10,6 +10,9 @@ on:
       - '*.css'
       - 'api/**'
       - 'test/**'
+      - 'e2e/**'
+      - 'scripts/**'
+      - 'package-lock.json'
       - 'package.json'
       - 'vercel.json'
       - '.github/workflows/security-smoke.yml'
@@ -27,9 +30,13 @@ jobs:
         with:
           node-version: '22'
       - name: Install dependencies
-        run: npm install --ignore-scripts --no-audit --no-fund
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Run unit and runtime audits
         run: npm test
+      - name: Install browser for regression checks
+        run: npx playwright install --with-deps chromium
+      - name: Check responsive layout, search and keyboard flows
+        run: npm run test:browser
 
   production-security-smoke:
     if: github.event_name == 'workflow_dispatch'

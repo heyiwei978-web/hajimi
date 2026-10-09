@@ -4,13 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f6f8fb">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231d67d8%22/%3E%3Cpath d=%22M10 8v16m12-16v16M10 16h12%22 stroke=%22white%22 stroke-width=%223.5%22/%3E%3C/svg%3E">
 <title>哈基米工作站</title>
 <link rel="stylesheet" href="/styles.css?v=20261008-sticky-home1">
 <link rel="stylesheet" href="/cms.css?v=20261006-g1">
 <link rel="stylesheet" href="/ui-polish.css?v=20261009-card-width2">
+<link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
 </head>
 <body>
-<div id="portalHome" class="portal-home official-home">
+<a class="skip-link" href="#homeContent">跳到主要内容</a>
+<div id="portalHome" class="portal-home official-home" hidden>
 <header class="global-nav official-nav">
   <div class="global-nav-inner official-nav-inner">
     <a class="global-brand official-brand" href="/">
@@ -33,7 +36,7 @@
   </div>
 </header>
 
-<main class="official-main">
+<main id="homeContent" class="official-main">
   <section class="official-hero">
     <div class="official-hero-bg" aria-hidden="true">
       <span class="bg-orb bg-orb-a"></span>
@@ -134,7 +137,7 @@
 <main class="portal-main"><section class="portal-hero"><p class="portal-kicker">ON CALL</p><h1>值班工作台</h1><p class="portal-subtitle">页面已预留。后续值班制度、交班清单、急诊流程和常用资料都可以直接加在这里。</p></section></main>
 </div>
 
-<div id="libraryShell" hidden>
+<div id="libraryShell" aria-busy="true">
 <header class="topbar library-topbar">
 <div class="brandline"><button id="menuBtn" class="menu-btn" type="button" aria-label="打开菜单" aria-controls="sidebar" aria-expanded="false">☰</button><a class="site-home-mark" href="/" aria-label="返回网站首页" title="网站首页"><span class="brand-mark library-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M3.8 10.8 12 4l8.2 6.8v8.1a1.6 1.6 0 0 1-1.6 1.6h-4.4v-6h-4.4v6H5.4a1.6 1.6 0 0 1-1.6-1.6z"/></svg></span></a><a class="brand library-brand" href="/bl"><span class="library-brand-copy"><em>哈基米工作站</em><strong>病历模板</strong><small>Clinical Template Library</small></span></a></div>
 <div class="top-actions library-top-actions"><a class="text-action" href="/">首页</a><a class="text-action library-active-link" href="/bl">病历模板</a><a class="text-action" href="/pathway">临床路径</a><a class="text-action" href="/tools">临床工具</a><a class="text-action" href="/admin">管理入口</a><button id="patientBtn" class="text-action patient-action" type="button">患者信息</button><span data-auth-slot></span></div>
@@ -150,6 +153,7 @@
 <div class="nav-label">通用场景</div><button class="nav-item" data-group="通用场景">围手术期常用记录</button>
 </aside>
 <main class="content">
+<noscript><p class="intro-note">请启用 JavaScript，以浏览和搜索病历模板。</p></noscript>
 <section class="article-intro">
 <div class="breadcrumb">CLINICAL RECORDS / TEMPLATE LIBRARY</div>
 <h1 id="libraryTitle">病历模板库</h1>
@@ -157,13 +161,13 @@
 <div class="intro-note"><strong>使用说明</strong><span>模板用于辅助书写。真实病历必须结合患者实际病史、查体、检查结果及诊疗经过修改。</span></div>
 <div id="patientStrip" class="patient-strip" hidden><div>患者 <strong id="patientNameView"></strong><span id="patientMetaView"></span></div><button id="editPatientBtn" class="inline-link" type="button">编辑</button></div>
 </section>
-<section class="doc-section controls-section"><h2><span class="section-no">01</span>查找模板</h2><div class="toolbar"><label class="searchbox">⌕ <input id="searchInput" placeholder="搜索疾病、术式、记录类型或关键词"><kbd>Ctrl K</kbd></label><div class="filter-row"><label>阶段<select id="stageFilter"><option value="all">全部阶段</option><option>入院</option><option>术前</option><option>术中</option><option>术后</option></select></label><label>记录类型<select id="typeFilter"><option value="all">全部记录类型</option></select></label></div></div></section>
-<section class="doc-section"><div class="result-head"><h2><span class="section-no">02</span><span id="resultTitle">全部模板</span></h2><div><span id="resultCount"></span><button id="resetFilters" class="inline-link" type="button">重置</button></div></div><div class="stat-line"><span>当前模板总数</span><strong id="templateCount">0</strong></div><div id="templateGrid" class="template-grid"></div><div id="emptyState" class="empty" hidden>没有找到匹配模板。</div></section>
+<section class="doc-section controls-section"><h2><span class="section-no">01</span>查找模板</h2><div class="toolbar"><label class="searchbox">⌕ <input aria-label="搜索病历模板" id="searchInput" disabled placeholder="搜索疾病、术式、记录类型或关键词"><kbd>Ctrl K</kbd></label><div class="filter-row"><label>阶段<select id="stageFilter" disabled><option value="all">全部阶段</option><option>入院</option><option>术前</option><option>术中</option><option>术后</option></select></label><label>记录类型<select id="typeFilter" disabled><option value="all">全部记录类型</option></select></label></div></div></section>
+<section class="doc-section"><div class="result-head"><h2><span class="section-no">02</span><span id="resultTitle">全部模板</span></h2><div><span id="resultCount" role="status" aria-live="polite"></span><button id="resetFilters" class="inline-link" type="button">重置</button></div></div><div class="stat-line"><span>当前模板总数</span><strong id="templateCount">0</strong></div><div id="templateGrid" class="template-grid"><p class="library-loading" role="status">正在加载病历资料…</p></div><div id="emptyState" role="status" class="empty" hidden>没有找到匹配模板。</div></section>
 <section class="doc-section guide-section"><h2><span class="section-no">03</span>推荐使用流程</h2><ol class="steps"><li><div><b>先建立患者信息</b><span>录入姓名、年龄、住院号、侧别、主要诊断和重要既往史。</span></div></li><li><div><b>选择科室与疾病/术式</b><span>进入对应科室后，再进入疾病或术式项目。</span></div></li><li><div><b>预览、核对、复制</b><span>所有默认内容都必须按真实病情修改后再进入正式病历。</span></div></li></ol></section>
 </main></div></div>
 
-<dialog id="patientDialog" class="modal">
-<div class="modal-head"><div><strong>患者信息</strong><span>仅保存在当前浏览器会话</span></div><button class="icon-btn" type="button" data-close-dialog>×</button></div>
+<dialog id="patientDialog" class="modal" aria-labelledby="patientDialogTitle">
+<div class="modal-head"><div><strong id="patientDialogTitle">患者信息</strong><span>仅保存在当前浏览器会话</span></div><button class="icon-btn" type="button" data-close-dialog aria-label="关闭患者信息">×</button></div>
 <form id="patientForm" class="form-grid">
 <label>姓名<input name="name" placeholder="如：张某某"></label><label>性别<select name="sex"><option value="">未填写</option><option>男</option><option>女</option></select></label>
 <label>年龄<input name="age" inputmode="numeric"></label><label>住院号<input name="admissionNo" placeholder="如：0000000001"></label><label>床号<input name="bedNo"></label><label>侧别<select name="side"><option>右</option><option>左</option><option>双侧</option></select></label>
@@ -173,14 +177,15 @@
 <div class="modal-actions"><button id="clearPatientBtn" class="btn ghost" type="button">清除</button><button class="btn ghost" type="button" data-close-dialog>取消</button><button id="savePatient" class="btn primary" type="submit" form="patientForm">应用</button></div>
 </dialog>
 
-<dialog id="previewDialog" class="modal preview-modal">
-<div class="modal-head"><div><strong id="previewTitle"></strong><span id="previewMeta"></span></div><button id="closePreview" class="icon-btn" type="button">×</button></div>
+<dialog id="previewDialog" class="modal preview-modal" aria-labelledby="previewTitle">
+<div class="modal-head"><div><strong id="previewTitle"></strong><span id="previewMeta"></span></div><button id="closePreview" class="icon-btn" type="button" aria-label="关闭病历预览">×</button></div>
 <div class="preview-tools"><button id="copyPreview" class="btn primary" type="button">复制</button><button id="printPreview" class="btn ghost" type="button">打印</button></div>
 <div id="previewContent" class="record-paper"></div>
 </dialog>
 
 <div id="toast" class="toast"></div><div id="portalToast" class="portal-toast"></div>
-<script defer src="/app.js?v=20261007-cases2"></script>
+<script defer src="/search-core.js?v=20261009-quality1"></script>
+<script defer src="/app.js?v=20261009-quality1"></script>
 <script defer src="/ideal-cases.js?v=20261007-complete4"></script>
 <script defer src="/orthopedic-expansion-a.js?v=20261007-expA"></script>
 <script defer src="/orthopedic-expansion-b.js?v=20261007-expB"></script>
@@ -211,8 +216,9 @@
 <script defer src="/record-quality-v22.js?v=20261007-q22b"></script>
 <script defer src="/record-quality-v24.js?v=20261007-q24"></script>
 <script defer src="/record-quality-v23.js?v=20261007-q23b"></script>
-<script defer src="/departments.js?v=20261009-reading-nav1"></script>
+<script defer src="/departments.js?v=20261009-quality1"></script>
 <script defer src="/ideal-other-cases.js?v=20261007-complete3"></script>
 <script defer src="/tka-special-cases.js?v=20261007-special5"></script>
-<script defer src="/cms-core.js?v=20261007-book1"></script>
+<script defer src="/cms-core.js?v=20261009-quality1"></script>
+<script defer src="/workspace.js?v=20261009-quality1"></script>
 </body></html>

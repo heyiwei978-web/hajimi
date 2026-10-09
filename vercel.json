@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/home.html"
+    },
+    {
       "source": "/admin",
       "destination": "/admin.html"
     },
@@ -139,5 +143,6 @@
         "action": "deny"
       }
     }
-  ]
+  ],
+  "buildCommand": "npm run build"
 }

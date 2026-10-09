@@ -123,6 +123,8 @@
     const deptToSlug=Object.fromEntries(departments.map((d)=>[d.name,d.slug]));
     const coreFiltered=typeof filtered==='function'?filtered:null;
     let currentDept=null;
+    let catalogSize=-1,departmentRecords=new Map(),diseaseRecords=new Map();
+    let searchIndex=null,searchIndexSize=-1;
 
     function pathState(){
       const p=location.pathname.split('/').filter(Boolean);
@@ -162,8 +164,21 @@
       const q=document.getElementById('searchInput'),s=document.getElementById('stageFilter'),t=document.getElementById('typeFilter');
       if(q)q.value='';if(s)s.value='all';if(t)t.value='all';
     }
-    function departmentCount(dep){return templates.filter((t)=>t.department===dep).length;}
-    function listForDept(dep){return templates.filter((t)=>t.department===dep);}
+    function ensureCatalog(){
+      if(catalogSize===templates.length)return;
+      departmentRecords=new Map();diseaseRecords=new Map();
+      for(const record of templates){
+        if(!departmentRecords.has(record.department))departmentRecords.set(record.department,[]);
+        departmentRecords.get(record.department).push(record);
+        const key=record.department+'\0'+record.group;
+        if(!diseaseRecords.has(key))diseaseRecords.set(key,[]);
+        diseaseRecords.get(key).push(record);
+      }
+      catalogSize=templates.length;
+    }
+    function listForDept(dep){ensureCatalog();return departmentRecords.get(dep)||[];}
+    function recordsForDisease(dep,group){ensureCatalog();return diseaseRecords.get(dep+'\0'+group)||[];}
+    function departmentCount(dep){return listForDept(dep).length;}
     function allDisease(dep){return diseaseMap[dep]||[...new Set(listForDept(dep).map((t)=>t.group))];}
     function deptCard(dep){
       const d=departments.find((x)=>x.name===dep),n=departmentCount(dep);
@@ -186,12 +201,12 @@
       </article>`;
     }
     function diseaseCard(dep,g){
-      const items=listForDept(dep).filter((t)=>t.group===g);
+      const items=recordsForDisease(dep,g);
       const chips=['入院','术前','术中','术后'].map((s)=>{const n=items.filter((t)=>t.stage===s).length;return n?`<span>${s} ${n}</span>`:''}).join('');
       return `<article class="project-card disease-card" data-disease="${encodeURIComponent(g)}" role="button" tabindex="0"><div class="project-card-top"><span class="project-kind">${dep}</span><strong>1 套完整病历</strong></div><h3>${labelFor(g)}</h3><p>一个病种一个连续病历页面，目录可直达术前讨论、手术记录及术后各日病程。</p><div class="project-stage-chips">${chips}</div><div class="project-open">打开完整病历 <span>→</span></div></article>`;
     }
     function orthoDiseaseCard(g){
-      const items=listForDept('骨科').filter((t)=>t.group===g);
+      const items=recordsForDisease('骨科',g);
       const standardItems=items.filter((t)=>!t.specialCase);
       const specialCases=[...new Set(items.filter((t)=>t.specialCase).map((t)=>t.specialCaseKey).filter(Boolean))];
       const stageOrder=['入院','术前','术中','术后'];
@@ -266,7 +281,7 @@
                     <h3>${section.title}</h3>
                     <p>${section.desc}</p>
                   </div>
-                  <strong>${section.items.reduce((sum,g)=>sum+list.filter((t)=>t.group===g).length,0)} 份模板</strong>
+                  <strong>${section.items.reduce((sum,g)=>sum+recordsForDisease('骨科',g).length,0)} 份模板</strong>
                 </div>
                 <div class="ortho-disease-grid">
                   ${section.items.map(orthoDiseaseCard).join('')}
@@ -602,11 +617,20 @@
       });
       const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=specialBundle.groups.length?'1 套 + '+specialBundle.groups.length+' 特殊':'1 套';if(ac)ac.textContent=departmentCount(currentDept);
     }
-    function navigateRoot(){history.pushState({},'', '/bl');applyRoute();}
-    function navigateDepartment(dep){history.pushState({},'', '/bl/'+deptToSlug[dep]);applyRoute();}
-    function navigateDisease(g){history.pushState({},'', '/bl/'+deptToSlug[currentDept]+'/'+encodeURIComponent(g));applyRoute();}
+    function finishNavigation(){
+      applyRoute();
+      window.scrollTo({top:0,behavior:'instant'});
+      const main=document.querySelector('#libraryShell main');
+      if(main){main.tabIndex=-1;main.focus({preventScroll:true});}
+    }
+    function navigateRoot(){history.pushState({},'', '/bl');finishNavigation();}
+    function navigateDepartment(dep){history.pushState({},'', '/bl/'+deptToSlug[dep]);finishNavigation();}
+    function navigateDisease(g){history.pushState({},'', '/bl/'+deptToSlug[currentDept]+'/'+encodeURIComponent(g));finishNavigation();}
     function applyRoute(){
+      document.getElementById('templateGrid').classList.remove('search-results');
       const r=pathState();setShell(r.page);
+      const title=r.page==='home'?'哈基米工作站':r.page==='duty'?'值班资料':r.page==='departments'?'病历模板库':(r.disease?labelFor(r.disease)+' · 完整病历':(r.department||'')+'病历模板库');
+      document.title=title==='哈基米工作站'?title:title+' · 哈基米工作站';
       if(r.page==='home'||r.page==='duty')return;
       if(r.page==='departments'){renderDepartmentRoot();return;}
       currentDept=r.department||null;if(!currentDept){renderDepartmentRoot();return;}
@@ -615,20 +639,51 @@
       else renderDepartmentIndex();
     }
 
-    const originalRender=typeof render==='function'?render:null;
+    function renderSearchResults(department){
+      if(!searchIndex||searchIndexSize!==templates.length){
+        searchIndex=createHajimiSearch(templates);searchIndexSize=templates.length;
+      }
+      const list=searchIndex(state,department);
+      document.body.classList.remove('disease-book-page');
+      document.body.classList.toggle('library-root-page',!department);
+      document.body.classList.toggle('department-no-sidebar',department!=='骨科');
+      setBrand();
+      const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
+      if(title)title.textContent=(department||'全部科室')+' · 搜索结果';
+      if(num)num.textContent=list.length+' 份';
+      if(empty)empty.hidden=list.length>0;
+      if(!grid)return;
+      grid.classList.add('search-results');
+      grid.replaceChildren();
+      let shown=0;
+      const append=()=>{
+        grid.querySelector('.search-more')?.remove();
+        const next=list.slice(shown,shown+60);shown+=next.length;
+        grid.insertAdjacentHTML('beforeend',next.map(templateCard).join(''));
+        if(shown<list.length){
+          grid.insertAdjacentHTML('beforeend','<div class="search-more"><span>已显示 '+shown+' / '+list.length+' 份</span><button class="btn ghost" type="button">显示更多</button></div>');
+          grid.querySelector('.search-more button').onclick=()=>{const focusIndex=shown;append();grid.querySelectorAll('.preview')[focusIndex]?.focus({preventScroll:true});};
+        }
+        bindTemplateActions();
+      };
+      append();
+    }
+
     render=function(){
+      document.getElementById('templateGrid').classList.remove('search-results');
       const r=pathState();
       if(r.page!=='library'&&r.page!=='departments'){setShell(r.page);return;}
-      if(r.page==='departments'){renderDepartmentRoot();return;}
+      if(r.page==='departments'){
+        currentDept=null;
+        if(state.q.trim()||state.stage!=='all'||state.type!=='all')renderSearchResults(null);
+        else renderDepartmentRoot();
+        return;
+      }
       currentDept=r.department||currentDept;
       if(!currentDept){renderDepartmentRoot();return;}
       if(state.group==='all'&&!state.q.trim()&&state.stage==='all'&&state.type==='all'){renderDepartmentIndex();return;}
       if(state.group!=='all'){renderDisease();return;}
-      const list=(coreFiltered?coreFiltered():templates).filter((t)=>t.department===currentDept);
-      document.body.classList.toggle('department-no-sidebar',currentDept!=='骨科');setBrand();
-      const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
-      if(title)title.textContent=currentDept+' · 搜索结果';if(num)num.textContent=list.length+' 份';if(grid)grid.innerHTML=toolbar(currentDept+' · 搜索结果',false)+list.map(templateCard).join('');if(empty)empty.hidden=list.length>0;
-      const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateDepartment(currentDept);bindTemplateActions();
+      renderSearchResults(currentDept);
     };
 
     const reset=document.getElementById('resetFilters');if(reset)reset.onclick=()=>{resetState();render();};
@@ -650,7 +705,7 @@
           const value=button.dataset.orthoRoute;
           if(value==='__overview')history.pushState({},'', '/bl/guke');
           else history.pushState({},'', '/bl/guke/'+value);
-          applyRoute();
+          finishNavigation();
         };
       });
     }
@@ -677,6 +732,9 @@
     window.addEventListener('hajimi:cms-ready',()=>{const r=pathState();if(r.page==='library'&&r.disease&&currentDept)renderDisease();});
     window.hajimiNavigateDepartment=navigateDepartment;
     window.hajimiNavigateRoot=navigateRoot;
+    window.HAJIMI_LIBRARY_READY=true;
+    document.getElementById('libraryShell').setAttribute('aria-busy','false');
+    for(const id of ['searchInput','stageFilter','typeFilter'])document.getElementById(id).disabled=false;
     applyRoute();
   }catch(e){console.error('department router failed',e);}
 })([
