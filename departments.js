@@ -401,6 +401,7 @@
       if(/影像复查|检查理由|复查申请/.test(s))return 260;
       if(/并发症|切口渗液|切口愈合不良|感染|血栓|发热|贫血|神经损伤|再手术/.test(s))return 400;
       if(/出院前主治医师查房/.test(s))return 450;
+      if(/出院当天查房|出院当日查房|出院前主治医师查房/.test(s))return 480;
       if(/出院小结|出院记录|出院病历/.test(s))return 500;
       if(t.stage==='入院')return 25;
       if(t.stage==='术前')return 65;
@@ -510,7 +511,7 @@
     function caseFileCategory(t){
       const label=String(t.short||'')+' '+String(t.type||'');
       if(/知情同意|同意书|选择治疗方案|选择手术方案|沟通记录|沟通告知|谈话记录|告知书|术前谈话|家属谈话|手术风险告知/.test(label))return 'consent';
-      if(/出院小结|出院记录|出院病历|出院医嘱|出院随访|随访记录/.test(label))return 'discharge';
+      if(/出院小结|出院记录|出院病历|出院医嘱|出院随访|随访记录|出院当天查房|出院当日查房|出院前主治医师查房/.test(label))return 'discharge';
       if(/术后|康复|下肢血管超声|影像复查|切口渗液|并发症/.test(label))return 'postop';
       if(/手术记录|麻醉记录|手术安全核查|手术清点|麻醉术后访视/.test(label))return 'surgery';
       if(/会诊申请|会诊回报|会诊记录|检查理由|辅助检查/.test(label))return 'consult';
