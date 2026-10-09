@@ -80,3 +80,37 @@ test('complex TKA cases keep their unique operative content', () => {
     sourceBody:'手术经过：于髌骨使用2枚锚钉修复内侧韧带撕裂，逐层缝合。' };
   assert.equal(sandbox({TKA:{group:'TKA',surgery:'右全膝关节置换术'}},[row])(row),row.sourceBody);
 });
+
+
+test('production compiler receives normalized sourceBody rather than only a browser display wrapper', () => {
+  const operation={
+    group:'股骨转子间骨折',short:'手术记录',type:'手术记录',
+    sourceBody:'术前诊断：右股骨转子间骨折\n手术开始时间：09:00\n\n手术经过：\n1. 患者核对身份。\n2. 常规消毒铺巾。\n3. 完成闭合复位。\n4. 置入股骨近端髓内钉。\n5. 置入螺旋刀片。\n6. 透视确认位置。\n7. 冲洗止血。\n8. 逐层缝合。\n9. 安返病房。\n\n术后计划：按固定情况康复。'
+  };
+  const note={
+    group:'股骨转子间骨折',short:'主任医师首次查房记录',type:'查房',
+    sourceBody:'记录名称：主任医师首次查房记录\n记录时间：2026-10-09 10:00\n\n今日王建伟主任医师查房。\n\n查体：髋部疼痛。\n\n处理：完善检查。'
+  };
+  sandbox({'股骨转子间骨折':{group:'股骨转子间骨折',surgery:'右股骨转子间骨折闭合复位髓内钉内固定术',side:'右',anesthesia:'全身麻醉',position:'仰卧位',drain:true,bloodloss:80}},[operation,note]);
+  const actual=operation.sourceBody;
+  const procedural=actual.split('手术经过：\n')[1].split('\n\n术后计划：')[0];
+  assert.equal(procedural.split('\n\n').length,4);
+  assert.match(actual,/大转子顶点/);
+  assert.doesNotMatch(procedural,/^\d+\./m);
+  assert.match(actual,/手术开始时间：09:00/);
+  assert.match(actual,/术后计划：按固定情况康复。/);
+  assert.doesNotMatch(note.sourceBody,/王建伟/);
+  assert.match(note.sourceBody,/主任医师：________$/);
+  assert.equal(note.sourceBody.split('\n\n').length,3);
+});
+
+test('special case keeps procedure detail but removes nine numbered one-line steps', () => {
+  const caseRow={
+    group:'TKA',short:'手术记录',specialCase:true,type:'手术记录',
+    sourceBody:'手术经过：\n1. 安全核查完成。\n2. 麻醉后消毒铺巾。\n3. 取前正中入路。\n4. 完成骨切除。\n5. 使用2枚锚钉修复髌骨内侧韧带。\n6. 检查髌骨轨迹。\n7. 冲洗止血。\n8. 缝合切口。\n9. 术毕安返病房。\n\n术后计划：保护伸膝装置。'
+  };
+  sandbox({TKA:{group:'TKA',surgery:'右全膝关节置换术'}},[caseRow]);
+  assert.equal(caseRow.sourceBody.split('手术经过：\n')[1].split('\n\n术后计划：')[0].split('\n\n').length,4);
+  assert.match(caseRow.sourceBody,/2枚锚钉修复髌骨内侧韧带/);
+  assert.doesNotMatch(caseRow.sourceBody,/^\d+\./m);
+});
