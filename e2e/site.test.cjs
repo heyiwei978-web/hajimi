@@ -266,6 +266,77 @@ test('disease navigation starts at the top, preserves record content and chapter
   } finally {await context.close();}
 });
 
+test('bottom reading actions follow document order, keep directory selection and preserve print and expanded modes',async()=>{
+  for(const width of [320,768,1440]){
+    const {page,context,errors}=await pageFor(width,{isMobile:width===320,hasTouch:width===320});
+    try{
+      await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});
+      const records=page.locator('#caseWorkspace .case-file-reader > .record-book-section');
+      const ids=await records.evaluateAll(items=>items.map(item=>item.id));
+      const original=await records.first().locator('.record-book-body').textContent();
+      const current=page.locator('#caseWorkspace .case-file-reader > .case-active');
+      assert(ids.length>2);
+      assert.equal(await current.getAttribute('id'),ids[0]);
+      assert(await page.locator('#casePreviousBottom').isDisabled());
+      assert(await page.locator('#casePrevious').isDisabled());
+      assert(await page.locator('.case-nav-item b').evaluateAll(items=>items.every(item=>parseFloat(getComputedStyle(item).fontSize)>=17)));
+      await page.locator('.case-file-bottom-nav').scrollIntoViewIfNeeded();await settle(page);
+      assert(await page.locator('.case-file-bottom-actions button:visible').evaluateAll(buttons=>buttons.every(button=>{
+        const r=button.getBoundingClientRect(),text=document.createRange();text.selectNodeContents(button);
+        return r.left>=0&&r.right<=innerWidth&&r.height>=48&&text.getClientRects().length===1;
+      })),`readable bottom actions at ${width}px`);
+      await page.locator('#caseNextBottom').click();await settle(page);
+      assert.equal(await current.getAttribute('id'),ids[1]);
+      assert.equal(decodeURIComponent(new URL(page.url()).hash.slice(1)),ids[1]);
+      assert.match(await page.locator('#caseBottomSection').innerText(),/02 \/ /);
+      assert(await current.locator('h3').evaluate(element=>element===document.activeElement));
+      const record=await current.boundingBox(),header=await page.locator('.library-topbar').boundingBox();
+      assert(record.y>=header.y+header.height+10,'next document clears the header');
+      await page.locator('#casePreviousBottom').click();await settle(page);
+      assert.equal(await current.getAttribute('id'),ids[0]);
+      assert.equal(await current.locator('.record-book-body').textContent(),original);
+      await page.locator('#caseBackToDirectory').click();await settle(page);
+      const sidebar=await page.locator('#recordBookToc').boundingBox();
+      assert(sidebar.y>=header.y+header.height+10,'return places directory below header');
+      assert(await page.locator('.case-nav-item[aria-current="location"]').evaluate(element=>{
+        const r=element.getBoundingClientRect(),parent=element.closest('aside').getBoundingClientRect();
+        return element===document.activeElement&&r.top>=parent.top&&r.bottom<=parent.bottom;
+      }),'return focuses the visible selected document');
+      // Directory groups differ from chronological reading order.
+      await page.locator('[data-case-record="'+ids.at(-1)+'"]').click();
+      assert.equal(await current.getAttribute('id'),ids.at(-1));
+      assert(await page.locator('#caseNextBottom').isDisabled());
+      assert(await page.locator('#caseNext').isDisabled());
+      await page.reload({waitUntil:'networkidle'});
+      assert.equal(await current.getAttribute('id'),ids.at(-1),'refresh restores the selected document');
+      await page.locator('#caseShowAll').click();
+      assert.equal(await records.filter({visible:true}).count(),ids.length);
+      assert.equal(await page.locator('#caseNextBottom').isVisible(),false);
+      assert(await page.locator('#caseShowSelectedBottom').isVisible());
+      await page.locator('#caseShowSelectedBottom').click();await settle(page);
+      assert.equal(await records.filter({visible:true}).count(),1);
+      assert.equal(await current.getAttribute('id'),ids.at(-1));
+      await page.evaluate(()=>{window.print=()=>{};});
+      await page.locator('#printWholeRecord').click();
+      assert.equal(await records.filter({visible:true}).count(),1,'print does not change reading mode');
+      await page.emulateMedia({media:'print'});
+      assert.equal(await records.filter({visible:true}).count(),ids.length,'print includes the complete case file');
+      assert.equal(await page.locator('.case-file-bottom-nav').isVisible(),false);
+      assert.equal(await page.locator('#previewDialog').isVisible(),false,'closed preview does not add duplicate printed content');
+      assert.equal(await records.first().locator('.record-book-body').evaluate(element=>getComputedStyle(element).fontSize),'16px');
+      await page.emulateMedia({media:'screen'});
+      assert.equal(await records.filter({visible:true}).count(),1);
+      assert.equal(await current.locator('.record-book-body').evaluate(element=>getComputedStyle(element).fontSize),'18px');
+      await current.locator('.preview').click();
+      assert.equal(await page.locator('#previewContent').evaluate(element=>getComputedStyle(element).fontSize),'18px');
+      await page.emulateMedia({media:'print'});
+      assert(await page.locator('#previewContent').isVisible(),'preview printing shows the selected document');
+      assert.equal(await records.filter({visible:true}).count(),0,'preview printing excludes the complete case file');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('failed content loading keeps administrator editing unavailable',async()=>{
   const {page,context,errors}=await pageFor();
   try {await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
@@ -428,7 +499,7 @@ test('signed-in clinical headers, preview actions and editors remain usable on n
       await page.locator('.record-book-toc a').first().click();await settle(page);
       const record=await page.locator('#caseWorkspace .case-active').boundingBox(),header=await page.locator('.library-topbar').boundingBox();
       assert(record.y>=header.y+header.height+10,`case directory clears the signed-in header at ${width}px`);
-      assert.equal(await page.locator('#caseWorkspace .case-active .record-book-body').evaluate(element=>getComputedStyle(element).fontSize),'16px');
+      assert.equal(await page.locator('#caseWorkspace .case-active .record-book-body').evaluate(element=>getComputedStyle(element).fontSize),'18px');
       await page.locator('.record-book-section .preview').first().click();await settle(page);
       assert(await page.locator('.preview-tools button').evaluateAll(buttons=>buttons.every(button=>{
         const text=document.createRange();text.selectNodeContents(button);const r=button.getBoundingClientRect(),dialog=button.closest('dialog').getBoundingClientRect();

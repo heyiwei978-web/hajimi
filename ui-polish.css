@@ -389,17 +389,23 @@ button,a,[role="button"]{
   .feature-eyebrow,.feature-enter,.official-stats small,.official-footer{font-size:12px}
   .official-footer small{font-size:12px}
   .feature-art{pointer-events:none}
-  .library-department-card p,.project-card p{font-size:15px;line-height:1.75}
-  .library-department-card small,.project-card-top,.project-stage-chips span{font-size:12px}
+  .library-department-card p,.project-card p{font-size:16px;line-height:1.75}
+  .library-department-card small,.project-card-top,.project-stage-chips span{font-size:14px}
   .library-department-card .department-card-open,.project-open{font-size:14px}
   #libraryShell .searchbox input,#libraryShell .filter-row select{font-size:16px;min-width:0}
   #libraryShell .filter-row label{flex-shrink:0;white-space:nowrap;font-size:13px}
-  #libraryShell .nav-item{font-size:14px;min-height:42px;display:flex;align-items:center}
+  #libraryShell .nav-item{font-size:16px;min-height:48px;display:flex;align-items:center}
   #libraryShell .btn,.record-chapter-actions button{min-height:42px;font-size:14px}
   .record-book-hero p,.intro-note{font-size:15px;line-height:1.8}
-  .record-book-toc a{min-height:44px}
-  .special-case-toc b{font-size:13px}
-  .record-book-body,.record-paper{overflow-wrap:anywhere}
+  .ortho-jump a{font-size:16px;min-height:48px}
+  .ortho-disease-card h3{font-size:21px;line-height:1.5}
+  .ortho-disease-card p{font-size:16px}
+  .ortho-stage-chips span{font-size:14px}
+  .record-book-toc a,.special-case-toc a{min-height:50px}
+  .record-book-toc a>b,.special-case-toc a b{font-size:17px}
+  .special-case-toc>div b{font-size:17px}
+  .record-book-body,.record-paper{font-size:18px;overflow-wrap:anywhere}
+  .record-back-toc{font-size:16px;min-height:44px;padding:8px 0}
   .form-grid input,.form-grid select,.form-grid textarea{font-size:16px;min-height:44px;min-width:0}
   .form-grid label{font-size:14px;min-width:0}
   .icon-btn{width:44px;height:44px;flex-shrink:0}
@@ -472,4 +478,8 @@ button,a,[role="button"]{
   body.department-no-sidebar #libraryShell .sidebar,
   #libraryShell .sidebar,#libraryShell .drawer-mask{display:none!important}
   body.drawer-open{overflow:visible!important}
+  .disease-book-page #libraryShell .content{width:100%;padding:0}
+  #previewDialog:not([open]){display:none!important}
+  body:has(#previewDialog[open]) #libraryShell{display:none!important}
+  #previewDialog[open]{max-height:none!important;overflow:visible!important}
 }

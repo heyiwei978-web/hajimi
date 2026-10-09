@@ -552,8 +552,38 @@
       const articles=[...root.querySelectorAll('.case-file-reader > .record-book-section')];
       const links=[...root.querySelectorAll('[data-case-record]')];
       const status=root.querySelector('#caseCurrentSection');
+      const bottomStatus=root.querySelector('#caseBottomSection');
       const allBtn=document.getElementById('caseShowAll');
+      const stepButtons=[...root.querySelectorAll('[data-case-step]')];
+      const selectedBtn=root.querySelector('#caseShowSelectedBottom');
+      const directory=root.querySelector('#recordBookToc');
+      if(!articles.length){
+        if(status)status.textContent='暂无标准文书';
+        if(bottomStatus)bottomStatus.textContent='暂无标准文书';
+        root.querySelectorAll('.case-file-tools button,.case-file-bottom-nav button').forEach(function(btn){btn.disabled=true;});
+        return;
+      }
       let selected=0;
+      function syncNavigation(){
+        const expanded=root.classList.contains('case-show-all');
+        const position=String(selected+1).padStart(2,'0')+' / '+articles.length;
+        if(status)status.textContent=expanded?'全部 '+articles.length+' 篇文书':'正在阅读 '+position+' 篇';
+        if(bottomStatus)bottomStatus.textContent=expanded?'已展开全部 '+articles.length+' 份文书':
+          '第 '+position+' 份 · '+articles[selected].querySelector('h3').textContent;
+        if(allBtn){allBtn.textContent=expanded?'只看当前文书':'展开整套病历';allBtn.setAttribute('aria-pressed',String(expanded));}
+        stepButtons.forEach(function(btn){btn.hidden=expanded;btn.disabled=Number(btn.dataset.caseStep)<0?selected===0:selected===articles.length-1;});
+        if(selectedBtn)selectedBtn.hidden=!expanded;
+      }
+      function revealDirectorySelection(){
+        const link=links.find(function(item){return item.dataset.caseRecord===articles[selected].id;});
+        if(link&&directory){
+          link.closest('details').open=true;
+          const item=link.getBoundingClientRect(),bounds=directory.getBoundingClientRect();
+          if(item.top<bounds.top+12)directory.scrollTop+=item.top-bounds.top-12;
+          else if(item.bottom>bounds.bottom-12)directory.scrollTop+=item.bottom-bounds.bottom+12;
+        }
+        return link;
+      }
       function activate(i,scroll){
         if(i<0||i>=articles.length)return;
         root.classList.remove('case-show-all');
@@ -561,9 +591,13 @@
         articles.forEach(function(a,j){a.classList.toggle('case-active',j===i);});
         const id=articles[i].id;
         links.forEach(function(link){const yes=link.dataset.caseRecord===id;link.classList.toggle('is-current',yes);if(yes){link.setAttribute('aria-current','location');link.closest('details').open=true;}else link.removeAttribute('aria-current');});
-        if(status)status.textContent='正在阅读 '+String(i+1).padStart(2,'0')+' / '+articles.length+' 篇';
-        if(allBtn){allBtn.textContent='展开整套病历';allBtn.setAttribute('aria-pressed','false');}
-        if(scroll)root.querySelector('.case-file-reader').scrollIntoView({behavior:'instant',block:'start'});
+        syncNavigation();
+        revealDirectorySelection();
+        if(scroll){
+          history.replaceState(history.state||{},'',location.pathname+location.search+'#'+encodeURIComponent(id));
+          root.querySelector('.case-file-reader').scrollIntoView({behavior:'instant',block:'start'});
+          const heading=articles[i].querySelector('h3');heading.tabIndex=-1;heading.focus({preventScroll:true});
+        }
       }
       links.forEach(function(link){
         link.addEventListener('click',function(e){
@@ -571,20 +605,21 @@
           const idx=articles.findIndex(function(a){return a.id===link.dataset.caseRecord;});
           if(idx<0)return;
           activate(idx,true);
-          history.replaceState(history.state||{},'',location.pathname+location.search+'#'+encodeURIComponent(articles[idx].id));
         });
       });
       if(allBtn)allBtn.onclick=function(){
         const expand=!root.classList.contains('case-show-all');root.classList.toggle('case-show-all',expand);
-        allBtn.textContent=expand?'只看当前文书':'展开整套病历';
-        allBtn.setAttribute('aria-pressed',expand?'true':'false');
-        if(status)status.textContent=expand?'全部 '+articles.length+' 篇文书':('正在阅读 '+String(selected+1).padStart(2,'0')+' / '+articles.length+' 篇');
+        syncNavigation();
       };
-      const prev=document.getElementById('casePrevious'),next=document.getElementById('caseNext');
-      if(prev)prev.onclick=function(){activate((selected-1+articles.length)%articles.length,true)};
-      if(next)next.onclick=function(){activate((selected+1)%articles.length,true)};
-      const printBtn=document.getElementById('printWholeRecord');
-      if(printBtn)printBtn.onclick=function(){root.classList.add('case-show-all');window.print();};
+      stepButtons.forEach(function(btn){btn.onclick=function(){activate(selected+Number(btn.dataset.caseStep),true);};});
+      if(selectedBtn)selectedBtn.onclick=function(){activate(selected,true);};
+      function backToDirectory(e){
+        e.preventDefault();
+        const link=revealDirectorySelection();
+        root.scrollIntoView({behavior:'instant',block:'start'});
+        if(link)link.focus({preventScroll:true});
+      }
+      root.querySelectorAll('#caseBackToDirectory,.record-back-toc').forEach(function(btn){btn.onclick=backToDirectory;});
       let hash='';
       try{hash=decodeURIComponent(location.hash.slice(1));}catch{hash='';}
       const initial=articles.findIndex(function(a){return a.id===hash;});
@@ -657,11 +692,20 @@
           '<aside class="record-book-toc case-file-sidebar" id="recordBookToc">'+caseFileNav(list)+'</aside>'+
           '<div class="record-book-content case-file-reader-wrap">'+
             '<div class="case-file-tools"><div><span class="case-file-eyebrow">CASE READER</span><strong id="caseCurrentSection">'+list.length+' 篇文书</strong><small>临床病历 '+(list.length-signedCount)+' 篇 · 签字沟通 '+signedCount+' 篇</small></div><div class="case-file-reader-actions">'+
-              '<button id="casePrevious" class="btn ghost" type="button">← 上一篇</button>'+
-              '<button id="caseNext" class="btn ghost" type="button">下一篇 →</button>'+
+              '<button id="casePrevious" data-case-step="-1" class="btn ghost" type="button">← 上一篇</button>'+
+              '<button id="caseNext" data-case-step="1" class="btn ghost" type="button">下一篇 →</button>'+
               '<button id="caseShowAll" class="btn ghost" type="button" aria-pressed="false">展开整套病历</button>'+
             '</div></div>'+
             '<div class="case-file-reader">'+allChapters+'</div>'+
+            '<nav class="case-file-bottom-nav" aria-label="病历阅读操作">'+
+              '<strong id="caseBottomSection" aria-live="polite" aria-atomic="true"></strong>'+
+              '<div class="case-file-bottom-actions">'+
+                '<button id="casePreviousBottom" data-case-step="-1" class="btn ghost" type="button">← 上一份</button>'+
+                '<button id="caseBackToDirectory" class="btn ghost" type="button">返回目录</button>'+
+                '<button id="caseNextBottom" data-case-step="1" class="btn primary" type="button">下一份 →</button>'+
+                '<button id="caseShowSelectedBottom" class="btn primary" type="button" hidden>只看当前文书</button>'+
+              '</div>'+
+            '</nav>'+
           '</div>'+
         '</section>'+specialBundle.html;
 
