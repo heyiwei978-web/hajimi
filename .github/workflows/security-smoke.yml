@@ -3,7 +3,7 @@ name: Site quality and security
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, 'preview/disease-case-workspace']
     paths:
       - '*.js'
       - '*.html'

@@ -1,0 +1,79 @@
+/* Preview only: disease-centered patient-case workspace. Existing clinical text unchanged. */
+#templateGrid.case-search-results{display:block!important;max-width:none;width:100%;min-width:0}
+.case-search-intro{margin:4px 0 17px;padding:13px 17px;border:1px solid #dce9f9;border-radius:14px;background:#f3f8ff;color:#42546b;font-size:13px;line-height:1.8}
+.case-search-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.case-search-card{background:#fff;border:1px solid #e4eaf2;border-radius:19px;padding:21px 23px;cursor:pointer;min-width:0;display:flex;flex-direction:column;gap:14px;box-shadow:0 5px 19px rgba(21,40,65,.045);transition:border-color .15s,box-shadow .15s,transform .15s}
+.case-search-card:hover,.case-search-card:focus-visible{border-color:#8dafe3;box-shadow:0 14px 32px rgba(21,40,65,.09);transform:translateY(-1px);outline:none}
+.case-search-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#697a93;font-size:11px;font-weight:650}
+.case-search-card-top span:first-child{background:#eaf2ff;border-radius:7px;padding:5px 9px;color:#235a9b}
+.case-search-card h3{font-size:21px;font-weight:750;color:#1d293b;margin:0}
+.case-search-card p{color:#67778c;font-size:13px;line-height:1.7;margin:0;flex:1}
+.case-search-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;border-top:1px solid #eff2f7}
+.case-search-card-bottom small{font-size:11px;color:#8793a4}
+.case-search-card-bottom b{font-size:12px;color:#1d5ea8}
+#templateGrid.case-search-results .search-more{grid-column:1/-1}
+body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px) minmax(0,1fr);gap:22px;align-items:start;margin-top:20px}
+.case-file-sidebar{padding:0!important;overflow:auto;max-height:calc(100vh - 100px);border:1px solid #dde7f1!important;border-radius:18px!important}
+.case-file-sidebar .record-book-toc-head{padding:23px 20px 17px;border-bottom:1px solid #e9eef5;background:linear-gradient(135deg,#f6f9ff,#fff)}
+.case-nav-family{padding:15px 12px;border-bottom:1px solid #ebeff4}
+.case-nav-family:last-child{border-bottom:0}
+.case-nav-family h4{font-size:12px;color:#375681;font-weight:800;letter-spacing:.02em;margin:0 9px 10px}
+.case-nav-group{margin:4px 0;border:1px solid transparent;border-radius:10px}
+.case-nav-group[open]{background:#fafcff;border-color:#edf1f6}
+.case-nav-group summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;font-weight:750;color:#26364e;padding:11px 10px;list-style:none}
+.case-nav-group summary::-webkit-details-marker{display:none}
+.case-nav-group summary:before{content:'▾';font-size:10px;color:#7b92b3}
+.case-nav-group:not([open]) summary:before{content:'▸'}
+.case-nav-group summary span{flex:1}
+.case-nav-group summary small{font-size:10px;background:#edf3fa;color:#4b6790;padding:3px 7px;border-radius:30px;white-space:nowrap}
+.case-nav-group nav{padding:0 5px 8px;display:grid;gap:3px}
+.case-file-sidebar .case-nav-item{padding:9px 10px;display:grid;grid-template-columns:23px minmax(0,1fr);align-items:start;gap:7px;text-decoration:none;color:#4d5b6c;border-radius:9px;line-height:1.45}
+.case-file-sidebar .case-nav-item span{color:#92a1b2;font-size:10px;font-variant-numeric:tabular-nums;padding-top:2px}
+.case-file-sidebar .case-nav-item b{font-size:11px;font-weight:590;overflow-wrap:anywhere}
+.case-file-sidebar .case-nav-item:hover{background:#e9f1fc}
+.case-file-sidebar .case-nav-item.is-current{background:#e4efff;color:#1553a2}
+.case-file-sidebar .case-nav-item.is-current span{color:#1553a2}
+.case-nav-empty{font-size:11px;color:#9aa4b4;padding:3px 16px 10px;margin:0}
+.case-file-reader-wrap{min-width:0}
+.case-file-reader{scroll-margin-top:92px}
+.case-file-reader>.record-book-section{scroll-margin-top:92px}
+.case-file-tools{display:flex;justify-content:space-between;gap:16px;align-items:center;background:#fff;border:1px solid #e2e8f1;border-radius:16px;padding:15px 18px;margin-bottom:15px;box-shadow:0 7px 18px rgba(25,45,72,.04)}
+.case-file-tools>div:first-child{display:flex;flex-direction:column;gap:4px}
+.case-file-eyebrow{font-size:10px;color:#6581aa;letter-spacing:.13em;font-weight:700}
+.case-file-tools strong{font-size:15px;color:#202e43}
+.case-file-tools small{font-size:11px;color:#8493a7}
+.case-file-reader-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.case-file-reader-actions .btn{font-size:11px;padding:8px 11px}
+.case-workspace .case-file-reader>.record-book-section{display:none}
+.case-workspace .case-file-reader>.record-book-section.case-active{display:block}
+.case-workspace.case-show-all .case-file-reader>.record-book-section{display:block}
+.case-workspace .record-book-section{margin-bottom:14px}
+.case-workspace .record-book-body{overflow-wrap:anywhere;line-height:2}
+.case-workspace .record-book-section-head{gap:12px}
+.case-workspace .record-chapter-title h3{font-size:17px}
+.case-workspace .record-chapter-actions .btn{font-size:11px}
+@media (max-width:980px){
+ body.disease-book-page .case-workspace{grid-template-columns:minmax(225px,250px) minmax(0,1fr);gap:14px}
+ .case-file-tools{flex-wrap:wrap}
+}
+@media (max-width:720px){
+ .case-search-grid{grid-template-columns:1fr}
+ .case-search-card{padding:18px}
+ body.disease-book-page .case-workspace{display:block}
+ .case-file-sidebar{position:relative;top:auto;max-height:380px;margin-bottom:16px}
+ .case-file-sidebar .record-book-toc-head{padding:16px}
+ .case-nav-family{padding:10px}
+ .case-file-tools{padding:12px}
+ .case-file-reader-actions{justify-content:flex-start}
+ .case-workspace .record-book-section-head{display:flex;flex-wrap:wrap;padding:13px}
+ .case-workspace .record-chapter-no{height:32px;width:32px}
+ .case-workspace .record-chapter-actions{width:100%;justify-content:flex-start}
+ .case-workspace .record-book-body{padding:17px;font-size:13px}
+}
+@media print{
+ .case-file-sidebar,.case-file-tools,.case-search-intro{display:none!important}
+ body.disease-book-page .case-workspace{display:block}
+ .case-workspace .case-file-reader>.record-book-section{display:block!important;break-inside:avoid-page}
+ .case-workspace .record-book-body{padding:10px 0!important}
+ .case-workspace .record-chapter-actions{display:none!important}
+}
