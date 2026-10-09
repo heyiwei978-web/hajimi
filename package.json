@@ -1,7 +1,7 @@
 {
   "type": "module",
   "dependencies": {
-    "@vercel/blob": "latest"
+    "@vercel/blob": "2.8.1"
   },
   "scripts": {
     "test": "node --test test/*.test.js",

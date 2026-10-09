@@ -8,7 +8,7 @@
 <title>网站管理 · 哈基米工作站</title>
 <link rel="stylesheet" href="/styles.css?v=20261007-library4">
 <link rel="stylesheet" href="/cms.css?v=20261006-g1">
-<link rel="stylesheet" href="/admin.css?v=20261009-readability1">
+<link rel="stylesheet" href="/admin.css?v=20261009-backups1">
 <link rel="stylesheet" href="/ui-polish.css?v=20261009-card-width2">
 <link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
 </head>
@@ -57,6 +57,7 @@
   </section>
 
   <section id="dashboardPanel" hidden>
+    <p id="adminDataError" class="admin-error" role="alert" hidden></p>
     <div class="admin-overview">
       <div><span>模板自定义修改</span><strong id="overrideCount">0</strong><small>已保存覆盖内容</small></div>
       <div><span>案例资料</span><strong id="caseCount">0</strong><small>已保存案例</small></div>
@@ -89,6 +90,14 @@
       </a>
     </div>
 
+    <section class="admin-guide admin-backups" aria-labelledby="backupTitle">
+      <div class="admin-card-head"><div><span>资料保护</span><h2 id="backupTitle">备份与修改历史</h2></div><button id="refreshHistory" class="admin-secondary" type="button">刷新</button></div>
+      <p>每次修改或恢复前自动保存一份备份，可在这里恢复最近 50 个版本。恢复时也会保留当前版本的备份。</p>
+      <button id="downloadCurrent" type="button" class="admin-primary" disabled>下载当前资料备份</button>
+      <p id="historyStatus" role="status" aria-live="polite">正在加载修改历史…</p>
+      <div id="historyList" class="admin-history-list"></div>
+    </section>
+
     <section class="admin-guide">
       <div class="admin-card-head"><div><span>固定维护流程</span><h2>以后都从这一套站点修改</h2></div><button id="adminLogout" type="button" class="admin-secondary">退出登录</button></div>
       <ol>
@@ -102,7 +111,7 @@
 </main>
 
 <div id="adminToast" class="portal-toast"></div>
-<script src="/admin.js?v=20261007-a1"></script>
+<script src="/admin.js?v=20261009-backups1"></script>
 <script defer src="/workspace.js?v=20261009-quality1"></script>
 </body>
 </html>

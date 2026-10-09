@@ -40,7 +40,7 @@ async function pageFor(width=1440, options={}) {
   // Anonymous/read-only content fixtures keep these UI tests independent of private storage.
   // API authorization is exercised by test/security.test.js, rather than this static server.
   await context.route('**/api/session',route=>route.fulfill({json:{authenticated:false,user:null}}));
-  await context.route('**/api/content',route=>route.fulfill({json:{version:1,templateOverrides:{},cases:[]}}));
+  await context.route('**/api/content',route=>route.fulfill({json:{version:1,revision:'fixture-v1',templateOverrides:{},cases:[]}}));
   const page = await context.newPage();
   const errors=[];
   page.on('pageerror',error=>errors.push(error.message));
@@ -157,4 +157,51 @@ test('failed content loading keeps administrator editing unavailable',async()=>{
     await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});await page.locator('.record-book-section .preview').first().click();
     assert.equal(await page.locator('#cmsEditTemplate,#cmsAddCase').count(),0);assert((await page.locator('#toast').textContent()).includes('加载失败'));assert.deepEqual(errors,[]);
   } finally {await context.close();}
+});
+
+test('failed template saves preserve the draft and preview; successful retry carries the loaded revision',async()=>{
+  const {page,context,errors}=await pageFor(393);
+  try{
+    await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
+    let writes=0,payload;
+    await context.route('**/api/content',route=>{
+      if(route.request().method()==='PUT'){
+        payload=route.request().postDataJSON();writes++;
+        return route.fulfill(writes===1?{status:503,json:{error:'备份失败，未保存'}}:{json:{...payload,revision:'fixture-v2'}});
+      }
+      return route.fulfill({json:{version:1,revision:'fixture-v1',templateOverrides:{},cases:[]}});
+    });
+    await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});await page.locator('.record-book-section .preview').first().click();
+    const before=await page.locator('#previewContent').innerText();await page.getByRole('button',{name:'编辑正文',exact:true}).click();
+    await page.locator('#cmsEditBody').fill('测试草稿：保存失败后仍保留。');await page.getByRole('button',{name:'保存修改',exact:true}).click();
+    await page.waitForSelector('#cmsEditError:visible');assert.equal(payload.revision,'fixture-v1');
+    assert.equal(await page.locator('#cmsEditBody').inputValue(),'测试草稿：保存失败后仍保留。');assert.equal(await page.locator('#previewContent').innerText(),before);
+    await page.getByRole('button',{name:'保存修改',exact:true}).click();await page.waitForSelector('#cmsEditDialog:not([open])',{state:'attached'});
+    assert.equal(await page.locator('#previewContent').innerText(),'测试草稿：保存失败后仍保留。');assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('administrator can download a backup and restore it with revision protection on phones and computers',async()=>{
+  for(const width of [375,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
+      let revision='fixture-v1',restored=false,restorePayload;
+      const backup={id:'1791500000000-550e8400-e29b-41d4-a716-446655440000',createdAt:'2026-10-09T00:00:00Z',user:'fixture-admin',action:'save',templateCount:1,caseCount:0};
+      await context.route('**/api/content',route=>route.fulfill({json:{version:1,revision,templateOverrides:restored?{}:{sample:{body:'Fixture record'}},cases:[]}}));
+      await context.route('**/api/content-history*',route=>{
+        if(route.request().method()==='POST'){restorePayload=route.request().postDataJSON();revision='fixture-v2';restored=true;return route.fulfill({json:{ok:true}});}
+        if(new URL(route.request().url()).searchParams.has('id'))return route.fulfill({json:{version:1,templateOverrides:{},cases:[]}});
+        return route.fulfill({json:{revision,history:[backup]}});
+      });
+      await page.goto(base+'/admin',{waitUntil:'networkidle'});await page.waitForSelector('.admin-history-item');
+      assert.equal(await page.locator('#overrideCount').innerText(),'1');
+      const downloadEvent=page.waitForEvent('download');await page.getByRole('button',{name:'下载当前资料备份',exact:true}).click();
+      assert.match((await downloadEvent).suggestedFilename(),/^hajimi-content-.*\.json$/);
+      page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'恢复此版本',exact:true}).click();
+      await page.waitForFunction(()=>document.querySelector('#overrideCount').textContent==='0');assert.deepEqual(restorePayload,{id:backup.id,revision:'fixture-v1'});
+      assert(await page.locator('.admin-history-item').evaluateAll(items=>items.every(item=>item.getBoundingClientRect().right<=innerWidth)));
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
 });

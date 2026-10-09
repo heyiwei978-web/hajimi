@@ -7,6 +7,7 @@ import login from '../api/login.js';
 import logout from '../api/logout.js';
 import session from '../api/session.js';
 import content from '../api/content.js';
+import history from '../api/content-history.js';
 import upload from '../api/upload.js';
 import image from '../api/image.js';
 
@@ -77,7 +78,7 @@ test('expired, tampered, extra-part and malformed-cookie sessions are rejected',
 
 test('cross-site requests and spoofed origins cannot perform admin writes', async t => {
   const cookie = adminEnvironment(t);
-  for (const handler of [login,logout,content,upload]) {
+  for (const handler of [login,logout,content,history,upload]) {
     for (const headers of [{origin:'https://attacker.example'},{origin:'null'},{'sec-fetch-site':'cross-site'},{origin:'https://wdyxzl.icu.attacker.example'}]) {
       const res = response();
       await handler(request({method:handler === content ? 'PUT' : 'POST',headers:{cookie,...headers}}),res);

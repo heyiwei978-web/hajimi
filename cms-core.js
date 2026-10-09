@@ -5,7 +5,7 @@
     const r=await fetch(url,{credentials:'same-origin',...options,headers:{'Content-Type':'application/json','X-Hajimi-Admin':'1',...(options.headers||{})}});
     const ct=r.headers.get('content-type')||'';
     const body=ct.includes('application/json')?await r.json():await r.text();
-    if(!r.ok)throw new Error(body?.error||body||'请求失败');
+    if(!r.ok){const error=new Error(body?.error||body||'请求失败');error.status=r.status;throw error;}
     return body;
   }
   function notify(msg){
@@ -25,7 +25,7 @@
       </form></dialog>
       <dialog id="cmsEditDialog" class="cms-dialog cms-edit-dialog" aria-labelledby="cmsEditDialogTitle"><form id="cmsEditForm">
         <div class="cms-dialog-head"><div><strong id="cmsEditDialogTitle">编辑模板正文</strong><span id="cmsEditTitle"></span></div><button type="button" class="cms-x" data-dialog-close aria-label="关闭">×</button></div>
-        <textarea id="cmsEditBody" rows="24"></textarea>
+        <textarea id="cmsEditBody" rows="24"></textarea><p id="cmsEditError" class="cms-error" role="alert" hidden></p>
         <div class="cms-actions"><button type="button" id="cmsRestoreDefault" class="btn ghost">恢复默认</button><span class="cms-spacer"></span><button type="button" class="btn ghost" data-dialog-close>取消</button><button type="submit" class="btn primary">保存修改</button></div>
       </form></dialog>
       <dialog id="cmsCaseDialog" class="cms-dialog" aria-labelledby="cmsCaseDialogTitle"><form id="cmsCaseForm">
@@ -62,7 +62,9 @@
     e.preventDefault();const f=e.currentTarget,err=document.getElementById('cmsLoginError');err.hidden=true;
     try{
       const d=Object.fromEntries(new FormData(f).entries());const s=await req('/api/login',{method:'POST',body:JSON.stringify(d)});
-      CMS.auth=true;CMS.user=s.user||'admin';syncAuthUI();document.getElementById('cmsLoginDialog').close();f.reset();notify('已进入开发者模式');if(CMS.activeTemplate)renderExtras(CMS.activeTemplate);
+      CMS.auth=true;CMS.user=s.user||'admin';CMS.dataReady=false;
+      CMS.data=await req('/api/content',{cache:'no-store'});CMS.dataReady=true;
+      syncAuthUI();document.getElementById('cmsLoginDialog').close();f.reset();notify('已进入开发者模式');if(CMS.activeTemplate)renderExtras(CMS.activeTemplate);
     }catch(ex){err.textContent=ex.message;err.hidden=false;}
   }
   async function logout(){
@@ -74,10 +76,10 @@
     if(!CMS.baseGenerate){CMS.baseGenerate=generate;generate=function(t){const o=CMS.data.templateOverrides[t.name];return o&&o.body?o.body:CMS.baseGenerate(t);};}
     if(!CMS.baseOpenPreview){CMS.baseOpenPreview=openPreview;openPreview=function(t){CMS.activeTemplate=t;CMS.baseOpenPreview(t);renderExtras(t);};}
   }
-  async function saveContent(){
+  async function saveContent(next){
     if(!CMS.dataReady)throw new Error('内容未加载完成，请刷新页面后重试');
-    const out=await req('/api/content',{method:'PUT',body:JSON.stringify(CMS.data)});
-    CMS.data={templateOverrides:out.templateOverrides||{},cases:out.cases||[]};
+    const out=await req('/api/content',{method:'PUT',body:JSON.stringify({...next,revision:CMS.data.revision})});
+    CMS.data=out;
   }
   function renderExtras(t){
     const dlg=document.getElementById('previewDialog');if(!dlg)return;
@@ -107,8 +109,19 @@
     document.getElementById('cmsEditTitle').textContent=t.name;document.getElementById('cmsEditBody').value=generate(t);
     const dialog=document.getElementById('cmsEditDialog');dialog.showModal();
     const form=document.getElementById('cmsEditForm');
-    form.onsubmit=async(e)=>{e.preventDefault();CMS.data.templateOverrides[t.name]={body:document.getElementById('cmsEditBody').value,updatedAt:new Date().toISOString()};await saveContent();dialog.close();document.getElementById('previewContent').textContent=generate(t);renderExtras(t);notify('模板已更新');};
-    document.getElementById('cmsRestoreDefault').onclick=async()=>{if(!confirm('恢复为系统默认模板？'))return;delete CMS.data.templateOverrides[t.name];await saveContent();document.getElementById('cmsEditBody').value=CMS.baseGenerate(t);document.getElementById('previewContent').textContent=generate(t);renderExtras(t);notify('已恢复默认模板');};
+    const error=document.getElementById('cmsEditError');error.hidden=true;
+    const run=async(operation)=>{
+      const buttons=[...form.querySelectorAll('button')];buttons.forEach(button=>button.disabled=true);error.hidden=true;
+      try{await operation();}catch(ex){error.textContent=ex.message;error.hidden=false;}finally{buttons.forEach(button=>button.disabled=false);}
+    };
+    form.onsubmit=async(e)=>{e.preventDefault();await run(async()=>{
+      const overrides={...CMS.data.templateOverrides,[t.name]:{body:document.getElementById('cmsEditBody').value,updatedAt:new Date().toISOString()}};
+      await saveContent({...CMS.data,templateOverrides:overrides});dialog.close();document.getElementById('previewContent').textContent=generate(t);renderExtras(t);notify('模板已更新，修改前资料已备份');
+    });};
+    document.getElementById('cmsRestoreDefault').onclick=async()=>{if(!confirm('恢复为系统默认模板？修改前资料会自动备份。'))return;await run(async()=>{
+      const overrides={...CMS.data.templateOverrides};delete overrides[t.name];await saveContent({...CMS.data,templateOverrides:overrides});
+      document.getElementById('cmsEditBody').value=CMS.baseGenerate(t);document.getElementById('previewContent').textContent=generate(t);renderExtras(t);notify('已恢复默认模板');
+    });};
   }
   function openCaseEditor(t,c){
     const f=document.getElementById('cmsCaseForm');f.reset();f.elements.caseId.value=c?.id||'';f.elements.title.value=c?.title||'';f.elements.description.value=c?.description||'';f.elements.published.checked=c?c.published!==false:true;
@@ -120,12 +133,12 @@
         let images=c?.images?[...c.images]:[];for(const file of [...f.elements.images.files]){const prepared=await prepareImage(file);const u=await req('/api/upload',{method:'POST',body:JSON.stringify(prepared)});images.push(u.pathname);}
         const now=new Date().toISOString(),id=c?.id||('case_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7));
         const item={id,template:t.name,title:f.elements.title.value.trim(),description:f.elements.description.value.trim(),images,published:f.elements.published.checked,createdAt:c?.createdAt||now,updatedAt:now};
-        const i=CMS.data.cases.findIndex((x)=>x.id===id);if(i>=0)CMS.data.cases[i]=item;else CMS.data.cases.push(item);
-        await saveContent();dialog.close();renderExtras(t);notify('案例已保存');
+        const cases=[...CMS.data.cases],i=cases.findIndex((x)=>x.id===id);if(i>=0)cases[i]=item;else cases.push(item);
+        await saveContent({...CMS.data,cases});dialog.close();renderExtras(t);notify('案例已保存，修改前资料已备份');
       }catch(ex){alert('保存失败：'+ex.message);}finally{btn.disabled=false;btn.textContent='保存案例';}
     };
   }
-  async function deleteCase(id,t){if(!confirm('删除这个案例？'))return;CMS.data.cases=CMS.data.cases.filter((c)=>c.id!==id);await saveContent();renderExtras(t);notify('案例已删除');}
+  async function deleteCase(id,t){if(!confirm('删除这个案例？修改前资料会自动备份。'))return;try{await saveContent({...CMS.data,cases:CMS.data.cases.filter((c)=>c.id!==id)});renderExtras(t);notify('案例已删除');}catch(ex){notify(ex.message);}}
   async function prepareImage(file){
     if(!/^image\/(jpeg|png|webp)$/.test(file.type))throw new Error('仅支持 JPG、PNG、WebP');
     const img=await createImageBitmap(file);let w=img.width,h=img.height,max=1800;if(Math.max(w,h)>max){const ratio=max/Math.max(w,h);w=Math.round(w*ratio);h=Math.round(h*ratio);}
@@ -140,7 +153,7 @@
       req('/api/session',{cache:'no-store'}),req('/api/content',{cache:'no-store'})
     ]);
     if(session.status==='fulfilled'){CMS.auth=!!session.value.authenticated;CMS.user=session.value.user||null;}
-    if(content.status==='fulfilled'){const c=content.value;CMS.data={templateOverrides:c.templateOverrides||{},cases:c.cases||[]};CMS.dataReady=true;}
+    if(content.status==='fulfilled'){CMS.data=content.value;CMS.dataReady=true;}
     else notify('资料加载失败，请刷新页面后重试');
     syncAuthUI();patchTemplates();
     window.dispatchEvent(new CustomEvent('hajimi:cms-ready'));
