@@ -586,7 +586,9 @@
           const id=decodeURIComponent(raw.replace(/^#/,''));
           const target=document.getElementById(id);
           if(!target)return;
-          target.scrollIntoView({behavior:'smooth',block:'start'});
+          // Smooth scrolling uses stale heights while offscreen chapters are rendered.
+          // An immediate jump lets the browser lay out the destination accurately.
+          target.scrollIntoView({behavior:'instant',block:'start'});
           const next=location.pathname+location.search+(id?'#'+encodeURIComponent(id):'');
           history.replaceState(history.state||{},'',next);
         };

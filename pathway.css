@@ -166,3 +166,30 @@ body.pathway-page{margin:0;background:var(--pw-bg);color:var(--pw-ink)}
 .pathway-nav-item.active.is-ready small{color:#2a6a58}
 .pathway-copy{margin:0;color:#56616e;font-size:12px;line-height:1.78}
 #dynamicPathway[hidden],#tkaPathway[hidden]{display:none!important}
+
+/* Pathway reading hierarchy and a bounded directory on small screens. */
+@media screen{
+  .pathway-hero p{font-size:16px;line-height:1.8}
+  .pathway-note,.pathway-title-card p{font-size:14px;line-height:1.75}
+  .pathway-nav-item{font-size:14px;min-height:44px}.pathway-nav-item small{font-size:11px}
+  .pathway-nav-group>span,.pathway-side-head span{font-size:11px;color:#697586}
+  .pathway-panel ul,.pathway-copy{font-size:16px;line-height:1.85}
+  .pathway-panel h4{font-size:18px}
+  .path-step-columns strong{font-size:14px}.path-step-columns p{font-size:15px;line-height:1.8}
+  .variance-card p,.variance-example p,.patient-path>div p{font-size:14px;line-height:1.8}
+  .path-check span,.pathway-overview-grid span,.quality-grid span,.source-list span,.version-note{font-size:12px}
+  .pathway-title-actions a,.pathway-title-actions button,.pathway-btn{min-height:44px;font-size:14px}
+  .quality-grid b,.source-list strong{font-size:15px;line-height:1.7}
+  .pathway-section-head small{font-size:11px}
+  .pathway-panel,.path-step-columns>div,.variance-card,.quality-grid>div{min-width:0;overflow-wrap:anywhere}
+}
+@media screen and (max-width:820px){
+  .pathway-sidebar{max-height:340px;overscroll-behavior-y:contain;scrollbar-gutter:stable}
+  .pathway-section{scroll-margin-top:120px}
+}
+@media screen and (max-width:580px){
+  .pathway-nav .official-links{display:flex}
+  .pathway-sidebar{max-height:300px}
+  .pathway-title-actions{grid-template-columns:1fr}
+  .pathway-note{flex-direction:column;gap:6px}
+}

@@ -15,9 +15,9 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .official-nav-inner{max-width:1360px;padding:0 28px}
 .official-brand-mark,.library-brand-mark{width:32px;height:32px;border-radius:9px;box-shadow:none;background:linear-gradient(145deg,#1769d7,#1f7be8)}
 .official-brand-text strong{font-size:16px;font-weight:700;letter-spacing:-.01em}
-.official-brand-text small{font-size:9px;color:#8d96a2}
+.official-brand-text small{font-size:11px;color:#697586}
 .official-links{gap:28px}
-.official-links a,.library-top-actions .text-action{font-size:12px;font-weight:600}
+.official-links a,.library-top-actions .text-action{font-size:14px;font-weight:600;white-space:nowrap}
 .official-search{background:#f4f6f8;color:#75808d}
 .library-topbar{padding:0 24px}
 .library-brand-copy strong{font-size:15px;font-weight:700}
@@ -30,10 +30,10 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .official-hero h1{font-size:clamp(48px,4.5vw,70px);line-height:1.08;letter-spacing:-.045em;font-weight:700}
 .official-lead{max-width:680px;margin-top:22px;font-size:18px;line-height:1.68;color:#556170}
 .official-hero-actions{margin-top:26px}
-.official-cta{height:46px;min-width:184px;border-radius:10px;font-size:13px;font-weight:650}
+.official-cta{height:48px;min-width:184px;border-radius:10px;font-size:15px;font-weight:650}
 .official-cta.primary{box-shadow:0 8px 20px rgba(29,103,216,.16)}
 .official-cta.secondary{box-shadow:none;background:rgba(255,255,255,.82)}
-.official-meta{margin-top:17px}
+.official-meta{margin-top:17px;font-size:12px;color:#697586;flex-wrap:wrap;row-gap:6px}
 .clinical-scene{height:310px;min-width:390px;transform:scale(.95);transform-origin:right center}
 .official-feature-grid{max-width:1320px;margin:-22px auto 0;padding:0 28px;gap:12px}
 .official-feature{min-height:295px;border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(51,65,85,.055)}
@@ -41,7 +41,7 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .feature-icon{width:44px;height:44px;border-radius:12px;font-size:19px}
 .feature-eyebrow{margin-top:13px}
 .official-feature h2{font-size:22px;font-weight:700}
-.official-feature p{font-size:12.5px;line-height:1.65}
+.official-feature p{font-size:14px;line-height:1.75}
 .official-stats{max-width:1264px;margin-top:16px;padding:12px 22px;border-radius:14px;box-shadow:none;border-color:#e7ebef}
 .official-stats>div{min-height:62px}
 .official-footer{margin-top:22px}
@@ -65,7 +65,7 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .ortho-hero{margin:12px 0 18px;padding:28px;border-radius:18px;background:linear-gradient(135deg,#122038 0%,#173253 100%)}
 .ortho-hero:after{opacity:.55}
 .ortho-hero h2{font-size:32px;font-weight:700;letter-spacing:-.025em}
-.ortho-hero p{font-size:13px;line-height:1.68}
+.ortho-hero p{font-size:15px;line-height:1.75}
 .ortho-stats div{border-radius:11px;padding:12px}
 .ortho-stats strong{font-size:21px}
 .ortho-jump{gap:8px;margin-bottom:24px}
@@ -75,16 +75,16 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .ortho-category{padding:22px;border-radius:16px;background:#fff;border-color:#e3e7ec}
 .ortho-category-head{margin-bottom:16px}
 .ortho-category-head h3{font-size:22px;font-weight:700}
-.ortho-category-head p{font-size:12px;line-height:1.6}
-.ortho-disease-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
-.ortho-disease-card{min-height:158px;border-radius:12px;padding:14px;box-shadow:none}
+.ortho-category-head p{font-size:14px;line-height:1.7}
+.ortho-disease-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ortho-disease-card{min-height:180px;border-radius:12px;padding:18px;box-shadow:none}
 .ortho-disease-card:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(15,23,42,.055)}
-.ortho-card-top{font-size:9px}
-.ortho-disease-card h3{font-size:16px;font-weight:700;line-height:1.35;margin:13px 0 5px;letter-spacing:-.01em}
-.ortho-disease-card p{font-size:11px;line-height:1.55;margin:0 0 9px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.ortho-card-top{font-size:12px}
+.ortho-disease-card h3{font-size:18px;font-weight:700;line-height:1.35;margin:13px 0 5px;letter-spacing:-.01em}
+.ortho-disease-card p{font-size:14px;line-height:1.7;margin:0 0 9px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .ortho-stage-chips{gap:4px}
-.ortho-stage-chips span{font-size:9px}
-.ortho-open{font-size:10px}
+.ortho-stage-chips span{font-size:12px}
+.ortho-open{font-size:14px}
 
 /* disease book */
 .disease-book-page{background:var(--h-bg)}
@@ -97,19 +97,19 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .record-book-toc-head h3{font-size:18px;font-weight:700}
 .record-book-toc nav{gap:2px;margin-top:8px}
 .record-book-toc a{grid-template-columns:25px minmax(0,1fr) auto;padding:8px 7px;border-radius:7px}
-.record-book-toc a>b{font-size:11.5px;font-weight:600}
-.record-book-toc a>span{font-size:8.5px}
+.record-book-toc a>b{font-size:13px;font-weight:600}
+.record-book-toc a>span{font-size:11px}
 .record-book-section{border-radius:12px;margin-bottom:14px;border-color:#dfe4e9;box-shadow:none}
 .record-book-section-head{grid-template-columns:42px minmax(0,1fr) auto;gap:12px;padding:16px 18px;background:#fbfcfd;border-bottom-color:#e7eaee}
 .record-chapter-no{width:38px;height:38px;border-radius:9px;background:#1c293b;font-size:10px}
 .record-chapter-title h3{font-size:18px;font-weight:700;letter-spacing:-.01em}
-.record-chapter-title>span{font-size:8.5px}
-.record-book-body{padding:24px 30px 28px;font-family:var(--h-serif);font-size:15px;line-height:1.84;letter-spacing:.008em;color:#242b33;font-weight:400}
+.record-chapter-title>span{font-size:11px}
+.record-book-body{padding:24px 30px 28px;font-family:var(--h-serif);font-size:16px;line-height:1.9;letter-spacing:.008em;color:#242b33;font-weight:400}
 .record-back-toc{margin:0 30px 18px auto}
 .record-book-reserved{background:#fbfcfd}
 .record-reserve-slots span{border-radius:8px}
 .preview-modal{width:min(920px,calc(100vw - 24px))}
-.record-paper{font-family:var(--h-serif);font-size:15px;line-height:1.84;color:#242b33;padding:28px 34px 46px}
+.record-paper{font-family:var(--h-serif);font-size:16px;line-height:1.9;color:#242b33;padding:28px 34px 46px}
 
 /* admin */
 body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
@@ -140,7 +140,7 @@ body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
   .official-nav,.library-topbar{min-height:58px;height:auto}
   .official-nav-inner{padding:9px 14px}
   .official-hero{padding:38px 17px 38px}.official-hero h1{font-size:40px;line-height:1.1}
-  .official-lead{font-size:15px;margin-top:17px}.official-meta{font-size:9px}
+  .official-lead{font-size:16px;margin-top:17px}.official-meta{font-size:12px}
   .clinical-scene{height:215px;transform:scale(.86);margin-top:-5px}
   .official-feature-grid{grid-template-columns:1fr;padding:0 13px;margin-top:-10px}
   .official-feature{min-height:255px;border-radius:15px;padding:19px}
@@ -154,8 +154,8 @@ body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
   .record-book-section{border-radius:9px}.record-book-section-head{grid-template-columns:36px minmax(0,1fr);padding:13px 12px;gap:9px}
   .record-chapter-no{width:33px;height:33px;border-radius:8px}.record-chapter-title h3{font-size:16px}
   .record-chapter-actions{grid-column:1/-1;padding-left:42px}
-  .record-book-body{padding:19px 16px 23px;font-size:14.5px;line-height:1.82;letter-spacing:0}
-  .record-paper{padding:20px 16px 36px;font-size:14.5px;line-height:1.82}
+  .record-book-body{padding:22px 18px 26px;font-size:16px;line-height:1.9;letter-spacing:0}
+  .record-paper{padding:22px 18px 36px;font-size:16px;line-height:1.9}
   .admin-main{width:calc(100% - 22px);padding-top:18px}.admin-hero{padding-top:24px}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
@@ -185,11 +185,11 @@ body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
 }
 .pathway-home-copy>span{font-size:9px;font-weight:700;letter-spacing:.13em;color:#7190b1}
 .pathway-home-copy h2{margin:5px 0 4px;font-size:22px;letter-spacing:-.02em}
-.pathway-home-copy p{margin:0;max-width:800px;color:#627183;font-size:12px;line-height:1.65}
+.pathway-home-copy p{margin:0;max-width:800px;color:#627183;font-size:14px;line-height:1.65}
 .pathway-home-meta{display:flex;gap:18px;align-items:center}
 .pathway-home-meta strong{font-size:28px;color:#173a61}
 .pathway-home-meta strong small{display:block;margin-top:3px;font-size:9px;color:#7b8794;font-weight:600}
-.pathway-home-meta b{padding:10px 13px;border-radius:9px;background:#173a61;color:#fff;font-size:11px}
+.pathway-home-meta b{padding:12px 16px;border-radius:9px;background:#173a61;color:#fff;font-size:14px}
 @media(max-width:760px){
   .pathway-home-banner{margin:12px 13px 0;grid-template-columns:48px 1fr;padding:18px;gap:13px}
   .pathway-home-icon{width:46px;height:46px;border-radius:11px;font-size:12px}
@@ -380,4 +380,60 @@ button,a,[role="button"]{
     transition-duration:.01ms!important;
     scroll-behavior:auto!important;
   }
+}
+
+/* Readable controls and compact mobile navigation. Screen rules preserve printing. */
+@media screen{
+  .feature-eyebrow,.feature-enter,.official-stats small,.official-footer{font-size:12px}
+  .official-footer small{font-size:12px}
+  .feature-art{pointer-events:none}
+  .library-department-card p,.project-card p{font-size:15px;line-height:1.75}
+  .library-department-card small,.project-card-top,.project-stage-chips span{font-size:12px}
+  .library-department-card .department-card-open,.project-open{font-size:14px}
+  #libraryShell .searchbox input,#libraryShell .filter-row select{font-size:16px;min-width:0}
+  #libraryShell .filter-row label{flex-shrink:0;white-space:nowrap;font-size:13px}
+  #libraryShell .nav-item{font-size:14px;min-height:42px;display:flex;align-items:center}
+  #libraryShell .btn,.record-chapter-actions button{min-height:42px;font-size:14px}
+  .record-book-hero p,.intro-note{font-size:15px;line-height:1.8}
+  .record-book-toc a{min-height:44px}
+  .special-case-toc b{font-size:13px}
+  .record-book-body,.record-paper{overflow-wrap:anywhere}
+  .form-grid input,.form-grid select,.form-grid textarea{font-size:16px;min-height:44px;min-width:0}
+  .form-grid label{font-size:14px;min-width:0}
+  .icon-btn{width:44px;height:44px;flex-shrink:0}
+  .admin-login-form,.admin-login-form label,.admin-login-form input{min-width:0;width:100%}
+  .admin-status small,.admin-guide p,.admin-tool-card p{font-size:14px;line-height:1.75}
+  .admin-card-head span,.admin-overview small{font-size:12px}
+}
+@media screen and (max-width:1200px){
+  .official-nav{height:auto}
+  .official-nav-inner{height:auto;flex-wrap:wrap;gap:8px;padding:12px 20px 0}
+  .official-brand{min-width:0}
+  .official-nav-right{display:none}
+  .official-links{flex:0 0 100%;order:3;width:100%;min-width:0;display:flex;gap:24px;height:44px;justify-content:flex-start;overflow-x:auto;overflow-y:hidden}
+  .official-nav .official-links a{display:flex;align-items:center;flex-shrink:0;white-space:nowrap;font-size:14px;min-height:44px}
+}
+@media screen and (max-width:900px){
+  .record-book-toc nav{max-height:280px;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-gutter:stable}
+  .record-book-toc a{grid-template-columns:24px minmax(0,1fr) auto}
+}
+@media screen and (max-width:640px){
+  .official-nav-inner{padding:10px 16px 0;gap:6px}
+  .official-links{gap:22px}
+  #libraryShell .brandline{min-width:0;flex:1;gap:6px}
+  #libraryShell .library-brand{min-width:0}
+  #libraryShell .library-brand-copy{min-width:0;grid-template-columns:minmax(0,1fr)}
+  #libraryShell .library-brand-copy strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #libraryShell .library-top-actions{gap:8px;flex-shrink:0}
+  #libraryShell .patient-action,#libraryShell [data-auth-slot]{white-space:nowrap}
+  .official-hero h1 span{display:block}
+  .official-hero{gap:18px;padding-top:32px}
+  .official-hero h1{font-size:clamp(32px,10vw,40px);line-height:1.2}
+  .clinical-scene{height:175px}
+  .official-feature{min-height:245px}
+  .official-feature p{max-width:28em}
+  .ortho-disease-card{padding:16px;min-height:160px}
+  .record-chapter-actions{padding-left:0;display:flex;flex-wrap:wrap;gap:8px}
+  .record-book-body,.record-paper{line-height:1.85}
+  .record-book-section,.ortho-category{scroll-margin-top:78px}
 }
