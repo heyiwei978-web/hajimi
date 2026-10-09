@@ -79,22 +79,41 @@ test('every orthopedic card keeps both borders inside its category on phones and
   }
 });
 
-test('cross-department search, filters, pagination, preview and empty-state reset work',async()=>{
+test('cross-department search groups templates into complete case files; filters and empty reset work',async()=>{
   const {page,context,errors}=await pageFor(393);
-  try {await page.goto(base+'/bl',{waitUntil:'networkidle'});
+  try {
+    await page.goto(base+'/bl',{waitUntil:'networkidle'});
     assert.equal(await page.evaluate(()=>templates.length),0);
     const search=page.getByRole('textbox',{name:'搜索病历模板'});
-    await search.fill('肝脓肿');await page.waitForFunction(()=>document.querySelector('#resultTitle').textContent.includes('搜索结果'));
+    await search.fill('肝脓肿');
+    await page.waitForFunction(()=>document.querySelector('#resultTitle').textContent.includes('搜索结果'));
     assert.equal(await page.evaluate(()=>templates.length),5159);
-    assert.equal(await search.inputValue(),'肝脓肿');assert((await page.locator('#templateGrid').innerText()).includes('普外科'));
-    assert(await page.locator('#templateGrid .card').evaluateAll(cards=>cards.every(card=>{const r=card.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&card.scrollWidth<=card.clientWidth+1;})));
-    await page.locator('#templateGrid .preview').first().click();await page.getByRole('dialog',{name:/肝脓肿/}).waitFor({state:'visible'});await page.keyboard.press('Escape');
-    await search.fill('术前');await page.waitForFunction(()=>document.querySelectorAll('#templateGrid .card').length===60);
-    await page.getByRole('button',{name:'显示更多',exact:true}).click();assert.equal(await page.locator('#templateGrid .card').count(),120);
-    await search.fill('不存在的资料xyz');await page.waitForSelector('#emptyState:visible');assert.equal(await page.locator('#templateGrid .card').count(),0);
-    await page.getByRole('button',{name:'重置',exact:true}).click();assert.equal(await page.locator('[data-department]').count(),4);assert.equal(await search.inputValue(),'');
-    await page.locator('#stageFilter').selectOption('术中');await page.waitForFunction(()=>document.querySelectorAll('#templateGrid .card').length===60);
-    assert(await page.locator('#templateGrid .tag.stage').evaluateAll(tags=>tags.every(tag=>tag.textContent==='术中')));
+    assert.equal(await page.locator('.case-search-card').count(),1,'one case entry per disease, not fragmented records');
+    assert.match(await page.locator('.case-search-card').first().innerText(),/肝脓肿/);
+    assert(await page.locator('.case-search-card').evaluateAll(cards=>cards.every(card=>{
+      const r=card.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&card.scrollWidth<=card.clientWidth+1;
+    })));
+    await page.locator('.case-search-card').first().click();
+    await page.locator('#caseWorkspace').waitFor({state:'visible'});
+    assert.match(await page.locator('#caseWorkspace .case-nav-family').innerText(),/临床病历/);
+    assert.match(await page.locator('#caseWorkspace .case-nav-family').innerText(),/知情同意/);
+    assert.equal(await page.locator('#caseWorkspace .case-file-reader > .record-book-section:visible').count(),1);
+    await page.locator('#caseShowAll').click();
+    assert((await page.locator('#caseWorkspace .case-file-reader > .record-book-section:visible').count())>1);
+    await page.goto(base+'/bl',{waitUntil:'networkidle'});
+    await page.locator('#searchInput').fill('术前');
+    await page.waitForFunction(()=>document.querySelectorAll('.case-search-card').length===24);
+    await page.getByRole('button',{name:'显示更多',exact:true}).click();
+    assert.equal(await page.locator('.case-search-card').count(),48);
+    await page.locator('#searchInput').fill('不存在的资料xyz');
+    await page.waitForSelector('#emptyState:visible');
+    assert.equal(await page.locator('.case-search-card').count(),0);
+    await page.getByRole('button',{name:'重置',exact:true}).click();
+    assert.equal(await page.locator('[data-department]').count(),4);
+    assert.equal(await page.locator('#searchInput').inputValue(),'');
+    await page.locator('#stageFilter').selectOption('术中');
+    await page.waitForFunction(()=>document.querySelectorAll('.case-search-card').length>0);
+    assert((await page.locator('.case-search-card').count())>0);
     assert.deepEqual(errors,[]);
   } finally {await context.close();}
 });
