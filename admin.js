@@ -4,7 +4,7 @@
   const error=document.getElementById('adminLoginError'),dataError=document.getElementById('adminDataError');
   const historyStatus=document.getElementById('historyStatus'),historyList=document.getElementById('historyList');
   const downloadCurrent=document.getElementById('downloadCurrent');
-  let content=null,revision=null,epoch=0;
+  let content=null,revision=null,epoch=0,loadGeneration=0,mutating=false;
   function notify(message){const toast=document.getElementById('adminToast');toast.textContent=message;toast.classList.add('show');clearTimeout(window.__adminToast);window.__adminToast=setTimeout(()=>toast.classList.remove('show'),2200);}
   async function json(url,options={}){
     const response=await fetch(url,{credentials:'same-origin',...options,headers:{'Content-Type':'application/json','X-Hajimi-Admin':'1',...(options.headers||{})}});
@@ -16,15 +16,25 @@
     const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
     const link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
+  async function mutate(url,payload){
+    if(mutating||!content||dashboard.hidden)throw new Error('资料未加载完成，请刷新后重试');
+    const generation=epoch;mutating=true;
+    const buttons=[...dashboard.querySelectorAll('button')],disabled=buttons.map(button=>button.disabled);buttons.forEach(button=>button.disabled=true);
+    try{const result=await json(url,{method:url==='/api/content'?'PUT':'POST',body:JSON.stringify(payload)});if(generation!==epoch)throw new Error('登录状态已改变，请重新登录后核对资料');return result;}
+    finally{mutating=false;buttons.forEach((button,index)=>button.disabled=disabled[index]);downloadCurrent.disabled=!content;}
+  }
+  const managerCallbacks={save:(next,expected)=>mutate('/api/content',{...next,revision:expected}),upload:prepared=>json('/api/upload',{method:'POST',body:JSON.stringify(prepared)}),notify,refresh:loadDashboard};
   async function loadDashboard(){
-    const generation=epoch;content=null;revision=null;downloadCurrent.disabled=true;dataError.hidden=true;
+    const generation=epoch,request=++loadGeneration;content=null;revision=null;downloadCurrent.disabled=true;dataError.hidden=true;
+    window.HAJIMI_ADMIN_CONTENT.setContent(null);document.getElementById('refreshHistory').disabled=true;
     historyList.replaceChildren();historyStatus.textContent='正在加载修改历史…';
     for(const id of ['overrideCount','caseCount'])document.getElementById(id).textContent='—';
     try{
       const [current,history]=await Promise.all([json('/api/content',{cache:'no-store'}),json('/api/content-history',{cache:'no-store'})]);
-      if(generation!==epoch)return;
+      if(generation!==epoch||request!==loadGeneration)return;
       if(current.revision!==history.revision)throw new Error('资料在加载期间发生更新，请点击刷新重试');
       content=current;revision=history.revision;downloadCurrent.disabled=false;
+      window.HAJIMI_ADMIN_CONTENT.setContent(current,managerCallbacks);
       document.getElementById('overrideCount').textContent=Object.keys(current.templateOverrides).length;
       document.getElementById('caseCount').textContent=current.cases.length;
       historyStatus.textContent=history.history.length?'共 '+history.history.length+' 个修改前备份':'暂无历史版本，首次修改前会自动创建备份。';
@@ -41,17 +51,17 @@
         const restoreButton=document.createElement('button');restoreButton.type='button';restoreButton.className='admin-secondary';restoreButton.textContent='恢复此版本';
         restoreButton.onclick=async()=>{
           if(!confirm('将把网站模板与案例恢复至 '+date+'。当前资料会先自动备份。确认恢复？'))return;
-          const buttons=[...document.querySelectorAll('.admin-backups button')];buttons.forEach(button=>button.disabled=true);
-          try{await json('/api/content-history',{method:'POST',body:JSON.stringify({id:item.id,revision})});await loadDashboard();notify('已恢复历史版本，恢复前资料已自动备份');}
+          try{await mutate('/api/content-history',{id:item.id,revision});await loadDashboard();notify('已恢复历史版本，恢复前资料已自动备份');}
           catch(ex){await loadDashboard();historyStatus.textContent=ex.message;}
-          finally{buttons.forEach(button=>button.disabled=false);downloadCurrent.disabled=!content;}
         };
         actions.append(exportButton,restoreButton);row.append(actions);historyList.append(row);
       }
-    }catch(ex){if(generation!==epoch)return;dataError.textContent=ex.message;dataError.hidden=false;historyStatus.textContent='资料暂不可用，请点击刷新重试。';}
+    }catch(ex){if(generation!==epoch||request!==loadGeneration)return;dataError.textContent=ex.message;dataError.hidden=false;historyStatus.textContent='资料暂不可用，请点击刷新重试。';}
+    finally{if(generation===epoch&&request===loadGeneration)document.getElementById('refreshHistory').disabled=false;}
   }
   function showAuth(auth,user){
     epoch++;content=null;revision=null;historyList.replaceChildren();downloadCurrent.disabled=true;
+    window.HAJIMI_ADMIN_CONTENT.clear();
     loginPanel.hidden=auth;dashboard.hidden=!auth;status.classList.toggle('online',auth);
     status.querySelector('strong').textContent=auth?'已登录 · '+(user||'admin'):'未登录管理后台';
     status.querySelector('small').textContent=auth?'可维护模板、案例和备份':'登录后显示管理工具';

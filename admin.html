@@ -8,7 +8,7 @@
 <title>网站管理 · 哈基米工作站</title>
 <link rel="stylesheet" href="/styles.css?v=20261007-library4">
 <link rel="stylesheet" href="/cms.css?v=20261006-g1">
-<link rel="stylesheet" href="/admin.css?v=20261009-backups1">
+<link rel="stylesheet" href="/admin.css?v=20261009-manager1">
 <link rel="stylesheet" href="/ui-polish.css?v=20261009-card-width2">
 <link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
 </head>
@@ -35,7 +35,7 @@
     <div>
       <p class="admin-kicker">HAJIMI ADMIN CONSOLE</p>
       <h1>网站管理入口</h1>
-      <p>以后从这里进入现有网站的管理模式，不再新建网站。登录后可直接进入模板管理、案例资料管理和源码管理。</p>
+      <p>集中维护模板修改、脱敏案例与图片资料。每次修改前自动备份，保留可恢复的历史版本。</p>
     </div>
     <div class="admin-status" id="adminStatus">
       <span class="status-dot"></span>
@@ -64,6 +64,17 @@
       <div><span>当前模式</span><strong class="admin-mode-text">开发者</strong><small>登录状态有效</small></div>
     </div>
 
+    <section id="adminContentManager" class="admin-guide admin-manager" aria-labelledby="managerTitle">
+      <div class="admin-card-head"><div><span>集中管理</span><h2 id="managerTitle">模板修改、案例与图片</h2></div><a class="admin-secondary" href="/bl">进入病历库添加资料 →</a></div>
+      <p class="manager-note">这里列出已保存的模板修改、全部案例及图片引用。选择病历库中的模板后，可添加新的案例或正文修改。</p>
+      <fieldset id="managerControls" disabled><legend>筛选资料</legend><div class="manager-filters">
+        <label>资料类型<select id="managerKind"><option value="templates">模板修改</option><option value="cases">案例资料</option><option value="images">图片引用</option></select></label>
+        <label>搜索资料<input id="managerSearch" type="search" placeholder="名称、所属模板或案例说明"></label>
+        <label id="managerPublishLabel" hidden>展示状态<select id="managerPublish"><option value="all">全部案例</option><option value="published">浏览者可见</option><option value="draft">未发布</option></select></label>
+      </div></fieldset>
+      <p id="managerSummary" role="status" aria-live="polite">正在加载资料…</p><p id="managerError" class="admin-error" role="alert" hidden></p>
+      <div id="managerList" class="manager-list"></div><button id="managerMore" class="admin-secondary" type="button" hidden>显示更多</button>
+    </section>
     <div class="admin-grid">
       <a class="admin-tool-card primary" href="/bl">
         <span class="admin-card-icon">▤</span>
@@ -101,8 +112,8 @@
     <section class="admin-guide">
       <div class="admin-card-head"><div><span>固定维护流程</span><h2>以后都从这一套站点修改</h2></div><button id="adminLogout" type="button" class="admin-secondary">退出登录</button></div>
       <ol>
-        <li><strong>普通模板内容：</strong>进入“病历模板管理” → 打开模板 → 点击“编辑正文”保存。</li>
-        <li><strong>病例图片/案例：</strong>模板预览中点击“添加案例/图片”，上传前先完成脱敏。</li>
+        <li><strong>普通模板内容：</strong>在集中管理列表修改已保存的正文；新增修改可在病历库打开模板后点击“编辑正文”。</li>
+        <li><strong>病例图片/案例：</strong>集中管理列表支持编辑、发布、删除及维护图片引用；新增案例在病历预览中添加，上传前先完成脱敏。</li>
         <li><strong>新增疾病、术式、页面布局或功能：</strong>继续修改同一个 <code>heyiwei978-web/hajimi</code> 项目，不再创建新网站。</li>
         <li><strong>正式发布：</strong>提交到 <code>main</code> 后由 Vercel 自动部署，正式地址保持不变。</li>
       </ol>
@@ -111,7 +122,23 @@
 </main>
 
 <div id="adminToast" class="portal-toast"></div>
-<script src="/admin.js?v=20261009-backups1"></script>
+<dialog id="managedTemplateDialog" class="manager-dialog" aria-labelledby="managedTemplateTitle"><form id="managedTemplateForm">
+  <div class="admin-card-head"><h2 id="managedTemplateTitle">编辑模板正文</h2><button type="button" class="icon-btn" data-manager-close aria-label="关闭模板编辑">×</button></div><p id="managedTemplateName" class="manager-template-name"></p>
+  <label for="managedTemplateBody">自定义正文</label><textarea id="managedTemplateBody" rows="22" required></textarea><p id="managedTemplateError" class="admin-error" role="alert" hidden></p>
+  <div class="manager-actions"><button class="admin-secondary" type="button" id="managedTemplateDraft">下载本次草稿</button><button class="admin-secondary" type="button" data-manager-close>取消</button><button class="admin-primary" type="submit">保存正文</button></div>
+</form></dialog>
+<dialog id="managedCaseDialog" class="manager-dialog" aria-labelledby="managedCaseTitle"><form id="managedCaseForm">
+  <div class="admin-card-head"><h2 id="managedCaseTitle">编辑案例资料</h2><button type="button" class="icon-btn" data-manager-close aria-label="关闭案例编辑">×</button></div><p id="managedCaseTemplate" class="manager-template-name"></p>
+  <label>案例标题<input name="title" maxlength="200" required></label><label>案例说明<textarea name="description" rows="5" maxlength="20000"></textarea></label>
+  <label class="manager-checkbox"><input name="published" type="checkbox"> 浏览者可见</label>
+  <div id="managedCaseImages" class="manager-edit-images"></div><label>添加图片<input name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple></label>
+  <p class="manager-note">上传前请去除姓名、住院号、二维码等可识别信息。图片会重新编码；移除引用不会删除文件，历史备份仍可恢复。</p>
+  <p id="managedCaseProgress" role="status" aria-live="polite"></p><p id="managedCaseError" class="admin-error" role="alert" hidden></p>
+  <div class="manager-actions"><button class="admin-secondary" type="button" id="managedCaseDraft">下载本次草稿</button><button class="admin-secondary" type="button" data-manager-close>取消</button><button class="admin-primary" type="submit">保存案例</button></div>
+</form></dialog>
+<script defer src="/image-upload.js?v=20261009-manager1"></script>
+<script defer src="/admin-content.js?v=20261009-manager1"></script>
+<script defer src="/admin.js?v=20261009-manager1"></script>
 <script defer src="/workspace.js?v=20261009-quality1"></script>
 </body>
 </html>

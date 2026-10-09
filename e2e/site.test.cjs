@@ -302,3 +302,88 @@ test('administrator can download a backup and restore it with revision protectio
     }finally{await context.close();}
   }
 });
+
+test('central management searches, paginates, edits templates and cases, and maintains image references',async()=>{
+  for(const width of [320,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      let data={version:1,revision:'fixture-v1',templateOverrides:{'示例病种 · 入院记录':{body:'原有自定义正文'}},cases:Array.from({length:54},(_,index)=>({id:'case-'+index,template:'示例病种 · 入院记录',title:'案例 '+index,description:'经过脱敏的说明',published:index!==0,images:index<2?['cases/shared.jpg']:[],createdAt:'2026-01-01T00:00:00Z'}))},writes=0,uploads=[];
+      await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
+      await context.route('**/api/content-history*',route=>route.fulfill({json:{revision:data.revision,history:[]}}));
+      await context.route('**/api/content',route=>{
+        if(route.request().method()==='PUT'){const next=route.request().postDataJSON();assert.equal(next.revision,data.revision);writes++;data={...next,revision:'fixture-v'+(writes+1)};}
+        return route.fulfill({json:data});
+      });
+      await context.route('**/api/upload',route=>{uploads.push(route.request().postDataJSON());return route.fulfill({json:{pathname:'cases/new-upload.jpg'}});});
+      await context.route('**/api/image?*',route=>route.fulfill({status:404,body:''}));
+      await page.goto(base+'/admin',{waitUntil:'networkidle'});await page.locator('#managerList .manager-item').waitFor();
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.getByRole('button',{name:'编辑正文',exact:true}).click();assert(await page.getByRole('button',{name:'保存正文',exact:true}).evaluate(button=>button.getBoundingClientRect().bottom<=innerHeight));await page.locator('#managedTemplateBody').fill('更新后的自定义正文');await page.getByRole('button',{name:'保存正文',exact:true}).click();await page.waitForSelector('#managedTemplateDialog:not([open])',{state:'attached'});await page.waitForFunction(()=>!document.getElementById('managerControls').disabled);assert.equal(data.templateOverrides['示例病种 · 入院记录'].body,'更新后的自定义正文');
+      page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'恢复默认',exact:true}).click();await page.waitForFunction(()=>document.getElementById('overrideCount').textContent==='0');assert.equal(Object.keys(data.templateOverrides).length,0);
+      await page.locator('#managerKind').selectOption('cases');assert.equal(await page.locator('#managerList .manager-item').count(),50);await page.locator('#managerMore').click();assert.equal(await page.locator('#managerList .manager-item').count(),54);await page.locator('#managerPublish').selectOption('draft');assert.equal(await page.locator('#managerList .manager-item').count(),1);
+      await page.getByRole('button',{name:'编辑案例',exact:true}).click();await page.locator('#managedCaseForm input[name="title"]').fill('脱敏演示案例');await page.locator('#managedCaseForm textarea[name="description"]').fill('更新后的案例说明');await page.locator('#managedCaseForm input[name="published"]').check();await page.getByRole('button',{name:'移除引用',exact:true}).click();
+      const png=await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=2000;canvas.height=1000;canvas.getContext('2d').fillRect(0,0,2000,1000);return canvas.toDataURL('image/png').split(',')[1];});
+      await page.locator('#managedCaseForm input[name="images"]').setInputFiles({name:'演示图片.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});await page.getByRole('button',{name:'保存案例',exact:true}).click();await page.waitForSelector('#managedCaseDialog:not([open])',{state:'attached'});await page.waitForFunction(()=>!document.getElementById('managerControls').disabled);
+      assert.equal(uploads.length,1);assert.equal(uploads[0].type,'image/jpeg');assert.deepEqual([...Buffer.from(uploads[0].data,'base64').subarray(0,3)],[255,216,255]);
+      const size=await page.evaluate(async data=>{const image=await createImageBitmap(new Blob([Uint8Array.from(atob(data),char=>char.charCodeAt(0))],{type:'image/jpeg'}));const size=[image.width,image.height];image.close();return size;},uploads[0].data);assert.deepEqual(size,[1800,900]);
+      assert.equal(data.cases.length,54);assert.equal(data.cases[0].published,true);assert.equal(data.cases[0].createdAt,'2026-01-01T00:00:00Z');assert.deepEqual(data.cases[0].images,['cases/new-upload.jpg']);assert.deepEqual(data.cases[1].images,['cases/shared.jpg']);
+      await page.locator('#managerKind').selectOption('images');assert.equal(await page.locator('#managerList .manager-item').count(),2);await page.locator('#managerSearch').fill('shared');assert.equal(await page.locator('#managerList .manager-item').count(),1);assert.match(await page.locator('#managerList').innerText(),/1 个案例引用/);
+      assert(await page.locator('#managerList .manager-item').evaluateAll(rows=>rows.every(row=>row.scrollWidth<=row.clientWidth+1&&row.getBoundingClientRect().right<=innerWidth)));
+      await page.getByRole('button',{name:/案例 1 · 管理引用/}).click();assert.equal(await page.locator('#managedCaseForm input[name="title"]').inputValue(),'案例 1');await page.keyboard.press('Escape');
+      await page.locator('#managerKind').selectOption('cases');await page.locator('#managerPublish').selectOption('all');await page.locator('#managerSearch').fill('脱敏演示案例');assert.equal(await page.locator('#managerList .manager-item').count(),1);page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'删除案例',exact:true}).click();await page.waitForFunction(()=>document.getElementById('caseCount').textContent==='53');assert.equal(data.cases.some(item=>item.id==='case-0'),false);assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('central editor preserves a conflicting draft and exports it without overwriting newer data',async()=>{
+  const {page,context,errors}=await pageFor(375);
+  try{
+    const name='示例病种 · 入院记录';let attempts=0,lastPayload;
+    await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
+    await context.route('**/api/content-history*',route=>route.fulfill({json:{revision:'fixture-v1',history:[]}}));
+    await context.route('**/api/content',route=>{if(route.request().method()==='PUT'){attempts++;lastPayload=route.request().postDataJSON();return route.fulfill({status:409,json:{error:'资料已在其他页面更新'}});}return route.fulfill({json:{version:1,revision:'fixture-v1',templateOverrides:{[name]:{body:'旧正文'}},cases:[]}});});
+    await page.goto(base+'/admin',{waitUntil:'networkidle'});await page.getByRole('button',{name:'编辑正文',exact:true}).click();await page.locator('#managedTemplateBody').fill('待核对的编辑草稿');await page.getByRole('button',{name:'保存正文',exact:true}).click();await page.waitForSelector('#managedTemplateError:visible');assert.equal(lastPayload.revision,'fixture-v1');assert.equal(await page.locator('#managedTemplateBody').inputValue(),'待核对的编辑草稿');assert.match(await page.locator('#managedTemplateError').innerText(),/下载本次草稿/);
+    const downloading=page.waitForEvent('download');await page.getByRole('button',{name:'下载本次草稿',exact:true}).click();const downloaded=JSON.parse(fs.readFileSync(await (await downloading).path(),'utf8'));assert.deepEqual(downloaded,{template:name,body:'待核对的编辑草稿'});
+    await page.getByRole('button',{name:'保存正文',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('#managedTemplateForm button[type=submit]').disabled);assert.equal(attempts,2);assert.equal(lastPayload.revision,'fixture-v1');assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('case retry reuses an uploaded image and logout clears private lists and editor drafts',async()=>{
+  const {page,context,errors}=await pageFor(375);
+  try{
+    let authenticated=true,uploads=0,writes=0,data={version:1,revision:'fixture-v1',templateOverrides:{},cases:[{id:'private-case',template:'示例模板',title:'私有案例',description:'私有草稿说明',published:false,images:[]}]};
+    await context.route('**/api/session',route=>route.fulfill({json:{authenticated,user:'fixture-admin'}}));await context.route('**/api/logout',route=>{authenticated=false;return route.fulfill({json:{ok:true}});});await context.route('**/api/content-history*',route=>route.fulfill({json:{revision:data.revision,history:[]}}));
+    await context.route('**/api/content',route=>{if(route.request().method()==='PUT'){writes++;if(writes===1)return route.fulfill({status:503,json:{error:'备份失败，未保存'}});data={...route.request().postDataJSON(),revision:'fixture-v2'};}return route.fulfill({json:data});});
+    await context.route('**/api/upload',route=>{uploads++;return route.fulfill({json:{pathname:'cases/upload-once.jpg'}});});await context.route('**/api/image?*',route=>route.fulfill({status:404}));
+    await page.goto(base+'/admin',{waitUntil:'networkidle'});await page.locator('#managerKind').selectOption('cases');await page.getByRole('button',{name:'编辑案例',exact:true}).click();const png=await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=2;canvas.height=2;return canvas.toDataURL('image/png').split(',')[1];});await page.locator('#managedCaseForm input[name="images"]').setInputFiles({name:'retry.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});await page.locator('#managedCaseForm input[name="title"]').fill('保留的案例草稿');await page.getByRole('button',{name:'保存案例',exact:true}).click();await page.waitForSelector('#managedCaseError:visible');assert.equal(uploads,1);assert.equal(await page.locator('#managedCaseForm input[name="title"]').inputValue(),'保留的案例草稿');assert.equal(data.cases[0].title,'私有案例');
+    await page.getByRole('button',{name:'保存案例',exact:true}).click();await page.waitForSelector('#managedCaseDialog:not([open])',{state:'attached'});await page.waitForFunction(()=>!document.getElementById('managerControls').disabled);assert.equal(uploads,1);assert.deepEqual(data.cases[0].images,['cases/upload-once.jpg']);assert.equal(data.cases[0].published,false);
+    await page.getByRole('button',{name:'退出登录',exact:true}).click();await page.waitForSelector('#loginPanel:visible');assert.equal(await page.locator('#managerList .manager-item').count(),0);assert.equal(await page.locator('#managedCaseForm input[name="title"]').inputValue(),'');assert.equal(await page.locator('#managedCaseForm textarea[name="description"]').inputValue(),'');assert.equal(await page.locator('#managedCaseImages img').count(),0);assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('failed admin reads disable management; late responses after logout cannot expose private data',async()=>{
+  const {page,context,errors}=await pageFor(375);
+  try{
+    await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
+    await context.route('**/api/content',route=>route.fulfill({status:503,json:{error:'资料读取失败'}}));await context.route('**/api/content-history*',route=>route.fulfill({status:503,json:{error:'历史读取失败'}}));
+    await page.goto(base+'/admin',{waitUntil:'networkidle'});assert(await page.locator('#adminDataError').isVisible());assert.equal(await page.locator('#overrideCount').innerText(),'—');assert(await page.locator('#managerSearch').isDisabled());assert(await page.locator('#managerControls').evaluate(element=>element.disabled));assert(await page.locator('#downloadCurrent').isDisabled());assert.equal(await page.locator('#managerList .manager-item').count(),0);
+    let release,authenticated=true;const pending=new Promise(resolve=>release=resolve);
+    await context.route('**/api/session',route=>route.fulfill({json:{authenticated,user:'fixture-admin'}}));await context.route('**/api/logout',route=>{authenticated=false;return route.fulfill({json:{ok:true}});});
+    await context.route('**/api/content',async route=>{await pending;return route.fulfill({json:{version:1,revision:'fixture-v1',templateOverrides:{private:{body:'私有模板正文'}},cases:[{id:'private',template:'private',title:'私有案例标题',published:false}]}});});
+    await context.route('**/api/content-history*',async route=>{await pending;return route.fulfill({json:{revision:'fixture-v1',history:[]}});});
+    await page.reload({waitUntil:'domcontentloaded'});await page.waitForSelector('#dashboardPanel:not([hidden])');await page.getByRole('button',{name:'退出登录',exact:true}).click();await page.waitForSelector('#loginPanel:visible');release();await page.waitForLoadState('networkidle');
+    assert.equal(await page.locator('#dashboardPanel').isVisible(),false);assert.equal(await page.locator('#managerList .manager-item').count(),0);assert.equal(await page.locator('#managedTemplateBody').inputValue(),'');assert(!((await page.locator('body').innerText()).includes('私有案例标题')));assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('library logout reports failures, then removes unpublished cases and clears their editor drafts',async()=>{
+  const {page,context,errors}=await pageFor(375);
+  try{
+    let logouts=0;await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
+    await context.route('**/api/logout',route=>{logouts++;return route.fulfill(logouts===1?{status:503,json:{error:'暂不可用'}}:{json:{ok:true}});});
+    await context.route('**/api/content',async route=>{const name=await page.evaluate(()=>templates[+document.querySelector('.record-book-section .preview').dataset.index].name);return route.fulfill({json:{version:1,revision:'fixture-v1',templateOverrides:{},cases:[{id:'private',template:name,title:'未发布测试案例',description:'待清理的私有草稿',published:false,images:[]},{id:'public',template:name,title:'公开案例',published:true,images:[]}]}});});
+    await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});await page.locator('.record-book-section .preview').first().click();const privateCase=page.locator('.cms-case-card').filter({hasText:'未发布测试案例'});await privateCase.getByRole('button',{name:'编辑',exact:true}).click();assert.equal(await page.locator('#cmsCaseForm input[name="title"]').inputValue(),'未发布测试案例');await page.keyboard.press('Escape');await page.keyboard.press('Escape');
+    await page.locator('#libraryShell [data-cms-logout]').click();await page.waitForFunction(()=>document.getElementById('toast').textContent.includes('退出失败'));assert.match(await page.locator('#toast').innerText(),/退出失败/);assert(await page.locator('#libraryShell [data-cms-badge]').isVisible());
+    await page.locator('#libraryShell [data-cms-logout]').click();await page.waitForSelector('#libraryShell [data-cms-login]:not([hidden])');assert.equal(await page.locator('#cmsCaseForm input[name="title"]').inputValue(),'');assert.equal(await page.locator('#cmsCaseForm textarea[name="description"]').inputValue(),'');
+    await page.locator('.record-book-section .preview').first().click();assert.equal(await privateCase.count(),0);assert.match(await page.locator('#cmsCases').innerText(),/公开案例/);assert.equal(await page.locator('#cmsEditTemplate,#cmsAddCase').count(),0);assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});

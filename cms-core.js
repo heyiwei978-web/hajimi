@@ -68,8 +68,12 @@
     }catch(ex){err.textContent=ex.message;err.hidden=false;}
   }
   async function logout(){
-    try{await req('/api/logout',{method:'POST',body:'{}'});}catch{}
-    CMS.auth=false;CMS.user=null;syncAuthUI();notify('已退出开发者模式');if(CMS.activeTemplate)renderExtras(CMS.activeTemplate);
+    try{await req('/api/logout',{method:'POST',body:'{}'});}catch(ex){notify('退出失败：'+ex.message);return;}
+    CMS.auth=false;CMS.user=null;CMS.data.cases=CMS.data.cases.filter(item=>item.published!==false);
+    for(const id of ['cmsEditDialog','cmsCaseDialog'])document.getElementById(id)?.close();
+    const editForm=document.getElementById('cmsEditForm'),caseForm=document.getElementById('cmsCaseForm');editForm.reset();caseForm.reset();editForm.onsubmit=null;caseForm.onsubmit=null;
+    document.getElementById('cmsEditTitle').textContent='';document.getElementById('cmsEditBody').value='';
+    syncAuthUI();notify('已退出开发者模式');if(CMS.activeTemplate)renderExtras(CMS.activeTemplate);
   }
   function patchTemplates(){
     if(typeof generate!=='function'||typeof openPreview!=='function')return;
@@ -140,12 +144,7 @@
   }
   async function deleteCase(id,t){if(!confirm('删除这个案例？修改前资料会自动备份。'))return;try{await saveContent({...CMS.data,cases:CMS.data.cases.filter((c)=>c.id!==id)});renderExtras(t);notify('案例已删除');}catch(ex){notify(ex.message);}}
   async function prepareImage(file){
-    if(!/^image\/(jpeg|png|webp)$/.test(file.type))throw new Error('仅支持 JPG、PNG、WebP');
-    const img=await createImageBitmap(file);let w=img.width,h=img.height,max=1800;if(Math.max(w,h)>max){const ratio=max/Math.max(w,h);w=Math.round(w*ratio);h=Math.round(h*ratio);}
-    const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);if(img.close)img.close();
-    let blob=await new Promise((resolve)=>canvas.toBlob(resolve,'image/jpeg',0.88));if(blob.size>3000000)blob=await new Promise((resolve)=>canvas.toBlob(resolve,'image/jpeg',0.72));
-    const data=await new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(String(fr.result).split(',')[1]);fr.onerror=reject;fr.readAsDataURL(blob);});
-    return {name:file.name.replace(/\.[^.]+$/,'')+'.jpg',type:'image/jpeg',data};
+    return window.HAJIMI_IMAGE.prepare(file);
   }
   async function init(){
     makeDialogs();installDialogCloseHandlers();installAuthSlots();document.getElementById('cmsLoginForm').addEventListener('submit',login);
