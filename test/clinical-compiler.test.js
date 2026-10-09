@@ -24,11 +24,13 @@ test('compiled catalogs and per-disease bodies preserve every original clinical 
   for(const file of Object.values(manifest.bodies)){
     for(const [id,body]of JSON.parse(fs.readFileSync(path.join(directory,file.slice(1)),'utf8')))records[id].sourceBody=body;
   }
-  assert.equal(records.length,5159);
+  const newDischargeRounds=source.records.filter(r=>r.department==='骨科'&&r.short==='出院当天查房记录');
+  assert.ok(newDischargeRounds.length>=200,'Every orthopedic model patient needs a discharge-day round');
+  assert.equal(records.length,5159+newDischargeRounds.length);
   // Convert cross-context objects before comparison; all public fields, flags,
   // special-case ordering and every body must survive the data split unchanged.
   assert.deepEqual(JSON.parse(JSON.stringify(records)),source.records);
-  assert.equal(manifest.departments.guke.count,5132);
+  assert.equal(manifest.departments.guke.count,5132+newDischargeRounds.length);
   // Regression: these assertions read published per-disease JSON, not preview-only scripts.
   const femur=records.find(r=>r.department==='骨科'&&r.group==='股骨转子间骨折'&&r.short==='手术记录'&&!r.specialCase);
   assert.ok(femur?.sourceBody,'股骨转子间骨折手术记录缺失');
@@ -43,8 +45,9 @@ test('compiled catalogs and per-disease bodies preserve every original clinical 
 
   const round=records.find(r=>r.department==='骨科'&&r.group==='股骨转子间骨折'&&r.short==='主任医师首次查房记录');
   assert.ok(round?.sourceBody,'主任医师查房记录缺失');
-  assert.match(round.sourceBody,/\n\n主任医师：________$/,'主任签名须留空');
-  assert.equal(round.sourceBody.split('\n\n').length,3,'病程正文必须为一个自然段');
+  assert.match(round.sourceBody,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/,'主诊断、正文与医师签名须分开');
+  assert.match(round.sourceBody,/________主任医师查房后指出：/,'缺少主任查房后指出的具体表述');
+  assert.equal(round.sourceBody.split('\n\n').length,4,'病程记录必须保持独立的主诊断、单段正文与医师签名');
   // Whole-library clinical style regression: verify the publishable JSON for all ordinary orthopedic surgery records.
   const ordinaryOperations=records.filter(r=>r.department==='骨科'&&/手术记录/.test(r.short||'')&&!r.specialCase&&typeof r.sourceBody==='string');
   assert.ok(ordinaryOperations.length>=200,'Too few orthopedic operation records were covered by the audit');
@@ -60,8 +63,23 @@ test('compiled catalogs and per-disease bodies preserve every original clinical 
   assert.ok(physicianCourses.length>100,'No physician progress notes checked');
   for(const r of physicianCourses){
     const expected=/主任医师/.test(r.short)?'主任医师':'主治医师';
-    assert.match(r.sourceBody,new RegExp('\\n\\n'+expected+'：________$'),r.group+'：查房医师姓名或签名未留空');
+    assert.match(r.sourceBody,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/,r.group+'：主诊断、病程正文与签名未独立分段');
+    assert.match(r.sourceBody,new RegExp('________'+expected+'查房后(?:指出|指示)'),r.group+'：查房后意见未用明确的标准表述');
   }
+
+  const groupsNeedingDischarge=new Set(source.records.filter(r=>r.department==='骨科'&&!r.specialCase&&r.group!=='通用场景').map(r=>r.group));
+  for(const group of groupsNeedingDischarge){
+    const entries=source.records.filter(r=>r.department==='骨科'&&r.group===group&&!r.specialCase&&r.short==='出院当天查房记录');
+    assert.equal(entries.length,1,group+'：必须有且仅有一份出院当天查房记录');
+    assert.match(entries[0].sourceBody,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/);
+  }
+  const orthoProgress=source.records.filter(r=>r.department==='骨科'&&typeof r.sourceBody==='string'&&/病程|查房/.test(r.short||'')&&!r.specialCase);
+  for(const r of orthoProgress){
+    assert.match(r.sourceBody,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/,r.group+' '+r.short+'：分区格式有误');
+    assert.equal(r.sourceBody.split('\n\n').length,4,r.group+' '+r.short+'：病程正文不能再分段');
+    assert.ok(r.sourceBody.includes('科别：骨科'),r.group+' '+r.short+'：须保留科别');
+  }
+
   // Keep the original TKA complication cases intact while enforcing the same prose layout.
   const specialOperations=records.filter(r=>r.department==='骨科'&&r.specialCase&&r.type==='手术记录'&&/手术记录/.test(r.short||''));
   assert.ok(specialOperations.length>=2,'Missing the two preserved TKA operative records');
