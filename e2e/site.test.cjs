@@ -95,8 +95,8 @@ test('cross-department search groups templates into complete case files; filters
     })));
     await page.locator('.case-search-card').first().click();
     await page.locator('#caseWorkspace').waitFor({state:'visible'});
-    assert.match(await page.locator('#caseWorkspace .case-nav-family').innerText(),/临床病历/);
-    assert.match(await page.locator('#caseWorkspace .case-nav-family').innerText(),/知情同意/);
+    assert.match(await page.locator('#caseWorkspace .case-nav-family').first().innerText(),/临床病历/);
+    assert.match(await page.locator('#caseWorkspace .case-nav-family').nth(1).innerText(),/知情同意/);
     assert.equal(await page.locator('#caseWorkspace .case-file-reader > .record-book-section:visible').count(),1);
     await page.locator('#caseShowAll').click();
     assert((await page.locator('#caseWorkspace .case-file-reader > .record-book-section:visible').count())>1);
@@ -260,7 +260,7 @@ test('disease navigation starts at the top, preserves record content and chapter
     assert.equal(await page.evaluate(()=>scrollY),0);assert.match(await page.title(),/全膝关节置换/);
     assert((await page.locator('.record-book-body').first().textContent()).length>100);
     const link=page.locator('.record-book-toc a').nth(10);await link.click();await settle(page);
-    const top=await page.locator(await link.getAttribute('href')).evaluate(e=>e.getBoundingClientRect().top);assert(top>=60&&top<150);
+    const selected=page.locator(await link.getAttribute('href'));assert(await selected.isVisible());assert.equal(await link.getAttribute('aria-current'),'location');assert.equal(await page.locator('#caseWorkspace .case-file-reader > .record-book-section:visible').count(),1);
     await page.emulateMedia({media:'print'});assert.equal(await page.locator('.record-book-toc').evaluate(e=>getComputedStyle(e).display),'none');
     assert.equal(await page.locator('.record-book-body').first().evaluate(e=>getComputedStyle(e).fontSize),'16px');assert.deepEqual(errors,[]);
   } finally {await context.close();}
