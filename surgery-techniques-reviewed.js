@@ -136,7 +136,11 @@
     '胫骨干骨折':'https://surgeryreference.aofoundation.org/orthopedic-trauma/adult-trauma/tibial-shaft/basic-technique/infrapatellar-intramedullary-nailing',
     '胫骨平台骨折':'https://surgeryreference.aofoundation.org/orthopedic-trauma/adult-trauma/proximal-tibia/lateral-plateau-split-depression-fracture/orif-conventional-plating',
     '跟骨骨折':'https://surgeryreference.aofoundation.org/orthopedic-trauma/adult-trauma/calcaneous/approach/sinus-tarsi-approach',
-    '锁骨骨折':'https://surgeryreference.aofoundation.org/orthopedic-trauma/adult-trauma/clavicle-fractures/approach/superior-approach-to-the-clavicle'
+    '锁骨骨折':'https://surgeryreference.aofoundation.org/orthopedic-trauma/adult-trauma/clavicle-fractures/approach/superior-approach-to-the-clavicle',
+    '桡骨远端骨折':'https://surgeryreference.aofoundation.org/orthopedic-trauma/adult-trauma/distal-forearm/extraarticular-fracture-of-the-radius-with-dorsal-displacement-or-tilt/orif-palmar-plate',
+    '髌骨骨折':'https://surgeryreference.aofoundation.org/orthopedic-trauma/adult-trauma/further-reading/tension-band-principles',
+    '股骨转子间骨折':'https://surgeryreference.aofoundation.org/orthopedic-trauma/adult-trauma/curriculum/principles-of-fracture-management-for-orp',
+    '股骨干骨折':'https://surgeryreference.aofoundation.org/orthopedic-trauma/adult-trauma/curriculum/principles-of-fracture-management-for-orp'
   };
   function getDetail(t,c){
     if(!t||!c||t.specialCase||t.specialCaseKey||!operations[t.group])return '';
