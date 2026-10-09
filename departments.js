@@ -505,6 +505,91 @@
       </section>`;
       return {html,groups};
     }
+
+    // Case workspace: all existing chapter content remains unchanged. Group only the navigation.
+    function caseFileCategory(t){
+      const label=String(t.short||'')+' '+String(t.type||'');
+      if(/知情同意|同意书|选择治疗方案|选择手术方案|沟通记录|沟通告知|谈话记录|告知书|术前谈话|家属谈话|手术风险告知/.test(label))return 'consent';
+      if(/出院小结|出院记录|出院病历|出院医嘱|出院随访|随访记录/.test(label))return 'discharge';
+      if(/术后|康复|下肢血管超声|影像复查|切口渗液|并发症/.test(label))return 'postop';
+      if(/手术记录|麻醉记录|手术安全核查|手术清点|麻醉术后访视/.test(label))return 'surgery';
+      if(/会诊申请|会诊回报|会诊记录|检查理由|辅助检查/.test(label))return 'consult';
+      return 'admission';
+    }
+    function caseFileSections(list){
+      const defs=[
+        ['admission','住院病历','入院、首次病程、术前查房及讨论','clinical'],
+        ['surgery','手术与麻醉','手术记录、麻醉及手术核查','clinical'],
+        ['postop','术后病程与康复','术后每日记录、康复和并发症','clinical'],
+        ['discharge','出院与随访','出院小结、出院记录与随访','clinical'],
+        ['consent','知情同意与沟通','手术、麻醉、治疗方案及家属签字','consent'],
+        ['consult','检查与会诊','辅助检查、会诊及其他材料','extra']
+      ];
+      return defs.map(function(def){
+        const members=list.map(function(t,i){return {t:t,i:i};}).filter(function(item){return caseFileCategory(item.t)===def[0];});
+        return {key:def[0],title:def[1],hint:def[2],family:def[3],members:members};
+      });
+    }
+    function caseFileNav(list){
+      const sections=caseFileSections(list);
+      const familyLabels={clinical:'一、临床病历',consent:'二、知情同意与沟通签字',extra:'三、检查与会诊'};
+      const nav=Object.keys(familyLabels).map(function(family){
+        const groups=sections.filter(function(x){return x.family===family;});
+        return '<div class="case-nav-family"><h4>'+familyLabels[family]+'</h4>'+groups.map(function(section){
+          const items=section.members.map(function(m){
+            const id=recordBookId(m.t,m.i);
+            return '<a href="#'+id+'" class="case-nav-item" data-case-record="'+id+'"><span>'+String(m.i+1).padStart(2,'0')+'</span><b>'+escapeHtml(m.t.short||m.t.name)+'</b></a>';
+          }).join('');
+          return '<details class="case-nav-group" open><summary><span>'+section.title+'</span><small>'+section.members.length+' 篇</small></summary>'+
+            (items?'<nav>'+items+'</nav>':'<p class="case-nav-empty">暂无此类文书</p>')+'</details>';
+        }).join('')+'</div>';
+      }).join('');
+      return '<div class="record-book-toc-head"><span>PATIENT CASE FILE</span><h3>完整病例目录</h3><p>按文书用途归类，点击阅读</p></div>'+nav;
+    }
+    function bindCaseFileReader(){
+      const root=document.getElementById('caseWorkspace');if(!root)return;
+      const articles=[...root.querySelectorAll('.case-file-reader > .record-book-section')];
+      const links=[...root.querySelectorAll('[data-case-record]')];
+      const status=root.querySelector('#caseCurrentSection');
+      const allBtn=document.getElementById('caseShowAll');
+      let selected=0;
+      function activate(i,scroll){
+        if(i<0||i>=articles.length)return;
+        root.classList.remove('case-show-all');
+        selected=i;
+        articles.forEach(function(a,j){a.classList.toggle('case-active',j===i);});
+        const id=articles[i].id;
+        links.forEach(function(link){const yes=link.dataset.caseRecord===id;link.classList.toggle('is-current',yes);if(yes){link.setAttribute('aria-current','location');link.closest('details').open=true;}else link.removeAttribute('aria-current');});
+        if(status)status.textContent='正在阅读 '+String(i+1).padStart(2,'0')+' / '+articles.length+' 篇';
+        if(allBtn){allBtn.textContent='展开整套病历';allBtn.setAttribute('aria-pressed','false');}
+        if(scroll)root.querySelector('.case-file-reader').scrollIntoView({behavior:'instant',block:'start'});
+      }
+      links.forEach(function(link){
+        link.addEventListener('click',function(e){
+          e.preventDefault();
+          const idx=articles.findIndex(function(a){return a.id===link.dataset.caseRecord;});
+          if(idx<0)return;
+          activate(idx,true);
+          history.replaceState(history.state||{},'',location.pathname+location.search+'#'+encodeURIComponent(articles[idx].id));
+        });
+      });
+      if(allBtn)allBtn.onclick=function(){
+        const expand=!root.classList.contains('case-show-all');root.classList.toggle('case-show-all',expand);
+        allBtn.textContent=expand?'只看当前文书':'展开整套病历';
+        allBtn.setAttribute('aria-pressed',expand?'true':'false');
+        if(status)status.textContent=expand?'全部 '+articles.length+' 篇文书':('正在阅读 '+String(selected+1).padStart(2,'0')+' / '+articles.length+' 篇');
+      };
+      const prev=document.getElementById('casePrevious'),next=document.getElementById('caseNext');
+      if(prev)prev.onclick=function(){activate((selected-1+articles.length)%articles.length,true)};
+      if(next)next.onclick=function(){activate((selected+1)%articles.length,true)};
+      const printBtn=document.getElementById('printWholeRecord');
+      if(printBtn)printBtn.onclick=function(){root.classList.add('case-show-all');window.print();};
+      let hash='';
+      try{hash=decodeURIComponent(location.hash.slice(1));}catch{hash='';}
+      const initial=articles.findIndex(function(a){return a.id===hash;});
+      activate(initial<0?0:initial,false);
+    }
+
     function renderDisease(){
       document.body.classList.remove('library-root-page');
       document.body.classList.add('department-no-sidebar','disease-book-page');
@@ -562,25 +647,22 @@
           <strong>1<small>套标准病历 · ${list.length} 个现有章节${specialBundle.groups.length?' · '+specialBundle.groups.length+'个特殊病例':''}</small></strong>
         </section>`;
 
+      const allChapters=list.map(function(t,i){return recordChapter(t,i);}).join('');
+      const grouping=caseFileSections(list);
+      const signedCount=grouping.find(function(x){return x.key==='consent';}).members.length;
       if(grid)grid.innerHTML=toolbar(currentDept+' · '+labelFor(state.group),false)+hero+
-        '<div class="source-template-note">模板为脱敏整理/标准化辅助内容，必须结合真实患者病史、查体、检查结果和实际诊疗经过修改。</div>'+
-        `<div class="record-book-layout">
-          <aside class="record-book-toc" id="recordBookToc">
-            <div class="record-book-toc-head"><span>CONTENTS</span><h3>病历目录</h3><p>按病历时间顺序排列</p></div>
-            <nav>${toc}</nav>
-          </aside>
-          <div class="record-book-content">
-            ${chaptersBefore}
-            <article class="record-book-section record-book-reserved complication-reserve" id="${complicationId}">
-              <header class="record-book-section-head"><div class="record-chapter-no">＋</div><div class="record-chapter-title"><span>术后 · 固定预留</span><h3>术后并发症 / 特殊情况</h3></div></header>
-              <div class="record-reserve-copy"><strong>该章节永久保留在本病种内。</strong><br>以后发生切口渗液/愈合不良、感染、下肢静脉血栓、贫血、发热、神经血管异常、再手术、特殊会诊或其他术后问题时，相关病程记录继续添加到本疾病页面，不再单独拆成新的病种模板。</div>
-              <div class="record-reserve-slots"><span>并发症首次记录</span><span>检查与结果分析</span><span>处理措施及依据</span><span>复查 / 转归</span></div>
-              <a class="record-back-toc" href="#recordBookToc">↑ 回到目录</a>
-            </article>
-            ${hasDischarge?chaptersDischarge:dischargeReserve}
-          </div>
-        </div>
-        ${specialBundle.html}`;
+        '<div class="source-template-note"><strong>示例患者 · 整套病历：</strong>各章节取自本病种现有示例模板，使用前请核对患者身份、日期、检查结果、真实手术经过及签字信息；特殊病例另行归档，不与标准病例混用。</div>'+
+        '<section id="caseWorkspace" class="case-workspace record-book-layout">'+
+          '<aside class="record-book-toc case-file-sidebar" id="recordBookToc">'+caseFileNav(list)+'</aside>'+
+          '<div class="record-book-content case-file-reader-wrap">'+
+            '<div class="case-file-tools"><div><span class="case-file-eyebrow">CASE READER</span><strong id="caseCurrentSection">'+list.length+' 篇文书</strong><small>临床病历 '+(list.length-signedCount)+' 篇 · 签字沟通 '+signedCount+' 篇</small></div><div class="case-file-reader-actions">'+
+              '<button id="casePrevious" class="btn ghost" type="button">← 上一篇</button>'+
+              '<button id="caseNext" class="btn ghost" type="button">下一篇 →</button>'+
+              '<button id="caseShowAll" class="btn ghost" type="button" aria-pressed="false">展开整套病历</button>'+
+            '</div></div>'+
+            '<div class="case-file-reader">'+allChapters+'</div>'+
+          '</div>'+
+        '</section>'+specialBundle.html;
 
       const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateDepartment(currentDept);
       bindTemplateActions();
@@ -589,22 +671,7 @@
       const copyWhole=document.getElementById('copyWholeRecord');if(copyWhole)copyWhole.onclick=()=>copyText(recordBookText(list));
       const printWhole=document.getElementById('printWholeRecord');if(printWhole)printWhole.onclick=()=>window.print();
 
-      // Disease-book TOC is in-page navigation only. Do not create browser-history entries
-      // for every chapter click; otherwise Back appears to move through prior TOC selections.
-      document.querySelectorAll('.record-book-toc a[href^="#"], .record-back-toc[href^="#"]').forEach((link)=>{
-        link.onclick=(e)=>{
-          e.preventDefault();
-          const raw=link.getAttribute('href')||'';
-          const id=decodeURIComponent(raw.replace(/^#/,''));
-          const target=document.getElementById(id);
-          if(!target)return;
-          // Smooth scrolling uses stale heights while offscreen chapters are rendered.
-          // An immediate jump lets the browser lay out the destination accurately.
-          target.scrollIntoView({behavior:'instant',block:'start'});
-          const next=location.pathname+location.search+(id?'#'+encodeURIComponent(id):'');
-          history.replaceState(history.state||{},'',next);
-        };
-      });
+      bindCaseFileReader();
 
       document.querySelectorAll('.copy-special-case').forEach((btn)=>{
         btn.onclick=()=>{
@@ -654,29 +721,55 @@
       if(!searchIndex||searchIndexSize!==templates.length){
         searchIndex=createHajimiSearch(templates);searchIndexSize=templates.length;
       }
-      const list=searchIndex(state,department);
+      const matching=searchIndex(state,department);
+      const grouped=new Map();
+      matching.forEach(function(t){
+        const key=t.department+'\0'+t.group;
+        if(!grouped.has(key))grouped.set(key,{department:t.department,group:t.group,count:0});
+        grouped.get(key).count++;
+      });
+      const cases=[...grouped.values()];
       document.body.classList.remove('disease-book-page');
       document.body.classList.toggle('library-root-page',!department);
       document.body.classList.toggle('department-no-sidebar',department!=='骨科');
       setBrand();
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
-      if(title)title.textContent=(department||'全部科室')+' · 搜索结果';
-      if(num)num.textContent=list.length+' 份';
-      if(empty)empty.hidden=list.length>0;
+      if(title)title.textContent=(department||'全部科室')+' · 病种病例';
+      if(num)num.textContent=cases.length+' 套病例 · 匹配 '+matching.length+' 份文书';
+      if(empty)empty.hidden=cases.length>0;
       if(!grid)return;
-      grid.classList.add('search-results');
-      grid.replaceChildren();
+      grid.classList.add('search-results','case-search-results');
+      grid.innerHTML='<p class="case-search-intro">每个病种只显示一个入口。打开后可在左侧查看住院病历、手术与术后记录，以及独立整理的知情同意和沟通签字材料。</p><div class="case-search-grid"></div>';
+      const container=grid.querySelector('.case-search-grid');
       let shown=0;
-      const append=()=>{
-        grid.querySelector('.search-more')?.remove();
-        const next=list.slice(shown,shown+60);shown+=next.length;
-        grid.insertAdjacentHTML('beforeend',next.map(templateCard).join(''));
-        if(shown<list.length){
-          grid.insertAdjacentHTML('beforeend','<div class="search-more"><span>已显示 '+shown+' / '+list.length+' 份</span><button class="btn ghost" type="button">显示更多</button></div>');
-          grid.querySelector('.search-more button').onclick=()=>{const focusIndex=shown;append();grid.querySelectorAll('.preview')[focusIndex]?.focus({preventScroll:true});};
+      function renderCard(c){
+        const count=recordsForDisease(c.department,c.group).filter(function(x){return !x.specialCase;}).length;
+        return '<article class="case-search-card" data-case-group="'+encodeURIComponent(c.group)+'" data-case-department="'+encodeURIComponent(c.department)+'" tabindex="0" role="button">'+
+        '<div class="case-search-card-top"><span>完整病例 · '+escapeHtml(c.department)+'</span><span>'+count+' 篇现有文书</span></div>'+
+        '<h3>'+escapeHtml(labelFor(c.group))+'</h3><p>整合入院、术前、手术、术后康复、出院记录以及独立的签字同意与沟通资料。</p>'+
+        '<div class="case-search-card-bottom"><small>搜索匹配 '+c.count+' 篇</small><b>打开完整病历 →</b></div></article>';
+      }
+      function append(){
+        container.querySelector('.search-more')?.remove();
+        const next=cases.slice(shown,shown+24);
+        shown+=next.length;
+        container.insertAdjacentHTML('beforeend',next.map(renderCard).join(''));
+        if(shown<cases.length){
+          container.insertAdjacentHTML('beforeend','<div class="search-more"><span>已显示 '+shown+' / '+cases.length+' 套病例</span><button class="btn ghost" type="button">显示更多</button></div>');
+          container.querySelector('.search-more button').onclick=append;
         }
-        bindTemplateActions();
-      };
+        container.querySelectorAll('.case-search-card').forEach(function(card){
+          if(card.dataset.bound==='yes')return;
+          card.dataset.bound='yes';
+          const open=function(){
+            const dep=decodeURIComponent(card.dataset.caseDepartment),g=decodeURIComponent(card.dataset.caseGroup);
+            history.pushState({},'', '/bl/'+deptToSlug[dep]+'/'+encodeURIComponent(g));
+            finishNavigation();
+          };
+          card.onclick=open;
+          card.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};
+        });
+      }
       append();
     }
 
