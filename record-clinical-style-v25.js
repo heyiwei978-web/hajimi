@@ -191,15 +191,45 @@
     return null;
   }
 
+  function regroupExistingOperativeSteps(original) {
+    var s=String(original||'');
+    var start=s.search(/手术经过[：:]/);
+    if(start<0)return s;
+    var intro=s.slice(0,start),section=s.slice(start);
+    var end=section.search(/\n(?:术后计划|术后医嘱|术后处理|术者签名|手术者签名)[：:]/);
+    var footer=end<0?'':section.slice(end);
+    var operative=end<0?section:section.slice(0,end);
+    var content=operative.replace(/^手术经过[：:]\s*/,''),steps=[],preamble=[];
+    content.split(/\n/).forEach(function(line){
+      var t=line.trim();
+      if(!t)return;
+      var match=t.match(/^\d{1,2}\s*[.、．]\s*(.+)$/);
+      if(match)steps.push(match[1]);
+      else if(steps.length)steps[steps.length-1]+=' '+t;
+      else preamble.push(t);
+    });
+    if(steps.length<4)return s;
+    var pieces=preamble.length?[preamble.join(' ')]:[];
+    steps.forEach(function(text,i){
+      var group=Math.min(3,Math.floor(4*i/steps.length));
+      while(pieces.length<group+1)pieces.push('');
+      if(pieces[group])pieces[group]+=' ';
+      pieces[group]+=text;
+    });
+    var blocks=pieces.filter(Boolean);
+    if(blocks.length<3)return s;
+    return intro+'手术经过：\n'+blocks.join('\n\n')+(footer?'\n\n'+footer.trim():'');
+  }
+
   function formatOperation(body, t) {
     var s = String(body || '').replace(/\r\n/g, '\n');
     if (!s) return s;
     var c = seeds[t.group] || null;
     if (t.specialCase) {
       amended.preservedSpecial++;
-      return s;
+      return regroupExistingOperativeSteps(s);
     }
-    if (!c) return s;
+    if (!c) return regroupExistingOperativeSteps(s);
     var op = String(c.surgery || ''), diagnosis = String(c.diagnosis || '');
     // Revision, staged infection, tumor, tendon and spine surgery require a procedure-specific protocol.
     // Do not overwrite their unique operative findings with an unrelated standard fracture approach.
@@ -214,7 +244,7 @@
     var inner = end >= 0 ? rest.slice(0, end) : rest;
     if (!tech) {
       // Preserve atypical operative details; adjust only clearly numbered step-by-step formatting.
-      if (inner.length >= 650) return s;
+      if (inner.length >= 650) return regroupExistingOperativeSteps(s);
       var manual = String(c.procedure || '').trim();
       if (!manual) return s;
       var prep = '患者入室后核对身份、手术名称及侧别，麻醉满意后取' + (c.position || '适当体位') + '，常规消毒、铺无菌巾单；依据术前影像和实际手术方案定位切口，分层显露病变区域，妥善保护重要神经血管及邻近软组织。';
@@ -251,8 +281,20 @@
     if (isOperation(record)) return formatOperation(body, record);
     return body;
   };
+  // Production /bl pages serve precompiled JSON records, not index.html scripts.
+  // Persist the formatted sourceBody BEFORE clinical-compiler.mjs serializes records.
+  // The copy and preview buttons then consume exactly the same already-formatted text.
+  var built = { courses:0, operations:0, special:0 };
   templates.forEach(function(t) {
-    if (isCourse(t)) amended.courses++;
+    if (typeof t.sourceBody !== 'string' || !t.sourceBody.trim()) return;
+    if (!isCourse(t) && !isOperation(t)) return;
+    var old = t.sourceBody;
+    var updated = generate(t);
+    if (updated === old) return;
+    t.sourceBody = updated;
+    if (isCourse(t)) built.courses++;
+    else if (t.specialCase) built.special++;
+    else built.operations++;
   });
-  window.HAJIMI_CLINICAL_COPY_STYLE_V25 = { enabled: true, version:'2026-10-09', summary:amended };
+  window.HAJIMI_CLINICAL_COPY_STYLE_V25 = { enabled: true, version:'2026-10-09', summary:amended, compiled:built };
 })();
