@@ -75,9 +75,57 @@
     document.getElementById('cmsEditTitle').textContent='';document.getElementById('cmsEditBody').value='';
     syncAuthUI();notify('已退出开发者模式');if(CMS.activeTemplate)renderExtras(CMS.activeTemplate);
   }
+  // A saved admin override takes precedence over compiled JSON. Normalize its copy text too.
+  // This changes the preview/copy presentation only; the original editable draft is kept intact.
+  function normalizeClinicalOverride(t,body){
+    let s=String(body||'').replace(/\r\n?/g,'\n');
+    if(t.department!=='骨科')return s;
+    const isOperation=/手术记录/.test(t.short||'')&&(t.type==='手术记录'||t.short==='手术记录'||t.short==='完整手术记录');
+    const isCourse=/病程|查房/.test(t.short||'')&&!/手术记录|讨论|知情同意|出院小结/.test(t.short||'');
+    if(isOperation){
+      const i=s.search(/手术经过[：:]/);if(i<0)return s;
+      const before=s.slice(0,i),remain=s.slice(i).replace(/^手术经过[：:]\s*/,'');
+      const end=/\n\s*(?:术后计划|术后医嘱|术后处理|术者签名|手术者签名)[：:]/.exec(remain);
+      const operative=end?remain.slice(0,end.index):remain;
+      const tail=end?remain.slice(end.index).trim():'';
+      const lines=operative.split('\n').map(v=>v.trim()).filter(Boolean),steps=[],heading=[];
+      for(const line of lines){
+        const m=line.match(/^\d{1,2}[.、．]\s*(.+)$/);
+        if(m)steps.push(m[1]);
+        else if(steps.length)steps[steps.length-1]+=' '+line;
+        else heading.push(line);
+      }
+      if(steps.length<4)return s;
+      const blocks=[[],[],[],[]];
+      heading.forEach(v=>blocks[0].push(v));
+      steps.forEach((v,index)=>blocks[Math.min(3,Math.floor(index*4/steps.length))].push(v));
+      return before+'手术经过：\n'+blocks.map(v=>v.join('')).filter(Boolean).join('\n\n')+(tail?'\n\n'+tail:'');
+    }
+    if(isCourse){
+      const lines=s.split('\n'),head=[],bodyLines=[];
+      const header=/^(记录名称|记录时间|患者|患者信息|主诊断|主要诊断|住院号|入院日期|手术日期|出院日期)[：:]/;
+      let bodyStarted=false;
+      for(const line of lines){
+        if(!bodyStarted&&(header.test(line.trim())||(!line.trim()&&head.length))){
+          if(line.trim())head.push(line.trim());
+        }else{bodyStarted=true;if(line.trim())bodyLines.push(line.trim());}
+      }
+      const role=/主任医师/.test(t.short)?'主任医师':/主治医师/.test(t.short)?'主治医师':/主刀医师/.test(t.short)?'主刀医师':'';
+      const namePattern=/[\u4e00-\u9fa5]{2,4}(主任医师|主治医师)(?=查房|指出|指示|认为|分析|意见|：|:)/g;
+      const prose=bodyLines.filter(x=>!/^((主任|主治|主刀)医师)(?:签名)?[：:]/.test(x)).join(' ').replace(namePattern,'________$1');
+      return (head.length?head.join('\n')+'\n\n':'')+prose+(role?'\n\n'+role+'：________':'');
+    }
+    return s;
+  }
   function patchTemplates(){
     if(typeof generate!=='function'||typeof openPreview!=='function')return;
-    if(!CMS.baseGenerate){CMS.baseGenerate=generate;generate=function(t){const o=CMS.data.templateOverrides[t.name];return o&&o.body?o.body:CMS.baseGenerate(t);};}
+    if(!CMS.baseGenerate){
+      CMS.baseGenerate=generate;
+      generate=function(t){
+        const o=CMS.data.templateOverrides[t.name];
+        return o&&o.body?normalizeClinicalOverride(t,o.body):CMS.baseGenerate(t);
+      };
+    }
     if(!CMS.baseOpenPreview){CMS.baseOpenPreview=openPreview;openPreview=function(t){CMS.activeTemplate=t;CMS.baseOpenPreview(t);renderExtras(t);};}
   }
   async function saveContent(next){
