@@ -2,4 +2,5 @@
 .env.*
 .vercel
 node_modules
+dist
 .DS_Store

@@ -9,13 +9,18 @@ let server, browser, base;
 
 before(async () => {
   const config = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json')));
+  const publicRoot=path.join(root,config.outputDirectory);
   server = http.createServer((req, res) => {
     const pathname = new URL(req.url, 'http://localhost').pathname;
     const rewrite = config.rewrites.find(rule => rule.source.endsWith(':path*')
       ? pathname.startsWith(rule.source.slice(0, -':path*'.length)) : pathname === rule.source);
-    const target = rewrite?.destination || pathname;
+    const direct=pathname==='/'?'/index.html':pathname;
+    // Match Vercel's filesystem precedence so the homepage cannot silently
+    // fall back to the much heavier clinical entry point after deployment.
+    const directFile=/^\/[a-zA-Z0-9_-]+\.(?:html|js|css)$/.test(direct)&&fs.existsSync(path.join(publicRoot,direct.slice(1)));
+    const target = directFile?direct:rewrite?.destination || pathname;
     if (!/^\/[a-zA-Z0-9_-]+\.(?:html|js|css)$/.test(target)) {res.writeHead(404);res.end();return;}
-    const file = path.join(root, target.slice(1));
+    const file = path.join(publicRoot, target.slice(1));
     if (!fs.existsSync(file)) {res.writeHead(404);res.end();return;}
     for (const header of config.headers.find(rule=>rule.source==='/(.*)')?.headers || []) res.setHeader(header.key,header.value);
     const type = target.endsWith('.css') ? 'text/css' : target.endsWith('.js') ? 'application/javascript' : 'text/html';

@@ -1,4 +1,4 @@
-import {readFileSync, writeFileSync} from 'node:fs';
+import {readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync, copyFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 
 // Keep homepage markup in index.html as the single source for both entry points.
@@ -21,6 +21,18 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     if (readFileSync(target, 'utf8') !== output) throw new Error('Run npm run build to refresh home.html');
   } else {
     writeFileSync(target, output);
-    console.log('Built lightweight homepage from index.html');
+    const directory=new URL('../dist/',import.meta.url);
+    // Vercel serves existing index.html before rewrites. Publish the lightweight
+    // page as index.html, and keep the complete library at a separate path.
+    rmSync(directory,{recursive:true,force:true});
+    mkdirSync(directory,{recursive:true});
+    for(const entry of readdirSync(new URL('../',import.meta.url),{withFileTypes:true})){
+      if(entry.isFile()&&/\.(?:html|js|css)$/.test(entry.name)&&entry.name!=='index.html'){
+        copyFileSync(new URL('../'+entry.name,import.meta.url),new URL(entry.name,directory));
+      }
+    }
+    writeFileSync(new URL('index.html',directory),output);
+    copyFileSync(new URL('../index.html',import.meta.url),new URL('library.html',directory));
+    console.log('Built lightweight homepage and clinical library in dist/');
   }
 }

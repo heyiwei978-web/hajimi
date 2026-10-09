@@ -30,19 +30,19 @@
     },
     {
       "source": "/bl",
-      "destination": "/index.html"
+      "destination": "/library.html"
     },
     {
       "source": "/bl/:path*",
-      "destination": "/index.html"
+      "destination": "/library.html"
     },
     {
       "source": "/duty",
-      "destination": "/index.html"
+      "destination": "/library.html"
     },
     {
       "source": "/duty/",
-      "destination": "/index.html"
+      "destination": "/library.html"
     }
   ],
   "headers": [
@@ -145,5 +145,5 @@
     }
   ],
   "buildCommand": "npm run build",
-  "outputDirectory": "."
+  "outputDirectory": "dist"
 }

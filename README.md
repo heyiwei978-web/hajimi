@@ -27,8 +27,9 @@ Git integration status: connected to Vercel for automatic deployment.
 
 ## 开发与检查
 
-- `npm run build`：从 `index.html` 的首页区块生成轻量的 `home.html`，避免首页加载病历脚本。Vercel 部署时自动运行。
+- `npm run build`：从 `index.html` 的首页区块生成轻量的 `home.html`，并生成 `dist/` 发布目录。发布目录的 `index.html` 是轻量首页，`library.html` 保留完整病历，避免静态首页覆盖路由规则。Vercel 部署时自动运行。
 - `npm test`：验证安全边界、病历生成链、首页构建与搜索过滤。
 - `npx playwright install chromium` 后执行 `npm run test:browser`：验证手机和电脑卡片边框、中文搜索、分页、弹窗、键盘操作和打印布局。可通过 `CHROMIUM_EXECUTABLE_PATH` 使用本机 Chromium。GitHub Actions 自动运行这两类检查。
 - 病历数据仍通过 `/bl` 加载；首页样式与入口内容继续维护在 `index.html`，不要直接修改生成的 `home.html`。
+- 本地预览应服务 `dist/`，根据 `vercel.json` 路由到对应页面；API 仍位于仓库根目录的 `api/`。
 - 修改 HTML 后请先运行构建，再检查电脑和手机端的组件边界、搜索、病历预览及临床工具。
