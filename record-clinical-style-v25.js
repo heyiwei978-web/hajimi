@@ -241,7 +241,8 @@
     // Revision, staged infection, tumor, tendon and spine surgery require a procedure-specific protocol.
     // Do not overwrite their unique operative findings with an unrelated standard fracture approach.
     var complex = /翻修|感染|肿瘤|植皮|肌腱|神经移植|椎间|脊柱|椎体|骨髓炎|清创|截肢|截趾|松解|截骨|骨不连|内生软骨瘤|滑膜炎/.test(op + diagnosis);
-    var tech = complex ? null : technique(c);
+    var approvedProtocol = (window.HAJIMI_ORTHO_PROTOCOLS||[]).some(function(rule){return new RegExp(rule.pattern).test(op);});
+    var tech = (!complex || approvedProtocol) ? technique(c) : null;
     var anchor = s.search(/手术经过[：:]/);
     if (anchor < 0) return s;
     var prefix = s.slice(0, anchor);
