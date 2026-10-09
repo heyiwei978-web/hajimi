@@ -77,7 +77,7 @@
   }
   function patchTemplates(){
     if(typeof generate!=='function'||typeof openPreview!=='function')return;
-    if(!CMS.baseGenerate){CMS.baseGenerate=generate;generate=function(t){const o=CMS.data.templateOverrides[t.name];return o&&o.body?o.body:CMS.baseGenerate(t);};}
+    if(!CMS.baseGenerate){CMS.baseGenerate=generate;generate=function(t){const o=CMS.data.templateOverrides[t.name];const body=o&&o.body?o.body:CMS.baseGenerate(t);return window.HAJIMI_RECORD_STANDARD?.format?.(t,body)??body;};}
     if(!CMS.baseOpenPreview){CMS.baseOpenPreview=openPreview;openPreview=function(t){CMS.activeTemplate=t;CMS.baseOpenPreview(t);renderExtras(t);};}
   }
   async function saveContent(next){
