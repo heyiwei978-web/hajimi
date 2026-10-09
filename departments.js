@@ -734,7 +734,7 @@
       document.body.classList.toggle('department-no-sidebar',department!=='骨科');
       setBrand();
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
-      if(title)title.textContent=(department||'全部科室')+' · 病种病例';
+      if(title)title.textContent=(department||'全部科室')+' · 搜索结果 · 完整病例';
       if(num)num.textContent=cases.length+' 套病例 · 匹配 '+matching.length+' 份文书';
       if(empty)empty.hidden=cases.length>0;
       if(!grid)return;
