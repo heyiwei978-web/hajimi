@@ -76,7 +76,10 @@
       var c=seeds[t.group]||null;
       if(!c){status.unmatched.push(t.group+'（缺少术式数据）');t.sourceBody=regroupNumbering(t.sourceBody);return;}
       var op=String(c.surgery||'')+' '+String(t.group||'');
-      var p=rules.find(function(r){return r.test.test(op);});
+      var candidates=rules.filter(function(r){return r.test.test(op);});
+      // A disease-specific reconstructive route must outrank a generic approach.
+      var p=(/侧弯矫形/.test(op)&&candidates.find(function(r){return /长节段矫形融合/.test(r.name);}))||
+            (/Haglund/.test(op)&&candidates.find(function(r){return /跟骨后上方跟腱止点/.test(r.name);}))||candidates[0];
       if(p){t.sourceBody=fourParagraphProtocol(t,c,p);status.rewritten++;status.applied[p.name]=(status.applied[p.name]||0)+1;}
       else {t.sourceBody=regroupNumbering(t.sourceBody);status.unmatched.push(op);}
       return;
