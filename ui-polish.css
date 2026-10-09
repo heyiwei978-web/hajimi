@@ -71,8 +71,8 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .ortho-jump{gap:8px;margin-bottom:24px}
 .ortho-jump a{border-radius:10px;padding:10px 12px;font-size:12px}
 .ortho-jump a:hover{transform:none;box-shadow:none;border-color:#bfc8d4}
-.ortho-sections{gap:24px}
-.ortho-category{padding:22px;border-radius:16px;background:#fff;border-color:#e3e7ec}
+.ortho-sections{gap:24px;grid-template-columns:minmax(0,1fr)}
+.ortho-category{min-width:0;padding:22px;border-radius:16px;background:#fff;border-color:#e3e7ec}
 .ortho-category-head{margin-bottom:16px}
 .ortho-category-head h3{font-size:22px;font-weight:700}
 .ortho-category-head p{font-size:14px;line-height:1.7}
@@ -149,7 +149,7 @@ body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
   .ortho-hero{padding:20px;border-radius:14px}.ortho-hero h2{font-size:27px}.ortho-stats{grid-template-columns:repeat(2,1fr)}
   .ortho-jump{grid-template-columns:repeat(2,1fr)}
   .ortho-category{padding:14px;border-radius:13px}.ortho-category-head{gap:10px}.ortho-category-head h3{font-size:19px}.ortho-category-head>strong{font-size:9px}
-  .ortho-disease-grid{grid-template-columns:1fr}.ortho-disease-card{min-height:138px;padding:13px}
+  .ortho-disease-grid{grid-template-columns:minmax(0,1fr)}.ortho-disease-card{min-height:138px;padding:13px}
   .record-book-toc{padding:12px;border-radius:11px}.record-book-toc nav{grid-template-columns:1fr}
   .record-book-section{border-radius:9px}.record-book-section-head{grid-template-columns:36px minmax(0,1fr);padding:13px 12px;gap:9px}
   .record-chapter-no{width:33px;height:33px;border-radius:8px}.record-chapter-title h3{font-size:16px}
@@ -318,6 +318,8 @@ button,a,[role="button"]{
   .ortho-category{
     content-visibility:auto;
     contain-intrinsic-size:auto 620px;
+    /* Reserve vertical space without imposing a 620px minimum card width. */
+    contain-intrinsic-width:none;
   }
 }
 @media(max-width:640px){
