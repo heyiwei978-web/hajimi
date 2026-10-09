@@ -59,7 +59,7 @@
     setPathwayUrl('tka');
     if(tka)tka.hidden=false;
     if(dynamic){dynamic.hidden=true;dynamic.innerHTML='';}
-    tka?.scrollIntoView({behavior:'smooth',block:'start'});
+    tka?.scrollIntoView({behavior:'instant',block:'start'});
   }
 
   function showOfficial(key,button){
@@ -75,7 +75,7 @@
       dynamic.hidden=false;
       dynamic.innerHTML=renderOfficial(pathway);
       dynamic.querySelector('.dynamic-print-pathway')?.addEventListener('click',()=>window.print());
-      dynamic.scrollIntoView({behavior:'smooth',block:'start'});
+      dynamic.scrollIntoView({behavior:'instant',block:'start'});
     }
   }
 

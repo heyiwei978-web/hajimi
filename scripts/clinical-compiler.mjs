@@ -54,7 +54,7 @@ export function compileClinicalSite(html,directory){
   manifest.scripts.app=write('app-runtime','const traumaGroups=window.HAJIMI.manifest.traumaGroups;\nconst groups=window.HAJIMI.manifest.groups;\n'+app.slice(header,start)+'const templates=window.HAJIMI.records;\n'+app.slice(end));
   manifest.scripts.router=write('department-runtime',fs.readFileSync(new URL('departments.js',root),'utf8'));
   const manifestFile=write('library-manifest','window.HAJIMI_MANIFEST='+JSON.stringify(manifest)+';');
-  const scripts=`<script defer src="/search-core.js?v=20261009-quality1"></script>\n<script defer src="/library-personal.js?v=20261009-personal1"></script>\n<script defer src="/image-upload.js?v=20261009-manager1"></script>\n<script defer src="${manifestFile}"></script>\n<script defer src="/library-loader.js?v=20261009-lazy1"></script>\n<script defer src="/workspace.js?v=20261009-quality1"></script>`;
+  const scripts=`<script defer src="/search-core.js?v=20261009-quality1"></script>\n<script defer src="/library-personal.js?v=20261009-personal1"></script>\n<script defer src="/image-upload.js?v=20261009-manager1"></script>\n<script defer src="${manifestFile}"></script>\n<script defer src="/library-loader.js?v=20261009-lazy1"></script>\n<script defer src="/workspace.js?v=20261009-layout1"></script>`;
   const runtimeHtml=html.replace(/<script\b[^>]*src="\/[^"]+"[^>]*><\/script>\s*/g,'').replace('</body>',scripts+'\n</body>');
   fs.writeFileSync(new URL('library.html',directory),runtimeHtml);
   return {source,manifest};

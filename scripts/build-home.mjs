@@ -12,7 +12,7 @@ export function buildHome(source) {
   }
   const head = source.slice(0, headEnd + '</head>'.length);
   const portal = source.slice(start, end).trim().replace(/^(<div id="portalHome"[^>]*?) hidden/, '$1');
-  return `${head}\n<body class="portal-mode">\n<a class="skip-link" href="#homeContent">跳到主要内容</a>\n${portal}\n<script defer src="/workspace.js?v=20261009-quality1"></script>\n<script defer src="/home.js?v=20261009-quality1"></script>\n</body></html>\n`;
+  return `${head}\n<body class="portal-mode">\n<a class="skip-link" href="#homeContent">跳到主要内容</a>\n${portal}\n<script defer src="/workspace.js?v=20261009-layout1"></script>\n<script defer src="/home.js?v=20261009-quality1"></script>\n</body></html>\n`;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

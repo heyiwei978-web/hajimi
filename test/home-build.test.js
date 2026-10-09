@@ -9,7 +9,7 @@ test('homepage build keeps public entries while loading no clinical script chain
   assert(!html.includes('id="libraryShell"'));
   assert(!html.includes('id="patientForm"'));
   const scripts=[...html.matchAll(/<script[^>]*src="([^"]+)"/g)].map(m=>m[1]);
-  assert.deepEqual(scripts,['/workspace.js?v=20261009-quality1','/home.js?v=20261009-quality1']);
+  assert.deepEqual(scripts,['/workspace.js?v=20261009-layout1','/home.js?v=20261009-quality1']);
   assert(html.includes('id="homeContent"'));
   assert(!/<div id="portalHome"[^>]*\bhidden/.test(html));
   assert(html.includes('骨科临床路径中心'));

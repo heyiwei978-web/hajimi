@@ -2,7 +2,7 @@
 :root{
   --h-font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC",sans-serif;
   --h-serif:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","SimSun",serif;
-  --h-ink:#172033;--h-text:#28313d;--h-muted:#6f7885;--h-line:#e3e7ec;--h-bg:#f6f8fb;--h-blue:#1d67d8
+  --h-ink:#172033;--h-text:#28313d;--h-muted:#6f7885;--h-line:#e3e7ec;--h-bg:#f6f8fb;--h-blue:#1d67d8;--site-header-height:62px
 }
 html{font-family:var(--h-font);text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
 body,button,input,select,textarea{font-family:var(--h-font)}
@@ -438,4 +438,38 @@ button,a,[role="button"]{
   .record-chapter-actions{padding-left:0;display:flex;flex-wrap:wrap;gap:8px}
   .record-book-body,.record-paper{line-height:1.85}
   .record-book-section,.ortho-category{scroll-margin-top:78px}
+}
+
+/* Keep anchors and dialog actions clear of headers at every viewport height. */
+@media screen{
+  main,.record-book-section,.ortho-category,.record-book-toc{scroll-margin-top:calc(var(--site-header-height) + 16px)}
+  .library-top-actions a.text-action{padding-top:18px;padding-bottom:18px}
+  .preview-tools{flex-wrap:wrap;background:#fff}
+  .preview-tools .btn,.modal-actions .btn{min-height:44px;font-size:14px;white-space:nowrap}
+  .preview-tools{top:var(--preview-header-height,80px)}
+}
+@media screen and (min-width:901px){
+  .record-book-toc{top:calc(var(--site-header-height) + 12px);max-height:calc(100dvh - var(--site-header-height) - 28px)}
+}
+@media screen and (max-width:640px){
+  #libraryShell .library-topbar{padding:0 14px}
+  #libraryShell .menu-btn{flex-shrink:0}
+  .cms-admin-mode #libraryShell .library-topbar{height:auto;padding:8px 14px;flex-wrap:wrap;gap:6px}
+  .cms-admin-mode #libraryShell .brandline{flex-basis:100%}
+  .cms-admin-mode #libraryShell .library-top-actions{width:100%;justify-content:flex-end}
+  .preview-tools>.btn{flex:1 1 auto}
+}
+@media screen and (max-width:900px){
+  body.department-no-sidebar #libraryShell .sidebar,
+  #libraryShell .sidebar{top:var(--site-header-height)!important;height:calc(100dvh - var(--site-header-height))!important;max-height:calc(100dvh - var(--site-header-height))!important}
+  #libraryShell .drawer-mask{inset:var(--site-header-height) 0 0!important}
+}
+@media screen and (max-width:900px) and (prefers-reduced-motion:reduce){
+  body.department-no-sidebar #libraryShell .sidebar,
+  #libraryShell .sidebar{transition:none!important}
+}
+@media print{
+  body.department-no-sidebar #libraryShell .sidebar,
+  #libraryShell .sidebar,#libraryShell .drawer-mask{display:none!important}
+  body.drawer-open{overflow:visible!important}
 }

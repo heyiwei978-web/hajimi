@@ -193,3 +193,9 @@ body.pathway-page{margin:0;background:var(--pw-bg);color:var(--pw-ink)}
   .pathway-title-actions{grid-template-columns:1fr}
   .pathway-note{flex-direction:column;gap:6px}
 }
+@media screen{
+  .pathway-main,.pathway-section{scroll-margin-top:calc(var(--site-header-height,62px) + 16px)}
+}
+@media screen and (min-width:821px){
+  .pathway-sidebar{top:calc(var(--site-header-height,62px) + 16px);max-height:calc(100dvh - var(--site-header-height,62px) - 32px)}
+}

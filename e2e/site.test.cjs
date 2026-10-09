@@ -406,3 +406,87 @@ test('library logout reports failures, then removes unpublished cases and clears
     await page.locator('.record-book-section .preview').first().click();assert.equal(await privateCase.count(),0);assert.match(await page.locator('#cmsCases').innerText(),/公开案例/);assert.equal(await page.locator('#cmsEditTemplate,#cmsAddCase').count(),0);assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
+
+test('signed-in clinical headers, preview actions and editors remain usable on narrow and short screens',async()=>{
+  for(const [width,height]of [[320,740],[375,812],[812,375],[1024,600]]){
+    const {page,context,errors}=await pageFor(width,{viewport:{width,height},isMobile:width<400,hasTouch:width<400});
+    try{
+      await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
+      await context.route('**/api/content',async route=>{
+        const name=await page.evaluate(()=>templates[+document.querySelector('.record-book-section .preview').dataset.index].name);
+        return route.fulfill({json:{version:1,revision:'fixture-v1',templateOverrides:{},cases:[{id:'long-title',template:name,title:'界面演示'+ 'A'.repeat(180),description:'https://example.invalid/'+ 'b'.repeat(240),published:true,images:[]}]}});
+      });
+      await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});await settle(page);
+      assert(await page.locator('.library-brand-copy strong').evaluate(element=>element.clientWidth>=element.scrollWidth),`visible signed-in title at ${width}px`);
+      if(width<=900){
+        await page.locator('#menuBtn').click();await settle(page);
+        const header=await page.locator('.library-topbar').boundingBox(),drawer=await page.locator('#sidebar').boundingBox();
+        assert(drawer.y>=header.y+header.height-1);assert(drawer.y+drawer.height<=height+1);
+        await page.emulateMedia({media:'print'});assert.equal(await page.locator('#sidebar').isVisible(),false);assert.equal(await page.locator('#drawerMask').isVisible(),false);assert.equal(await page.evaluate(()=>getComputedStyle(document.body).overflow),'visible');
+        await page.emulateMedia({media:'screen'});await page.keyboard.press('Escape');
+      }
+      await page.locator('.record-book-toc a').first().click();await settle(page);
+      const record=await page.locator('#caseWorkspace .case-active').boundingBox(),header=await page.locator('.library-topbar').boundingBox();
+      assert(record.y>=header.y+header.height+10,`case directory clears the signed-in header at ${width}px`);
+      assert.equal(await page.locator('#caseWorkspace .case-active .record-book-body').evaluate(element=>getComputedStyle(element).fontSize),'16px');
+      await page.locator('.record-book-section .preview').first().click();await settle(page);
+      assert(await page.locator('.preview-tools button').evaluateAll(buttons=>buttons.every(button=>{
+        const text=document.createRange();text.selectNodeContents(button);const r=button.getBoundingClientRect(),dialog=button.closest('dialog').getBoundingClientRect();
+        return text.getClientRects().length===1&&r.height>=44&&r.left>=dialog.left&&r.right<=dialog.right;
+      })),`readable preview buttons at ${width}px`);
+      await page.locator('#cmsCases').scrollIntoViewIfNeeded();await settle(page);
+      assert(await page.locator('.cms-case-card').evaluate(element=>element.scrollWidth<=element.clientWidth+1));
+      if(width<400){
+        const tools=await page.locator('.preview-tools').boundingBox(),head=await page.locator('#previewDialog .modal-head').boundingBox();
+        assert(tools.y>=head.y+head.height-1,'sticky controls stay below the complete preview title');
+      }
+      await page.locator('#cmsEditTemplate').click();await settle(page);
+      const editor=page.locator('#cmsEditDialog');
+      assert.equal(await page.locator('#cmsEditBody').evaluate(element=>getComputedStyle(element).fontSize),'16px');
+      const save=await editor.getByRole('button',{name:'保存修改',exact:true}).boundingBox(),dialog=await editor.boundingBox();
+      assert(save.y>=dialog.y&&save.y+save.height<=dialog.y+dialog.height,`save is visible at ${width} × ${height}`);
+      assert(await editor.evaluate(element=>element.scrollWidth<=element.clientWidth+1));
+      await page.keyboard.press('Escape');await page.locator('#cmsAddCase').click();await settle(page);
+      assert.equal(await page.locator('#cmsCaseForm input[name="title"]').evaluate(element=>getComputedStyle(element).fontSize),'16px');
+      assert(await page.locator('#cmsCaseDialog').evaluate(element=>element.scrollWidth<=element.clientWidth+1));
+      await page.keyboard.press('Escape');await page.keyboard.press('Escape');assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('pathway directory selections and direct links leave their title cards below the current header',async()=>{
+  for(const [width,height]of [[320,740],[375,812],[812,375],[1024,600],[1440,900]]){
+    const {page,context,errors}=await pageFor(width,{viewport:{width,height},isMobile:width<400,hasTouch:width<400});
+    try{
+      await page.goto(base+'/pathway',{waitUntil:'networkidle'});await page.locator('#jumpTka').click();await settle(page);
+      for(const target of ['#tkaPathway','#dynamicPathway']){
+        if(target==='#dynamicPathway')await page.locator('[data-key="tha"]').click();await settle(page);
+        const card=await page.locator(target+' .pathway-title-card').boundingBox(),header=await page.locator('header').boundingBox();
+        assert(card.y>=header.y+header.height+10,`unobscured pathway title at ${width} × ${height}`);
+        if(width>820){const sidebar=await page.locator('.pathway-sidebar').boundingBox();assert(sidebar.y>=header.y+header.height+10);assert(sidebar.y+sidebar.height<=height+1);}
+      }
+      await page.goto(base+'/pathway?p=tha',{waitUntil:'networkidle'});await settle(page);
+      const card=await page.locator('#dynamicPathway .pathway-title-card').boundingBox(),header=await page.locator('header').boundingBox();assert(card.y>=header.y+header.height+10);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('the active navigation link stays visible after loading and resizing each standalone page',async()=>{
+  const {page,context,errors}=await pageFor(320);
+  try{
+    for(const route of ['/tools','/admin','/pathway','/duty']){
+      await page.setViewportSize({width:320,height:740});await page.goto(base+route,{waitUntil:'networkidle'});
+      for(const width of [320,768,1440,375]){
+        await page.setViewportSize({width,height:740});await settle(page);
+        assert(await page.locator('.official-links,.nav nav').evaluate(element=>{
+          const item=element.querySelector('a.active').getBoundingClientRect(),bounds=element.getBoundingClientRect();
+          return item.left>=bounds.left-1&&item.right<=bounds.right+1;
+        }),`visible selected navigation on ${route} at ${width}px`);
+        assert.equal(await page.evaluate(()=>scrollY),0,'horizontal navigation does not scroll the page');
+      }
+      assert.equal(await page.locator('header a[href="/duty"]').count(),1);
+    }
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
