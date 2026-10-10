@@ -112,7 +112,11 @@ test('every original orthopedic disease now explains fracture-line morphology an
   for(const [id,n,code,feature] of cases){
    await page.goto(base+'/classification/guke/'+id,{waitUntil:'domcontentloaded'});
    const cards=page.locator('.class-type-detailed');
-   assert.equal(await cards.count(),n,'incorrect detail count for '+id);
+   const actual=await cards.count();
+   if(actual!==n){
+     const body=await page.locator('#classificationApp').innerText().catch(()=>'app-missing');
+     throw new Error('incorrect detail count for '+id+' ('+actual+' instead of '+n+') '+page.url()+'; page='+body.slice(0,400)+'; errors='+errors.join(' // '));
+   }
    assert.match(await page.locator('#class-types').innerText(),new RegExp(feature),'missing fracture morphology for '+id);
    assert.equal(await page.getByText(code,{exact:true}).count(),1,'missing expected subtype '+code);
    assert((await page.locator('.class-differentials li').count())>=2,'missing adjacent-type comparisons for '+id);
