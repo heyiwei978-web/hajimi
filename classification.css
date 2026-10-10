@@ -9,7 +9,7 @@ body.class-page{margin:0;background:var(--cl-bg);color:var(--cl-ink);font-family
 .class-hero:after{content:"";position:absolute;right:-85px;top:-210px;width:490px;height:490px;border-radius:50%;border:75px solid rgba(105,177,253,.1);pointer-events:none}
 .class-hero>div{position:relative;z-index:1}
 .class-eyebrow{color:#afcee9;letter-spacing:.12em;font-weight:800;font-size:10px}
-.class-hero h1{font-size:clamp(32px,4vw,52px);line-height:1.1;letter-spacing:-.04em;margin:13px 0 14px}
+.class-hero h1{color:#fff;font-size:clamp(32px,4vw,52px);line-height:1.1;letter-spacing:-.04em;margin:13px 0 14px}
 .class-hero h1 em{font-style:normal;color:#a7d1ff}
 .class-hero p{font-size:14px;color:#d0e0f1;line-height:1.85;max-width:720px;margin:0}
 .class-hero-stats{display:flex;gap:11px;flex:0 0 auto}
