@@ -639,8 +639,8 @@ window.HAJIMI_CLASSIFICATION_DATA = {
           "status": "候选图源（待逐图复核）"
         }
       ],
-      "evidence": "距骨颈正侧位和踝穴位DR；CT评价骨折线、移位及关节匹配。",
-      "imaging": "术前正侧位DR；复杂骨折需结合CT复核。"
+      "evidence": [],
+      "imaging": "距骨颈正侧位和踝穴位DR；CT评价骨折线、移位及关节匹配。"
     },
     {
       "id": "pelvic-ring",
