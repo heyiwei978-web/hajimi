@@ -1,4 +1,4 @@
-/* Four literature-search batches consolidated; image URLs point to external articles only. */
+/* Four literature-search batches consolidated; external figure links are references, not embedded images. */
 window.HAJIMI_CLASSIFICATION_DATA = {
   "schema": 1,
   "updated": "2026-10-10",
@@ -586,10 +586,16 @@ window.HAJIMI_CLASSIFICATION_DATA = {
       "decision": "舌形骨折合并后方皮肤受压、苍白或濒临坏死为紧急评估复位的重要情况；其余根据关节面与跟骨形态、皮肤和软组织条件选择治疗。",
       "figures": [
         {
-          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5265199/",
-          "fig": "需更换为跟骨专属图源",
-          "match": "当前占位图不可用于跟骨分型",
-          "status": "待复核、禁止误配"
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10293754/",
+          "fig": "Figure 1A",
+          "match": "Essex-Lopresti 舌形跟骨骨折：术前跟骨侧位DR",
+          "status": "原文明确分型；版权许可仍需逐图核验"
+        },
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8725541/",
+          "fig": "Figure 1A、2A",
+          "match": "关节压缩型跟骨骨折：真实术前侧位DR",
+          "status": "原文明确分型；版权许可仍需逐图核验"
         }
       ],
       "evidence": [],
