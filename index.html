@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
 <link rel="stylesheet" href="/library-personal.css?v=20261009-personal1">
 <link rel="stylesheet" href="/case-workspace-preview.css?v=20261009-reading1">
+<link rel="stylesheet" href="/workspace-design.css?v=20261010-design1">
 </head>
 <body>
 <a class="skip-link" href="#homeContent">跳到主要内容</a>
@@ -27,7 +28,6 @@
       <a href="/bl">病历模板</a>
       <a href="/pathway">临床路径</a>
       <a href="/duty">值班资料</a>
-      <a href="/bl">其他科室</a>
       <a href="/tools">临床工具</a>
       <a href="/admin">管理入口</a>
     </nav>
@@ -48,6 +48,14 @@
       <p class="official-kicker">HAJIMI CLINICAL WORKSPACE</p>
       <h1>临床资料，<span>一个入口。</span></h1>
       <p class="official-lead">病历模板、骨科临床路径、值班资料和常用临床工具统一整理，打开即用，持续更新。</p>
+      <form class="home-search" action="/bl" method="get" role="search">
+        <label for="homeSearch">搜索病历模板</label>
+        <div class="home-search-field">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg>
+          <input id="homeSearch" name="q" type="search" placeholder="疾病、术式或文书名称" required>
+          <button type="submit">搜索 <span aria-hidden="true">→</span></button>
+        </div>
+      </form>
       <div class="official-hero-actions">
         <a class="official-cta primary" href="/bl"><span class="cta-icon">▣</span>进入病历模板 <b>→</b></a>
         <a class="official-cta secondary" href="/tools"><span class="cta-icon">⌘</span>打开临床工具 <b>→</b></a>
@@ -79,6 +87,16 @@
       <div class="scene-stethoscope"><span></span><b></b></div>
       <div class="scene-books"><span>Orthopedics</span><span>Trauma</span><span>Arthroplasty</span></div>
     </div>
+    <aside class="home-quick-panel" aria-labelledby="homeQuickTitle">
+      <div class="home-quick-heading"><span>病历模板</span><h2 id="homeQuickTitle">从科室开始</h2><a href="/bl">全部科室 →</a></div>
+      <div class="home-quick-grid">
+        <a href="/bl/guke"><span class="home-department-icon" aria-hidden="true">骨</span><div><strong>骨科</strong><small>创伤 · 关节置换</small></div><b aria-hidden="true">↗</b></a>
+        <a href="/bl/puwai"><span class="home-department-icon" aria-hidden="true">外</span><div><strong>普外科</strong><small>腹部外科 · 外科病历</small></div><b aria-hidden="true">↗</b></a>
+        <a href="/bl/shennei"><span class="home-department-icon" aria-hidden="true">肾</span><div><strong>肾内科</strong><small>肾功能 · 内科记录</small></div><b aria-hidden="true">↗</b></a>
+        <a href="/bl/fuke"><span class="home-department-icon" aria-hidden="true">妇</span><div><strong>妇科</strong><small>妇科疾病 · 围手术期</small></div><b aria-hidden="true">↗</b></a>
+      </div>
+      <a class="home-quick-pathway" href="/pathway"><span>骨科临床路径中心</span><b aria-hidden="true">→</b></a>
+    </aside>
   </section>
 
   <section class="official-feature-grid" aria-label="主要功能">
@@ -160,7 +178,7 @@
 <div class="breadcrumb">CLINICAL RECORDS / TEMPLATE LIBRARY</div>
 <h1 id="libraryTitle">病历模板库</h1>
 <p id="libraryLead" class="lead">按科室、疾病/术式、阶段和记录类型快速定位常用病历。</p>
-<div class="intro-note"><strong>使用说明</strong><span>模板用于辅助书写。真实病历必须结合患者实际病史、查体、检查结果及诊疗经过修改。</span></div>
+<details class="intro-note library-guidance"><summary><strong>使用说明</strong></summary><span>模板用于辅助书写。真实病历必须结合患者实际病史、查体、检查结果及诊疗经过修改。</span></details>
 <div id="patientStrip" class="patient-strip" hidden><div>患者 <strong id="patientNameView"></strong><span id="patientMetaView"></span></div><button id="editPatientBtn" class="inline-link" type="button">编辑</button></div>
 </section>
 <section class="doc-section controls-section"><h2><span class="section-no">01</span>查找模板</h2><div class="toolbar"><label class="searchbox">⌕ <input aria-label="搜索病历模板" id="searchInput" disabled placeholder="搜索疾病、术式、记录类型或关键词"><kbd>Ctrl K</kbd></label><div class="filter-row"><label>阶段<select id="stageFilter" disabled><option value="all">全部阶段</option><option>入院</option><option>术前</option><option>术中</option><option>术后</option></select></label><label>记录类型<select id="typeFilter" disabled><option value="all">全部记录类型</option></select></label></div></div></section>

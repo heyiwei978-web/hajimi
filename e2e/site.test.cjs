@@ -57,6 +57,35 @@ test('homepage is usable without JavaScript and avoids loading clinical data', a
   } finally {await context.close();}
 });
 
+test('homepage search opens shareable clinical results and reset restores department selection',async()=>{
+  for(const width of [320,375,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      const requests=[];page.on('request',request=>requests.push(new URL(request.url()).pathname));
+      await page.goto(base+'/',{waitUntil:'networkidle'});
+      assert.equal(requests.filter(url=>/^\/(?:catalog-|records-|app-runtime-|department-runtime-)/.test(url)).length,0,'landing stays independent of clinical data');
+      const search=page.getByRole('searchbox',{name:'搜索病历模板',exact:true});
+      const bounds=await search.boundingBox();assert(bounds.y>0&&bounds.y+bounds.height<900,'homepage search is in the initial viewport');
+      assert.equal(await page.locator('.home-quick-grid a').count(),4);
+      await search.fill('肝脓肿');await page.locator('.home-search button').click();
+      await page.waitForURL(/\/bl\?q=/);await page.locator('.case-search-card').waitFor({state:'visible'});
+      assert.equal(await page.locator('#searchInput').inputValue(),'肝脓肿');
+      assert.equal(await page.locator('.case-search-card').count(),1);
+      assert.match(await page.locator('.case-search-card').innerText(),/肝脓肿/);
+      await page.locator('.library-guidance summary').click();
+      assert(await page.locator('.library-guidance>span').isVisible(),'complete original usage instructions remain accessible');
+      assert.match(await page.locator('.library-guidance>span').innerText(),/真实病历必须结合患者实际病史/);
+      await page.reload({waitUntil:'networkidle'});await page.locator('.case-search-card').waitFor({state:'visible'});
+      assert.equal(await page.locator('#searchInput').inputValue(),'肝脓肿','refresh restores the search query');
+      await page.locator('#resetFilters').click();
+      assert.equal(new URL(page.url()).searchParams.has('q'),false);
+      assert.equal(await page.locator('[data-department]').count(),4);
+      assert.equal(await page.locator('#searchInput').inputValue(),'');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('every orthopedic card keeps both borders inside its category on phones and computers', {timeout:120000}, async()=>{
   for(const width of [320,375,393,768,1280,1440,1920]) {
     const {page,context,errors}=await pageFor(width);

@@ -324,6 +324,11 @@
       if(empty)empty.hidden=true;
       if(grid)grid.innerHTML=`
         <div class="library-root-home-row"><a class="btn ghost site-home-btn" href="/">⌂ 返回网站首页</a></div>
+        <div class="library-section-heading">
+          <div><span>01</span><h3>科室入口</h3><p>选择科室后，再进入具体疾病或术式。</p></div>
+          <strong>${departments.length} 个科室</strong>
+        </div>
+        <div class="department-grid library-department-grid">${departments.map((d)=>deptCard(d.name)).join('')}</div>
         <section class="library-overview">
           <div class="library-overview-copy">
             <span>CLINICAL TEMPLATE LIBRARY</span>
@@ -337,12 +342,7 @@
             <div><strong>${otherCount}</strong><span>其他科室</span></div>
           </div>
         </section>
-        <section id="libraryPersonal" class="library-quick-panel" aria-label="我的常用入口"></section>
-        <div class="library-section-heading">
-          <div><span>01</span><h3>科室入口</h3><p>选择科室后，再进入具体疾病或术式。</p></div>
-          <strong>${departments.length} 个科室</strong>
-        </div>
-        <div class="department-grid library-department-grid">${departments.map((d)=>deptCard(d.name)).join('')}</div>`;
+        <section id="libraryPersonal" class="library-quick-panel" aria-label="我的常用入口"></section>`;
       window.HAJIMI_PERSONAL?.mount();
       document.querySelectorAll('[data-department]').forEach((c)=>{
         const go=()=>navigateDepartment(c.dataset.department);
@@ -736,6 +736,14 @@
     function navigateRoot(){history.pushState({},'', '/bl');finishNavigation();}
     function navigateDepartment(dep){history.pushState({},'', '/bl/'+deptToSlug[dep]);finishNavigation();}
     function navigateDisease(g){history.pushState({},'', '/bl/'+deptToSlug[currentDept]+'/'+encodeURIComponent(g));finishNavigation();}
+    function applyRouteSearch(){
+      if(!location.search)return;
+      const query=new URLSearchParams(location.search).get('q')?.trim();
+      if(!query)return;
+      state.q=query;
+      document.getElementById('searchInput').value=query;
+      render();
+    }
     async function applyRoute(){
       const generation=++routeGeneration;
       document.getElementById('templateGrid').classList.remove('search-results','case-search-results');
@@ -743,7 +751,7 @@
       const title=r.page==='home'?'哈基米工作站':r.page==='duty'?'值班资料':r.page==='departments'?'病历模板库':(r.disease?labelFor(r.disease)+' · 完整病历':(r.department||'')+'病历模板库');
       document.title=title==='哈基米工作站'?title:title+' · 哈基米工作站';
       if(r.page==='home'||r.page==='duty')return;
-      if(r.page==='departments'){renderDepartmentRoot();return;}
+      if(r.page==='departments'){renderDepartmentRoot();applyRouteSearch();return;}
       if(window.HAJIMI&&r.department){
         const grid=document.getElementById('templateGrid');grid.innerHTML='<p class="library-loading" role="status">正在加载病历资料…</p>';
         try{
@@ -759,7 +767,7 @@
       currentDept=r.department||null;if(!currentDept){renderDepartmentRoot();return;}
       resetState();
       if(r.disease&&allDisease(currentDept).includes(r.disease)){state.group=r.disease;renderDisease();}
-      else renderDepartmentIndex();
+      else{renderDepartmentIndex();applyRouteSearch();}
     }
 
     function renderSearchResults(department){
@@ -843,7 +851,11 @@
       renderSearchResults(currentDept);
     };
 
-    const reset=document.getElementById('resetFilters');if(reset)reset.onclick=()=>{resetState();render();};
+    const reset=document.getElementById('resetFilters');if(reset)reset.onclick=()=>{
+      resetState();
+      if(location.search){const url=new URL(location.href);url.searchParams.delete('q');history.replaceState(history.state||{},'',url.pathname+url.search+url.hash);}
+      render();
+    };
 
     // Rebuild the orthopedic drawer after all expansion scripts have loaded.
     // app.js renders the original trauma-only sidebar before later disease batches exist.
