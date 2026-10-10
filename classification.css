@@ -117,8 +117,31 @@ body.class-page{margin:0;background:var(--cl-bg);color:var(--cl-ink);font-family
 .class-classification-refs div{padding:6px 0}
 .class-classification-refs a{color:#1d66b4;text-decoration:none;font-size:12px;font-weight:700}
 .class-classification-refs a:hover{text-decoration:underline}
+.class-type-detailed{scroll-margin-top:90px}
+.class-type-permalink{margin-left:auto;color:#346aa3;padding:7px;text-decoration:none}
+.class-type-treatment{margin-top:12px;padding-top:10px;border-top:1px dashed #c8d8e8}
+.class-type-treatment .class-type-part strong{color:#255c8a}
+.class-type-citation{display:inline-block;color:#1d66b4;font-size:12px;margin-top:8px}
+.class-type-navigation{margin:17px 0}
+.class-type-navigation>strong{font-size:13px;color:#324f6d}
+.class-type-navigation>div{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.class-type-navigation a{padding:8px 10px;border:1px solid #d3e1ee;background:#f5f9fd;border-radius:7px;color:#245a91;font-size:12px;text-decoration:none;overflow-wrap:anywhere}
+.class-comparison{margin:16px 0 22px;border:1px solid #d9e4ee;border-radius:10px;overflow:hidden}
+.class-comparison summary{cursor:pointer;padding:13px 16px;font-size:14px;font-weight:700;color:#254f78;background:#f3f7fc}
+.class-table-scroll{overflow-x:auto;max-width:100%;padding:0 12px 12px}
+.class-comparison table{width:100%;min-width:570px;border-collapse:collapse;font-size:13px;line-height:1.8;text-align:left}
+.class-comparison caption{text-align:left;padding:13px 0;color:#4b6683}
+.class-comparison th,.class-comparison td{padding:11px 12px;border:1px solid #dce5ee;vertical-align:top}
+.class-comparison th{background:#f6f9fc}.class-comparison th:first-child{width:20%}
+.class-comparison a{color:#1d66b4}
+.class-treatment-sources{scroll-margin-top:85px;margin-top:20px;border-top:1px solid #dce6ef;padding-top:16px;line-height:1.9;font-size:13px;color:#425b72}
+.class-treatment-sources h4{font-size:17px;margin:0 0 10px;color:#253d57}
+.class-treatment-sources a{color:#1d66b4}
+.class-treatment-sources small{color:#6b7f92}
+.class-treatment-missing{padding:12px;border:1px dashed #cbd6e1;font-size:13px}
+@media print{.class-type-navigation,.class-type-permalink,.class-type-citation,.class-comparison{display:none!important}.class-type-detailed{break-inside:avoid}.class-content-section{break-inside:auto}}
 @media(max-width:750px){
  .class-type-detailed{padding:15px}
  .class-clinical-guide{padding:15px}
- .class-type-detailed .class-type-part p{font-size:12px}
+ .class-type-detailed .class-type-part p{font-size:14px;line-height:1.9}
 }

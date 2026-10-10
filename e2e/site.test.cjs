@@ -118,7 +118,10 @@ test('every original orthopedic disease now explains fracture-line morphology an
      throw new Error('incorrect detail count for '+id+' ('+actual+' instead of '+n+') '+page.url()+'; page='+body.slice(0,400)+'; errors='+errors.join(' // '));
    }
    assert.match(await page.locator('#class-types').innerText(),new RegExp(feature),'missing fracture morphology for '+id);
-   assert.equal(await page.getByText(code,{exact:true}).count(),1,'missing expected subtype '+code);
+   assert.equal(await cards.getByRole('heading',{name:code,exact:true}).count(),1,'missing expected subtype '+code);
+   assert.equal(await cards.locator('.class-type-treatment').count(),n,'every subtype needs treatment '+id);
+   assert.equal(await page.locator('.class-type-navigation a').count(),n,'every subtype needs a jump link '+id);
+   assert.equal(await page.locator('.class-treatment-sources').count(),1,'missing treatment scope '+id);
    assert((await page.locator('.class-differentials li').count())>=2,'missing adjacent-type comparisons for '+id);
    assert((await page.locator('.class-classification-refs a').count())>=1,'missing authoritative classification reference for '+id);
    assert.equal(await page.locator('img').count(),0,'do not embed candidate x-rays without image permission');
@@ -127,6 +130,36 @@ test('every original orthopedic disease now explains fracture-line morphology an
   }
   assert.deepEqual(errors,[]);
  }finally{await context.close();}
+});
+
+test('classification subtype search, comparison table and deep anchors work on phones and desktop',async()=>{
+ for(const width of [320,375,1440]){
+  const {page,context,errors}=await pageFor(width);
+  try{
+   await page.goto(base+'/classification/guke?q=Hoffa',{waitUntil:'networkidle'});
+   assert.equal(await page.locator('.class-disease-card:not([hidden])').count(),1);
+   assert.match(await page.locator('.class-disease-card:not([hidden])').innerText(),/股骨远端/);
+   await page.locator('#diseaseFilter').fill('Garden IV');
+   assert.equal(await page.locator('.class-disease-card:not([hidden])').count(),1,'ASCII roman numerals match the displayed Unicode subtype');
+   await page.locator('.class-disease-card:not([hidden])').click();
+   await page.locator('.class-type-navigation a').last().click();
+   assert.equal(new URL(page.url()).hash,'#type-4');
+   assert.equal(await page.evaluate(()=>document.activeElement.id),'type-4');
+   await page.reload({waitUntil:'networkidle'});
+   assert.equal(await page.evaluate(()=>document.activeElement.id),'type-4','refresh restores deep anchor focus');
+   await page.locator('.class-comparison summary').click();
+   assert.equal(await page.locator('.class-comparison tbody tr').count(),4);
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2),false,'open table must not widen the page');
+   const type=page.locator('#type-4');
+   assert.match(await type.innerText(),/保守条件与处理/);
+   assert.match(await type.innerText(),/手术判断/);
+   assert.match(await type.innerText(),/可选方案/);
+   await type.locator('.class-type-citation').click();
+   assert.equal(new URL(page.url()).hash,'#class-treatment-sources');
+   assert.match(await page.locator('#class-treatment-sources').innerText(),/55岁/);
+   assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+ }
 });
 
 test('homepage search opens shareable clinical results and reset restores department selection',async()=>{

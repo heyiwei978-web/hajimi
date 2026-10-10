@@ -6,6 +6,8 @@ if(!data||!Array.isArray(data.entries)||!app){if(app)app.textContent='分型资�
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const areas=[...new Set(data.entries.map(x=>x.area))];
 const extended=window.HAJIMI_CLASSIFICATION_DETAILS||{};
+const treatments=window.HAJIMI_CLASSIFICATION_TREATMENTS||{};
+const normalize=s=>String(s??'').normalize('NFKC').toLowerCase().replace(/\s+/g,'');
 const groupSize=d=>extended[d.id]?.types?.length||d.types.length;
 const parts=location.pathname.replace(/\/+$/,'').split('/').filter(Boolean);
 const department=parts[1],slug=parts[2],disease=data.entries.find(x=>x.id===slug);
@@ -16,7 +18,6 @@ const root='<a href="/">首页</a><span>›</span><a href="/classification">疾�
 function setCrumbs(extra){crumbs.innerHTML=root+extra;}
 function departments(){
  setCrumbs('');
- const active=data.departments.filter(d=>d.ready).length;
  app.innerHTML='<section class="class-section-head"><span>01 / DEPARTMENTS</span><h2>按科室浏览</h2><p>不同科室分别维护自己的疾病分型与治疗证据。骨科资料已经开始整理，其他科室保留独立位置。</p></section>'+
  '<div class="class-dept-grid">'+data.departments.map((d,i)=>d.ready?
  '<a class="class-dept-card is-ready" href="/classification/'+esc(d.id)+'"><span class="class-dept-index">0'+(i+1)+' · '+esc(d.id.toUpperCase())+'</span><div class="class-dept-symbol">'+esc(d.name.slice(0,1))+'</div><h3>'+esc(d.name)+'</h3><p>'+esc(d.description)+'</p><div class="class-dept-foot"><strong>'+data.entries.length+' 个首批病种</strong><span>进入科室 →</span></div></a>':
@@ -33,28 +34,47 @@ function cards(){
  '<div class="class-layout">'+groupNav()+'<section class="class-main"><label class="class-search-label" for="diseaseFilter">搜索骨科疾病或分型</label><input id="diseaseFilter" class="class-filter" type="search" placeholder="例如：股骨颈 / Schatzker / AO/OTA / Pilon" autocomplete="off">'+
  '<div id="diseaseList">'+areas.map(a=>'<section class="class-area"><div class="class-area-heading"><h3>'+esc(a)+'</h3><span>'+data.entries.filter(d=>d.area===a).length+' 个病种</span></div><div class="class-disease-grid">'+data.entries.filter(d=>d.area===a).map(d=>'<a class="class-disease-card" href="/classification/guke/'+esc(d.id)+'"><small>'+esc(d.system)+'</small><h4>'+esc(d.name)+' <span>↗</span></h4><p>'+groupSize(d)+' 条分型／亚型 · '+d.figures.length+' 组文献图源</p><b>查看分型及指征 →</b></a>').join('')+'</div></section>').join('')+'</div><p id="filterEmpty" hidden>未找到匹配病种，请更换关键词。</p></section></div>';
  const field=document.getElementById('diseaseFilter');const sections=[...document.querySelectorAll('.class-area')];
- const run=()=>{let shown=0;const q=field.value.trim().toLowerCase();for(const section of sections){let n=0;for(const el of section.querySelectorAll('.class-disease-card')){const visible=!q||el.textContent.toLowerCase().includes(q);el.hidden=!visible;n+=Number(visible);}section.hidden=n===0;shown+=n;}document.getElementById('filterEmpty').hidden=shown>0;};
+ const searchIndex=data.entries.map(d=>normalize([d.name,d.system,d.area,...(extended[d.id]?.types||[]).flat()].join(' ')));
+ const cardIndex=new Map([...document.querySelectorAll('.class-disease-card')].map(el=>[el,data.entries.findIndex(d=>el.getAttribute('href')==='/classification/guke/'+d.id)]));
+ const run=()=>{let shown=0;const q=normalize(field.value.trim());for(const section of sections){let n=0;for(const el of section.querySelectorAll('.class-disease-card')){const visible=!q||searchIndex[cardIndex.get(el)].includes(q);el.hidden=!visible;n+=Number(visible);}section.hidden=n===0;shown+=n;}document.getElementById('filterEmpty').hidden=shown>0;};
  field.addEventListener('input',run);
  const q=new URLSearchParams(location.search).get('q');if(q){field.value=q;run();}
 }
 function details(d){
  setCrumbs('<span>›</span><a href="/classification/guke">骨科</a><span>›</span><span>'+esc(d.name)+'</span>');
- const x=extended[d.id];
- const rows=x?.types?.length ? x.types.map((t,i)=>'<article class="class-type class-type-detailed"><div class="class-type-head"><span class="class-type-no">'+String(i+1).padStart(2,'0')+'</span><h4>'+esc(t[0])+'</h4></div><div class="class-type-part"><strong>骨折线与形态</strong><p>'+esc(t[1])+'</p></div><div class="class-type-part"><strong>与相邻分型的关键区别</strong><p>'+esc(t[2])+'</p></div><div class="class-type-part"><strong>影像检查</strong><p>'+esc(t[3])+'</p></div></article>').join('')
+ const x=extended[d.id],tx=treatments[d.id];
+ document.title=d.name+'分型与治疗要点｜哈基米工作站';
+ const treatmentFor=code=>{
+  const t=tx?.types?.[code];
+  if(!t)return '<div class="class-treatment-missing">本型治疗要点尚待整理，请结合本病种总述与原始资料判断。</div>';
+  return '<div class="class-type-treatment">'+[['保守条件与处理',t.conservative],['手术判断',t.operative],['可选方案',t.plan]].map(([title,body])=>'<div class="class-type-part"><strong>'+esc(title)+'</strong><p>'+esc(body)+'</p></div>').join('')+'<a class="class-type-citation" href="#class-treatment-sources">查看治疗资料与适用范围 ↓</a></div>';
+ };
+ const rows=x?.types?.length ? x.types.map((t,i)=>'<article id="type-'+(i+1)+'" class="class-type class-type-detailed" tabindex="-1"><div class="class-type-head"><span class="class-type-no">'+String(i+1).padStart(2,'0')+'</span><h4>'+esc(t[0])+'</h4><a class="class-type-permalink" href="#type-'+(i+1)+'" aria-label="定位到'+esc(t[0])+'">#</a></div><div class="class-type-part"><strong>定义：骨折线与形态</strong><p>'+esc(t[1])+'</p></div><div class="class-type-part"><strong>与相邻分型的关键区别</strong><p>'+esc(t[2])+'</p></div><div class="class-type-part"><strong>影像识别与检查要点</strong><p>'+esc(t[3])+'</p></div>'+treatmentFor(t[0])+'</article>').join('')
  : d.types.map((t,i)=>'<article class="class-type"><span class="class-type-no">'+String(i+1).padStart(2,'0')+'</span><h4>'+esc(t.code)+'</h4><p>'+esc(t.feature)+'</p></article>').join('');
  const clinicalGuide=x?'<div class="class-clinical-guide"><span>采用的分型标准</span><p>'+esc(x.standard)+'</p><span>逐片判读顺序</span><p>'+esc(x.guide)+'</p></div>':'';
  const distinctions=x?.compare?.length?'<div class="class-differentials"><h4>相邻分型快速鉴别</h4><ol>'+x.compare.map(c=>'<li>'+esc(c)+'</li>').join('')+'</ol></div>':'';
  const morphologySources=x?.sources?.length?'<div class="class-classification-refs"><h4>分型标准与影像判读原始资料</h4>'+x.sources.map(src=>'<div>'+link(src[1],src[0])+'</div>').join('')+'</div>':'';
+ const typeNavigation=x?.types?.length?'<nav class="class-type-navigation" aria-label="本病种分型定位"><strong>快速定位分型</strong><div>'+x.types.map((t,i)=>'<a href="#type-'+(i+1)+'">'+esc(t[0])+'</a>').join('')+'</div></nav>':'';
+ const comparison=x?.types?.length?'<details class="class-comparison"><summary>打开分型对照表（'+x.types.length+' 条）</summary><div class="class-table-scroll" role="region" aria-label="分型对照表，可横向滚动" tabindex="0"><table><caption>'+esc(d.name)+'：形态与区别对照</caption><thead><tr><th scope="col">分型</th><th scope="col">定义与形态</th><th scope="col">区别</th></tr></thead><tbody>'+x.types.map((t,i)=>'<tr><th scope="row"><a href="#type-'+(i+1)+'">'+esc(t[0])+'</a></th><td>'+esc(t[1])+'</td><td>'+esc(t[2])+'</td></tr>').join('')+'</tbody></table></div></details>':'';
+ const treatmentSources=tx?'<div id="class-treatment-sources" class="class-treatment-sources"><h4>逐型治疗资料与适用范围</h4><p><strong>资料层级：</strong>逐型内容为结合分型形态、指南与AO技术参考的临床整理；共享治疗原则并不表示每个亚型均有独立指南推荐。具体术式属于可选方案。</p><p><strong>适用范围：</strong>'+esc(tx.scope)+'</p><p><strong>随访与康复：</strong>'+esc(tx.followUp)+'</p><div>'+tx.sources.map(src=>'<p>'+link(src[1],src[0])+'</p>').join('')+'</div><small>本次资料核查：'+esc(tx.updated)+' · 完整影像图示与部分官方细码继续待补充</small></div>':'';
 
  const figures=d.figures.map((f,i)=>'<article class="class-figure"><div class="class-figure-icon" aria-hidden="true">DR<span>→</span></div><div><span class="class-figure-meta">外部医学文献图源 '+String(i+1).padStart(2,'0')+'</span><h4>'+esc(f.fig)+'</h4><p>'+esc(f.match)+'</p><p class="class-figure-status">'+esc(f.status)+'</p>'+link(f.url,'打开原始文献与Figure')+'</div></article>').join('');
  const refs=Array.isArray(d.evidence)&&d.evidence.length?d.evidence.map((e,i)=>'<article class="class-evidence"><span class="class-ev-num">依据 '+String(i+1).padStart(2,'0')+'</span><h4>'+esc(e.name)+'</h4><p>'+esc(e.claim)+'</p><div class="class-evidence-scope"><b>适用与限制：</b>'+esc(e.scope)+'</div><span class="class-evidence-grade">'+esc(e.level)+'</span><div>'+link(e.url,'查阅原始指南／综述')+'</div></article>').join(''):'<div class="class-pending"><strong>逐条指南依据尚待审核</strong><p>现有内容为文献图源整理与临床决策要点，不把分型综述误当成正式手术指征指南。本病种尚未核准逐亚型的推荐级别与强制阈值。</p></div>';
- app.innerHTML='<div class="class-dept-title"><div><span>ORTHOPAEDICS / '+esc(d.area)+'</span><h2>'+esc(d.name)+'</h2><p>'+esc(d.system)+' · 详细分型核校版</p></div><a href="/classification/guke">返回骨科列表 ↑</a></div>'+
+ app.innerHTML='<div class="class-dept-title"><div><span>ORTHOPAEDICS / '+esc(d.area)+'</span><h2>'+esc(d.name)+'</h2><p>'+esc(d.system)+' · 逐型定义、影像与治疗要点</p></div><a href="/classification/guke">返回骨科列表 ↑</a></div>'+
  '<div class="class-layout">'+groupNav()+'<article class="class-main class-detail"><section class="class-detail-intro"><span class="class-dossier-kicker">DISEASE CLASSIFICATION</span><h3>'+esc(d.name)+'</h3><p>现有主要分型：'+esc(d.system)+'</p><div class="class-detail-links"><a href="#class-types">分型特点</a><a href="#class-images">真实影像来源</a><a href="#class-indications">治疗与手术指征</a><a href="#class-sources">证据依据</a></div></section>'+
- '<section id="class-types" class="class-content-section"><div class="class-section-label">01 / CLASSIFICATION</div><h3>详细分型与相邻类型的鉴别</h3><p class="class-section-sub">按骨折线位置、关节面受累、骨块移位与稳定性等特征展开。AO/OTA相关条目注明2018版本；有些亚型按组汇总，不能视为所有官方细码已逐个配图。</p>'+clinicalGuide+'<div class="class-type-grid '+(x?'class-type-grid-detailed':'')+'">'+rows+'</div>'+distinctions+morphologySources+'</section>'+
+ '<section id="class-types" class="class-content-section"><div class="class-section-label">01 / CLASSIFICATION</div><h3>详细分型与相邻类型的鉴别</h3><p class="class-section-sub">每型依次列出定义、影像识别、区别及治疗考虑。AO/OTA相关条目注明2018版本；部分亚型按组汇总，完整细码和逐型图示仍待补充。</p>'+clinicalGuide+typeNavigation+comparison+'<div class="class-type-grid '+(x?'class-type-grid-detailed':'')+'">'+rows+'</div>'+distinctions+morphologySources+'</section>'+
  '<section id="class-images" class="class-content-section"><div class="class-section-label">02 / SOURCE RADIOGRAPHS</div><h3>真实术前影像资料</h3><p class="class-section-sub">适合影像检查：'+esc(d.imaging)+'。下列均为原文链接；本页不擅自转载患者影像。打开原图时须注意图注中哪些是术前DR、哪些是CT或术后片。</p><div class="class-figure-list">'+figures+'</div></section>'+
- '<section id="class-indications" class="class-content-section"><div class="class-section-label">03 / TREATMENT DECISIONS</div><h3>保守治疗与手术指征</h3><div class="class-decision"><span>临床判断与适用范围</span><p>'+esc(d.decision)+'</p></div><p class="class-asterisk">分型标签只是治疗决策的一部分。必须结合影像的实际移位/稳定性、患者年龄、合并伤、软组织条件、功能需要和麻醉风险。</p></section>'+
+ '<section id="class-indications" class="class-content-section"><div class="class-section-label">03 / TREATMENT DECISIONS</div><h3>保守治疗与手术指征</h3><div class="class-decision"><span>本病种总体判断（逐型要点见各分型卡片）</span><p>'+esc(d.decision)+'</p></div><p class="class-asterisk">分型标签只是治疗决策的一部分。必须结合影像的实际移位/稳定性、患者年龄、合并伤、软组织条件、功能需要和麻醉风险。</p>'+treatmentSources+'</section>'+
  '<section id="class-sources" class="class-content-section"><div class="class-section-label">04 / EVIDENCE</div><h3>手术指征对应依据</h3>'+refs+'</section>'+
  '<div class="class-more"><a href="/bl/guke/'+encodeURIComponent(d.name)+'">查找对应病历模板 ↗</a><a href="/classification/guke">骨科所有病种 →</a></div></article></div>';
+ const jump=hash=>{
+  if(!/^#type-\d+$/.test(hash))return;
+  const target=document.getElementById(hash.slice(1));
+  if(target){target.focus({preventScroll:true});target.scrollIntoView({block:'start'});}
+ };
+ app.addEventListener('click',event=>{const a=event.target.closest('a[href^="#type-"]');if(a)jump(a.getAttribute('href'));});
+ window.addEventListener('hashchange',()=>jump(location.hash));
+ if(location.hash)requestAnimationFrame(()=>jump(location.hash));
 }
 if(!department)departments();
 else if(department==='guke'){if(!slug)cards();else if(disease)details(disease);else{setCrumbs('<span>›</span><a href="/classification/guke">骨科</a>');app.innerHTML='<section class="class-error"><h2>未找到对应的疾病分型</h2><p>请回到骨科目录选择现有病种。</p><a href="/classification/guke">返回骨科</a></section>';}}
