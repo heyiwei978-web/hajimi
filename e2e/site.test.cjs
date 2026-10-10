@@ -53,8 +53,38 @@ test('homepage is usable without JavaScript and avoids loading clinical data', a
   try {await page.goto(base+'/');assert(await page.locator('#portalHome').isVisible());
     assert.equal(await page.getByRole('link',{name:'病历模板',exact:true}).count(),1);
     assert.equal(await page.locator('script[src*="app.js"],script[src*="record-quality"],#libraryShell').count(),0);
-    assert.equal(await page.locator('.official-feature').count(),4);
+    assert.equal(await page.locator('.official-feature').count(),5);
+    assert.equal(await page.locator('a.card-classification[href="/classification"]').count(),1);
   } finally {await context.close();}
+});
+
+test('classification is a separate department-first hub with 17 orthopedic dossiers, references, and deep links',async()=>{
+ for(const width of [375,1440]){
+  const {page,context,errors}=await pageFor(width);
+  try{
+    await page.goto(base+'/classification',{waitUntil:'networkidle'});
+    assert.equal(await page.locator('.class-dept-card').count(),4);
+    assert.equal(await page.locator('a.class-dept-card[href="/classification/guke"]').count(),1);
+    assert.equal(await page.locator('.class-dept-card.is-pending').count(),3);
+    assert.equal(await page.locator('.class-disease-card').count(),0,'root must first select a department');
+    await page.locator('a.class-dept-card[href="/classification/guke"]').click();
+    await page.waitForURL(/\/classification\/guke$/);
+    assert.equal(await page.locator('.class-disease-card').count(),17);
+    assert.equal(await page.locator('.class-area').count(),5);
+    await page.locator('#diseaseFilter').fill('Schatzker');
+    assert.equal(await page.locator('.class-disease-card:not([hidden])').count(),1);
+    await page.locator('#diseaseFilter').fill('');
+    await page.locator('a.class-disease-card[href="/classification/guke/femoral-neck"]').click();
+    await page.waitForURL(/femoral-neck$/);
+    assert.equal(await page.locator('.class-type').count(),4);
+    assert.match(await page.locator('#class-images').innerText(),/Figure 1a/);
+    assert.match(await page.locator('#class-sources').innerText(),/AAOS/);
+    assert.equal(await page.locator('img').count(),0,'unlicensed clinical radiographs must not be embedded');
+    await page.goto(base+'/classification/shennei',{waitUntil:'networkidle'});
+    assert.match(await page.locator('.class-error').innerText(),/待建设/);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+ }
 });
 
 test('homepage search opens shareable clinical results and reset restores department selection',async()=>{

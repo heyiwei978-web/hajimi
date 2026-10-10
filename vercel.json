@@ -13,6 +13,18 @@
       "destination": "/admin.html"
     },
     {
+      "source": "/classification",
+      "destination": "/classification.html"
+    },
+    {
+      "source": "/classification/",
+      "destination": "/classification.html"
+    },
+    {
+      "source": "/classification/:path*",
+      "destination": "/classification.html"
+    },
+    {
       "source": "/pathway",
       "destination": "/pathway.html"
     },
@@ -48,7 +60,12 @@
   "headers": [
     {
       "source": "/records-(.*).json",
-      "headers": [{"key":"Cache-Control","value":"public, max-age=31536000, immutable"}]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     },
     {
       "source": "/(.*).css",
