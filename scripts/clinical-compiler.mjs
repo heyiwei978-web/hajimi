@@ -17,7 +17,7 @@ export function loadClinicalSource(html){
     addEventListener(){},dispatchEvent(){},scrollTo(){},console:{log(){},warn(){},error(...items){errors.push(items.map(String).join(' '));}}};
   context.window=context;
   vm.createContext(context);
-  const files=[...html.matchAll(/<script\s+[^>]*?src="\/([^?"]+)(?:\?[^"]*)?"/g)].map(match=>match[1]).filter(file=>!['cms-core.js','workspace.js','library-personal.js','image-upload.js'].includes(file));
+  const files=[...html.matchAll(/<script\s+[^>]*?src="\/([^?"]+)(?:\?[^"]*)?"/g)].map(match=>match[1]).filter(file=>!['cms-core.js','workspace.js','library-personal.js','image-upload.js','library-ui.js'].includes(file));
   for(const file of files)vm.runInContext(fs.readFileSync(new URL(file,root),'utf8'),context,{filename:file,timeout:10000});
   if(errors.length)throw new Error('Clinical build failed: '+errors.join('\n'));
   return JSON.parse(vm.runInContext('JSON.stringify({records:templates,groups,traumaGroups,seeds:window.HAJIMI_IDEAL_CASES.seeds})',context));
@@ -54,7 +54,7 @@ export function compileClinicalSite(html,directory){
   manifest.scripts.app=write('app-runtime','const traumaGroups=window.HAJIMI.manifest.traumaGroups;\nconst groups=window.HAJIMI.manifest.groups;\n'+app.slice(header,start)+'const templates=window.HAJIMI.records;\n'+app.slice(end));
   manifest.scripts.router=write('department-runtime',fs.readFileSync(new URL('departments.js',root),'utf8'));
   const manifestFile=write('library-manifest','window.HAJIMI_MANIFEST='+JSON.stringify(manifest)+';');
-  const scripts=`<script defer src="/search-core.js?v=20261009-quality1"></script>\n<script defer src="/library-personal.js?v=20261009-personal1"></script>\n<script defer src="/image-upload.js?v=20261009-manager1"></script>\n<script defer src="${manifestFile}"></script>\n<script defer src="/library-loader.js?v=20261009-lazy1"></script>\n<script defer src="/workspace.js?v=20261009-layout1"></script>`;
+  const scripts=`<script defer src="/library-ui.js?v=20261011-mvp1"></script>\n<script defer src="/search-core.js?v=20261011-mvp1"></script>\n<script defer src="/library-personal.js?v=20261009-personal1"></script>\n<script defer src="/image-upload.js?v=20261009-manager1"></script>\n<script defer src="${manifestFile}"></script>\n<script defer src="/library-loader.js?v=20261009-lazy1"></script>\n<script defer src="/workspace.js?v=20261009-layout1"></script>`;
   const runtimeHtml=html.replace(/<script\b[^>]*src="\/[^"]+"[^>]*><\/script>\s*/g,'').replace('</body>',scripts+'\n</body>');
   fs.writeFileSync(new URL('library.html',directory),runtimeHtml);
   return {source,manifest};

@@ -269,6 +269,103 @@ test('department browsing loads only its catalog; record bodies arrive on demand
   }finally{await context.close();}
 });
 
+test('search previews show actual matching document names and highlight terms without fetching bodies',async()=>{
+  for(const width of [320,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      const requests=[];page.on('request',request=>requests.push(new URL(request.url()).pathname));
+      await page.goto(base+'/bl?q='+encodeURIComponent('tka 术后'),{waitUntil:'networkidle'});
+      const card=page.locator('.case-search-card');await card.first().waitFor({state:'visible'});
+      assert.equal(await card.count(),1);
+      assert.equal(await card.locator('.case-search-code .search-hit').innerText(),'TKA');
+      assert((await card.locator('.case-search-matches .search-hit').count())>0);
+      const names=await card.locator('.case-search-matches li b').allTextContents();
+      const expected=await page.evaluate(()=>createHajimiSearch(templates)({group:'all',stage:'all',type:'all',q:'tka 术后'}).slice(0,3).map(t=>t.short||t.name));
+      assert.deepEqual(names,expected);
+      assert.equal(requests.filter(url=>url.startsWith('/records-')).length,0,'search stays metadata-only');
+      assert(await card.evaluate(element=>element.scrollWidth<=element.clientWidth+1&&element.getBoundingClientRect().right<innerWidth));
+      await page.locator('#searchInput').fill('肝脓肿');await page.waitForFunction(()=>document.querySelector('.case-search-card h3')?.textContent==='肝脓肿');
+      assert.equal(await page.locator('.case-search-card h3 .search-hit').innerText(),'肝脓肿');
+      await page.locator('#searchInput').fill('');await page.locator('#stageFilter').selectOption('术中');
+      await page.locator('.case-search-matches').first().waitFor({state:'visible'});
+      assert.equal(await page.locator('.case-search-matches h4').first().innerText(),'符合筛选的文书');
+      assert.equal(await page.locator('.case-search-card .search-hit').count(),0,'clearing the query clears highlighting');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('reading sizes update directory and preview, persist and leave copied and printed records unchanged',async()=>{
+  for(const width of [320,375,768,1440]){
+    const {page,context,errors}=await pageFor(width,{isMobile:width<=375,hasTouch:width<=375});
+    try{
+      await context.addInitScript(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.copiedClinicalText=text;}}}));
+      await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});
+      const current=page.locator('#caseWorkspace .case-active'),body=current.locator('.record-book-body');
+      const original=await body.textContent();
+      const controls=page.locator('#recordBookToc .reading-font-controls');
+      for(const size of [18,20,22]){
+        await controls.locator('[data-reading-font="'+size+'"]').click();
+        assert.equal(await body.evaluate(element=>getComputedStyle(element).fontSize),size+'px');
+        assert.equal(await page.locator('.case-nav-item b').first().evaluate(element=>getComputedStyle(element).fontSize),size+'px');
+        assert.equal(await controls.locator('[aria-pressed="true"]').count(),1);
+        assert.equal(await body.textContent(),original);
+      }
+      const selected=page.locator('.case-nav-item[aria-current="location"]');
+      assert(await selected.locator('.case-nav-current-label').isVisible(),'current selection has a text marker');
+      await current.locator('.copy').click();assert.equal(await page.evaluate(()=>window.copiedClinicalText),original);
+      await current.locator('.preview').click();
+      assert.equal(await page.locator('#previewContent').evaluate(element=>getComputedStyle(element).fontSize),'22px');
+      await page.locator('#copyPreview').click();assert.equal(await page.evaluate(()=>window.copiedClinicalText),original);
+      assert(await page.locator('#previewDialog').evaluate(dialog=>dialog.scrollWidth<=dialog.clientWidth+1));
+      await page.emulateMedia({media:'print'});
+      assert.equal(await page.locator('#previewContent').evaluate(element=>getComputedStyle(element).fontSize),'16px');
+      assert.equal(await page.locator('#previewDialog .reading-font-slot').isVisible(),false);
+      await page.emulateMedia({media:'screen'});await page.locator('#closePreview').click();
+      await page.emulateMedia({media:'print'});
+      assert.equal(await body.evaluate(element=>getComputedStyle(element).fontSize),'16px');
+      assert.equal(await controls.isVisible(),false);
+      await page.emulateMedia({media:'screen'});
+      await page.reload({waitUntil:'networkidle'});
+      assert.equal(await controls.locator('[data-reading-font="22"]').getAttribute('aria-pressed'),'true');
+      assert.equal(await body.evaluate(element=>getComputedStyle(element).fontSize),'22px');
+      assert.equal(await page.evaluate(()=>localStorage.getItem('hajimi-library-font-v1')),'22');
+      assert(await page.locator('#caseWorkspace').evaluate(element=>element.scrollWidth<=element.clientWidth+1));
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('reading preferences synchronize between tabs and remain usable with invalid or blocked storage',async()=>{
+  const {page,context,errors}=await pageFor(375);
+  try{
+    await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});
+    await page.evaluate(()=>localStorage.setItem('hajimi-library-font-v1','999; color:red'));
+    await page.reload({waitUntil:'networkidle'});
+    assert.equal(await page.locator('#recordBookToc [data-reading-font="18"]').getAttribute('aria-pressed'),'true');
+    const other=await context.newPage();await other.goto(base+'/bl/puwai/'+encodeURIComponent('肝脓肿'),{waitUntil:'networkidle'});
+    await other.locator('#recordBookToc [data-reading-font="20"]').click();
+    await page.waitForFunction(()=>document.querySelector('#recordBookToc [data-reading-font="20"]').getAttribute('aria-pressed')==='true');
+    await other.locator('.record-book-section.case-active .preview').click();
+    assert.equal(await other.locator('#previewContent').evaluate(element=>getComputedStyle(element).fontSize),'20px');
+    await other.locator('#previewDialog [data-reading-font="22"]').click();
+    await page.waitForFunction(()=>document.querySelector('#recordBookToc [data-reading-font="22"]').getAttribute('aria-pressed')==='true');
+    await other.evaluate(()=>localStorage.removeItem('hajimi-library-font-v1'));
+    await page.waitForFunction(()=>document.querySelector('#recordBookToc [data-reading-font="18"]').getAttribute('aria-pressed')==='true');
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+  const blocked=await pageFor(320);
+  try{
+    await blocked.context.addInitScript(()=>{Storage.prototype.getItem=function(){throw new DOMException('Blocked','SecurityError');};Storage.prototype.setItem=function(){throw new DOMException('Blocked','SecurityError');};});
+    await blocked.page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});
+    await blocked.page.locator('#recordBookToc [data-reading-font="22"]').click();
+    assert.equal(await blocked.page.locator('.case-active .record-book-body').evaluate(element=>getComputedStyle(element).fontSize),'22px');
+    assert.equal(await blocked.page.locator('#recordBookToc .reading-font-note').innerText(),'仅本页生效');
+    assert(await blocked.page.locator('#recordBookToc .reading-font-note').isVisible());
+    assert.deepEqual(blocked.errors,[]);
+  }finally{await blocked.context.close();}
+});
+
 test('a slow earlier disease request cannot replace the newer selection',async()=>{
   const {page,context,errors}=await pageFor(1440);
   try{

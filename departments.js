@@ -539,13 +539,13 @@
         return '<div class="case-nav-family"><h4>'+familyLabels[family]+'</h4>'+groups.map(function(section){
           const items=section.members.map(function(m){
             const id=recordBookId(m.t,m.i);
-            return '<a href="#'+id+'" class="case-nav-item" data-case-record="'+id+'"><span>'+String(m.i+1).padStart(2,'0')+'</span><b>'+escapeHtml(m.t.short||m.t.name)+'</b></a>';
+            return '<a href="#'+id+'" class="case-nav-item" data-case-record="'+id+'"><span>'+String(m.i+1).padStart(2,'0')+'</span><b>'+escapeHtml(m.t.short||m.t.name)+'</b><small class="case-nav-current-label" aria-hidden="true">当前文书</small></a>';
           }).join('');
           return '<details class="case-nav-group" open><summary><span>'+section.title+'</span><small>'+section.members.length+' 篇</small></summary>'+
             (items?'<nav>'+items+'</nav>':'<p class="case-nav-empty">暂无此类文书</p>')+'</details>';
         }).join('')+'</div>';
       }).join('');
-      return '<div class="record-book-toc-head"><span>PATIENT CASE FILE</span><h3>完整病例目录</h3><p>按文书用途归类，点击阅读</p></div>'+nav;
+      return '<div class="record-book-toc-head"><span>PATIENT CASE FILE</span><h3>完整病例目录</h3><p>按文书用途归类，点击阅读</p><div class="reading-font-slot"></div></div>'+nav;
     }
     function bindCaseFileReader(){
       const root=document.getElementById('caseWorkspace');if(!root)return;
@@ -717,6 +717,7 @@
       const printWhole=document.getElementById('printWholeRecord');if(printWhole)printWhole.onclick=()=>window.print();
 
       bindCaseFileReader();
+      window.HAJIMI_UI?.mount();
 
       document.querySelectorAll('.copy-special-case').forEach((btn)=>{
         btn.onclick=()=>{
@@ -778,8 +779,10 @@
       const grouped=new Map();
       matching.forEach(function(t){
         const key=t.department+'\0'+t.group;
-        if(!grouped.has(key))grouped.set(key,{department:t.department,group:t.group,count:0});
-        grouped.get(key).count++;
+        if(!grouped.has(key))grouped.set(key,{department:t.department,group:t.group,count:0,examples:[]});
+        const entry=grouped.get(key);
+        entry.count++;
+        if(entry.examples.length<3&&!entry.examples.some(item=>item.name===t.name&&item.specialCaseKey===t.specialCaseKey))entry.examples.push(t);
       });
       const cases=[...grouped.values()];
       document.body.classList.remove('disease-book-page');
@@ -797,10 +800,22 @@
       let shown=0;
       function renderCard(c){
         const count=recordsForDisease(c.department,c.group).filter(function(x){return !x.specialCase;}).length;
+        const highlight=value=>highlightHajimiSearch(value,state.q);
+        const icon=name=>window.HAJIMI_UI?.icon(name)||'';
+        const terms=state.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+        const examples=c.examples.map(t=>{
+          const desc=String(t.desc||'');
+          const showDesc=terms.some(term=>desc.toLowerCase().includes(term));
+          return '<li>'+icon('file')+'<div><b>'+highlight(t.short||t.name)+'</b><small>'+highlight([t.stage,t.type,t.specialCase?'特殊病例':''].filter(Boolean).join(' · '))+'</small>'+
+            (showDesc?'<span class="case-match-description">'+highlight(desc)+'</span>':'')+'</div></li>';
+        }).join('');
+        const code=labelFor(c.group)!==c.group?'<span class="case-search-code">'+highlight(c.group)+'</span>':'';
         return '<article class="case-search-card" data-case-group="'+encodeURIComponent(c.group)+'" data-case-department="'+encodeURIComponent(c.department)+'" tabindex="0" role="button">'+
-        '<div class="case-search-card-top"><span>完整病例 · '+escapeHtml(c.department)+'</span><span>'+count+' 篇现有文书</span></div>'+
-        '<h3>'+escapeHtml(labelFor(c.group))+'</h3><p>整合入院、术前、手术、术后康复、出院记录以及独立的签字同意与沟通资料。</p>'+
-        '<div class="case-search-card-bottom"><small>搜索匹配 '+c.count+' 篇</small><b>打开完整病历 →</b></div></article>';
+        '<div class="case-search-card-top"><span>完整病例 · '+highlight(c.department)+'</span>'+code+'<span>'+count+' 篇现有文书</span></div>'+
+        '<h3>'+highlight(labelFor(c.group))+'</h3><p>整合入院、术前、手术、术后康复、出院记录以及独立的签字同意与沟通资料。</p>'+
+        '<div class="case-search-matches"><h4>'+(state.q.trim()?'匹配文书':'符合筛选的文书')+'</h4><ul>'+examples+'</ul>'+
+        (c.count>c.examples.length?'<small class="case-match-more">另有 '+(c.count-c.examples.length)+' 篇匹配文书</small>':'')+'</div>'+
+        '<div class="case-search-card-bottom"><small>搜索匹配 '+c.count+' 篇</small><b>打开完整病历 '+icon('next')+'</b></div></article>';
       }
       function append(){
         container.querySelector('.search-more')?.remove();

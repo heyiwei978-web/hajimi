@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
 <link rel="stylesheet" href="/library-personal.css?v=20261009-personal1">
 <link rel="stylesheet" href="/case-workspace-preview.css?v=20261009-reading1">
-<link rel="stylesheet" href="/workspace-design.css?v=20261010-design1">
+<link rel="stylesheet" href="/workspace-design.css?v=20261011-mvp1">
 <link rel="stylesheet" href="/classification-home.css?v=20261010-classification1">
 </head>
 <body>
@@ -208,12 +208,13 @@
 
 <dialog id="previewDialog" class="modal preview-modal" aria-labelledby="previewTitle">
 <div class="modal-head"><div><strong id="previewTitle"></strong><span id="previewMeta"></span></div><button id="closePreview" class="icon-btn" type="button" aria-label="关闭病历预览">×</button></div>
-<div class="preview-tools"><button id="copyPreview" class="btn primary" type="button">复制</button><button id="printPreview" class="btn ghost" type="button">打印</button></div>
+<div class="preview-tools"><button id="copyPreview" class="btn primary" type="button">复制</button><button id="printPreview" class="btn ghost" type="button">打印</button><div class="reading-font-slot"></div></div>
 <div id="previewContent" class="record-paper"></div>
 </dialog>
 
 <div id="toast" class="toast"></div><div id="portalToast" class="portal-toast"></div>
-<script defer src="/search-core.js?v=20261009-quality1"></script>
+<script defer src="/library-ui.js?v=20261011-mvp1"></script>
+<script defer src="/search-core.js?v=20261011-mvp1"></script>
 <script defer src="/library-personal.js?v=20261009-personal1"></script>
 <script defer src="/image-upload.js?v=20261009-manager1"></script>
 <script defer src="/app.js?v=20261009-quality1"></script>
