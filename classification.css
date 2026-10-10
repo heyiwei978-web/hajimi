@@ -94,3 +94,31 @@ body.class-page{margin:0;background:var(--cl-bg);color:var(--cl-ink);font-family
 @media(max-width:750px){.class-shell{width:calc(100% - 24px);padding-top:19px}.class-hero{padding:27px 22px;display:block;min-height:auto}.class-hero-stats{justify-content:flex-start;margin-top:23px}.class-hero-stats div{min-height:76px}.class-hero-stats strong{font-size:24px}.class-layout{display:flex;flex-direction:column}.class-side{position:static;max-height:none;width:100%;display:block}.class-side section{display:none}.class-side-head{padding-bottom:7px;border-bottom:0}.class-side .class-all-link{margin:4px}.class-main{width:100%}.class-disease-grid,.class-type-grid{grid-template-columns:1fr}.class-detail-intro,.class-content-section{padding:20px 18px}.class-dept-title{align-items:flex-start}.class-dept-title h2{font-size:23px}.class-dept-title a{font-size:11px;padding:9px 10px}.class-notice{align-items:flex-start;flex-direction:column;gap:2px}}
 @media(max-width:430px){.class-dept-grid{grid-template-columns:1fr}.class-dept-card{min-height:210px}.class-dept-symbol{margin:15px 0 5px}.class-figure{grid-template-columns:55px 1fr;gap:12px}.class-figure-icon{width:54px;height:64px;font-size:18px}.class-hero h1{font-size:31px}.class-hero p{font-size:12px}.class-footer{flex-wrap:wrap}}
 @media print{.class-topnav,.class-side,.class-notice,.class-detail-links,.class-more,.class-footer{display:none!important}.class-layout{display:block}.class-content-section{break-inside:avoid}}
+
+
+/* Detailed morphology reader: full-width sequence instead of abbreviated two-column chips. */
+.class-type-grid.class-type-grid-detailed{grid-template-columns:minmax(0,1fr);gap:12px}
+.class-type-detailed{display:block;padding:19px 20px;background:#fff;border:1px solid #dfe7ef}
+.class-type-detailed .class-type-head{display:flex;align-items:center;gap:12px;border-bottom:1px solid #e9eff5;padding-bottom:11px;margin-bottom:12px}
+.class-type-detailed .class-type-no{display:grid;place-items:center;flex:none;width:29px;height:29px;border-radius:8px;background:#eaf3ff;color:#2463a5;font-size:10px}
+.class-type-detailed .class-type-head h4{margin:0;font-size:17px;color:#203b5a}
+.class-type-detailed .class-type-part{padding:6px 0}
+.class-type-detailed .class-type-part strong{display:block;color:#426888;font-size:11px;letter-spacing:.015em}
+.class-type-detailed .class-type-part p{margin:4px 0 0;color:#3c4c5f;font-size:13px;line-height:1.86}
+.class-clinical-guide{border:1px solid #d8e5f3;background:linear-gradient(130deg,#f2f7fd,#fff);padding:18px 21px;border-radius:11px;margin-bottom:17px}
+.class-clinical-guide span{display:block;color:#2667a9;font-weight:800;font-size:12px}
+.class-clinical-guide p{margin:6px 0 15px;line-height:1.95;color:#394d66;font-size:13px}
+.class-clinical-guide p:last-child{margin-bottom:0}
+.class-differentials{border-left:3px solid #3872b2;background:#f4f8fc;border-radius:8px;padding:17px 20px;margin-top:18px}
+.class-differentials h4,.class-classification-refs h4{margin:0 0 9px;font-size:16px;color:#253d57}
+.class-differentials ol{margin:0;padding-left:19px}
+.class-differentials li{padding:4px 0;line-height:1.85;font-size:13px;color:#41556a}
+.class-classification-refs{margin-top:18px;border-top:1px solid #e4eaf0;padding-top:16px}
+.class-classification-refs div{padding:6px 0}
+.class-classification-refs a{color:#1d66b4;text-decoration:none;font-size:12px;font-weight:700}
+.class-classification-refs a:hover{text-decoration:underline}
+@media(max-width:750px){
+ .class-type-detailed{padding:15px}
+ .class-clinical-guide{padding:15px}
+ .class-type-detailed .class-type-part p{font-size:12px}
+}
