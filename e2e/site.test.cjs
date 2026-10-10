@@ -87,6 +87,48 @@ test('classification is a separate department-first hub with 17 orthopedic dossi
  }
 });
 
+test('every original orthopedic disease now explains fracture-line morphology and differentiates neighboring types', {timeout:120000}, async()=>{
+ const {page,context,errors}=await pageFor(375);
+ try{
+  const cases=[
+   ['femoral-neck',4,'Garden Ⅲ','骨折端'],
+   ['intertrochanteric',8,'31A2.2','外侧壁'],
+   ['distal-femur',9,'33B3','冠状'],
+   ['tibial-plateau',7,'ⅢB型','皮质'],
+   ['tibial-shaft',7,'42C3','节段'],
+   ['pilon',6,'Rüedi–Allgöwer Ⅲ','粉碎'],
+   ['patella',7,'儿童袖套型','软骨'],
+   ['proximal-humerus',10,'四部分·外翻嵌插变型','内侧'],
+   ['distal-humerus',9,'13C3','关节面'],
+   ['clavicle',11,'Neer ⅡC（扩展型）','韧带'],
+   ['distal-radius',11,'2R3A2.3','掌'],
+   ['scaphoid',10,'Herbert B4','周月骨'],
+   ['ankle',3,'Weber B','联合'],
+   ['calcaneus',10,'Sanders ⅢBC','CT'],
+   ['talus',5,'Hawkins ⅡB（修订）','距下'],
+   ['pelvic-ring',8,'LC Ⅲ','对侧'],
+   ['acetabulum',10,'联合型·双柱','关节']
+  ];
+  for(const [id,n,code,feature] of cases){
+   await page.goto(base+'/classification/guke/'+id,{waitUntil:'domcontentloaded'});
+   const cards=page.locator('.class-type-detailed');
+   const actual=await cards.count();
+   if(actual!==n){
+     const body=await page.locator('#classificationApp').innerText().catch(()=>'app-missing');
+     throw new Error('incorrect detail count for '+id+' ('+actual+' instead of '+n+') '+page.url()+'; page='+body.slice(0,400)+'; errors='+errors.join(' // '));
+   }
+   assert.match(await page.locator('#class-types').innerText(),new RegExp(feature),'missing fracture morphology for '+id);
+   assert.equal(await page.getByText(code,{exact:true}).count(),1,'missing expected subtype '+code);
+   assert((await page.locator('.class-differentials li').count())>=2,'missing adjacent-type comparisons for '+id);
+   assert((await page.locator('.class-classification-refs a').count())>=1,'missing authoritative classification reference for '+id);
+   assert.equal(await page.locator('img').count(),0,'do not embed candidate x-rays without image permission');
+   const spill=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2);
+   assert.equal(spill,false,'mobile horizontal overflow at '+id);
+  }
+  assert.deepEqual(errors,[]);
+ }finally{await context.close();}
+});
+
 test('homepage search opens shareable clinical results and reset restores department selection',async()=>{
   for(const width of [320,375,1440]){
     const {page,context,errors}=await pageFor(width);
