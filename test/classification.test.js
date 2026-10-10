@@ -21,6 +21,9 @@ test('17 orthopedic disease dossiers each have detailed fracture morphology, dif
  assert.equal(new Set(ids).size,17);
  let n=0;
  for(const disease of data.entries){
+   assert.ok(Array.isArray(disease.evidence), disease.id+' must keep evidence separate from imaging text');
+   assert.ok(Array.isArray(disease.figures), disease.id+' must keep source figures as a list');
+   assert.equal(typeof disease.imaging,'string',disease.id+' must have an imaging note');
    const d=details[disease.id];
    assert.ok(d, disease.id+' details missing');
    assert.match(d.standard,/.{12}/u,disease.id+' missing classification version');
