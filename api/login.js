@@ -1,4 +1,4 @@
-import {createSession,sha256,safeEqHex} from './_auth.js';
+import {createSession,verifyPassword} from './_auth.js';
 import {guardRequest} from './_security.js';
 import {checkLoginThrottle,recordLoginFailure,clearLoginFailures} from './_rate-limit.js';
 
@@ -11,7 +11,10 @@ export default async function handler(req,res) {
   }
   const {username, password} = req.body;
   if (typeof username !== 'string' || typeof password !== 'string') return res.status(400).json({error:'用户名和密码格式错误'});
-  if (username !== (process.env.HAJIMI_ADMIN_USER || 'admin') || !safeEqHex(sha256(password), process.env.HAJIMI_ADMIN_PASSWORD_SHA256 || '')) {
+  if (password.length > 1024) return res.status(400).json({error:'用户名和密码格式错误'});
+  // Always run the password check so a wrong username takes as long as a wrong password.
+  const passwordOk = verifyPassword(password);
+  if (username !== (process.env.HAJIMI_ADMIN_USER || 'admin') || !passwordOk) {
     const failed = await recordLoginFailure(req);
     if (failed.blocked) res.setHeader('Retry-After',String(failed.retryAfter));
     return res.status(failed.blocked ? 429 : 401).json({error:failed.blocked ? '登录尝试过于频繁，请稍后再试' : '用户名或密码错误'});

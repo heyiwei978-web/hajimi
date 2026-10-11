@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import test from 'node:test';
-import {createSession,readSession,sha256} from '../api/_auth.js';
+import {createSession,readSession,sha256,hashPassword,verifyPassword} from '../api/_auth.js';
 import {guardRequest} from '../api/_security.js';
 import login from '../api/login.js';
 import logout from '../api/logout.js';
@@ -9,7 +9,7 @@ import session from '../api/session.js';
 import content from '../api/content.js';
 import history from '../api/content-history.js';
 import upload from '../api/upload.js';
-import image from '../api/image.js';
+import image,{createImageHandler} from '../api/image.js';
 
 function response() {
   return {
@@ -143,4 +143,44 @@ test('image paths cannot request other storage files, traversal or SVG content',
   const wrongMethod = response();
   await image(request({method:'POST',query:{path:'cases/a.jpg'}}),wrongMethod);
   assert.equal(wrongMethod.code,405);
+});
+
+function imageFixture(cases) {
+  const reads = {store:0};
+  const store = {async read() { reads.store++; return {data:{templateOverrides:{},cases}}; }};
+  const blob = {async get() {
+    return {statusCode:200,blob:{contentType:'image/png'},stream:new Blob([Buffer.from([137,80,78,71,13,10,26,10])]).stream()};
+  }};
+  return {store,blob,reads};
+}
+
+test('anonymous viewers only get images referenced by a published case', async t => {
+  const fixture = imageFixture([
+    {id:'1',template:'t',images:['cases/public.png']},
+    {id:'2',template:'t',published:false,images:['cases/draft.png']}
+  ]);
+  const handler = createImageHandler(fixture);
+  const ok = response(); await handler(request({method:'GET',query:{path:'cases/public.png'}}),ok);
+  assert.equal(ok.code,200);
+  assert.equal(ok.headers['cache-control'],'private, max-age=600');
+  for (const path of ['cases/draft.png','cases/orphan.png']) {
+    const res = response(); await handler(request({method:'GET',query:{path}}),res); assert.equal(res.code,404);
+  }
+  assert.equal(fixture.reads.store,1,'published image index is cached between requests');
+  const cookie = adminEnvironment(t);
+  const admin = response(); await handler(request({method:'GET',query:{path:'cases/orphan.png'},headers:{cookie}}),admin);
+  assert.equal(admin.code,200);
+  assert.equal(admin.headers['cache-control'],'private, no-store');
+});
+
+test('salted scrypt admin password hash is preferred and legacy SHA-256 still works', () => {
+  const hash = hashPassword('correct horse battery');
+  assert.match(hash,/^scrypt\$[A-Za-z0-9_-]+\$[A-Za-z0-9_-]{43}$/);
+  assert.notEqual(hash,hashPassword('correct horse battery'),'each hash uses a fresh salt');
+  assert.equal(verifyPassword('correct horse battery',{HAJIMI_ADMIN_PASSWORD_HASH:hash}),true);
+  assert.equal(verifyPassword('wrong',{HAJIMI_ADMIN_PASSWORD_HASH:hash}),false);
+  assert.equal(verifyPassword('legacy',{HAJIMI_ADMIN_PASSWORD_HASH:hash,HAJIMI_ADMIN_PASSWORD_SHA256:sha256('legacy')}),false,'new hash replaces the legacy value');
+  assert.equal(verifyPassword('legacy',{HAJIMI_ADMIN_PASSWORD_SHA256:sha256('legacy')}),true);
+  assert.equal(verifyPassword('x',{HAJIMI_ADMIN_PASSWORD_HASH:'garbage'}),false);
+  assert.equal(verifyPassword('',{}),false);
 });
