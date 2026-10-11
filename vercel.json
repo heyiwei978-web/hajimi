@@ -13,6 +13,10 @@
       "destination": "/admin.html"
     },
     {
+      "source": "/admin/password",
+      "destination": "/password-hash.html"
+    },
+    {
       "source": "/ecg",
       "destination": "/ecg.html"
     },

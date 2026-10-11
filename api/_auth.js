@@ -47,7 +47,7 @@ export function safeEqHex(a, b) {
   return crypto.timingSafeEqual(Buffer.from(a, 'hex'), Buffer.from(b, 'hex'));
 }
 // Preferred: HAJIMI_ADMIN_PASSWORD_HASH = "scrypt$<salt>$<hash>" (base64url), made with
-// `node scripts/hash-password.mjs`. A salted, memory-hard hash resists offline guessing if the
+// `node scripts/hash-password.mjs`, or the browser-generated pbkdf2 form below. A salted, memory-hard hash resists offline guessing if the
 // value ever leaks. HAJIMI_ADMIN_PASSWORD_SHA256 is still accepted until it is replaced.
 const SCRYPT_PARAMS = {N: 16384, r: 8, p: 1, maxmem: 64 * 1024 * 1024};
 export function hashPassword(password, salt = crypto.randomBytes(16)) {
@@ -57,11 +57,19 @@ export function hashPassword(password, salt = crypto.randomBytes(16)) {
 export function verifyPassword(password, env = process.env) {
   const stored = env.HAJIMI_ADMIN_PASSWORD_HASH;
   if (typeof stored === 'string' && stored.trim()) {
-    const match = /^scrypt\$([A-Za-z0-9_-]{16,})\$([A-Za-z0-9_-]{43})$/.exec(stored.trim());
-    if (!match) return false;
-    const expected = Buffer.from(match[2], 'base64url');
-    const actual = crypto.scryptSync(String(password), Buffer.from(match[1], 'base64url'), 32, SCRYPT_PARAMS);
-    return crypto.timingSafeEqual(actual, expected);
+    const value = stored.trim();
+    const scrypt = /^scrypt\$([A-Za-z0-9_-]{16,})\$([A-Za-z0-9_-]{43})$/.exec(value);
+    if (scrypt) {
+      const actual = crypto.scryptSync(String(password), Buffer.from(scrypt[1], 'base64url'), 32, SCRYPT_PARAMS);
+      return crypto.timingSafeEqual(actual, Buffer.from(scrypt[2], 'base64url'));
+    }
+    // "pbkdf2$<iterations>$<salt>$<hash>" (PBKDF2-HMAC-SHA256, base64url): can be made in any
+    // browser with Web Crypto, so the password never has to leave the administrator's device.
+    const pbkdf2 = /^pbkdf2\$(\d{6,7})\$([A-Za-z0-9_-]{16,})\$([A-Za-z0-9_-]{43})$/.exec(value);
+    const iterations = pbkdf2 ? Number(pbkdf2[1]) : 0;
+    if (!pbkdf2 || iterations < 310000 || iterations > 2000000) return false;
+    const actual = crypto.pbkdf2Sync(String(password), Buffer.from(pbkdf2[2], 'base64url'), iterations, 32, 'sha256');
+    return crypto.timingSafeEqual(actual, Buffer.from(pbkdf2[3], 'base64url'));
   }
   return safeEqHex(sha256(password), env.HAJIMI_ADMIN_PASSWORD_SHA256 || '');
 }
