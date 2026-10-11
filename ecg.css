@@ -117,3 +117,13 @@ html:has(.ecg-entry-page){scroll-padding-bottom:calc(var(--ecg-footer-height,150
 #ecg-references a{color:#1b66bd;text-decoration-thickness:1px;text-underline-offset:3px;overflow-wrap:anywhere}
 #ecg-references a:visited{color:#4f4a9c}
 #ecg-references li+li{margin-top:8px}
+
+.ecg-risk{display:inline-block;border-radius:7px;padding:3px 8px;font-size:14px;line-height:1.6;font-weight:600;margin-right:8px;border:1px solid}
+.ecg-risk-high{color:#9b1c1c;background:#fdecec;border-color:#f2c1c1}
+.ecg-risk-medium{color:#7a4b00;background:#fff4dc;border-color:#ecd39b}
+.ecg-risk-low{color:#1f5f3a;background:#e8f5ec;border-color:#b9dcc5}
+.ecg-criteria-wrap{overflow-x:auto;margin:8px 0 6px}
+.ecg-criteria{width:100%;border-collapse:collapse;font-size:15px;line-height:1.7}
+.ecg-criteria th,.ecg-criteria td{border:1px solid #dfe6ee;padding:8px 10px;text-align:left;vertical-align:top}
+.ecg-criteria th{background:#f4f7fb;font-weight:600;width:32%;min-width:110px;color:#1f3448}
+@media (max-width:600px){.ecg-criteria th{width:38%}}
