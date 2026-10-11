@@ -83,6 +83,11 @@ test('ECG routes share the public layout, expose learning sections and keep the 
       assert.match(await page.locator('#ecg-normal').innerText(),/120–200 ms/);
       await page.goto(base+'/ecg/periop',{waitUntil:'networkidle'});
       assert.equal(await page.locator('#ecg-scenarios .ecg-card').count(),6);
+      assert(await page.locator('#ecg-abnormal .ecg-abnormal-item').count()>=15);
+      assert(await page.locator('#ecg-anesthesia .ecg-abnormal-item').count()>=8);
+      assert(await page.locator('#ecg-postop li').count()>=5);
+      assert.match(await page.locator('#ecg-injury').innerText(),/肌钙蛋白/);
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'periop tables stay inside the page');
       assert.match(await page.locator('#ecg-oncall').innerText(),/术后胸痛/);
       assert.match(await page.locator('#ecg-oncall').innerText(),/术后气促/);
       assert.match(await page.locator('#ecg-oncall').innerText(),/术后心悸/);
