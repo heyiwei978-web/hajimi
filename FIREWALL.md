@@ -13,7 +13,7 @@
 
 生产登录使用 Vercel 项目的 `HAJIMI_ADMIN_USER`、`HAJIMI_SESSION_SECRET`，以及管理员密码哈希：
 
-- 推荐：`HAJIMI_ADMIN_PASSWORD_HASH`，加盐 scrypt 哈希。在本地运行 `node scripts/hash-password.mjs` 生成（密码至少 12 个字符），填入 Vercel 后重新部署，再删除旧的 `HAJIMI_ADMIN_PASSWORD_SHA256`。
+- 推荐：`HAJIMI_ADMIN_PASSWORD_HASH`，加盐哈希。最简单的方式是打开网站的 `/admin/password` 页面，在浏览器内生成 PBKDF2-SHA256（60 万次迭代）校验码，密码不会离开本机；也可在本地运行 `node scripts/hash-password.mjs` 生成 scrypt 哈希（密码至少 12 个字符）。填入 Vercel 后重新部署，再删除旧的 `HAJIMI_ADMIN_PASSWORD_SHA256`。
 - 兼容：未设置上述变量时，仍使用 `HAJIMI_ADMIN_PASSWORD_SHA256`（无盐 SHA-256，泄露后易被离线破解，建议尽快替换）。
 
 会话密钥应使用至少 32 字节的随机值。会话有效期 7 天，“退出”只清除当前浏览器的 Cookie；如怀疑会话被盗用，更换 `HAJIMI_SESSION_SECRET` 并重新部署，即可让所有已签发会话立即失效。敏感值只在 Vercel Environment Variables 中安全填写，不提交到 GitHub。
