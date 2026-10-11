@@ -6,6 +6,10 @@
   const points=items=>'<ul class="ecg-points">'+items.map(text=>'<li>'+esc(text)+'</li>').join('')+'</ul>';
   const entryUrl=entry=>'/ecg/atlas/'+entry.category+'/'+entry.id;
   const categoryFor=entry=>data.categories.find(category=>category.id===entry.category);
+  const RISK={high:['高风险','ecg-risk-high'],medium:['中等风险','ecg-risk-medium'],low:['低风险','ecg-risk-low']};
+  const riskLabel=entry=>RISK[entry.risk]?RISK[entry.risk][0]:'';
+  const riskBadge=entry=>RISK[entry.risk]?'<span class="ecg-risk '+RISK[entry.risk][1]+'">'+RISK[entry.risk][0]+'</span>':'';
+  const criteriaTable=rows=>Array.isArray(rows)&&rows.length?'<h3>诊断标准</h3><div class="ecg-criteria-wrap"><table class="ecg-criteria"><tbody>'+rows.map(([item,value])=>'<tr><th scope="row">'+esc(item)+'</th><td>'+esc(value)+'</td></tr>').join('')+'</tbody></table></div><p class="ecg-hint">数值为成人常用标准，需结合年龄、性别、导联和临床背景；与本院或最新指南不一致时以后者为准。</p>':'';
   const section=(id,title,content)=>'<section class="class-content-section" id="'+id+'"><h2>'+esc(title)+'</h2>'+content+'</section>';
   const card=(url,title,description,meta='')=>'<a class="class-disease-card ecg-card" href="'+esc(url)+'">'+(meta?'<small>'+esc(meta)+'</small>':'')+'<h3>'+esc(title)+'</h3><p>'+esc(description)+'</p><b>查看 →</b></a>';
   function setPage(title,description,crumbs=[]){
@@ -35,9 +39,9 @@
     setPage(category?category.title:'图谱库',category?category.description:'按类别逐级查阅，或直接搜索疾病名、英文缩写和关键表现。',category?[{title:'图谱库',url:'/ecg/atlas'},{title:category.title}]:[{title:'图谱库'}]);
     const entries=category?data.entries.filter(entry=>entry.category===category.id):data.entries;
     const categories=category?'<nav class="ecg-section-links" aria-label="图谱导航"><a href="/ecg/atlas">← 全部图谱类别</a></nav>':'<section id="ecgCategoryDirectory" aria-labelledby="ecgCategoriesTitle"><h2 id="ecgCategoriesTitle">按类别查阅</h2><div class="ecg-category-grid">'+data.categories.map(item=>{const count=data.entries.filter(entry=>entry.category===item.id).length;return card('/ecg/atlas/'+item.id,item.title,item.description,count?count+' 个词条 · 待审核':'建设中');}).join('')+'</div></section>';
-    app.innerHTML='<section class="ecg-search" aria-label="搜索图谱"><label class="class-search-label" for="ecgSearch">搜索心电图图谱</label><input class="class-filter" id="ecgSearch" type="search" placeholder="例如：房颤、STEMI、文氏、LBBB、低钾、起搏" autocomplete="off"><div class="ecg-search-actions"><span id="ecgSearchCount" role="status" aria-live="polite"></span><button type="button" class="btn" id="ecgClearSearch" hidden>清空搜索</button></div></section>'+categories+'<section aria-labelledby="ecgResultsTitle"><h2 id="ecgResultsTitle">词条</h2><div class="ecg-panel-grid" id="ecgSearchResults">'+entries.map(entry=>'<div data-ecg-entry="'+entry.id+'">'+card(entryUrl(entry),entry.title,entry.basic.summary,categoryFor(entry).title+' · '+entry.reviewStatus)+'</div>').join('')+'</div><p id="ecgSearchEmpty" hidden></p></section>';
+    app.innerHTML='<section class="ecg-search" aria-label="搜索图谱"><label class="class-search-label" for="ecgSearch">搜索心电图图谱</label><input class="class-filter" id="ecgSearch" type="search" placeholder="例如：房颤、STEMI、文氏、LBBB、低钾、起搏" autocomplete="off"><div class="ecg-search-actions"><span id="ecgSearchCount" role="status" aria-live="polite"></span><button type="button" class="btn" id="ecgClearSearch" hidden>清空搜索</button></div></section>'+categories+'<section aria-labelledby="ecgResultsTitle"><h2 id="ecgResultsTitle">词条</h2><div class="ecg-panel-grid" id="ecgSearchResults">'+entries.map(entry=>'<div data-ecg-entry="'+entry.id+'">'+card(entryUrl(entry),entry.title,entry.basic.summary,[categoryFor(entry).title,riskLabel(entry),entry.reviewStatus].filter(Boolean).join(' · '))+'</div>').join('')+'</div><p id="ecgSearchEmpty" hidden></p></section>';
     const field=document.getElementById('ecgSearch'),count=document.getElementById('ecgSearchCount'),empty=document.getElementById('ecgSearchEmpty'),clear=document.getElementById('ecgClearSearch');
-    const index=entries.map((entry,order)=>({id:entry.id,order,key:normalize([entry.title,...entry.aliases].join(' ')),text:normalize([entry.title,categoryFor(entry).title,...entry.aliases,entry.basic.summary,...entry.basic.diagnosticPoints,...entry.basic.differentialPoints,...Object.values(entry.periop)].join(' '))}));
+    const index=entries.map((entry,order)=>({id:entry.id,order,key:normalize([entry.title,...entry.aliases].join(' ')),text:normalize([entry.title,categoryFor(entry).title,...entry.aliases,entry.basic.summary,...entry.basic.diagnosticPoints,...entry.basic.differentialPoints,...(entry.basic.criteria||[]).flat(),...Object.values(entry.periop)].join(' '))}));
     const results=document.getElementById('ecgSearchResults');
     const matches=(text,term)=>/^[a-z0-9]{1,3}$/.test(term)?new RegExp('(^|[^a-z0-9])'+term+'($|[^a-z0-9])').test(text):text.includes(term);
     function run(){
@@ -69,14 +73,18 @@
     const refs=entry.references.filter(reference=>{try{return new URL(reference.url).protocol==='https:';}catch{return false;}});
     return refs.length?'<ol class="ecg-points">'+refs.map(reference=>'<li><a href="'+esc(reference.url)+'" target="_blank" rel="noopener noreferrer">'+esc(reference.title)+' ↗</a></li>').join('')+'</ol>':'<p>待补充：本词条尚未录入经核实的参考文献。</p>';
   }
+  function related(entry){
+    const items=(entry.related||[]).map(id=>data.entries.find(other=>other.id===id)).filter(Boolean);
+    return items.length?section('ecg-related','相关词条','<div class="ecg-panel-grid">'+items.map(other=>card(entryUrl(other),other.title,other.basic.summary,[categoryFor(other).title,riskLabel(other)].filter(Boolean).join(' · '))).join('')+'</div>'):'';
+  }
   function details(entry){
     const category=categoryFor(entry);
     document.body.classList.add('ecg-entry-page');
     setPage(entry.title,entry.basic.summary,[{title:'图谱库',url:'/ecg/atlas'},{title:category.title,url:'/ecg/atlas/'+category.id},{title:entry.title}]);
     document.querySelector('.class-eyebrow').textContent='ECG ATLAS · DRAFT';
-    const basic='<span class="class-section-label">基础层 · 默认展开</span>'+diagram(entry.basic.diagram.kind,entry.basic.diagram.caption)+'<h3>诊断要点</h3>'+points(entry.basic.diagnosticPoints)+'<h3>鉴别点</h3>'+points(entry.basic.differentialPoints);
+    const basic='<span class="class-section-label">基础层 · 默认展开</span>'+diagram(entry.basic.diagram.kind,entry.basic.diagram.caption)+criteriaTable(entry.basic.criteria)+'<h3>诊断要点</h3>'+points(entry.basic.diagnosticPoints)+'<h3>鉴别点</h3>'+points(entry.basic.differentialPoints);
     const periop=[['对手术时机的影响',entry.periop.timing],['麻醉关注点',entry.periop.anesthesia],['术后管理',entry.periop.postoperative],['何时会诊',entry.periop.consultation]].map(([title,text])=>'<section><h3>'+title+'</h3><p>'+esc(text)+'</p></section>').join('');
-    app.innerHTML='<div class="ecg-layer-control"><span class="ecg-status">'+esc(entry.reviewStatus)+' · 草稿</span><button class="btn" id="ecgLayerToggle" type="button" aria-controls="ecgPeriopLayer" aria-expanded="false">展开围手术期层</button></div>'+section('ecg-basic','基础判读',basic)+'<details class="class-content-section ecg-periop" id="ecgPeriopLayer"><summary><h2>围手术期要点<span class="ecg-hint">对手术、麻醉、术后管理及会诊的影响 · 默认折叠</span></h2></summary>'+periop+'</details>'+section('ecg-references','参考文献',references(entry))+'<nav class="ecg-section-links" aria-label="词条导航"><a href="/ecg/atlas/'+category.id+'">返回'+esc(category.title)+'</a><a href="/ecg/periop">围手术期专区</a></nav>';
+    app.innerHTML='<div class="ecg-layer-control">'+riskBadge(entry)+'<span class="ecg-status">'+esc(entry.reviewStatus)+' · 草稿</span><button class="btn" id="ecgLayerToggle" type="button" aria-controls="ecgPeriopLayer" aria-expanded="false">展开围手术期层</button></div>'+section('ecg-basic','基础判读',basic)+'<details class="class-content-section ecg-periop" id="ecgPeriopLayer"><summary><h2>围手术期要点<span class="ecg-hint">对手术、麻醉、术后管理及会诊的影响 · 默认折叠</span></h2></summary>'+periop+'</details>'+related(entry)+section('ecg-references','参考文献',references(entry))+'<nav class="ecg-section-links" aria-label="词条导航"><a href="/ecg/atlas/'+category.id+'">返回'+esc(category.title)+'</a><a href="/ecg/periop">围手术期专区</a></nav>';
     const toggle=document.getElementById('ecgLayerToggle'),layer=document.getElementById('ecgPeriopLayer');
     function sync(){toggle.setAttribute('aria-expanded',String(layer.open));toggle.textContent=layer.open?'收起围手术期层':'展开围手术期层';}
     toggle.addEventListener('click',()=>{layer.open=!layer.open;sync();});
