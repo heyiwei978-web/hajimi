@@ -9,7 +9,14 @@
 - 未配置 `HAJIMI_SESSION_SECRET` 时拒绝验证或签发会话；过期、篡改、格式错误的会话无效。审计 API 也要求管理员身份，避免匿名请求触发大批模板执行。
 - `Content-Security-Policy` 只允许本站脚本及连接；保留页面需要的内联样式和本地图片预览。禁止 iframe 嵌入、对象插件及跨站表单提交。
 
-生产登录仍使用 Vercel 项目已有的 `HAJIMI_ADMIN_USER`、`HAJIMI_ADMIN_PASSWORD_SHA256` 和 `HAJIMI_SESSION_SECRET`。会话密钥应使用至少 32 字节的随机值。敏感值只在 Vercel Environment Variables 中安全填写，不提交到 GitHub。
+- 案例图片 `/api/image` 只向访客提供已发布案例引用的图片；草稿、已删除案例及未关联的上传图片仅管理员可见。图片只允许浏览器私有缓存，取消发布后最长 10 分钟内失效，不进入共享 CDN 缓存。
+
+生产登录使用 Vercel 项目的 `HAJIMI_ADMIN_USER`、`HAJIMI_SESSION_SECRET`，以及管理员密码哈希：
+
+- 推荐：`HAJIMI_ADMIN_PASSWORD_HASH`，加盐 scrypt 哈希。在本地运行 `node scripts/hash-password.mjs` 生成（密码至少 12 个字符），填入 Vercel 后重新部署，再删除旧的 `HAJIMI_ADMIN_PASSWORD_SHA256`。
+- 兼容：未设置上述变量时，仍使用 `HAJIMI_ADMIN_PASSWORD_SHA256`（无盐 SHA-256，泄露后易被离线破解，建议尽快替换）。
+
+会话密钥应使用至少 32 字节的随机值。会话有效期 7 天，“退出”只清除当前浏览器的 Cookie；如怀疑会话被盗用，更换 `HAJIMI_SESSION_SECRET` 并重新部署，即可让所有已签发会话立即失效。敏感值只在 Vercel Environment Variables 中安全填写，不提交到 GitHub。
 
 ## Vercel 边缘防火墙：需要单独启用
 
