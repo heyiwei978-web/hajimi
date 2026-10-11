@@ -37,7 +37,7 @@ test('ECG calculations reject missing, nonpositive and nonfinite input instead o
 test('all ECG atlas drafts keep valid categories, both clinical layers and explicit review metadata',()=>{
   const window=load(),data=window.HAJIMI_ECG_DATA;
   assert.equal(data.schema,1);
-  assert.equal(data.entries.length,24);
+  assert.equal(data.entries.length,30);
   const ids=Array.from(data.entries,entry=>entry.id);
   assert.equal(new Set(ids).size,ids.length,'entry ids are unique');
   for(const id of ['atrial-fibrillation','hyperkalemia','pulmonary-embolism','stemi','complete-heart-block','ventricular-pacing'])assert(ids.includes(id));
@@ -55,6 +55,7 @@ test('all ECG atlas drafts keep valid categories, both clinical layers and expli
     assert(entry.title&&entry.basic.summary&&entry.aliases.length>0);
     for(const field of ['timing','anesthesia','postoperative','consultation'])assert(entry.periop[field].length>15);
     assert(Array.isArray(entry.references));
+    assert(entry.references.length>=1,'every entry cites at least one source: '+entry.id);
     for(const reference of entry.references){assert(reference.title);assert.equal(new URL(reference.url).protocol,'https:');}
   }
   assert.equal(data.basics.steps.length,6);

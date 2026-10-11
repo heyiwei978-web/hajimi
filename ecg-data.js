@@ -61,10 +61,10 @@ window.HAJIMI_ECG_DATA = {
     scenarios: [
       {id:'pe',title:'肺栓塞',entry:'pulmonary-embolism',body:'骨科围手术期突发气促、胸痛、低氧或晕厥，应结合 VTE 风险及时评估；心电图正常不能排除肺栓塞。'},
       {id:'high-potassium',title:'高钾血症',entry:'hyperkalemia',body:'结合血钾、肾功能、药物及监护变化判断；危险的高钾血症也可能没有典型心电图表现。'},
-      {id:'low-potassium',entry:'hypokalemia',title:'低钾血症',body:'可见 T 波低平、ST 压低及明显 U 波；U 波可能干扰 QT 测量。核对电解质及相关药物，详细词条待建设。'},
-      {id:'long-qt',entry:'drug-induced-long-qt',title:'QT 延长',body:'复核 QT 测量、校正公式、药物和钾镁等电解质；晕厥或可疑室性心律失常时需及时评估。详细词条待建设。'},
+      {id:'low-potassium',entry:'hypokalemia',title:'低钾血症',body:'可见 T 波低平、ST 压低及明显 U 波；U 波可能干扰 QT 测量。核对电解质及相关药物。'},
+      {id:'long-qt',entry:'drug-induced-long-qt',title:'QT 延长',body:'复核 QT 测量、校正公式、药物和钾镁等电解质；晕厥或可疑室性心律失常时需及时评估。'},
       {id:'postop-af',title:'术后房颤',entry:'atrial-fibrillation',body:'关注血流动力学状态，寻找疼痛、低氧、感染及电解质紊乱等诱因；治疗与抗凝需结合出血风险共同决定。'},
-      {id:'myocardial-injury',entry:'nste-ischemia',title:'术后心肌损伤',body:'可能缺乏胸痛或典型心电图改变。结合肌钙蛋白动态、供需失衡及其他病因评估；不能仅凭一张心电图排除。详细词条待建设。'}
+      {id:'myocardial-injury',entry:'nste-ischemia',title:'术后心肌损伤',body:'可能缺乏胸痛或典型心电图改变。结合肌钙蛋白动态、供需失衡及其他病因评估；不能仅凭一张心电图排除。'}
     ],
     onCall: [
       {title:'术后胸痛',points:['先评估生命体征及循环状态，并按本院急症流程处理。','尽快获取 12 导联心电图并与旧图比较，结合必要的动态复查和肌钙蛋白等检查。','同时考虑急性冠脉综合征、肺栓塞等病因；持续症状或不稳定时及时升级处置。']},
@@ -87,7 +87,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'复查节律和诱因，结合病程与风险决定监护及随访。卒中预防与抗凝时机需同时评估血栓和手术出血风险，不在此草稿给出固定用药方案。',
         consultation:'新发房颤、持续症状、难以控制的心室率或抗凝决策存在困难时考虑心内科会诊；伴低灌注、缺血症状或意识异常时及时启动急症流程。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'2023 ACC/AHA/ACCP/HRS Guideline for the Diagnosis and Management of Atrial Fibrillation · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001193'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'hyperkalemia',title:'高钾血症',category:'electrolytes',aliases:['高血钾','hyperkalemia','potassium','血钾升高'],
@@ -103,7 +103,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'动态复核血钾、心电监护和病因变化，关注治疗后的反跳及肾功能；具体监测与处理按本院流程。',
         consultation:'显著升高、快速变化、出现传导异常或合并症状时及时升级评估；肾功能受损、治疗困难或需要肾脏替代治疗评估时联系相关专科。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'StatPearls: Hyperkalemia（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK470284/'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part IV：ST 段、T 波、U 波与 QT 间期（2009）',url:'https://www.hrsonline.org/resource/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-iv-st-segment/'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'pulmonary-embolism',title:'肺栓塞',category:'pulmonary',aliases:['PE','pulmonary embolism','肺动脉栓塞','S1Q3T3','右心负荷'],
@@ -119,7 +119,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'关注氧合、循环状态、右心功能和出血风险；抗凝及随访按专科方案与本院流程，心电图仅作为综合评估的一部分。',
         consultation:'突发气促、胸痛、低氧、晕厥或疑似急性肺栓塞时及时评估并联系相关专科；循环不稳定时立即启动急救流程。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'2019 ESC Guidelines for the diagnosis and management of acute pulmonary embolism · Eur Heart J 2020',url:'https://pubmed.ncbi.nlm.nih.gov/31504429/'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'stemi',title:'急性 ST 段抬高型心肌梗死',category:'ischemia',
@@ -144,7 +144,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'术后心肌梗死常缺乏典型胸痛，可表现为心动过速、低血压或气促。新发 ST 改变时复查 12 导联并结合肌钙蛋白动态变化；抗栓治疗需与手术出血风险共同权衡。',
         consultation:'一旦怀疑 STEMI，立即联系心内科，按本院胸痛中心流程评估急诊再灌注；同时请手术团队评估出血风险，不要等待复查结果后再联系。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'Fourth Universal Definition of Myocardial Infarction (2018) · Circulation 2018',url:'https://doi.org/10.1161/CIR.0000000000000617'},{title:'2023 ESC Guidelines for the management of acute coronary syndromes · Eur Heart J 2023',url:'https://doi.org/10.1093/eurheartj/ehad191'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'nste-ischemia',title:'ST 段压低与 T 波倒置（可疑缺血）',category:'ischemia',
@@ -155,7 +155,7 @@ window.HAJIMI_ECG_DATA = {
         diagnosticPoints:[
           '新发水平型或下斜型 ST 段压低 ≥0.5 mm（2 个相邻导联）提示心肌缺血；上斜型压低特异性较低。',
           '新发 T 波倒置 ≥1 mm（R 波为主或 R/S >1 的相邻导联）也可提示缺血；V2–V3 深而对称的 T 波倒置需警惕前降支近段病变（Wellens 图形）。',
-          '广泛 ST 段压低（≥6 个导联）伴 aVR 导联 ST 抬高，提示多支或左主干病变可能，属于高危表现。',
+          '广泛 ST 段压低（≥8 个导联、≥1 mm）伴 aVR 和/或 V1 导联 ST 抬高，提示左主干或多支病变可能，属于高危表现。',
           '心电图正常不能排除急性冠脉综合征。症状持续时应复查心电图并结合肌钙蛋白动态变化判断。'
         ],
         differentialPoints:[
@@ -169,7 +169,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'术后肌钙蛋白升高而无典型症状（术后心肌损伤）并不少见，与不良预后相关。高危患者可按本院方案监测肌钙蛋白，新发改变要寻找贫血、低氧、低血压、疼痛和心动过速等诱因。',
         consultation:'新发缺血性改变伴症状或肌钙蛋白升高、广泛 ST 压低伴 aVR 抬高、血流动力学不稳定时，及时请心内科会诊。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'Fourth Universal Definition of Myocardial Infarction (2018) · Circulation 2018',url:'https://doi.org/10.1161/CIR.0000000000000617'},{title:'2023 ESC Guidelines for the management of acute coronary syndromes · Eur Heart J 2023',url:'https://doi.org/10.1093/eurheartj/ehad191'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'},{title:'2022 ESC Guidelines on cardiovascular assessment and management of patients undergoing non-cardiac surgery（ESC 指南页）',url:'https://escardio.org/Guidelines/Clinical-Practice-Guidelines/ESC-Guidelines-on-non-cardiac-surgery-cardiovascular-assessment-and-managem'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'ventricular-tachycardia',title:'室性心动过速',category:'arrhythmias',
@@ -194,7 +194,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'寻找诱因：心肌缺血、低钾/低镁、低氧、酸中毒、中心静脉导管或导丝位置过深、致心律失常药物。持续心电监护，动态复查电解质和 12 导联心电图。',
         consultation:'无脉搏立即按心脏骤停流程处理；有脉搏但不稳定（低血压、意识改变、胸痛、心衰）时立即启动急救并考虑同步电复律；稳定的室速也应尽快请心内科会诊。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'2017 AHA/ACC/HRS Guideline for Management of Patients With Ventricular Arrhythmias and the Prevention of Sudden Cardiac Death · Circulation 2018',url:'https://doi.org/10.1161/CIR.0000000000000549'},{title:'2022 ESC Guidelines for the management of patients with ventricular arrhythmias and the prevention of sudden cardiac death · Eur Heart J 2022',url:'https://doi.org/10.1093/eurheartj/ehac262'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'ventricular-fibrillation',title:'心室颤动',category:'arrhythmias',
@@ -218,7 +218,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'复苏后进入监护，评估缺血、电解质、药物和结构性心脏病；按心脏骤停后综合治疗流程管理。',
         consultation:'立即呼叫复苏团队并按本院心脏骤停流程处理；复苏后尽快请心内科及重症医学科会诊，评估冠脉造影和后续治疗。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'},{title:'2017 AHA/ACC/HRS Guideline for Management of Patients With Ventricular Arrhythmias and the Prevention of Sudden Cardiac Death · Circulation 2018',url:'https://doi.org/10.1161/CIR.0000000000000549'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'torsades-de-pointes',title:'尖端扭转型室速',category:'arrhythmias',
@@ -227,7 +227,7 @@ window.HAJIMI_ECG_DATA = {
         summary:'QT 延长背景下出现的多形性室速，QRS 方向和振幅围绕基线“扭转”，可自行终止或恶化为室颤。',
         diagram:{kind:'torsades',caption:'尖端扭转型室速教学示意：QT 明显延长的窦性搏动后，出现振幅和方向周期性变化的多形性室速。'},
         diagnosticPoints:[
-          '多形性室速，QRS 振幅周期性增大、减小，主波方向围绕等电位线扭转，频率常为 200–250 次/分。',
+          '多形性室速，QRS 振幅周期性增大、减小，主波方向围绕等电位线扭转，频率常为 160–250 次/分。',
           '发作前的窦性搏动 QT（QTc）明显延长；常由“短–长–短”周期诱发（早搏后长间歇，再出现早搏）。',
           '常见诱因：致 QT 延长药物、低钾、低镁、心动过缓或长间歇、先天性长 QT 综合征。'
         ],
@@ -242,7 +242,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'梳理并停用可疑药物，纠正电解质，持续监护；心动过缓相关者可能需要提高心率。用药方案按本院流程和专科意见，本草稿不给出固定剂量。',
         consultation:'发作时：无脉搏按心脏骤停流程除颤；有脉搏时立即启动急救，静脉镁剂是常用一线措施，按本院流程执行。发作后尽快请心内科会诊。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'Prevention of Torsade de Pointes in Hospital Settings（AHA/ACCF 科学声明）· Circulation 2010',url:'https://doi.org/10.1161/CIRCULATIONAHA.109.192704'},{title:'2017 AHA/ACC/HRS Guideline for Management of Patients With Ventricular Arrhythmias and the Prevention of Sudden Cardiac Death · Circulation 2018',url:'https://doi.org/10.1161/CIR.0000000000000549'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'svt',title:'阵发性室上性心动过速',category:'arrhythmias',
@@ -266,7 +266,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'先区分窦性心动过速与室上速：术后窦速常见，应寻找疼痛、出血、低血容量、发热、低氧和肺栓塞等原因。',
         consultation:'稳定患者可按本院流程尝试迷走神经刺激和药物转复；伴低血压、意识改变、胸痛或心衰时立即启动急救并考虑同步电复律；反复发作或疑有预激时请心内科会诊。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'2015 ACC/AHA/HRS Guideline for the Management of Adult Patients With Supraventricular Tachycardia · Circulation 2016',url:'https://doi.org/10.1161/CIR.0000000000000311'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'sinus-bradycardia',title:'窦性心动过缓',category:'arrhythmias',
@@ -290,7 +290,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'术后心率明显下降时，复核药物（β 受体阻滞剂、右美托咪定、阿片类等）、体温、电解质和疼痛控制情况，并评估灌注是否充足。',
         consultation:'症状性心动过缓、伴低血压或意识改变时，按本院流程启动急救（药物与经皮起搏准备）；长间歇、怀疑病窦或需临时起搏时请心内科会诊。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'premature-ventricular-contractions',title:'室性早搏',category:'arrhythmias',
@@ -314,7 +314,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'术后新发频发室早，先排查低钾、低镁、低氧、心肌缺血、疼痛，以及中心静脉导管或导丝刺激右心室（尖端位置过深）。',
         consultation:'出现短阵或持续室速、多形性室早伴 QT 延长、合并胸痛或血流动力学改变时，及时请心内科会诊。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'2017 AHA/ACC/HRS Guideline for Management of Patients With Ventricular Arrhythmias and the Prevention of Sudden Cardiac Death · Circulation 2018',url:'https://doi.org/10.1161/CIR.0000000000000549'},{title:'2022 ESC Guidelines for the management of patients with ventricular arrhythmias and the prevention of sudden cardiac death · Eur Heart J 2022',url:'https://doi.org/10.1093/eurheartj/ehac262'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'first-degree-av-block',title:'一度房室传导阻滞',category:'conduction',
@@ -338,7 +338,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'复核术后新加用的减慢房室传导药物和电解质；若 PR 进行性延长或出现脱落，应提高警惕。',
         consultation:'进展为二度或三度房室阻滞、伴晕厥或症状性心动过缓，或合并双分支阻滞时，请心内科会诊。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'second-degree-av-block',title:'二度房室传导阻滞',category:'conduction',
@@ -363,7 +363,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'持续心电监护，复核药物、电解质和缺血情况；文氏型在睡眠时出现可以是生理性的，但新发的莫氏 II 型需高度重视。',
         consultation:'莫氏 II 型、高度房室阻滞、伴晕厥、低血压或宽 QRS 的 2:1 阻滞，应及时请心内科会诊，评估临时或永久起搏。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'complete-heart-block',title:'三度房室传导阻滞',category:'conduction',
@@ -387,7 +387,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'持续心电监护，评估可逆因素（药物、高钾、缺血）；明确是否需要永久起搏器。',
         consultation:'立即请心内科会诊。伴低血压、意识改变、晕厥或心衰时，按本院流程启动急救并准备经皮起搏。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'right-bundle-branch-block',title:'右束支传导阻滞',category:'conduction',
@@ -412,7 +412,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'术后新发右束支阻滞伴气促、心动过速或低氧时，应首先想到肺栓塞，结合临床概率和其他检查评估。',
         consultation:'新发右束支阻滞伴心肺症状、双分支阻滞伴晕厥，或合并房室阻滞时请心内科会诊。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part III：室内传导障碍（2009）',url:'https://pubmed.ncbi.nlm.nih.gov/19281930/'},{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'left-bundle-branch-block',title:'左束支传导阻滞',category:'conduction',
@@ -436,7 +436,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'术后胸痛时不能依赖 ST 段判断，需结合肌钙蛋白动态变化和临床表现，必要时与旧图对比。',
         consultation:'新发左束支阻滞、伴胸痛疑似急性心肌梗死、伴心衰或晕厥时请心内科会诊。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part III：室内传导障碍（2009）',url:'https://pubmed.ncbi.nlm.nih.gov/19281930/'},{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'},{title:'Fourth Universal Definition of Myocardial Infarction (2018) · Circulation 2018',url:'https://doi.org/10.1161/CIR.0000000000000617'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'left-ventricular-hypertrophy',title:'左心室肥厚',category:'enlargement',
@@ -460,7 +460,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'控制疼痛和血压，避免容量过多或不足；基础 ST-T 改变会干扰术后缺血判断，需与术前心电图对比。',
         consultation:'疑似重度主动脉瓣狭窄、肥厚型心肌病，或伴心衰、晕厥等症状时请心内科会诊。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part V：心腔肥大相关心电图改变（2009）',url:'https://hrsonline.org/guidance/clinical-resources/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-v'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'right-ventricular-hypertrophy',title:'右心室肥厚与慢性右心负荷',category:'pulmonary',
@@ -484,7 +484,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'关注氧合、液体平衡和右心衰征象（颈静脉怒张、外周水肿、低血压）；术后疼痛和肺不张会加重低氧。',
         consultation:'疑似中重度肺动脉高压或右心衰时，术前请心内科或呼吸科会诊；术中、术后循环不稳定时及时联系重症团队。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part V：心腔肥大相关心电图改变（2009）',url:'https://hrsonline.org/guidance/clinical-resources/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-v'},{title:'2022 ESC/ERS Guidelines for the diagnosis and treatment of pulmonary hypertension · Eur Heart J 2022',url:'https://doi.org/10.1093/eurheartj/ehac237'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'hypokalemia',title:'低钾血症',category:'electrolytes',
@@ -508,7 +508,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'术后利尿、胃肠减压、呕吐、腹泻和补液不当都可导致低钾；按本院流程监测和补钾，同时纠正低镁。',
         consultation:'伴心律失常、QT 明显延长、肌无力或难以纠正的低钾时，及时与内科或相关专科讨论；出现室性心律失常时按急救流程处理。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'StatPearls: Hypokalemia（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK482465/'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part IV：ST 段、T 波、U 波与 QT 间期（2009）',url:'https://www.hrsonline.org/resource/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-iv-st-segment/'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'calcium-disorders',title:'血钙异常（低钙 / 高钙）',category:'electrolytes',
@@ -532,7 +532,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'甲状腺或甲状旁腺术后、大量输血后应监测离子钙；高钙患者注意补液、肾功能和意识状态。',
         consultation:'伴心律失常、QT 明显改变、抽搐、意识改变的血钙异常，以及病因不明的高钙血症，及时请内分泌科或相关专科会诊。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'StatPearls: Hypocalcemia（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK430912/'},{title:'StatPearls: Hypercalcemia（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK430714/'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part IV：ST 段、T 波、U 波与 QT 间期（2009）',url:'https://www.hrsonline.org/resource/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-iv-st-segment/'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'drug-induced-long-qt',title:'药物相关 QT 间期延长',category:'electrolytes',
@@ -556,7 +556,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'新加药物前核对 QT 风险，维持血钾、血镁正常；高风险患者用药后复查心电图。',
         consultation:'QTc >500 ms、出现室性早搏增多或尖端扭转型室速，或怀疑先天性长 QT 综合征时，请心内科会诊。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'Prevention of Torsade de Pointes in Hospital Settings（AHA/ACCF 科学声明）· Circulation 2010',url:'https://doi.org/10.1161/CIRCULATIONAHA.109.192704'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part IV：ST 段、T 波、U 波与 QT 间期（2009）',url:'https://www.hrsonline.org/resource/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-iv-st-segment/'},{title:'CredibleMeds：QT 延长与尖端扭转风险药物数据库',url:'https://crediblemeds.org/healthcare-providers'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'digoxin-effect',title:'地高辛效应与中毒',category:'electrolytes',
@@ -580,7 +580,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'术后肾功能变化、电解质紊乱和新增相互作用药物都可能诱发中毒；必要时监测血药浓度。',
         consultation:'疑似中毒伴心律失常或血流动力学改变时，及时联系心内科及中毒救治团队，评估特异性解毒剂等治疗；不在此草稿给出固定方案。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'StatPearls: Digitalis Toxicity（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK470568/'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'ventricular-pacing',title:'心室起搏心电图',category:'pacing',
@@ -604,7 +604,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'术中曾重新程控或暂停治疗的器械，术后必须恢复原设置并确认功能正常，在恢复前持续监护。',
         consultation:'术前器械信息不明、起搏依赖、术中可能需要调整设置，或术后怀疑器械功能异常时，联系心内科或器械程控团队。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'HRS/ASA 2011 Expert Consensus Statement on the Perioperative Management of Patients with Implantable Defibrillators, Pacemakers and Arrhythmia Monitors',url:'https://www.hrsonline.org/resource/2011-expert-consensus-statement-perioperative-management-patients-implantable-defibrillators/'},{title:'ASA Practice Advisory for the Perioperative Management of Patients with Cardiac Implantable Electronic Devices · Anesthesiology 2020',url:'https://pubmed.ncbi.nlm.nih.gov/32032098/'},{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
       id:'pacing-malfunction',title:'起搏功能异常',category:'pacing',
@@ -628,7 +628,157 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'术后（尤其是器械植入后早期或术中曾受电刀干扰者）持续监护，复查起搏功能；纠正高钾、缺血等可升高起搏阈值的因素。',
         consultation:'一旦怀疑起搏功能异常，尽快联系心内科或器械程控团队；伴严重心动过缓、低血压或晕厥时，立即启动急救并经皮起搏。'
       },
-      references:[],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'HRS/ASA 2011 Expert Consensus Statement on the Perioperative Management of Patients with Implantable Defibrillators, Pacemakers and Arrhythmia Monitors',url:'https://www.hrsonline.org/resource/2011-expert-consensus-statement-perioperative-management-patients-implantable-defibrillators/'},{title:'ASA Practice Advisory for the Perioperative Management of Patients with Cardiac Implantable Electronic Devices · Anesthesiology 2020',url:'https://pubmed.ncbi.nlm.nih.gov/32032098/'},{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
+    },
+    {
+      id:'atrial-flutter',title:'心房扑动',category:'arrhythmias',
+      aliases:['房扑','AFL','atrial flutter','锯齿波','F波','2:1房扑'],
+      basic:{
+        summary:'连续的锯齿样扑动波、心房率约 300 次/分；2:1 传导时心室率约 150 次/分，容易被误认为窦速或室上速。',
+        diagram:{kind:'atrial-flutter',caption:'典型心房扑动教学示意：II 导联连续锯齿样 F 波，波间无等电位线，本例为 4:1 传导。'},
+        diagnosticPoints:[
+          '典型（三尖瓣峡部依赖）房扑：II、III、aVF 导联呈负向锯齿样 F 波，V1 导联多为正向，F 波之间没有等电位线。',
+          '心房率通常在 250–350 次/分（典型约 300 次/分）；常见 2:1 传导，心室率约 150 次/分。传导比例固定时心室律规则，比例变化时心室律不规则。',
+          '心室率稳定在约 150 次/分的规则窄 QRS 心动过速，应主动寻找“藏在” QRS 或 T 波中的第二个 F 波。'
+        ],
+        differentialPoints:[
+          '房颤的心房活动杂乱无序、RR 绝对不齐；粗颤的房颤可被误认为房扑，需对比多个导联。',
+          '房性心动过速的 P 波之间有等电位线，心房率多为 150–250 次/分；窦性心动过速 P 波形态正常，且心率逐渐变化。'
+        ]
+      },
+      periop:{
+        timing:'新发或心室率未控制的房扑，择期手术前应先控制心室率并评估诱因与血栓风险；病情稳定、心室率控制良好的慢性房扑一般可结合风险评估安排手术。',
+        anesthesia:'告知麻醉团队心室率、心功能和抗凝情况。房扑的心室率常比房颤更难用药物控制，术中交感兴奋可使传导比例由 4:1 变为 2:1 甚至 1:1，应备好同步电复律设备。',
+        postoperative:'寻找低氧、疼痛、电解质紊乱、容量异常等诱因；卒中风险评估和抗凝原则与房颤相近，需与手术出血风险共同权衡。',
+        consultation:'心室率难以控制、伴低血压或心衰、需要抗凝决策，或考虑电复律/导管消融时请心内科会诊；血流动力学不稳定时按急救流程同步电复律。'
+      },
+      references:[{title:'2015 ACC/AHA/HRS Guideline for the Management of Adult Patients With Supraventricular Tachycardia · Circulation 2016',url:'https://doi.org/10.1161/CIR.0000000000000311'},{title:'2023 ACC/AHA/ACCP/HRS Guideline for the Diagnosis and Management of Atrial Fibrillation · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001193'}],
+      updatedAt:'2026-10-11',reviewStatus:'待审核'
+    },
+    {
+      id:'pre-excitation',title:'预激综合征（WPW）',category:'conduction',
+      aliases:['预激','WPW','delta波','delta 波','δ波','旁路','短PR','预激综合征'],
+      basic:{
+        summary:'PR 缩短、QRS 起始部 delta 波、QRS 增宽，提示存在房室旁路；合并房颤时可出现危险的极快心室率。',
+        diagram:{kind:'wpw',caption:'心室预激教学示意：II 导联 PR 缩短，QRS 起始部有缓慢上升的 delta 波，QRS 增宽。'},
+        diagnosticPoints:[
+          '典型图形：PR 间期 <120 ms，QRS 起始部顿挫（delta 波），QRS 增宽（常 >110–120 ms），可伴继发性 ST-T 改变。',
+          '仅有心电图表现、无心动过速发作称为“预激图形”；同时有心动过速发作才称为预激综合征。',
+          '预激合并房颤：QRS 宽窄不一、形态多变、节律绝对不齐，心室率可极快，有恶化为室颤的风险。'
+        ],
+        differentialPoints:[
+          'delta 波可在下壁或其他导联形成“假性 Q 波”，被误认为陈旧性心肌梗死；也可类似束支阻滞或左室肥厚。',
+          '只有 PR 缩短而没有 delta 波、QRS 正常者，不属于典型心室预激；间歇性预激的 delta 波可时有时无。'
+        ]
+      },
+      periop:{
+        timing:'无症状的预激图形一般不单独推迟手术；有心悸、晕厥或心动过速发作史者，择期手术前建议先请心内科评估。',
+        anesthesia:'告知麻醉团队旁路情况，避免交感过度兴奋，备好同步电复律设备。预激合并房颤时，应避免使用主要阻断房室结的药物（如腺苷、β 受体阻滞剂、非二氢吡啶类钙通道阻滞剂、地高辛），以免加快旁路传导。',
+        postoperative:'术后新发心悸要尽快记录心电图，区分顺向型折返性心动过速与预激合并房颤，二者处理不同。',
+        consultation:'宽 QRS、不规则、极快心率疑似预激合并房颤时，立即启动急救流程（不稳定时同步电复律）并请心内科会诊；有症状的预激患者择期请心内科评估是否消融。'
+      },
+      references:[{title:'2015 ACC/AHA/HRS Guideline for the Management of Adult Patients With Supraventricular Tachycardia · Circulation 2016',url:'https://doi.org/10.1161/CIR.0000000000000311'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'}],
+      updatedAt:'2026-10-11',reviewStatus:'待审核'
+    },
+    {
+      id:'brugada',title:'Brugada 图形',category:'arrhythmias',
+      aliases:['Brugada','布鲁加达','Brugada综合征','穹窿形ST抬高','钠通道病'],
+      basic:{
+        summary:'右胸导联穹窿形 ST 段抬高伴 T 波倒置（1 型）具有诊断意义；发热和部分药物可诱发或加重，与猝死风险相关。',
+        diagram:{kind:'brugada',caption:'1 型 Brugada 图形教学示意：V1 导联穹窿形（下斜型）ST 段抬高，随后 T 波倒置。'},
+        diagnosticPoints:[
+          '1 型（穹窿形）：V1–V2 中至少 1 个导联（可放在第 2、3 或 4 肋间）J 点/ST 段抬高 ≥2 mm，呈下斜型，随后 T 波倒置。只有 1 型具有诊断意义。',
+          '2 型（马鞍形）ST 抬高本身不能确诊，需要专科进一步评估。',
+          '图形可间歇出现；发热、钠通道阻滞药物、迷走张力增高等可使其显现或加重。'
+        ],
+        differentialPoints:[
+          '右束支阻滞、早期复极、致心律失常性右室心肌病、急性前间壁心肌梗死、高钾血症、漏斗胸以及 V1–V2 电极位置过高均可产生类似图形。',
+          '与右束支阻滞不同，Brugada 图形的 ST 抬高位于右胸导联，且 I、V6 导联常没有宽钝的 S 波。'
+        ]
+      },
+      periop:{
+        timing:'术前新发现 1 型图形或有晕厥、猝死家族史者，择期手术前应请心内科评估；已植入 ICD 的患者按器械流程准备。',
+        anesthesia:'告知麻醉团队：及时控制发热；尽量避免已知可能诱发 Brugada 图形的药物（部分钠通道阻滞剂、某些局部麻醉药的大剂量使用等，请麻醉科结合专门的药物清单判断）；术中持续心电监护并贴好体外除颤电极。',
+        postoperative:'术后发热要积极退热，持续监护右胸导联变化；出现晕厥、室性心律失常时立即处理。',
+        consultation:'1 型图形、伴晕厥或室性心律失常、有猝死家族史时请心内科会诊；发生室颤或多形性室速时按心脏骤停流程处理。'
+      },
+      references:[{title:'2022 ESC Guidelines for the management of patients with ventricular arrhythmias and the prevention of sudden cardiac death · Eur Heart J 2022',url:'https://doi.org/10.1093/eurheartj/ehac262'},{title:'J-Wave syndromes expert consensus conference report: emerging concepts and gaps in knowledge · Heart Rhythm 2016',url:'https://pubmed.ncbi.nlm.nih.gov/27423412/'}],
+      updatedAt:'2026-10-11',reviewStatus:'待审核'
+    },
+    {
+      id:'acute-pericarditis',title:'急性心包炎',category:'ischemia',
+      aliases:['心包炎','pericarditis','广泛ST抬高','PR压低','PR 压低','心包积液'],
+      basic:{
+        summary:'多数导联凹面向上的 ST 段抬高伴 PR 段压低，aVR 导联相反；是 ST 抬高的重要鉴别诊断。',
+        diagram:{kind:'pericarditis',caption:'急性心包炎教学示意：II 导联 ST 段凹面抬高并 PR 段压低；aVR 导联 ST 段压低、PR 段抬高。'},
+        diagnosticPoints:[
+          '广泛、不按冠脉供血区分布的凹面向上 ST 段抬高；aVR（有时 V1）导联 ST 段压低。',
+          'PR 段压低（aVR 导联 PR 段抬高）是较有特点的表现；通常没有病理性 Q 波，除 aVR、V1 外一般无对应性 ST 压低。',
+          '心电图可随病程演变（ST 抬高 → 恢复 → T 波倒置 → 恢复），且并非所有患者都有典型改变。低电压或电交替提示可能存在较多心包积液。'
+        ],
+        differentialPoints:[
+          '急性 ST 段抬高型心肌梗死：ST 抬高常呈凸面、局限于某一供血区、有对应性压低，可出现 Q 波，且多有肌钙蛋白显著升高和室壁运动异常。',
+          '早期复极：多见于年轻人，ST 抬高相对稳定，PR 段压低不明显；V6 导联 ST 抬高幅度与 T 波振幅之比较小也支持早期复极。'
+        ]
+      },
+      periop:{
+        timing:'急性心包炎期间，择期手术一般应推迟至炎症控制；伴心包积液时需评估积液量和血流动力学影响。',
+        anesthesia:'告知麻醉团队有无心包积液。较多积液或心包填塞时，麻醉诱导、正压通气和血容量下降可导致循环骤然衰竭，需要专门的麻醉计划。',
+        postoperative:'术后胸痛伴广泛 ST 抬高时，仍需首先排除急性心肌梗死；心脏手术后的心包切开术后综合征也可出现类似表现。',
+        consultation:'胸痛伴 ST 抬高、诊断不明确时立即请心内科评估；怀疑心包填塞（低血压、颈静脉怒张、奇脉）时立即启动急救并联系相关专科。'
+      },
+      references:[{title:'2015 ESC Guidelines for the diagnosis and management of pericardial diseases · Eur Heart J 2015',url:'https://pubmed.ncbi.nlm.nih.gov/26320112/'},{title:'Fourth Universal Definition of Myocardial Infarction (2018) · Circulation 2018',url:'https://doi.org/10.1161/CIR.0000000000000617'}],
+      updatedAt:'2026-10-11',reviewStatus:'待审核'
+    },
+    {
+      id:'early-repolarization',title:'早期复极',category:'ischemia',
+      aliases:['早复极','早期复极综合征','J点抬高','J 点抬高','J波','ER','良性早期复极'],
+      basic:{
+        summary:'下壁或侧壁导联 QRS 终末部切迹或顿挫、J 点抬高，多见于年轻人和运动员；通常为良性，但需与急性心肌梗死和心包炎鉴别。',
+        diagram:{kind:'early-repolarization',caption:'早期复极教学示意：V4 导联 QRS 终末部 J 点切迹，ST 段凹面向上轻度抬高，T 波高大。'},
+        diagnosticPoints:[
+          '早期复极图形：在下壁和/或侧壁至少 2 个相邻导联中，QRS 终末部出现切迹或顿挫，J 点抬高 ≥1 mm。',
+          'ST 段多呈凹面向上抬高，常伴高大 T 波；心率增快时可减轻，与旧图相比通常长期稳定。',
+          '“早期复极综合征”专指有不明原因室颤或心脏骤停史的患者，绝大多数早期复极图形者没有心律失常风险。'
+        ],
+        differentialPoints:[
+          '急性心肌梗死：ST 抬高动态变化，有对应性压低、Q 波形成或缺血症状；不能确定时复查心电图并查肌钙蛋白。',
+          '急性心包炎：分布更广泛，伴 PR 段压低；Brugada 图形局限于右胸导联；高钾血症也可出现 ST-T 改变。'
+        ]
+      },
+      periop:{
+        timing:'无症状的早期复极图形不需推迟手术。有晕厥、心脏骤停史或猝死家族史时，择期手术前请心内科评估。',
+        anesthesia:'告知麻醉团队术前已有 ST 抬高，避免术中监护时误判为急性缺血；保留术前 12 导联心电图作对比。',
+        postoperative:'术后胸痛时，将当前心电图与术前心电图仔细对比，新发或动态变化的 ST 改变仍需按急性冠脉综合征评估。',
+        consultation:'ST 抬高与旧图不同、伴胸痛或肌钙蛋白升高，或有室性心律失常、晕厥史时请心内科会诊。'
+      },
+      references:[{title:'J-Wave syndromes expert consensus conference report: emerging concepts and gaps in knowledge · Heart Rhythm 2016',url:'https://pubmed.ncbi.nlm.nih.gov/27423412/'},{title:'Fourth Universal Definition of Myocardial Infarction (2018) · Circulation 2018',url:'https://doi.org/10.1161/CIR.0000000000000617'}],
+      updatedAt:'2026-10-11',reviewStatus:'待审核'
+    },
+    {
+      id:'left-anterior-fascicular-block',title:'左前分支阻滞与双分支阻滞',category:'conduction',
+      aliases:['左前分支阻滞','LAFB','LAHB','左前半阻滞','双分支阻滞','三分支阻滞','电轴左偏','分支阻滞'],
+      basic:{
+        summary:'电轴显著左偏（−45° 至 −90°）、I 和 aVL 呈 qR、下壁导联呈 rS；合并右束支阻滞即为双分支阻滞。',
+        diagram:{kind:'lafb',caption:'左前分支阻滞教学示意：I 导联以 R 波为主（qR），aVF 导联以深 S 波为主（rS），电轴显著左偏。'},
+        diagnosticPoints:[
+          '左前分支阻滞：额面电轴 −45° 至 −90°；I、aVL 呈 qR；II、III、aVF 呈 rS；QRS 时限 <120 ms（单纯分支阻滞时）。',
+          '双分支阻滞：右束支阻滞合并左前分支阻滞（较常见）或左后分支阻滞。',
+          '双分支阻滞合并一度房室阻滞过去常被称为“三分支阻滞”，但 PR 延长不一定来自希浦系统，该名称现已不推荐作为诊断。'
+        ],
+        differentialPoints:[
+          '下壁心肌梗死：II、III、aVF 呈 Q 波（QS 或 Qr），而不是以小 r 波开始的 rS。',
+          '左后分支阻滞表现为电轴右偏（约 +90° 至 +180°），诊断前需先排除右心室肥厚、肺部疾病和体型因素等更常见的原因。'
+        ]
+      },
+      periop:{
+        timing:'无症状的单纯左前分支阻滞或双分支阻滞，一般不需推迟手术，也通常不需要术前预防性植入起搏器。有晕厥史时，择期手术前应评估是否存在间歇性高度房室阻滞。',
+        anesthesia:'告知麻醉团队；双分支阻滞患者应备好经皮起搏，留意迷走反射和减慢传导的药物。若已有完全性左束支阻滞，右心导管（如肺动脉导管）操作诱发右束支阻滞时可导致完全性房室阻滞。',
+        postoperative:'术后监护中出现新发房室阻滞、心动过缓或晕厥时，复查 12 导联心电图并评估药物、电解质和缺血因素。',
+        consultation:'双分支阻滞伴晕厥、新发房室阻滞或心动过缓症状时请心内科会诊，评估是否需要起搏。'
+      },
+      references:[{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part III：室内传导障碍（2009）',url:'https://pubmed.ncbi.nlm.nih.gov/19281930/'},{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'}],
+      updatedAt:'2026-10-11',reviewStatus:'待审核'
     }
   ]
 };
