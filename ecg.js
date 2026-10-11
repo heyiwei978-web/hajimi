@@ -21,7 +21,7 @@
   }
   function home(){
     setPage('心电图','从基础到围手术期：学习、查阅和床旁计算。');
-    const entries=[['basics','基础学习','从电活动、导联与测量开始，认识正常心电图，再用六步法读图。','基'],['atlas','图谱库','按类别逐级查阅，搜索三个示例词条及其围手术期要点。','图'],['periop','围手术期专区','术前评估、骨科高频场景，以及胸痛、气促、心悸值班速查。','术']];
+    const entries=[['basics','基础学习','从电活动、导联与测量开始，认识正常心电图，再用六步法读图。','基'],['atlas','图谱库','按类别逐级查阅，搜索常见心电图词条及其围手术期要点。','图'],['periop','围手术期专区','术前评估、骨科高频场景，以及胸痛、气促、心悸值班速查。','术']];
     app.innerHTML='<section class="class-section-head"><span>01 / LEARN & READ</span><h2>从这里开始</h2><p>基础层帮助认识波形，围手术期层联系临床场景。</p></section><div class="ecg-entry-grid">'+entries.map(([id,title,description,symbol],index)=>'<a class="class-dept-card is-ready" href="/ecg/'+id+'"><span class="class-dept-index">0'+(index+1)+'</span><div class="class-dept-symbol" aria-hidden="true">'+symbol+'</div><h3>'+title+'</h3><p>'+description+'</p><div class="class-dept-foot"><strong>进入栏目</strong><span aria-hidden="true">→</span></div></a>').join('')+'</div>'+section('ecg-more','工具与自测','<div class="ecg-panel-grid">'+card('/ecg/tools','心电图工具','QTc 双公式计算、RR 间期心率速算，以及现有 RCRI 入口。')+card('/ecg/quiz','自测','建设中：本阶段保留入口，后续加入判读练习。','建设中')+'</div>');
   }
   function basics(){
@@ -32,23 +32,28 @@
   }
   const normalize=text=>String(text).normalize('NFKC').toLowerCase();
   function atlas(category){
-    setPage(category?category.title:'图谱库',category?category.description:'按类别逐级查阅。第一阶段三个示例，其余分类保留建设入口。',category?[{title:'图谱库',url:'/ecg/atlas'},{title:category.title}]:[{title:'图谱库'}]);
+    setPage(category?category.title:'图谱库',category?category.description:'按类别逐级查阅，或直接搜索疾病名、英文缩写和关键表现。',category?[{title:'图谱库',url:'/ecg/atlas'},{title:category.title}]:[{title:'图谱库'}]);
     const entries=category?data.entries.filter(entry=>entry.category===category.id):data.entries;
-    const categories=category?'<nav class="ecg-section-links" aria-label="图谱导航"><a href="/ecg/atlas">← 全部图谱类别</a></nav>':'<section id="ecgCategoryDirectory" aria-labelledby="ecgCategoriesTitle"><h2 id="ecgCategoriesTitle">按类别查阅</h2><div class="ecg-category-grid">'+data.categories.map(item=>{const count=data.entries.filter(entry=>entry.category===item.id).length;return card('/ecg/atlas/'+item.id,item.title,item.description,count?count+' 个示例 · 待审核':'建设中');}).join('')+'</div></section>';
-    app.innerHTML='<section class="ecg-search" aria-label="搜索图谱"><label class="class-search-label" for="ecgSearch">搜索心电图图谱</label><input class="class-filter" id="ecgSearch" type="search" placeholder="例如：房颤、AF、高钾、肺栓塞、PE" autocomplete="off"><div class="ecg-search-actions"><span id="ecgSearchCount" role="status" aria-live="polite"></span><button type="button" class="btn" id="ecgClearSearch" hidden>清空搜索</button></div></section>'+categories+'<section aria-labelledby="ecgResultsTitle"><h2 id="ecgResultsTitle">示例词条</h2><div class="ecg-panel-grid" id="ecgSearchResults">'+entries.map(entry=>'<div data-ecg-entry="'+entry.id+'">'+card(entryUrl(entry),entry.title,entry.basic.summary,categoryFor(entry).title+' · '+entry.reviewStatus)+'</div>').join('')+'</div><p id="ecgSearchEmpty" hidden></p></section>';
+    const categories=category?'<nav class="ecg-section-links" aria-label="图谱导航"><a href="/ecg/atlas">← 全部图谱类别</a></nav>':'<section id="ecgCategoryDirectory" aria-labelledby="ecgCategoriesTitle"><h2 id="ecgCategoriesTitle">按类别查阅</h2><div class="ecg-category-grid">'+data.categories.map(item=>{const count=data.entries.filter(entry=>entry.category===item.id).length;return card('/ecg/atlas/'+item.id,item.title,item.description,count?count+' 个词条 · 待审核':'建设中');}).join('')+'</div></section>';
+    app.innerHTML='<section class="ecg-search" aria-label="搜索图谱"><label class="class-search-label" for="ecgSearch">搜索心电图图谱</label><input class="class-filter" id="ecgSearch" type="search" placeholder="例如：房颤、STEMI、文氏、LBBB、低钾、起搏" autocomplete="off"><div class="ecg-search-actions"><span id="ecgSearchCount" role="status" aria-live="polite"></span><button type="button" class="btn" id="ecgClearSearch" hidden>清空搜索</button></div></section>'+categories+'<section aria-labelledby="ecgResultsTitle"><h2 id="ecgResultsTitle">词条</h2><div class="ecg-panel-grid" id="ecgSearchResults">'+entries.map(entry=>'<div data-ecg-entry="'+entry.id+'">'+card(entryUrl(entry),entry.title,entry.basic.summary,categoryFor(entry).title+' · '+entry.reviewStatus)+'</div>').join('')+'</div><p id="ecgSearchEmpty" hidden></p></section>';
     const field=document.getElementById('ecgSearch'),count=document.getElementById('ecgSearchCount'),empty=document.getElementById('ecgSearchEmpty'),clear=document.getElementById('ecgClearSearch');
-    const index=entries.map(entry=>({id:entry.id,text:normalize([entry.title,categoryFor(entry).title,...entry.aliases,entry.basic.summary,...entry.basic.diagnosticPoints,...entry.basic.differentialPoints,...Object.values(entry.periop)].join(' '))}));
+    const index=entries.map((entry,order)=>({id:entry.id,order,key:normalize([entry.title,...entry.aliases].join(' ')),text:normalize([entry.title,categoryFor(entry).title,...entry.aliases,entry.basic.summary,...entry.basic.diagnosticPoints,...entry.basic.differentialPoints,...Object.values(entry.periop)].join(' '))}));
+    const results=document.getElementById('ecgSearchResults');
+    const matches=(text,term)=>/^[a-z0-9]{1,3}$/.test(term)?new RegExp('(^|[^a-z0-9])'+term+'($|[^a-z0-9])').test(text):text.includes(term);
     function run(){
       const query=field.value.trim(),terms=normalize(query).split(/\s+/).filter(Boolean);
       let shown=0;
-      for(const item of index){
-        const visible=terms.every(term=>/^[a-z0-9]{1,3}$/.test(term)?new RegExp('(^|[^a-z0-9])'+term+'($|[^a-z0-9])').test(item.text):item.text.includes(term));
-        document.querySelector('[data-ecg-entry="'+item.id+'"]').hidden=!visible;
+      // Entries whose title or aliases match come first, then other full-text matches.
+      const ranked=index.map(item=>({item,visible:terms.every(term=>matches(item.text,term)),primary:terms.length>0&&terms.every(term=>matches(item.key,term))}))
+        .sort((a,b)=>(b.primary-a.primary)||(a.item.order-b.item.order));
+      for(const {item,visible} of ranked){
+        const node=results.querySelector('[data-ecg-entry="'+item.id+'"]');
+        node.hidden=!visible;results.appendChild(node);
         shown+=Number(visible);
       }
       count.textContent=shown+' 个匹配词条 · 资料待审核';
       empty.hidden=shown>0;
-      empty.textContent=query?'未找到匹配词条，请更换关键词。':'本分类建设中，第一阶段暂未添加示例词条。';
+      empty.textContent=query?'未找到匹配词条，请更换关键词。':'本分类建设中，暂未添加词条。';
       clear.hidden=!query;
       const directory=document.getElementById('ecgCategoryDirectory');if(directory)directory.hidden=Boolean(query);
       const url=new URL(location.href);if(query)url.searchParams.set('q',query);else url.searchParams.delete('q');
@@ -71,7 +76,7 @@
     document.querySelector('.class-eyebrow').textContent='ECG ATLAS · DRAFT';
     const basic='<span class="class-section-label">基础层 · 默认展开</span>'+diagram(entry.basic.diagram.kind,entry.basic.diagram.caption)+'<h3>诊断要点</h3>'+points(entry.basic.diagnosticPoints)+'<h3>鉴别点</h3>'+points(entry.basic.differentialPoints);
     const periop=[['对手术时机的影响',entry.periop.timing],['麻醉关注点',entry.periop.anesthesia],['术后管理',entry.periop.postoperative],['何时会诊',entry.periop.consultation]].map(([title,text])=>'<section><h3>'+title+'</h3><p>'+esc(text)+'</p></section>').join('');
-    app.innerHTML='<div class="ecg-layer-control"><span class="ecg-status">'+esc(entry.reviewStatus)+' · 示例草稿</span><button class="btn" id="ecgLayerToggle" type="button" aria-controls="ecgPeriopLayer" aria-expanded="false">展开围手术期层</button></div>'+section('ecg-basic','基础判读',basic)+'<details class="class-content-section ecg-periop" id="ecgPeriopLayer"><summary><h2>围手术期要点<span class="ecg-hint">对手术、麻醉、术后管理及会诊的影响 · 默认折叠</span></h2></summary>'+periop+'</details>'+section('ecg-references','参考文献',references(entry))+'<nav class="ecg-section-links" aria-label="词条导航"><a href="/ecg/atlas/'+category.id+'">返回'+esc(category.title)+'</a><a href="/ecg/periop">围手术期专区</a></nav>';
+    app.innerHTML='<div class="ecg-layer-control"><span class="ecg-status">'+esc(entry.reviewStatus)+' · 草稿</span><button class="btn" id="ecgLayerToggle" type="button" aria-controls="ecgPeriopLayer" aria-expanded="false">展开围手术期层</button></div>'+section('ecg-basic','基础判读',basic)+'<details class="class-content-section ecg-periop" id="ecgPeriopLayer"><summary><h2>围手术期要点<span class="ecg-hint">对手术、麻醉、术后管理及会诊的影响 · 默认折叠</span></h2></summary>'+periop+'</details>'+section('ecg-references','参考文献',references(entry))+'<nav class="ecg-section-links" aria-label="词条导航"><a href="/ecg/atlas/'+category.id+'">返回'+esc(category.title)+'</a><a href="/ecg/periop">围手术期专区</a></nav>';
     const toggle=document.getElementById('ecgLayerToggle'),layer=document.getElementById('ecgPeriopLayer');
     function sync(){toggle.setAttribute('aria-expanded',String(layer.open));toggle.textContent=layer.open?'收起围手术期层':'展开围手术期层';}
     toggle.addEventListener('click',()=>{layer.open=!layer.open;sync();});
@@ -86,7 +91,7 @@
   }
   function periop(){
     setPage('围手术期专区','联系手术紧迫性、症状、血流动力学状态及出血风险，按临床场景查阅。',[{title:'围手术期专区'}]);
-    const scenarios=data.periop.scenarios.map(item=>{const entry=data.entries.find(entry=>entry.id===item.entry);return entry?card(entryUrl(entry),item.title,item.body,'示例词条 · 待审核'):'<article class="class-disease-card ecg-card"><small>详细词条待建设</small><h3>'+esc(item.title)+'</h3><p>'+esc(item.body)+'</p></article>';}).join('');
+    const scenarios=data.periop.scenarios.map(item=>{const entry=data.entries.find(entry=>entry.id===item.entry);return entry?card(entryUrl(entry),item.title,item.body,'图谱词条 · 待审核'):'<article class="class-disease-card ecg-card"><small>详细词条待建设</small><h3>'+esc(item.title)+'</h3><p>'+esc(item.body)+'</p></article>';}).join('');
     app.innerHTML='<nav class="ecg-section-links" aria-label="围手术期目录"><a href="#ecg-assessment">术前评估</a><a href="#ecg-scenarios">骨科高频场景</a><a href="#ecg-oncall">值班速查</a></nav>'+section('ecg-assessment','术前评估',points(data.periop.assessment)+'<p><a class="btn" href="/tools?tool=rcri">打开现有 RCRI 工具 →</a></p>')+section('ecg-scenarios','骨科高频场景','<div class="ecg-panel-grid">'+scenarios+'</div>')+section('ecg-oncall','值班速查',data.periop.onCall.map(item=>'<section><h3>'+esc(item.title)+'</h3>'+points(item.points)+'</section>').join(''));
   }
   function tools(){

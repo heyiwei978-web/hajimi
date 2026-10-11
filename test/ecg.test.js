@@ -34,12 +34,16 @@ test('ECG calculations reject missing, nonpositive and nonfinite input instead o
   assert.throws(()=>calculator.qtc(Number.MAX_VALUE,Number.MIN_VALUE));
 });
 
-test('all three ECG drafts keep valid categories, both clinical layers and explicit review metadata',()=>{
-  const data=load().HAJIMI_ECG_DATA;
+test('all ECG atlas drafts keep valid categories, both clinical layers and explicit review metadata',()=>{
+  const window=load(),data=window.HAJIMI_ECG_DATA;
   assert.equal(data.schema,1);
-  assert.equal(data.entries.length,3);
-  assert.deepEqual(Array.from(data.entries,entry=>entry.id).sort(),['atrial-fibrillation','hyperkalemia','pulmonary-embolism']);
+  assert.equal(data.entries.length,24);
+  const ids=Array.from(data.entries,entry=>entry.id);
+  assert.equal(new Set(ids).size,ids.length,'entry ids are unique');
+  for(const id of ['atrial-fibrillation','hyperkalemia','pulmonary-embolism','stemi','complete-heart-block','ventricular-pacing'])assert(ids.includes(id));
   assert.equal(new Set(data.categories.map(category=>category.id)).size,7);
+  for(const category of data.categories)assert(data.entries.some(entry=>entry.category===category.id),'category '+category.id+' has at least one entry');
+  for(const scenario of data.periop.scenarios)if(scenario.entry)assert(ids.includes(scenario.entry),'scenario links to an existing entry');
   for(const entry of data.entries){
     assert(data.categories.some(category=>category.id===entry.category));
     assert.equal(entry.reviewStatus,'待审核');
@@ -47,6 +51,8 @@ test('all three ECG drafts keep valid categories, both clinical layers and expli
     assert(entry.basic.diagnosticPoints.length>=3);
     assert(entry.basic.differentialPoints.length>=2);
     assert.equal(typeof entry.basic.diagram.kind,'string');
+    assert(window.HAJIMI_ECG_WAVEFORMS.render(entry.basic.diagram.kind).startsWith('<svg'),'diagram exists for '+entry.id);
+    assert(entry.title&&entry.basic.summary&&entry.aliases.length>0);
     for(const field of ['timing','anesthesia','postoperative','consultation'])assert(entry.periop[field].length>15);
     assert(Array.isArray(entry.references));
     for(const reference of entry.references){assert(reference.title);assert.equal(new URL(reference.url).protocol,'https:');}
@@ -55,14 +61,15 @@ test('all three ECG drafts keep valid categories, both clinical layers and expli
 });
 
 test('ECG drawings are accessible original inline vectors with unique IDs and no external image embeds',()=>{
-  const drawings=load().HAJIMI_ECG_WAVEFORMS;
+  const window=load(),drawings=window.HAJIMI_ECG_WAVEFORMS;
   const identifiers=[];
-  for(const kind of ['normal','af','hyperkalemia','pe']){
+  for(const kind of ['normal',...new Set(window.HAJIMI_ECG_DATA.entries.map(entry=>entry.basic.diagram.kind))]){
     const svg=drawings.render(kind);
     assert.match(svg,/<svg[^>]*role="img"[^>]*aria-labelledby=/);
     assert.match(svg,/<title[^>]*>.+<\/title>/);
     assert.match(svg,/<desc[^>]*>.+<\/desc>/);
     assert.match(svg,/<path/);
+    assert.doesNotMatch(svg,/NaN|undefined/);
     assert.doesNotMatch(svg,/<(?:image|script|foreignObject)\b|\bon\w+=|\bhref=/i);
     identifiers.push(...Array.from(svg.matchAll(/\bid="([^"]+)"/g),match=>match[1]));
   }

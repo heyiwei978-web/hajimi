@@ -107,13 +107,14 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
     try{
       await page.goto(base+'/ecg/atlas',{waitUntil:'networkidle'});
       assert.equal(await page.locator('.ecg-category-grid a').count(),7);
-      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),3);
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),24);
       const search=page.getByRole('searchbox',{name:'搜索心电图图谱'});
       const searchBounds=await search.boundingBox();assert(searchBounds.y>0&&searchBounds.y+searchBounds.height<900,'atlas search is visible before scrolling through categories');
-      for(const [query,id] of [['房颤','atrial-fibrillation'],['AF','atrial-fibrillation'],['高钾','hyperkalemia'],['PE','pulmonary-embolism'],['Ｓ１Ｑ３Ｔ３','pulmonary-embolism']]){
+      // Exact abbreviations match one entry; common Chinese terms rank the title/alias match first.
+      for(const [query,id,only] of [['房颤','atrial-fibrillation',false],['AF','atrial-fibrillation',true],['高钾','hyperkalemia',false],['低钾','hypokalemia',false],['文氏','second-degree-av-block',false],['LBBB','left-bundle-branch-block',true],['PE','pulmonary-embolism',true],['Ｓ１Ｑ３Ｔ３','pulmonary-embolism',true]]){
         await search.fill(query);
-        assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),1);
-        assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').getAttribute('data-ecg-entry'),id);
+        if(only)assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),1);
+        assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').first().getAttribute('data-ecg-entry'),id);
         assert.equal(new URL(page.url()).searchParams.get('q'),query);
       }
       await page.reload({waitUntil:'networkidle'});
@@ -123,11 +124,12 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
       assert(await page.locator('#ecgSearchEmpty').isVisible());
       assert.equal(await page.locator('#ecgSearchResults img').count(),0);
       await page.getByRole('button',{name:'清空搜索'}).click();
-      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),3);
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),24);
       assert.equal(new URL(page.url()).searchParams.has('q'),false);
       await page.locator('a[href="/ecg/atlas/conduction"]').click();
       await page.waitForURL(base+'/ecg/atlas/conduction',{waitUntil:'networkidle'});
-      assert.match(await page.locator('#ecgSearchEmpty').innerText(),/建设中/);
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),5);
+      assert(await page.locator('#ecgSearchEmpty').isHidden());
       await page.goto(base+'/ecg/atlas/pulmonary',{waitUntil:'networkidle'});
       await page.locator('a[href="/ecg/atlas/pulmonary/pulmonary-embolism"]').click();
       await page.waitForURL(base+'/ecg/atlas/pulmonary/pulmonary-embolism',{waitUntil:'networkidle'});
@@ -139,7 +141,7 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
 });
 
 test('ECG draft dossiers keep the basic layer visible, synchronize keyboard folding and keep fixed review metadata readable',async()=>{
-  const dossiers=[['arrhythmias','atrial-fibrillation','房颤'],['electrolytes','hyperkalemia','高钾血症'],['pulmonary','pulmonary-embolism','肺栓塞']];
+  const dossiers=[['arrhythmias','atrial-fibrillation','房颤'],['electrolytes','hyperkalemia','高钾血症'],['pulmonary','pulmonary-embolism','肺栓塞'],['conduction','second-degree-av-block','二度房室传导阻滞'],['pacing','ventricular-pacing','心室起搏心电图']];
   for(const width of [320,375,768,1440]){
     const {page,context,errors}=await pageFor(width);
     try{
