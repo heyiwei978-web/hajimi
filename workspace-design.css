@@ -437,3 +437,14 @@
 @media print{
   .reading-font-slot{display:none!important}
 }
+/* Layout fixes 2026-10-11: scrollable top tabs show a fade so hidden tabs are discoverable;
+   duty hero button keeps its spacing on phones. */
+@media screen and (max-width:1100px){
+  .official-nav .official-links,.tools-page .nav nav{
+    -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);
+    mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);
+    padding-right:24px;scroll-padding-inline:24px}
+}
+@media screen and (max-width:600px){
+  body.duty-page .duty-hero>.btn{display:inline-flex;margin-top:16px}
+}
