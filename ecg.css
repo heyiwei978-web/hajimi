@@ -113,3 +113,7 @@ html:has(.ecg-entry-page){scroll-padding-bottom:calc(var(--ecg-footer-height,150
   .ecg-figure-scroll{overflow:visible}
   .ecg-page .class-content-section{break-inside:avoid}
 }
+
+#ecg-references a{color:#1b66bd;text-decoration-thickness:1px;text-underline-offset:3px;overflow-wrap:anywhere}
+#ecg-references a:visited{color:#4f4a9c}
+#ecg-references li+li{margin-top:8px}

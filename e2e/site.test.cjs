@@ -107,7 +107,7 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
     try{
       await page.goto(base+'/ecg/atlas',{waitUntil:'networkidle'});
       assert.equal(await page.locator('.ecg-category-grid a').count(),7);
-      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),24);
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),30);
       const search=page.getByRole('searchbox',{name:'搜索心电图图谱'});
       const searchBounds=await search.boundingBox();assert(searchBounds.y>0&&searchBounds.y+searchBounds.height<900,'atlas search is visible before scrolling through categories');
       // Exact abbreviations match one entry; common Chinese terms rank the title/alias match first.
@@ -124,11 +124,11 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
       assert(await page.locator('#ecgSearchEmpty').isVisible());
       assert.equal(await page.locator('#ecgSearchResults img').count(),0);
       await page.getByRole('button',{name:'清空搜索'}).click();
-      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),24);
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),30);
       assert.equal(new URL(page.url()).searchParams.has('q'),false);
       await page.locator('a[href="/ecg/atlas/conduction"]').click();
       await page.waitForURL(base+'/ecg/atlas/conduction',{waitUntil:'networkidle'});
-      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),5);
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),7);
       assert(await page.locator('#ecgSearchEmpty').isHidden());
       await page.goto(base+'/ecg/atlas/pulmonary',{waitUntil:'networkidle'});
       await page.locator('a[href="/ecg/atlas/pulmonary/pulmonary-embolism"]').click();
@@ -141,7 +141,7 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
 });
 
 test('ECG draft dossiers keep the basic layer visible, synchronize keyboard folding and keep fixed review metadata readable',async()=>{
-  const dossiers=[['arrhythmias','atrial-fibrillation','房颤'],['electrolytes','hyperkalemia','高钾血症'],['pulmonary','pulmonary-embolism','肺栓塞'],['conduction','second-degree-av-block','二度房室传导阻滞'],['pacing','ventricular-pacing','心室起搏心电图']];
+  const dossiers=[['arrhythmias','atrial-fibrillation','房颤'],['electrolytes','hyperkalemia','高钾血症'],['pulmonary','pulmonary-embolism','肺栓塞'],['conduction','second-degree-av-block','二度房室传导阻滞'],['pacing','ventricular-pacing','心室起搏心电图'],['arrhythmias','brugada','Brugada 图形']];
   for(const width of [320,375,768,1440]){
     const {page,context,errors}=await pageFor(width);
     try{
@@ -155,7 +155,9 @@ test('ECG draft dossiers keep the basic layer visible, synchronize keyboard fold
         assert.equal(await page.locator('#ecg-basic img').count(),0);
         const footer=page.locator('#ecgReviewFooter');
         const footerText=await footer.innerText();
-        for(const text of ['仅供临床参考，不替代医生判断','参考文献：待补充','待审核','2026-10-11'])assert(footerText.includes(text));
+        for(const text of ['仅供临床参考，不替代医生判断','参考文献：','待审核','2026-10-11'])assert(footerText.includes(text));
+        assert.doesNotMatch(footerText,/待补充/);
+        assert(await page.locator('#ecg-references a[target="_blank"]').count()>=1);
         assert(await footer.evaluate(element=>{const r=element.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight+1&&r.left>=0&&r.right<=innerWidth&&getComputedStyle(element).position==='fixed';}));
         await page.locator('#ecgLayerToggle').click();
         assert.equal(await page.locator('#ecgPeriopLayer').evaluate(element=>element.open),true);
@@ -168,7 +170,7 @@ test('ECG draft dossiers keep the basic layer visible, synchronize keyboard fold
         assert.match(await page.locator('#ecgPeriopLayer').innerText(),/对手术时机的影响/);
         assert.match(await page.locator('#ecgPeriopLayer').innerText(),/何时会诊/);
         await page.locator('#ecgFooterReferences a').click();
-        await page.waitForFunction(()=>{const r=document.querySelector('#ecg-references').getBoundingClientRect(),footer=document.querySelector('#ecgReviewFooter').getBoundingClientRect(),header=document.querySelector('header').getBoundingClientRect();return r.top>=header.bottom+8&&r.bottom<=footer.top;});
+        await page.waitForFunction(()=>{const r=document.querySelector('#ecg-references').getBoundingClientRect(),footer=document.querySelector('#ecgReviewFooter').getBoundingClientRect(),header=document.querySelector('header').getBoundingClientRect();return r.top>=header.bottom+8&&r.top+48<=footer.top;});
         assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'SVG scrolling stays inside the figure');
         assert(await page.locator('#ecg-basic p').first().evaluate(element=>parseFloat(getComputedStyle(element).fontSize)>=16));
       }

@@ -88,6 +88,16 @@
     'ventricular-pacing':{title:'心室起搏心电图教学示意',description:'II 导联每个宽 QRS 前有起搏脉冲（红色竖线），QRS 宽大，ST-T 与主波方向相反。双极起搏的脉冲在体表心电图上可能很小。',rows:[row('II',N.flatMap(c=>beat(c,{p:false,qrs:'paced',t:-1,tAt:50,tw:10})),N.map(c=>c-14))]},
     'pacing-malfunction':{title:'起搏异常教学示意',description:'上行（II）：第二、四个起搏脉冲后无相应 QRS（失夺获）。下行（II）：自身 QRS 后仍有起搏脉冲落在 T 波上（感知不良）。',rows:[row('II',[90,410].flatMap(c=>beat(c,{p:false,qrs:'paced',t:-1,tAt:50,tw:10})),[76,236,396,556]),row('II',[...beats([90,330],{}),...beat(570,{p:false,qrs:'paced',t:-1,tAt:50,tw:10})],[150,556])]}
   });
+
+  const sawtooth=(period,amp)=>[x=>{const k=((x%period)+period)%period/period;return amp*(k<0.8?(k/0.8)*2-1:1-(k-0.8)/0.2*2);}];
+  Object.assign(drawings,{
+    'atrial-flutter':{title:'典型心房扑动教学示意',description:'II 导联连续的锯齿样扑动波（F 波），波间无等电位线；本例为 4:1 传导，心室率规则。',rows:[row('II',[...sawtooth(32,7),...[60,188,316,444,572].flatMap(c=>beat(c,{p:false,t:0.25,tAt:40,tw:6}))])]},
+    wpw:{title:'心室预激（WPW 图形）教学示意',description:'II 导联 PR 间期缩短，QRS 起始部有缓慢上升的 delta 波，QRS 增宽。',rows:[row('II',N.flatMap(c=>[...beat(c,{pr:18,r:1.05}),x=>G(x,c-9,5,-15)]))]},
+    brugada:{title:'1 型 Brugada 图形教学示意',description:'V1 导联 QRS 后 ST 段穹窿形抬高（下斜型），随后 T 波倒置。',rows:[row('V1',N.flatMap(c=>[...beat(c,{r:0.4,s:0.6,t:-1.1,tAt:48,tw:8}),x=>(x>c+3?-26*Math.exp(-((x-c-6)**2)/(2*15*15))*(x<c+6?(x-c-3)/3:1):0)]))]},
+    pericarditis:{title:'急性心包炎教学示意',description:'II 导联 ST 段凹面向上抬高并 PR 段压低；aVR 导联相反：ST 段压低、PR 段抬高。',rows:[row('II',N.flatMap(c=>[...beat(c,{st:9,t:1.1,tAt:56}),x=>plateau(x,c-22,c-10,3)])),row('aVR',N.flatMap(c=>[...beat(c,{r:-0.7,s:0,st:-4,t:-0.7}),x=>plateau(x,c-22,c-10,-2)]))]},
+    'early-repolarization':{title:'早期复极教学示意',description:'V4 导联 QRS 终末部 J 点切迹，ST 段凹面向上轻度抬高，T 波高大。',rows:[row('V4',N.flatMap(c=>[...beat(c,{r:1.2,s:0.15,st:4,t:1.5,tw:9}),x=>G(x,c+9,1.6,-7)]))]},
+    lafb:{title:'左前分支阻滞教学示意',description:'I 导联以 R 波为主（qR），aVF 导联以深 S 波为主（rS），提示电轴显著左偏；QRS 时限基本正常。',rows:[row('I',beats(N,{q:0.4,r:1,s:0.1})),row('aVF',beats(N,{r:0.35,s:1.5,t:0.6}))]}
+  });
   function render(kind){
     const drawing=drawings[kind];
     if(!drawing)return '';
