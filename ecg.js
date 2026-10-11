@@ -25,7 +25,7 @@
   }
   function home(){
     setPage('心电图','从基础到围手术期：学习、查阅和床旁计算。');
-    const entries=[['basics','基础学习','从电活动、导联与测量开始，认识正常心电图，再用六步法读图。','基'],['atlas','图谱库','按类别逐级查阅，搜索常见心电图词条及其围手术期要点。','图'],['periop','围手术期专区','术前评估、骨科高频场景，以及胸痛、气促、心悸值班速查。','术']];
+    const entries=[['basics','基础学习','从电活动、导联与测量开始，认识正常心电图，再用六步法读图。','基'],['atlas','图谱库','按类别逐级查阅，搜索常见心电图词条及其围手术期要点。','图'],['periop','围手术期专区','术前异常心电图处置、骨科麻醉相关风险、术后胸闷流程与术后心肌损伤。','术']];
     app.innerHTML='<section class="class-section-head"><span>01 / LEARN & READ</span><h2>从这里开始</h2><p>基础层帮助认识波形，围手术期层联系临床场景。</p></section><div class="ecg-entry-grid">'+entries.map(([id,title,description,symbol],index)=>'<a class="class-dept-card is-ready" href="/ecg/'+id+'"><span class="class-dept-index">0'+(index+1)+'</span><div class="class-dept-symbol" aria-hidden="true">'+symbol+'</div><h3>'+title+'</h3><p>'+description+'</p><div class="class-dept-foot"><strong>进入栏目</strong><span aria-hidden="true">→</span></div></a>').join('')+'</div>'+section('ecg-more','工具与自测','<div class="ecg-panel-grid">'+card('/ecg/tools','心电图工具','QTc 双公式计算、RR 间期心率速算，以及现有 RCRI 入口。')+card('/ecg/quiz','自测','建设中：本阶段保留入口，后续加入判读练习。','建设中')+'</div>');
   }
   function basics(){
@@ -98,9 +98,24 @@
     fitFooter();if(typeof ResizeObserver==='function')new ResizeObserver(fitFooter).observe(footer);else window.addEventListener('resize',fitFooter);
   }
   function periop(){
-    setPage('围手术期专区','联系手术紧迫性、症状、血流动力学状态及出血风险，按临床场景查阅。',[{title:'围手术期专区'}]);
-    const scenarios=data.periop.scenarios.map(item=>{const entry=data.entries.find(entry=>entry.id===item.entry);return entry?card(entryUrl(entry),item.title,item.body,'图谱词条 · 待审核'):'<article class="class-disease-card ecg-card"><small>详细词条待建设</small><h3>'+esc(item.title)+'</h3><p>'+esc(item.body)+'</p></article>';}).join('');
-    app.innerHTML='<nav class="ecg-section-links" aria-label="围手术期目录"><a href="#ecg-assessment">术前评估</a><a href="#ecg-scenarios">骨科高频场景</a><a href="#ecg-oncall">值班速查</a></nav>'+section('ecg-assessment','术前评估',points(data.periop.assessment)+'<p><a class="btn" href="/tools?tool=rcri">打开现有 RCRI 工具 →</a></p>')+section('ecg-scenarios','骨科高频场景','<div class="ecg-panel-grid">'+scenarios+'</div>')+section('ecg-oncall','值班速查',data.periop.onCall.map(item=>'<section><h3>'+esc(item.title)+'</h3>'+points(item.points)+'</section>').join(''));
+    const P=data.periop;
+    setPage('围手术期专区','骨科术前异常心电图、麻醉相关风险、术后胸闷与心肌损伤：联系手术紧迫性、症状、血流动力学状态及出血风险。',[{title:'围手术期专区'}]);
+    const link=id=>{const entry=id&&data.entries.find(item=>item.id===id);return entry?'<a href="'+esc(entryUrl(entry))+'">'+esc(entry.title)+' →</a>':'';};
+    const scenarios=P.scenarios.map(item=>{const entry=data.entries.find(entry=>entry.id===item.entry);return entry?card(entryUrl(entry),item.title,item.body,'图谱词条 · 待审核'):'<article class="class-disease-card ecg-card"><small>详细词条待建设</small><h3>'+esc(item.title)+'</h3><p>'+esc(item.body)+'</p></article>';}).join('');
+    const LEVEL={proceed:['通常可手术','ecg-risk-low'],evaluate:['评估后决定','ecg-risk-medium'],postpone:['推迟择期手术','ecg-risk-high']};
+    const parts=[];const nav=[];
+    const add=(id,title,html)=>{nav.push('<a href="#'+id+'">'+esc(title)+'</a>');parts.push(section(id,title,html));};
+    add('ecg-assessment','术前评估',points(P.assessment)+'<p><a class="btn" href="/tools?tool=rcri">打开现有 RCRI 工具 →</a></p>');
+    if(P.indications)add('ecg-indications','术前心电图：谁需要做','<p>'+esc(P.indications.intro)+'</p>'+points(P.indications.points));
+    if(P.surgeryRisk)add('ecg-surgery-risk','骨科手术的心血管风险','<div class="ecg-criteria-wrap"><table class="ecg-criteria ecg-table-3"><thead><tr><th scope="col">手术类型</th><th scope="col">风险分级</th><th scope="col">评估重点</th></tr></thead><tbody>'+P.surgeryRisk.map(row=>'<tr>'+row.map((cell,i)=>i?'<td>'+esc(cell)+'</td>':'<th scope="row">'+esc(cell)+'</th>').join('')+'</tr>').join('')+'</tbody></table></div><p class="ecg-hint">风险分级参考 ESC 2022 非心脏手术指南（30 天心血管死亡或心梗的估计风险）；患者自身因素同样重要。</p>');
+    if(P.abnormal)add('ecg-abnormal','术前异常心电图怎么办','<p>按心电图发现查找处置建议；最终决定需结合症状、手术紧迫性和多学科讨论。</p><div class="ecg-abnormal-list">'+P.abnormal.map(item=>'<article class="ecg-abnormal-item"><div class="ecg-abnormal-head"><h3>'+esc(item.finding)+'</h3><span class="ecg-risk '+LEVEL[item.level][1]+'">'+LEVEL[item.level][0]+'</span></div><p>'+esc(item.action)+'</p>'+link(item.entry)+'</article>').join('')+'</div>');
+    add('ecg-scenarios','骨科高频场景','<div class="ecg-panel-grid">'+scenarios+'</div>');
+    if(P.anesthesia)add('ecg-anesthesia','麻醉与术中相关风险','<div class="ecg-abnormal-list">'+P.anesthesia.map(item=>'<article class="ecg-abnormal-item"><h3>'+esc(item.title)+'</h3><dl class="ecg-mini-dl"><dt>常见场景</dt><dd>'+esc(item.context)+'</dd><dt>心电图与循环表现</dt><dd>'+esc(item.ecg)+'</dd><dt>应对要点</dt><dd>'+esc(item.response)+'</dd></dl>'+link(item.link)+'</article>').join('')+'</div>');
+    if(P.postopFlow)add('ecg-postop','术后胸闷 / 胸痛：处理流程','<ol class="ecg-steps ecg-flow">'+P.postopFlow.map(step=>'<li><strong>'+esc(step.title)+'</strong><p>'+esc(step.body)+'</p></li>').join('')+'</ol>');
+    if(P.injury)add('ecg-injury','术后心肌损伤','<p>'+esc(P.injury.intro)+'</p><div class="ecg-criteria-wrap"><table class="ecg-criteria"><tbody>'+P.injury.rows.map(([a,b])=>'<tr><th scope="row">'+esc(a)+'</th><td>'+esc(b)+'</td></tr>').join('')+'</tbody></table></div><h3>发现后怎么做</h3>'+points(P.injury.points)+'<p>'+link('nste-ischemia')+'</p>');
+    add('ecg-oncall','值班速查',P.onCall.map(item=>'<section><h3>'+esc(item.title)+'</h3>'+points(item.points)+'</section>').join(''));
+    if(P.references)add('ecg-periop-refs','参考文献','<ol class="ecg-points">'+P.references.map(ref=>'<li><a href="'+esc(ref.url)+'" target="_blank" rel="noopener noreferrer">'+esc(ref.title)+' ↗</a></li>').join('')+'</ol><p class="ecg-hint">专题内容为草稿，待临床医师审核；不含固定药物剂量，具体处理以本院流程为准。</p>');
+    app.innerHTML='<nav class="ecg-section-links" aria-label="围手术期目录">'+nav.join('')+'</nav>'+parts.join('');
   }
   function tools(){
     setPage('心电图工具','输入单位统一为毫秒（ms），计算在当前浏览器完成。结果需结合测量方法和临床背景。',[{title:'工具'}]);

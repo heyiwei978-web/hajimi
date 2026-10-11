@@ -5,7 +5,7 @@ import {test} from 'node:test';
 
 function load(){
   const context={window:{}};
-  for(const file of ['ecg-data.js','ecg-waveforms.js','ecg-calculators.js']){
+  for(const file of ['ecg-data.js','ecg-periop-data.js','ecg-waveforms.js','ecg-calculators.js']){
     runInNewContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context,{filename:file});
   }
   return context.window;
@@ -79,4 +79,15 @@ test('ECG drawings are accessible original inline vectors with unique IDs and no
   }
   assert.equal(new Set(identifiers).size,identifiers.length);
   assert.equal(drawings.render('unknown'),'');
+});
+
+test('perioperative topic links only to existing entries and cites https sources',()=>{
+  const data=load().HAJIMI_ECG_DATA,ids=new Set(data.entries.map(entry=>entry.id)),P=data.periop;
+  assert(P.indications.points.length>=4);
+  assert(P.abnormal.length>=15);
+  for(const item of P.abnormal){assert(['proceed','evaluate','postpone'].includes(item.level));assert(ids.has(item.entry),item.entry);}
+  for(const item of P.anesthesia){assert(item.title&&item.context&&item.ecg&&item.response);if(item.link)assert(ids.has(item.link),item.link);}
+  assert(P.postopFlow.length>=5);
+  assert(P.injury.rows.length>=4);
+  for(const ref of P.references)assert.equal(new URL(ref.url).protocol,'https:');
 });
