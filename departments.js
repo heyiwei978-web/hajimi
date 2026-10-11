@@ -125,7 +125,7 @@
     let currentDept=null;
     let catalogSize=-1,departmentRecords=new Map(),diseaseRecords=new Map();
     let searchIndex=null,searchIndexSize=-1;
-    let routeGeneration=0;
+    let routeGeneration=0,activeRoute='';
 
     function pathState(){
       const p=location.pathname.split('/').filter(Boolean);
@@ -240,6 +240,10 @@
         c.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
       });
     }
+    function scrollToOrthoCategory(){
+      const anchor=orthoSections.find(section=>location.hash==='#ortho-'+section.key);
+      if(anchor)document.getElementById('ortho-'+anchor.key)?.scrollIntoView({behavior:'instant',block:'start'});
+    }
     function renderOrthoIndex(){
       document.body.classList.remove('department-no-sidebar','library-root-page','disease-book-page');
       setBrand();
@@ -307,6 +311,9 @@
       const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');
       if(tc)tc.textContent=list.length;
       if(ac)ac.textContent=list.length;
+      // The catalog loads asynchronously, so an initial fragment may arrive
+      // before its category exists. Restore it once the overview is rendered.
+      scrollToOrthoCategory();
     }
     function toolbar(label,root){
       return `<div class="department-toolbar"><div class="department-toolbar-actions"><a class="btn ghost site-home-btn" href="/">⌂ 网站首页</a><button class="btn ghost" id="departmentBack">← ${root?'返回病历首页':'返回科室'}</button></div><span>${label}</span></div>`;
@@ -746,6 +753,7 @@
       render();
     }
     async function applyRoute(){
+      activeRoute=location.pathname+location.search;
       const generation=++routeGeneration;
       document.getElementById('templateGrid').classList.remove('search-results','case-search-results');
       const r=pathState();setShell(r.page);
@@ -912,7 +920,15 @@
       document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&sidebar.classList.contains('open'))close();});
       window.addEventListener('resize',()=>{if(innerWidth>900&&sidebar.classList.contains('open'))close();},{passive:true});
     }
-    window.addEventListener('popstate',applyRoute);
+    window.addEventListener('popstate',()=>{
+      // Native category anchors also emit popstate. Keep their DOM and let
+      // the browser scroll; rebuilding it interrupts fragment navigation.
+      if(activeRoute===location.pathname+location.search&&document.querySelector('.ortho-jump'))return;
+      applyRoute();
+    });
+    // hashchange follows native history scroll restoration. Align the category
+    // after that step, including when returning from another category link.
+    window.addEventListener('hashchange',scrollToOrthoCategory);
     window.addEventListener('hajimi:cms-ready',async()=>{const r=pathState(),path=location.pathname;if(r.page==='library'&&r.disease&&currentDept){try{if(window.HAJIMI)await window.HAJIMI.ensureGroup(r.department,r.disease);if(path===location.pathname)renderDisease();}catch(error){toast(error.message);}}});
     window.hajimiNavigateDepartment=navigateDepartment;
     window.hajimiNavigateRoot=navigateRoot;

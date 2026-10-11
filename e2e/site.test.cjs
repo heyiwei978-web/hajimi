@@ -213,6 +213,63 @@ test('every orthopedic card keeps both borders inside its category on phones and
   }
 });
 
+async function waitForOrthoCategory(page,key) {
+  await page.waitForFunction(key=>{
+    const target=document.getElementById('ortho-'+key);
+    if(!target)return false;
+    const top=target.getBoundingClientRect().top;
+    const header=document.querySelector('.library-topbar').getBoundingClientRect().bottom;
+    return top>=header+10&&top<=header+20;
+  },key,{timeout:5000});
+  await settle(page);
+  assert(await page.locator('#ortho-'+key+' .ortho-category-head h3').isVisible());
+}
+
+test('orthopedic category links land on the selected heading without rebuilding the overview', {timeout:120000},async()=>{
+  for(const width of [320,375,393,768,1440]){
+    const {page,context,errors}=await pageFor(width,{reducedMotion:'no-preference',isMobile:width<=393,hasTouch:width<=393});
+    try{
+      await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
+      await page.evaluate(()=>window.categoryOverview=document.querySelector('.ortho-sections'));
+      // Jump to the last category first, before earlier cards have been scrolled into view.
+      for(const key of ['soft','joint','trauma','pediatric','sports','hand','foot','spine','bone','soft']){
+        await page.locator('.ortho-jump a[href="#ortho-'+key+'"]').click();
+        await waitForOrthoCategory(page,key);
+        assert.equal(new URL(page.url()).hash,'#ortho-'+key);
+        assert(await page.evaluate(()=>window.categoryOverview===document.querySelector('.ortho-sections')),'a fragment change preserves the existing overview');
+      }
+      assert.equal(await page.locator('#ortho-soft .ortho-disease-card h3').innerText(),'通用场景');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('orthopedic category deep links survive refresh and browser history, and open the matching records', {timeout:60000},async()=>{
+  for(const width of [375,1440]){
+    const {page,context,errors}=await pageFor(width,{reducedMotion:width===375?'no-preference':'reduce',isMobile:width===375,hasTouch:width===375});
+    try{
+      await page.goto(base+'/bl/guke#ortho-soft',{waitUntil:'networkidle'});
+      await waitForOrthoCategory(page,'soft');
+      await page.reload({waitUntil:'networkidle'});
+      await waitForOrthoCategory(page,'soft');
+      const joint=page.locator('.ortho-jump a[href="#ortho-joint"]');
+      await joint.focus();await page.keyboard.press('Enter');
+      await waitForOrthoCategory(page,'joint');
+      await page.goBack();await waitForOrthoCategory(page,'soft');
+      await page.goForward();await waitForOrthoCategory(page,'joint');
+      await page.goBack();await waitForOrthoCategory(page,'soft');
+      await page.locator('#ortho-soft .ortho-disease-card').click();
+      await page.locator('#caseWorkspace').waitFor({state:'visible'});
+      assert.equal(decodeURIComponent(new URL(page.url()).pathname),'/bl/guke/通用场景');
+      assert.match(await page.title(),/通用场景/);
+      await page.goBack();await waitForOrthoCategory(page,'soft');
+      await page.goForward();await page.locator('#caseWorkspace').waitFor({state:'visible'});
+      assert.equal(decodeURIComponent(new URL(page.url()).pathname),'/bl/guke/通用场景');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('cross-department search groups templates into complete case files; filters and empty reset work',async()=>{
   const {page,context,errors}=await pageFor(393);
   try {

@@ -304,6 +304,10 @@ body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
 html{
   scrollbar-gutter:stable;
 }
+/* Long category jumps should arrive directly, without an ongoing scroll animation. */
+html:has(.ortho-jump){
+  scroll-behavior:auto;
+}
 button,a,[role="button"]{
   touch-action:manipulation;
 }
@@ -313,9 +317,9 @@ button,a,[role="button"]{
   scroll-margin-top:84px;
 }
 @supports (content-visibility:auto){
+  /* Category anchors need exact heights for all preceding disease cards. */
   .record-book-section:not(:first-child),
-  .pathway-section:not(:first-child),
-  .ortho-category{
+  .pathway-section:not(:first-child){
     content-visibility:auto;
     contain-intrinsic-size:auto 620px;
     /* Reserve vertical space without imposing a 620px minimum card width. */
