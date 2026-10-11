@@ -53,9 +53,151 @@ test('homepage is usable without JavaScript and avoids loading clinical data', a
   try {await page.goto(base+'/');assert(await page.locator('#portalHome').isVisible());
     assert.equal(await page.getByRole('link',{name:'病历模板',exact:true}).count(),1);
     assert.equal(await page.locator('script[src*="app.js"],script[src*="record-quality"],#libraryShell').count(),0);
-    assert.equal(await page.locator('.official-feature').count(),5);
+    assert.equal(await page.locator('.official-feature').count(),6);
     assert.equal(await page.locator('a.card-classification[href="/classification"]').count(),1);
+    assert.equal(await page.locator('a.card-ecg[href="/ecg"]').count(),1);
+    assert.match(await page.locator('a.card-ecg p').innerText(),/从基础到围手术期/);
   } finally {await context.close();}
+});
+
+test('ECG routes share the public layout, expose learning sections and keep the quiz explicitly under construction',async()=>{
+  for(const width of [320,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      const requests=[];page.on('request',request=>requests.push(new URL(request.url()).pathname));
+      for(const [route,title] of [['','心电图'],['basics','基础学习'],['atlas','图谱库'],['periop','围手术期专区'],['tools','心电图工具'],['quiz','自测']]){
+        const response=await page.goto(base+'/ecg'+(route?'/'+route:''),{waitUntil:'networkidle'});
+        assert.equal(response.status(),200);
+        assert.equal(await page.locator('h1').innerText(),title);
+        assert.equal(await page.locator('header nav a.active').getAttribute('href'),'/ecg');
+        assert(await page.locator('header nav a.active').evaluate(element=>{const r=element.getBoundingClientRect(),nav=element.closest('nav').getBoundingClientRect();return r.left>=nav.left-1&&r.right<=nav.right+1;}));
+        assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+        assert.match(await page.locator('#ecgReviewFooter').innerText(),/仅供临床参考，不替代医生判断/);
+      }
+      assert.match(await page.locator('#ecgApp').innerText(),/建设中/);
+      assert.equal(await page.locator('#ecgApp input').count(),0,'quiz must not imply that questions or scoring are available');
+      await page.goto(base+'/ecg/basics',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('.ecg-steps>li').count(),6);
+      assert.match(await page.locator('#ecg-leads').innerText(),/10 个电极/);
+      assert.match(await page.locator('#ecg-paper').innerText(),/40 ms/);
+      assert.match(await page.locator('#ecg-normal').innerText(),/120–200 ms/);
+      await page.goto(base+'/ecg/periop',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('#ecg-scenarios .ecg-card').count(),6);
+      assert.match(await page.locator('#ecg-oncall').innerText(),/术后胸痛/);
+      assert.match(await page.locator('#ecg-oncall').innerText(),/术后气促/);
+      assert.match(await page.locator('#ecg-oncall').innerText(),/术后心悸/);
+      assert.equal(requests.filter(url=>/^\/(?:api\/|catalog-|records-|app-runtime-|department-runtime-)/.test(url)).length,0,'ECG remains independent of private administration and clinical-record loading');
+      for(const route of ['/','/classification','/pathway','/tools','/duty']){
+        await page.goto(base+route,{waitUntil:'networkidle'});
+        assert.equal(await page.locator('header nav a[href="/ecg"]').count(),1,'public ECG navigation on '+route);
+      }
+      await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('.library-top-actions a[href="/ecg"]').count(),1);
+      if(width===320){await page.locator('#menuBtn').click();await page.locator('.mobile-drawer-shortcuts a[href="/ecg"]').click();await page.waitForURL(base+'/ecg');}
+      await page.goto(base+'/ecg/atlas/not-a-category',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('h1').innerText(),'页面未找到');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh and opens category deep links',async()=>{
+  for(const width of [375,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/ecg/atlas',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('.ecg-category-grid a').count(),7);
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),3);
+      const search=page.getByRole('searchbox',{name:'搜索心电图图谱'});
+      const searchBounds=await search.boundingBox();assert(searchBounds.y>0&&searchBounds.y+searchBounds.height<900,'atlas search is visible before scrolling through categories');
+      for(const [query,id] of [['房颤','atrial-fibrillation'],['AF','atrial-fibrillation'],['高钾','hyperkalemia'],['PE','pulmonary-embolism'],['Ｓ１Ｑ３Ｔ３','pulmonary-embolism']]){
+        await search.fill(query);
+        assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),1);
+        assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').getAttribute('data-ecg-entry'),id);
+        assert.equal(new URL(page.url()).searchParams.get('q'),query);
+      }
+      await page.reload({waitUntil:'networkidle'});
+      assert.equal(await search.inputValue(),'Ｓ１Ｑ３Ｔ３');
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),1);
+      await search.fill('<img src=x onerror=alert(1)>');
+      assert(await page.locator('#ecgSearchEmpty').isVisible());
+      assert.equal(await page.locator('#ecgSearchResults img').count(),0);
+      await page.getByRole('button',{name:'清空搜索'}).click();
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),3);
+      assert.equal(new URL(page.url()).searchParams.has('q'),false);
+      await page.locator('a[href="/ecg/atlas/conduction"]').click();
+      await page.waitForURL(base+'/ecg/atlas/conduction',{waitUntil:'networkidle'});
+      assert.match(await page.locator('#ecgSearchEmpty').innerText(),/建设中/);
+      await page.goto(base+'/ecg/atlas/pulmonary',{waitUntil:'networkidle'});
+      await page.locator('a[href="/ecg/atlas/pulmonary/pulmonary-embolism"]').click();
+      await page.waitForURL(base+'/ecg/atlas/pulmonary/pulmonary-embolism',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('h1').innerText(),'肺栓塞');
+      await page.goBack();assert.equal(await page.locator('h1').innerText(),'肺循环与右心负荷');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('ECG draft dossiers keep the basic layer visible, synchronize keyboard folding and keep fixed review metadata readable',async()=>{
+  const dossiers=[['arrhythmias','atrial-fibrillation','房颤'],['electrolytes','hyperkalemia','高钾血症'],['pulmonary','pulmonary-embolism','肺栓塞']];
+  for(const width of [320,375,768,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      for(const [category,id,title] of dossiers){
+        await page.goto(base+'/ecg/atlas/'+category+'/'+id,{waitUntil:'networkidle'});await settle(page);
+        assert.equal(await page.locator('h1').innerText(),title);
+        assert(await page.locator('#ecg-basic').isVisible());
+        assert.equal(await page.locator('#ecgPeriopLayer').evaluate(element=>element.open),false);
+        assert.equal(await page.locator('#ecgLayerToggle').getAttribute('aria-expanded'),'false');
+        assert.equal(await page.locator('#ecg-basic svg[role="img"] title').count(),1);
+        assert.equal(await page.locator('#ecg-basic img').count(),0);
+        const footer=page.locator('#ecgReviewFooter');
+        const footerText=await footer.innerText();
+        for(const text of ['仅供临床参考，不替代医生判断','参考文献：待补充','待审核','2026-10-11'])assert(footerText.includes(text));
+        assert(await footer.evaluate(element=>{const r=element.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight+1&&r.left>=0&&r.right<=innerWidth&&getComputedStyle(element).position==='fixed';}));
+        await page.locator('#ecgLayerToggle').click();
+        assert.equal(await page.locator('#ecgPeriopLayer').evaluate(element=>element.open),true);
+        assert.equal(await page.locator('#ecgLayerToggle').getAttribute('aria-expanded'),'true');
+        assert(await page.locator('#ecg-basic').isVisible());
+        const summary=page.locator('#ecgPeriopLayer summary');await summary.focus();await page.keyboard.press('Enter');await settle(page);
+        assert.equal(await page.locator('#ecgLayerToggle').getAttribute('aria-expanded'),'false');
+        await summary.focus();await page.keyboard.press('Enter');await settle(page);
+        assert.equal(await page.locator('#ecgLayerToggle').getAttribute('aria-expanded'),'true');
+        assert.match(await page.locator('#ecgPeriopLayer').innerText(),/对手术时机的影响/);
+        assert.match(await page.locator('#ecgPeriopLayer').innerText(),/何时会诊/);
+        await page.locator('#ecgFooterReferences a').click();
+        await page.waitForFunction(()=>{const r=document.querySelector('#ecg-references').getBoundingClientRect(),footer=document.querySelector('#ecgReviewFooter').getBoundingClientRect(),header=document.querySelector('header').getBoundingClientRect();return r.top>=header.bottom+8&&r.bottom<=footer.top;});
+        assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'SVG scrolling stays inside the figure');
+        assert(await page.locator('#ecg-basic p').first().evaluate(element=>parseFloat(getComputedStyle(element).fontSize)>=16));
+      }
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('ECG tools calculate both QTc formulas and RR heart rate, discard stale results and link to the existing RCRI',async()=>{
+  for(const width of [320,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/ecg/tools',{waitUntil:'networkidle'});
+      await page.locator('#ecgQt').fill('400');await page.locator('#ecgQtRr').fill('800');await page.locator('#ecgQtRr').press('Enter');
+      assert.match(await page.locator('#ecgQtResult').innerText(),/Bazett：447 ms/);
+      assert.match(await page.locator('#ecgQtResult').innerText(),/Fridericia：431 ms/);
+      await page.locator('#ecgQtRr').fill('1000');assert.equal(await page.locator('#ecgQtResult').isVisible(),false);
+      await page.getByRole('button',{name:'计算 QTc'}).click();assert.match(await page.locator('#ecgQtResult').innerText(),/Bazett：400 ms/);
+      await page.locator('#ecgQtRr').fill('0');await page.getByRole('button',{name:'计算 QTc'}).click();
+      assert.match(await page.locator('#ecgQtResult').innerText(),/大于 0/);assert.doesNotMatch(await page.locator('#ecgQtResult').innerText(),/Infinity|NaN|400 ms/);
+      await page.locator('#ecgHeartRr').fill('800');await page.getByRole('button',{name:'计算心率'}).click();
+      assert.match(await page.locator('#ecgHeartResult').innerText(),/75.0 次\/分/);
+      await page.locator('#ecgHeartRr').fill('');await page.getByRole('button',{name:'计算心率'}).click();assert.match(await page.locator('#ecgHeartResult').innerText(),/完整输入/);
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      await page.getByRole('link',{name:'打开现有 RCRI 工具 →'}).click();
+      await page.locator('#dlg').waitFor({state:'visible'});
+      assert.match(await page.locator('#dtitle').innerText(),/Revised Cardiac Risk Index/);
+      assert.equal(await page.locator('#dbody input[type="checkbox"]').count(),6);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
 });
 
 test('classification is a separate department-first hub with 17 orthopedic dossiers, references, and deep links',async()=>{

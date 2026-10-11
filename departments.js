@@ -885,7 +885,7 @@
     const orthoDrawer=document.getElementById('sidebar');
     if(orthoDrawer){
       orthoDrawer.innerHTML=
-        '<div class="mobile-drawer-shortcuts"><a href="/">⌂ 网站首页</a><a href="/bl">▤ 病历首页</a></div>'+ 
+        '<div class="mobile-drawer-shortcuts"><a href="/">⌂ 网站首页</a><a href="/bl">▤ 病历首页</a><a href="/ecg">心电图</a></div>'+
         '<div class="side-head">骨科疾病 / 术式</div>'+
         '<button class="nav-item active" type="button" data-ortho-route="__overview">骨科总览</button>'+
         orthoSections.map((section)=>{

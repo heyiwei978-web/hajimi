@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="/library-personal.css?v=20261009-personal1">
 <link rel="stylesheet" href="/case-workspace-preview.css?v=20261009-reading1">
 <link rel="stylesheet" href="/workspace-design.css?v=20261011-mvp1">
-<link rel="stylesheet" href="/classification-home.css?v=20261010-classification1">
+<link rel="stylesheet" href="/classification-home.css?v=20261011-ecg1">
 </head>
 <body>
 <a class="skip-link" href="#homeContent">跳到主要内容</a>
@@ -28,6 +28,7 @@
       <a class="active" href="/">首页</a>
       <a href="/bl">病历模板</a>
       <a href="/classification">疾病分型</a>
+      <a href="/ecg">心电图</a>
       <a href="/pathway">临床路径</a>
       <a href="/duty">值班资料</a>
       <a href="/tools">临床工具</a>
@@ -49,7 +50,7 @@
     <div class="official-hero-copy">
       <p class="official-kicker">HAJIMI CLINICAL WORKSPACE</p>
       <h1>临床资料，<span>一个入口。</span></h1>
-      <p class="official-lead">病历模板、疾病分型、临床路径、值班资料和常用临床工具统一整理，打开即用，持续更新。</p>
+      <p class="official-lead">病历模板、疾病分型、心电图、临床路径、值班资料和常用临床工具统一整理，打开即用，持续更新。</p>
       <form class="home-search" action="/bl" method="get" role="search">
         <label for="homeSearch">搜索病历模板</label>
         <div class="home-search-field">
@@ -115,6 +116,11 @@
       <div class="feature-art classification-art" aria-hidden="true"><i></i><i></i><i></i></div>
       <div class="feature-enter">进入 <span>→</span></div>
     </a>
+    <a class="official-feature card-ecg" href="/ecg">
+      <div class="feature-icon blue" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h5l3-7 4 14 3-7h5"/></svg></div>
+      <div class="feature-copy"><span class="feature-eyebrow">学习与查阅</span><h2>心电图</h2><p>从基础到围手术期</p></div>
+      <div class="feature-enter">进入 <span>→</span></div>
+    </a>
     <a class="official-feature card-duty" href="/duty">
       <div class="feature-icon green">▦</div>
       <div class="feature-copy"><span class="feature-eyebrow">值班工作台</span><h2>值班资料</h2><p>交班清单、待办复评提醒与病历、路径、工具快捷入口。</p></div>
@@ -162,14 +168,14 @@
 </div>
 
 <div id="dutyPage" class="portal-home" hidden>
-<header class="global-nav"><div class="global-nav-inner"><a class="global-brand" href="/">hajimi</a><nav class="global-links"><a href="/">首页</a><a href="/bl">病历模板</a><a href="/classification">疾病分型</a><a href="/pathway">临床路径</a><a href="/tools">临床工具</a><a href="/admin">管理入口</a><span data-auth-slot></span></nav></div></header>
+<header class="global-nav"><div class="global-nav-inner"><a class="global-brand" href="/">hajimi</a><nav class="global-links"><a href="/">首页</a><a href="/bl">病历模板</a><a href="/classification">疾病分型</a><a href="/ecg">心电图</a><a href="/pathway">临床路径</a><a href="/tools">临床工具</a><a href="/admin">管理入口</a><span data-auth-slot></span></nav></div></header>
 <main class="portal-main"><section class="portal-hero"><p class="portal-kicker">ON CALL</p><h1>值班工作台</h1><p class="portal-subtitle">交班核对清单、待办复评安排与常用资料。</p><a class="btn primary" href="/duty">打开值班工作台</a></section></main>
 </div>
 
 <div id="libraryShell" aria-busy="true">
 <header class="topbar library-topbar">
 <div class="brandline"><button id="menuBtn" class="menu-btn" type="button" aria-label="打开菜单" aria-controls="sidebar" aria-expanded="false">☰</button><a class="site-home-mark" href="/" aria-label="返回网站首页" title="网站首页"><span class="brand-mark library-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M3.8 10.8 12 4l8.2 6.8v8.1a1.6 1.6 0 0 1-1.6 1.6h-4.4v-6h-4.4v6H5.4a1.6 1.6 0 0 1-1.6-1.6z"/></svg></span></a><a class="brand library-brand" href="/bl"><span class="library-brand-copy"><em>哈基米工作站</em><strong>病历模板</strong><small>Clinical Template Library</small></span></a></div>
-<div class="top-actions library-top-actions"><a class="text-action" href="/">首页</a><a class="text-action library-active-link" href="/bl">病历模板</a><a href="/classification">疾病分型</a><a class="text-action" href="/pathway">临床路径</a><a class="text-action" href="/tools">临床工具</a><a class="text-action" href="/admin">管理入口</a><button id="patientBtn" class="text-action patient-action" type="button">患者信息</button><span data-auth-slot></span></div>
+<div class="top-actions library-top-actions"><a class="text-action" href="/">首页</a><a class="text-action library-active-link" href="/bl">病历模板</a><a href="/classification">疾病分型</a><a class="text-action" href="/ecg">心电图</a><a class="text-action" href="/pathway">临床路径</a><a class="text-action" href="/tools">临床工具</a><a class="text-action" href="/admin">管理入口</a><button id="patientBtn" class="text-action patient-action" type="button">患者信息</button><span data-auth-slot></span></div>
 </header>
 <div id="drawerMask" class="drawer-mask" aria-hidden="true"></div>
 <div class="page">

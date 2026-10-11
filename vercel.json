@@ -13,6 +13,18 @@
       "destination": "/admin.html"
     },
     {
+      "source": "/ecg",
+      "destination": "/ecg.html"
+    },
+    {
+      "source": "/ecg/",
+      "destination": "/ecg.html"
+    },
+    {
+      "source": "/ecg/:path*",
+      "destination": "/ecg.html"
+    },
+    {
       "source": "/classification",
       "destination": "/classification.html"
     },

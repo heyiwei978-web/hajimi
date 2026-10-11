@@ -1,6 +1,6 @@
 /* Top-level classification is a peer of records and pathways, not a sub-route of either. */
 @media screen and (min-width:1251px){
-  .official-home .official-feature-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .official-home .official-feature-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media screen and (min-width:761px) and (max-width:1250px){
   .official-home .official-feature-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -14,6 +14,7 @@
 .official-home .official-feature.card-classification{border-top:3px solid #3d83bf}
 .official-home .card-classification .class-icon{background:#e9f4ff;color:#1e6dae;font-size:17px;font-weight:800}
 .official-home .card-classification .feature-enter{color:#1c6cae}
+.official-home .official-feature.card-ecg{border-top:3px solid var(--ws-blue)}
 .official-home .home-quick-panel .home-quick-pathway + .home-quick-pathway{margin-top:8px}
 @media screen and (min-width:1050px) and (max-width:1380px){
   .official-nav .official-links{gap:12px}
