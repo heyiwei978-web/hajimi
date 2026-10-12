@@ -151,6 +151,17 @@
     vflutter:{title:'心室扑动教学示意',description:'II 导联规则、连续的正弦样大波（约 280 次/分），没有等电位线，无法分辨 QRS 与 T 波。',rows:[row('II',[x=>-28*Math.sin(2*Math.PI*(x-28)/43)])]}
   });
 
+  // Eighth batch (textbook chapters 4–6 and 9).
+  Object.assign(drawings,{
+    'mi-evolution':{title:'急性心肌梗死演变教学示意',description:'上行：超急性期 T 波高大宽阔。中行：急性期 ST 弓背向上抬高并与 T 融合（单向曲线）。下行：演变期出现 Q 波，ST 回落，T 波对称倒置。',rows:[row('V3 超急性期',beats(N,{r:1.1,s:0.5,t:2.1,tAt:50,tw:12})),row('V3 急性期',beats(N,{r:0.8,s:0.1,st:24,t:0.9,tAt:56,tw:12})),row('V3 演变期',N.flatMap(c=>[...beat(c,{r:0.35,s:0.2,t:-1.3,tAt:54,tw:9}),x=>G(x,c-4,3,20)]))]},
+    'variant-angina':{title:'变异型心绞痛教学示意',description:'上行（发作时）：V3 导联 ST 段抬高、T 波高尖。下行（缓解后数分钟）：ST-T 恢复正常。',rows:[row('V3 发作时',beats(N,{r:1.15,s:0.1,st:20,t:1.3,tAt:54,tw:11})),row('V3 缓解后',beats(N,{r:0.9,s:0.6,t:1}))]},
+    aneurysm:{title:'室壁瘤持续性 ST 抬高教学示意',description:'V2 导联 QS 波，其后 ST 段持续抬高并接倒置 T 波；与数周前心电图形态相同。',rows:[row('V2',beats(N,{qrs:'qs',r:1.1,st:7,t:-0.9,tAt:56,tw:9}))]},
+    'pseudo-q':{title:'体位相关的 III 导联 Q 波教学示意',description:'上行（平静呼气）：III 导联呈 Qr 形。下行（深吸气后）：Q 波消失，呈以 R 波为主的图形。',rows:[row('III 呼气',N.flatMap(c=>[...beat(c,{r:0.45,s:0.1,t:0.4}),x=>G(x,c-5,2.8,22)])),row('III 深吸气',beats(N,{r:0.9,s:0.2,t:0.6}))]},
+    'cns-t':{title:'颅内病变相关 T 波教学示意',description:'V3 导联宽而深的倒置 T 波，QT 间期明显延长。',rows:[row('V3',[90,330,570].flatMap(c=>beat(c,{r:0.9,s:0.5,t:-2.4,tAt:104,tw:20})))]},
+    exercise:{title:'运动负荷试验教学示意',description:'上行（静息）：V5 导联 ST 段正常。下行（运动中，心率增快）：ST 段水平型压低。',rows:[row('V5 静息',beats(N,{})),row('V5 运动中',[60,160,260,360,460,560].flatMap(c=>beat(c,{pr:26,s:0.1,st:-11,t:0.35,tAt:50,tw:6})))]},
+    antiarrhythmic:{title:'Ia 类抗心律失常药作用教学示意',description:'II 导联 QRS 轻度增宽、T 波低平，QT 间期延长。',rows:[row('II',[90,310,530].flatMap(c=>beat(c,{qrs:'broad',r:0.9,s:0.4,t:0.45,tAt:98,tw:12})))]}
+  });
+
   // Artifact and lead-reversal sketches for the basics page.
   const noise=(amp,rate,seed=0)=>[x=>amp*(Math.sin(x*rate+seed)*0.6+Math.sin(x*rate*1.9+seed*3)*0.4)];
   Object.assign(drawings,{

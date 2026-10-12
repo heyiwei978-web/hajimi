@@ -5,7 +5,7 @@ import {test} from 'node:test';
 
 function load(){
   const context={window:{}};
-  for(const file of ['ecg-data.js','ecg-cases-data.js','ecg-basics-data.js','ecg-periop-data.js','ecg-book-data.js','ecg-book-data-2.js','ecg-waveforms.js','ecg-calculators.js']){
+  for(const file of ['ecg-data.js','ecg-cases-data.js','ecg-basics-data.js','ecg-periop-data.js','ecg-book-data.js','ecg-book-data-2.js','ecg-book-data-3.js','ecg-waveforms.js','ecg-calculators.js']){
     runInNewContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context,{filename:file});
   }
   return context.window;
@@ -37,7 +37,7 @@ test('ECG calculations reject missing, nonpositive and nonfinite input instead o
 test('all ECG atlas drafts keep valid categories, both clinical layers and explicit review metadata',()=>{
   const window=load(),data=window.HAJIMI_ECG_DATA;
   assert.equal(data.schema,1);
-  assert.equal(data.entries.length,73);
+  assert.equal(data.entries.length,80);
   const ids=Array.from(data.entries,entry=>entry.id);
   assert.equal(new Set(ids).size,ids.length,'entry ids are unique');
   for(const id of ['atrial-fibrillation','hyperkalemia','pulmonary-embolism','stemi','complete-heart-block','ventricular-pacing'])assert(ids.includes(id));
@@ -161,4 +161,13 @@ test('textbook batch 7: arrhythmia chapters add entries, sketches and chapter ci
   const wct=data.entries.find(entry=>entry.id==='wide-complex-tachycardia');
   assert(wct.basic.criteria.some(([name])=>name.includes('Brugada')));
   assert(wct.basic.criteria.some(([name])=>name.includes('aVR')));
+});
+
+test('textbook batch 8: infarction, ischemia, pulmonary embolism and drug/electrolyte chapters',()=>{
+  const window=load(),data=window.HAJIMI_ECG_DATA,W=window.HAJIMI_ECG_WAVEFORMS,ids=new Set(data.entries.map(entry=>entry.id));
+  for(const id of ['mi-evolution','variant-angina','ventricular-aneurysm','pseudo-infarct-q','cns-t-waves','exercise-test','antiarrhythmic-drug-effects'])assert(ids.has(id),id);
+  for(const kind of ['mi-evolution','variant-angina','aneurysm','pseudo-q','cns-t','exercise','antiarrhythmic'])assert(W.render(kind).startsWith('<svg'),kind);
+  for(const id of ['stemi','old-mi','pulmonary-embolism','hyperkalemia','hypokalemia','calcium-disorders','digoxin-effect','nste-ischemia'])assert.match(data.entries.find(entry=>entry.id===id).textbook.chapter,/^第 [4569] 章/,id);
+  const pe=data.entries.find(entry=>entry.id==='pulmonary-embolism');
+  assert(pe.basic.criteria.some(([name])=>name.includes('21 分')));
 });

@@ -135,7 +135,7 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
     try{
       await page.goto(base+'/ecg/atlas',{waitUntil:'networkidle'});
       assert.equal(await page.locator('.ecg-category-grid a').count(),8);
-      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),73);
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),80);
       const search=page.getByRole('searchbox',{name:'搜索心电图图谱'});
       const searchBounds=await search.boundingBox();assert(searchBounds.y>0&&searchBounds.y+searchBounds.height<900,'atlas search is visible before scrolling through categories');
       // Exact abbreviations match one entry; common Chinese terms rank the title/alias match first.
@@ -152,7 +152,7 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
       assert(await page.locator('#ecgSearchEmpty').isVisible());
       assert.equal(await page.locator('#ecgSearchResults img').count(),0);
       await page.getByRole('button',{name:'清空搜索'}).click();
-      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),73);
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),80);
       assert.equal(new URL(page.url()).searchParams.has('q'),false);
       await page.locator('a[href="/ecg/atlas/conduction"]').click();
       await page.waitForURL(base+'/ecg/atlas/conduction',{waitUntil:'networkidle'});
