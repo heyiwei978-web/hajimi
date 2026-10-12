@@ -173,6 +173,13 @@
     pmt:{title:'起搏器介导的心动过速教学示意',description:'II 导联：一个窦性搏动后出现室性早搏，其后每个心室起搏 QRS 后都有倒置的逆行 P 波，被心房通道跟踪，形成连续快速的心室起搏。',rows:[row('II',[...beat(60,{}),...beat(165,{p:false,qrs:'broad',r:-1,s:-0.3,t:1.1,tAt:38,tw:9}),...P(203,-1.5),...[275,375,475,575].flatMap(c=>[...beat(c,{...VP,t:-0.7,tAt:62,tw:8}),...P(c+32,-1.5)])],[261,361,461,561])]}
   });
 
+  // Tenth batch (textbook chapter 7).
+  Object.assign(drawings,{
+    hcm:{title:'肥厚型心肌病教学示意',description:'上行 V5 导联：深而窄的 Q 波、高 R 波，T 波直立。下行（心尖肥厚型）V4 导联：高 R 波伴对称性巨大倒置 T 波。',rows:[row('V5',N.flatMap(c=>[...beat(c,{r:1.6,s:0.1,t:0.9}),x=>G(x,c-6,1.4,22)])),row('V4 心尖型',beats(N,{r:1.8,s:0.2,st:-3,t:-2.6,tAt:56,tw:10}))]},
+    arvc:{title:'致心律失常性右室心肌病教学示意',description:'V1 导联 QRS 终末部可见低振幅小棘波（Epsilon 波），其后 T 波倒置。',rows:[row('V1',N.flatMap(c=>[...beat(c,{r:0.35,s:1,t:-0.9,tAt:56,tw:9}),x=>G(x,c+14,1,-5)+G(x,c+19,0.9,4)]))]},
+    asd:{title:'继发孔型房间隔缺损教学示意',description:'上行 V1 导联：rSr′（不完全性右束支阻滞样）。下行 II 导联：R 波顶部附近切迹（“钩型”R 波）。',rows:[row('V1',beats(N,{qrs:'rbbb',t:0.4})),row('II',N.flatMap(c=>[...beat(c,{r:1,s:0.2}),x=>G(x,c-1,0.9,14)]))]}
+  });
+
   // Artifact and lead-reversal sketches for the basics page.
   const noise=(amp,rate,seed=0)=>[x=>amp*(Math.sin(x*rate+seed)*0.6+Math.sin(x*rate*1.9+seed*3)*0.4)];
   Object.assign(drawings,{
