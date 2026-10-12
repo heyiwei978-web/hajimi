@@ -1,6 +1,7 @@
 import {readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync, copyFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {compileClinicalSite} from './clinical-compiler.mjs';
+import {compileEcg} from './ecg-compiler.mjs';
 
 // Keep homepage markup in index.html as the single source for both entry points.
 export function buildHome(source) {
@@ -34,6 +35,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     }
     writeFileSync(new URL('index.html',directory),output);
     compileClinicalSite(readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);
+    const ecg=compileEcg(directory);
     console.log('Built lightweight homepage and clinical library in dist/');
+    console.log('Built ECG bundle assets/'+ecg.name+' ('+ecg.entries+' entries, '+Math.round(ecg.bytes/1024)+' KB)');
   }
 }

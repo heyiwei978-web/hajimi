@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="/classification.css?v=20261010-treatment1">
 <link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
 <link rel="stylesheet" href="/workspace-design.css?v=20261011-layout2">
-<link rel="stylesheet" href="/ecg.css?v=20261012-book1">
+<link rel="stylesheet" href="/ecg.css?v=20261012-fw1">
 </head>
 <body class="class-page ecg-page">
 <a class="skip-link" href="#ecgContent">跳到主要内容</a>
@@ -29,6 +29,11 @@
   </header>
   <div class="class-notice"><strong>资料草稿 · 待审核</strong><span>图谱收录 94 个心电图词条，覆盖 8 个分类，按风险分级并附诊断标准与参考文献。图形为自绘教学示意，非真实病例；临床使用前需完成专业审核。</span></div>
   <noscript><p>请启用 JavaScript 以查看资料和使用计算工具。<a href="/">返回首页</a></p></noscript>
+  <form class="ecg-global-search" id="ecgGlobalSearchForm" role="search" action="/ecg/atlas" method="get">
+    <label for="ecgGlobalSearch">搜索心电图栏目</label>
+    <div class="ecg-global-field"><input id="ecgGlobalSearch" name="q" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ecgGlobalResults" aria-describedby="ecgGlobalHint" autocomplete="off" spellcheck="false" placeholder="词条、缩写、基础章节或心电现象，例如 文氏、QTc、隐匿性传导"><kbd aria-hidden="true">/</kbd><ul id="ecgGlobalResults" role="listbox" aria-label="搜索结果" hidden></ul></div>
+    <span class="ecg-global-hint" id="ecgGlobalHint">按 / 键随时搜索，↑↓ 选择，回车打开。</span>
+  </form>
   <div id="ecgApp"><p role="status">正在加载心电图栏目……</p></div>
 </main>
 <footer class="ecg-review-footer" id="ecgReviewFooter" aria-label="临床参考与资料状态">
@@ -43,9 +48,11 @@
 <script defer src="/ecg-book-data-3.js?v=20261012-book3"></script>
 <script defer src="/ecg-book-data-4.js?v=20261012-book4"></script>
 <script defer src="/ecg-book-data-5.js?v=20261012-book5"></script>
-<script defer src="/ecg-waveforms.js?v=20261012-book5"></script>
+<script defer src="/ecg-waveforms.js?v=20261012-fw1"></script>
 <script defer src="/ecg-calculators.js?v=20261012-basics1"></script>
-<script defer src="/ecg.js?v=20261012-book5"></script>
+<script defer src="/ecg-search.js?v=20261012-fw1"></script>
+<script defer src="/ecg-calipers.js?v=20261012-fw1"></script>
+<script defer src="/ecg.js?v=20261012-fw1"></script>
 <script defer src="/workspace.js?v=20261009-layout1"></script>
 </body>
 </html>
