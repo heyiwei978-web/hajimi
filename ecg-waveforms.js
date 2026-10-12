@@ -138,6 +138,19 @@
     'low-voltage':{title:'低电压与电交替教学示意',description:'II 导联 QRS 振幅普遍很小，心率偏快，QRS 振幅逐搏高低交替（电交替），提示大量心包积液的可能。',rows:[row('II',[60,160,260,360,460,560].flatMap((c,i)=>beat(c,{pAmp:0.6,r:i%2?0.22:0.42,s:0.1,t:0.3,tAt:44,tw:7})))]}
   });
 
+  // Seventh batch (textbook arrhythmia chapters).
+  Object.assign(drawings,{
+    'sa-block':{title:'二度 II 型窦房阻滞教学示意',description:'II 导联前两个窦性搏动后出现长间歇，长 PP 恰为基本 PP 的 2 倍，其间没有 P 波。',rows:[row('II',beats([70,210,490],{}))]},
+    wandering:{title:'心房内游走节律教学示意',description:'II 导联 P 波由直立高大逐渐变小、平坦直至倒置，PR 随之缩短，RR 略延长。',rows:[row('II',[[60,1.4,32],[185,0.9,30],[315,0.3,26],[450,-0.7,22],[590,-0.9,20]].flatMap(([c,a,pr])=>beat(c,{pAmp:a,pr})))]},
+    'short-pr':{title:'短 PR 间期教学示意',description:'II 导联 PR 明显缩短（<120 ms），QRS 窄，起始部没有 delta 波。',rows:[row('II',beats(N,{pr:17}))]},
+    mahaim:{title:'Mahaim 旁路前传心动过速教学示意',description:'V1 导联宽而深的 QS/rS 波（左束支阻滞形）规则快速出现，未见与之相关的 P 波。',rows:[row('V1',[62,132,202,272,342,412,482,552].flatMap(c=>beat(c,{p:false,qrs:'qs',r:1.2,t:0.9,tAt:38,tw:8})))]},
+    avrt:{title:'顺向型房室折返性心动过速教学示意',description:'II 导联窄 QRS 规则心动过速，每个 QRS 后的 ST 段上可见倒置的逆行 P′ 波（RP′ 短于 P′R）。',rows:[row('II',[60,138,216,294,372,450,528,606].flatMap(c=>[...beat(c,{p:false,t:0.6,tAt:40,tw:6}),...P(c+22,-0.9)]))]},
+    'rvot-vt':{title:'右室流出道特发性室速教学示意',description:'上行 II 导联：宽大高 R 波（电轴下偏）。下行 V1 导联：宽 QS/rS 波（左束支阻滞形）。',rows:[row('II',[62,134,206,278,350,422,494,566].flatMap(c=>beat(c,{p:false,qrs:'broad',r:1.1,s:0.2,t:-0.8,tAt:36,tw:8}))),row('V1',[62,134,206,278,350,422,494,566].flatMap(c=>beat(c,{p:false,qrs:'qs',r:1,t:0.8,tAt:36,tw:8})))]},
+    npjt:{title:'非阵发性交界性心动过速教学示意',description:'II 导联窄 QRS 规则出现，约 90 次/分，QRS 前无 P 波，ST 段上可见倒置的逆行 P′ 波。',rows:[row('II',[70,200,330,460,590].flatMap(c=>[...beat(c,{p:false}),...P(c+24,-0.8)]))]},
+    pjrt:{title:'持续性交界区反复性心动过速教学示意',description:'II 导联窄 QRS 心动过速，倒置的逆行 P′ 远离前一个 QRS、靠近下一个 QRS（RP′ 长于 P′R）。',rows:[row('II',[60,150,240,330,420,510,600].flatMap(c=>[...beat(c,{p:false,t:0.6,tAt:34,tw:6}),...P(c+60,-1.4)]))]},
+    vflutter:{title:'心室扑动教学示意',description:'II 导联规则、连续的正弦样大波（约 280 次/分），没有等电位线，无法分辨 QRS 与 T 波。',rows:[row('II',[x=>-28*Math.sin(2*Math.PI*(x-28)/43)])]}
+  });
+
   // Artifact and lead-reversal sketches for the basics page.
   const noise=(amp,rate,seed=0)=>[x=>amp*(Math.sin(x*rate+seed)*0.6+Math.sin(x*rate*1.9+seed*3)*0.4)];
   Object.assign(drawings,{

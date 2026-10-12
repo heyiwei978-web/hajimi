@@ -5,7 +5,7 @@ import {test} from 'node:test';
 
 function load(){
   const context={window:{}};
-  for(const file of ['ecg-data.js','ecg-cases-data.js','ecg-basics-data.js','ecg-periop-data.js','ecg-book-data.js','ecg-waveforms.js','ecg-calculators.js']){
+  for(const file of ['ecg-data.js','ecg-cases-data.js','ecg-basics-data.js','ecg-periop-data.js','ecg-book-data.js','ecg-book-data-2.js','ecg-waveforms.js','ecg-calculators.js']){
     runInNewContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context,{filename:file});
   }
   return context.window;
@@ -37,7 +37,7 @@ test('ECG calculations reject missing, nonpositive and nonfinite input instead o
 test('all ECG atlas drafts keep valid categories, both clinical layers and explicit review metadata',()=>{
   const window=load(),data=window.HAJIMI_ECG_DATA;
   assert.equal(data.schema,1);
-  assert.equal(data.entries.length,62);
+  assert.equal(data.entries.length,73);
   const ids=Array.from(data.entries,entry=>entry.id);
   assert.equal(new Set(ids).size,ids.length,'entry ids are unique');
   for(const id of ['atrial-fibrillation','hyperkalemia','pulmonary-embolism','stemi','complete-heart-block','ventricular-pacing'])assert(ids.includes(id));
@@ -149,4 +149,16 @@ test('textbook batch: new entries, textbook citations, per-lead normals and phen
   for(const kind of ['lae','rae','pac','pjc','lqts','sqts','cpvt','lpfb','dextrocardia','low-voltage'])assert(W.render(kind).startsWith('<svg'),kind);
   const lvh=data.entries.find(entry=>entry.id==='left-ventricular-hypertrophy');
   assert(lvh.basic.criteria.some(([name])=>name.includes('教材')));
+});
+
+test('textbook batch 7: arrhythmia chapters add entries, sketches and chapter citations without duplicating related links',()=>{
+  const window=load(),data=window.HAJIMI_ECG_DATA,W=window.HAJIMI_ECG_WAVEFORMS,ids=new Set(data.entries.map(entry=>entry.id));
+  const added=['sinoatrial-block','wandering-pacemaker','lgl-short-pr','mahaim','avrt','narrow-complex-tachycardia','idiopathic-vt','ventricular-flutter','nonparoxysmal-junctional-tachycardia','pjrt','sinus-node-reentry'];
+  for(const id of added)assert(ids.has(id),id);
+  for(const kind of ['sa-block','wandering','short-pr','mahaim','avrt','rvot-vt','vflutter','npjt','pjrt'])assert(W.render(kind).startsWith('<svg'),kind);
+  for(const id of ['atrial-fibrillation','atrial-flutter','pre-excitation','wide-complex-tachycardia','ventricular-tachycardia','mobitz-i','complete-heart-block','svt','junctional-rhythm'])assert.match(data.entries.find(entry=>entry.id===id).textbook.chapter,/^第 1[3-9]|^第 2[01]/,id);
+  for(const entry of data.entries){assert(!(entry.related||[]).includes(entry.id),entry.id);assert.equal(new Set(entry.related||[]).size,(entry.related||[]).length,entry.id);}
+  const wct=data.entries.find(entry=>entry.id==='wide-complex-tachycardia');
+  assert(wct.basic.criteria.some(([name])=>name.includes('Brugada')));
+  assert(wct.basic.criteria.some(([name])=>name.includes('aVR')));
 });
