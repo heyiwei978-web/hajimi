@@ -17,9 +17,9 @@ before(async () => {
     const direct=pathname==='/'?'/index.html':pathname;
     // Match Vercel's filesystem precedence so the homepage cannot silently
     // fall back to the much heavier clinical entry point after deployment.
-    const directFile=/^\/[a-zA-Z0-9_-]+\.(?:html|js|css|json)$/.test(direct)&&fs.existsSync(path.join(publicRoot,direct.slice(1)));
+    const directFile=/^\/(?:assets\/)?[a-zA-Z0-9_-]+\.(?:html|js|css|json)$/.test(direct)&&fs.existsSync(path.join(publicRoot,direct.slice(1)));
     const target = directFile?direct:rewrite?.destination || pathname;
-    if (!/^\/[a-zA-Z0-9_-]+\.(?:html|js|css|json)$/.test(target)) {res.writeHead(404);res.end();return;}
+    if (!/^\/(?:assets\/)?[a-zA-Z0-9_-]+\.(?:html|js|css|json)$/.test(target)) {res.writeHead(404);res.end();return;}
     const file = path.join(publicRoot, target.slice(1));
     if (!fs.existsSync(file)) {res.writeHead(404);res.end();return;}
     for (const header of config.headers.find(rule=>rule.source==='/(.*)')?.headers || []) res.setHeader(header.key,header.value);
@@ -163,6 +163,80 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
       await page.waitForURL(base+'/ecg/atlas/pulmonary/pulmonary-embolism',{waitUntil:'networkidle'});
       assert.equal(await page.locator('h1').innerText(),'肺栓塞');
       await page.goBack();assert.equal(await page.locator('h1').innerText(),'肺循环与右心负荷');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('ECG framework navigates in-page, searches the whole section from the keyboard and measures sketches with calipers',async()=>{
+  for(const width of [375,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      const scripts=[];page.on('request',request=>{if(request.resourceType()==='script')scripts.push(new URL(request.url()).pathname);});
+      await page.goto(base+'/ecg',{waitUntil:'networkidle'});
+      const bundle=scripts.filter(item=>/^\/assets\/ecg-[0-9a-f]{20}\.js$/.test(item));
+      assert.equal(bundle.length,1,'one hashed ECG bundle');
+      assert.equal(scripts.filter(item=>/\/ecg-(?:data|book-data)/.test(item)).length,0,'source data files are bundled');
+      // In-section links render without another document load or data download.
+      await page.evaluate(()=>{window.__ecgMarker=1;});
+      await page.locator('#ecgApp a[href="/ecg/atlas"]').first().click();
+      await page.waitForURL(base+'/ecg/atlas');
+      assert.equal(await page.locator('h1').innerText(),'图谱库');
+      assert.equal(await page.evaluate(()=>window.__ecgMarker),1,'no full page reload');
+      assert(await page.locator('#ecgGlobalSearchForm').isHidden(),'atlas uses its own filter');
+      await page.locator('a[href="/ecg/atlas/pulmonary"]').first().click();
+      await page.locator('a[href="/ecg/atlas/pulmonary/pulmonary-embolism"]').click();
+      await page.waitForURL(base+'/ecg/atlas/pulmonary/pulmonary-embolism');
+      assert.equal(await page.locator('h1').innerText(),'肺栓塞');
+      assert.equal(await page.evaluate(()=>document.activeElement.id),'ecgTitle','focus moves to the new page heading');
+      assert.match(await page.locator('#ecgReviewFooter').innerText(),/参考文献：\d+ 条/);
+      // Pager links to neighbours in the same category.
+      const next=page.locator('.ecg-pager a[rel="next"]');
+      if(await next.count()){const title=(await next.innerText()).replace(/^下一条\s*/,'');await next.click();await settle(page);assert.equal(await page.locator('h1').innerText(),title.trim());await page.goBack();await settle(page);}
+      assert.equal(await page.locator('h1').innerText(),'肺栓塞');
+      await page.goBack();await settle(page);
+      assert.equal(await page.locator('h1').innerText(),'肺循环与右心负荷');
+      await page.goBack();await settle(page);await page.goBack();await settle(page);
+      assert.equal(await page.locator('h1').innerText(),'心电图');
+      assert.equal(await page.locator('#ecgReviewFooter').innerText().then(text=>/参考文献：见各栏目及词条/.test(text)),true,'footer metadata resets');
+      assert.equal(scripts.filter(item=>item.startsWith('/assets/ecg-')).length,1,'bundle downloaded once');
+      // Global search: "/" focuses, results span long-form pages, keyboard opens the result.
+      await page.keyboard.press('/');
+      assert.equal(await page.evaluate(()=>document.activeElement.id),'ecgGlobalSearch');
+      await page.keyboard.type('隐匿性传导');
+      const listbox=page.getByRole('listbox',{name:'搜索结果'});
+      assert(await listbox.isVisible());
+      assert.equal(await page.locator('#ecgGlobalSearch').getAttribute('aria-expanded'),'true');
+      assert.match(await listbox.locator('[role="option"]').first().innerText(),/心电现象[\s\S]*隐匿性传导/);
+      assert(await listbox.locator('mark').count()>=1);
+      await page.keyboard.press('ArrowDown');
+      assert.equal(await page.locator('#ecgGlobalSearch').getAttribute('aria-activedescendant'),'ecgGlobalOption0');
+      await page.keyboard.press('Enter');
+      await page.waitForURL(base+'/ecg/phenomena#ecg-ph-concealed');
+      assert.equal(await page.locator('h1').innerText(),'常见心电现象');
+      await page.locator('#ecgGlobalSearch').fill('<img src=x onerror=alert(1)>');
+      assert.match(await listbox.innerText(),/没有找到/);
+      assert.equal(await page.locator('#ecgGlobalResults img').count(),0);
+      await page.keyboard.press('Escape');
+      assert(await listbox.isHidden());
+      // Exact abbreviation + Enter jumps straight to the entry.
+      await page.locator('#ecgGlobalSearch').fill('LBBB');await page.keyboard.press('Enter');
+      await page.waitForURL(/\/ecg\/atlas\/conduction\/left-bundle-branch-block$/);
+      // Calipers read the default RR and move one small box per arrow key.
+      const caliper=page.locator('#ecg-basic .ecg-caliper-toggle');
+      await caliper.click();
+      assert.equal(await caliper.getAttribute('aria-pressed'),'true');
+      assert.match(await page.locator('#ecg-basic .ecg-caliper-readout').innerText(),/800 ms · 相当于 75 次\/分/);
+      assert.equal(await page.locator('#ecg-basic svg[role="img"] title').count(),1,'calipers add no second labelled image');
+      await page.locator('#ecg-basic svg.is-measuring').focus();await page.keyboard.press('ArrowRight');
+      assert.match(await page.locator('#ecg-basic .ecg-caliper-readout').innerText(),/840 ms/);
+      const sketch=page.locator('#ecg-basic svg.is-measuring'),size=await sketch.boundingBox();
+      await sketch.click({position:{x:size.width*90/640,y:size.height*0.75}});
+      assert.match(await page.locator('#ecg-basic .ecg-caliper-readout').innerText(),/16[34]\d ms/);
+      await caliper.click();
+      assert.equal(await page.locator('#ecg-basic .ecg-caliper').count(),0);
+      assert.equal(await page.locator('#ecgPrint').count(),1);
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
   }

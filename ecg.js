@@ -12,6 +12,18 @@
   const criteriaTable=rows=>Array.isArray(rows)&&rows.length?'<h3>诊断标准</h3><div class="ecg-criteria-wrap"><table class="ecg-criteria"><tbody>'+rows.map(([item,value])=>'<tr><th scope="row">'+esc(item)+'</th><td>'+esc(value)+'</td></tr>').join('')+'</tbody></table></div><p class="ecg-hint">数值为成人常用标准，需结合年龄、性别、导联和临床背景；与本院或最新指南不一致时以后者为准。</p>':'';
   const section=(id,title,content)=>'<section class="class-content-section" id="'+id+'"><h2>'+esc(title)+'</h2>'+content+'</section>';
   const card=(url,title,description,meta='')=>'<a class="class-disease-card ecg-card" href="'+esc(url)+'">'+(meta?'<small>'+esc(meta)+'</small>':'')+'<h3>'+esc(title)+'</h3><p>'+esc(description)+'</p><b>查看 →</b></a>';
+  const eyebrow=document.querySelector('.class-eyebrow'),footer=document.getElementById('ecgReviewFooter');
+  const defaults={eyebrow:eyebrow?eyebrow.textContent:'',footer:footer?footer.innerHTML:''};
+  let cleanup=[];
+  // Every view starts from the same shell state, so client-side navigation
+  // never leaks classes, listeners or footer metadata from the previous page.
+  function resetShell(){
+    for(const undo of cleanup.splice(0))try{undo();}catch{}
+    document.body.classList.remove('ecg-entry-page','ecg-atlas-list');
+    if(eyebrow)eyebrow.textContent=defaults.eyebrow;
+    if(footer&&footer.innerHTML!==defaults.footer)footer.innerHTML=defaults.footer;
+    document.documentElement.style.removeProperty('--ecg-footer-height');
+  }
   function setPage(title,description,crumbs=[]){
     document.body.classList.toggle('ecg-subpage',crumbs.length>0);
     document.title=title+'｜心电图 · 哈基米工作站';
@@ -21,7 +33,7 @@
     document.getElementById('ecgBreadcrumb').innerHTML=items.map((item,index)=>(index?'<span aria-hidden="true">›</span>':'')+(index===items.length-1?'<span aria-current="page">'+esc(item.title)+'</span>':'<a href="'+esc(item.url)+'">'+esc(item.title)+'</a>')).join('');
   }
   function diagram(kind,caption){
-    return '<figure class="ecg-figure"><div class="ecg-figure-scroll" tabindex="0" role="region" aria-label="心电图教学示意图，可横向滚动">'+window.HAJIMI_ECG_WAVEFORMS.render(kind)+'</div><figcaption><strong>自绘教学示意 · 非真实病例</strong><p>'+esc(caption)+'</p><span>示意图比例不用于测量，手机上可横向滑动查看。</span></figcaption></figure>';
+    return '<figure class="ecg-figure"><div class="ecg-figure-scroll" tabindex="0" role="region" aria-label="心电图教学示意图，可横向滚动">'+window.HAJIMI_ECG_WAVEFORMS.render(kind)+'</div><figcaption><strong>自绘教学示意 · 非真实病例</strong><p>'+esc(caption)+'</p><span>示意图并非真实记录，不用于诊断测量；手机上可横向滑动查看。</span></figcaption></figure>';
   }
   function home(){
     setPage('心电图','从基础到围手术期：学习、查阅和床旁计算。');
@@ -46,27 +58,29 @@
     if(B.references)parts.push(['ecg-basics-refs','参考文献','<ol class="ecg-points">'+B.references.map(ref=>'<li><a href="'+esc(ref.url)+'" target="_blank" rel="noopener noreferrer">'+esc(ref.title)+' ↗</a></li>').join('')+'</ol>']);
     app.innerHTML='<nav class="ecg-section-links" aria-label="基础学习目录">'+parts.map(([id,title])=>'<a href="#'+id+'">'+esc(title)+'</a>').join('')+'</nav>'+parts.map(([id,title,html])=>section(id,title,html)).join('');
   }
-  const normalize=text=>String(text).normalize('NFKC').toLowerCase();
+  let engine=null;
+  const searchEngine=()=>engine||(engine=window.HAJIMI_ECG_SEARCH.create(window.HAJIMI_ECG_SEARCH.documents(data)));
   function atlas(category){
     setPage(category?category.title:'图谱库',category?category.description:'按类别逐级查阅，或直接搜索疾病名、英文缩写和关键表现。',category?[{title:'图谱库',url:'/ecg/atlas'},{title:category.title}]:[{title:'图谱库'}]);
     const entries=category?data.entries.filter(entry=>entry.category===category.id):data.entries;
     const categories=category?'<nav class="ecg-section-links" aria-label="图谱导航"><a href="/ecg/atlas">← 全部图谱类别</a></nav>':'<section id="ecgCategoryDirectory" aria-labelledby="ecgCategoriesTitle"><h2 id="ecgCategoriesTitle">按类别查阅</h2><div class="ecg-category-grid">'+data.categories.map(item=>{const count=data.entries.filter(entry=>entry.category===item.id).length;return card('/ecg/atlas/'+item.id,item.title,item.description,count?count+' 个词条 · 待审核':'建设中');}).join('')+'</div></section>';
     app.innerHTML='<section class="ecg-search" aria-label="搜索图谱"><label class="class-search-label" for="ecgSearch">搜索心电图图谱</label><input class="class-filter" id="ecgSearch" type="search" placeholder="例如：房颤、STEMI、文氏、LBBB、低钾、起搏" autocomplete="off"><div class="ecg-search-actions"><span id="ecgSearchCount" role="status" aria-live="polite"></span><button type="button" class="btn" id="ecgClearSearch" hidden>清空搜索</button></div></section>'+categories+'<section aria-labelledby="ecgResultsTitle"><h2 id="ecgResultsTitle">词条</h2><div class="ecg-panel-grid" id="ecgSearchResults">'+entries.map(entry=>'<div data-ecg-entry="'+entry.id+'">'+card(entryUrl(entry),entry.title,entry.basic.summary,[categoryFor(entry).title,riskLabel(entry),entry.reviewStatus].filter(Boolean).join(' · '))+'</div>').join('')+'</div><p id="ecgSearchEmpty" hidden></p></section>';
     const field=document.getElementById('ecgSearch'),count=document.getElementById('ecgSearchCount'),empty=document.getElementById('ecgSearchEmpty'),clear=document.getElementById('ecgClearSearch');
-    const index=entries.map((entry,order)=>({id:entry.id,order,key:normalize([entry.title,...entry.aliases].join(' ')),text:normalize([entry.title,categoryFor(entry).title,...entry.aliases,entry.basic.summary,...entry.basic.diagnosticPoints,...entry.basic.differentialPoints,...(entry.basic.criteria||[]).flat(),...Object.values(entry.periop)].join(' '))}));
+    document.body.classList.add('ecg-atlas-list');
+    const allowed=new Set(entries.map(entry=>entry.id));
     const results=document.getElementById('ecgSearchResults');
-    const matches=(text,term)=>/^[a-z0-9]{1,3}$/.test(term)?new RegExp('(^|[^a-z0-9])'+term+'($|[^a-z0-9])').test(text):text.includes(term);
+    const nodes=new Map([...results.querySelectorAll('[data-ecg-entry]')].map(node=>[node.dataset.ecgEntry,node]));
     function run(){
-      const query=field.value.trim(),terms=normalize(query).split(/\s+/).filter(Boolean);
+      const query=field.value.trim();
       let shown=0;
-      // Entries whose title or aliases match come first, then other full-text matches.
-      const ranked=index.map(item=>({item,visible:terms.every(term=>matches(item.text,term)),primary:terms.length>0&&terms.every(term=>matches(item.key,term))}))
-        .sort((a,b)=>(b.primary-a.primary)||(a.item.order-b.item.order));
-      for(const {item,visible} of ranked){
-        const node=results.querySelector('[data-ecg-entry="'+item.id+'"]');
-        node.hidden=!visible;results.appendChild(node);
-        shown+=Number(visible);
+      // Ranked by the shared engine: exact title/alias first, then partial and full-text matches.
+      const ranked=query?searchEngine().search(query,{type:'entry'}).map(result=>result.doc.id).filter(id=>allowed.has(id)):entries.map(entry=>entry.id);
+      const visible=new Set(ranked);
+      for(const id of [...ranked,...entries.map(entry=>entry.id).filter(id=>!visible.has(id))]){
+        const node=nodes.get(id);
+        node.hidden=!visible.has(id);results.appendChild(node);
       }
+      shown=visible.size;
       count.textContent=shown+' 个匹配词条 · 资料待审核';
       empty.hidden=shown>0;
       empty.textContent=query?'未找到匹配词条，请更换关键词。':'本分类建设中，暂未添加词条。';
@@ -98,10 +112,14 @@
     const category=categoryFor(entry);
     document.body.classList.add('ecg-entry-page');
     setPage(entry.title,entry.basic.summary,[{title:'图谱库',url:'/ecg/atlas'},{title:category.title,url:'/ecg/atlas/'+category.id},{title:entry.title}]);
-    document.querySelector('.class-eyebrow').textContent='ECG ATLAS · DRAFT';
+    if(eyebrow)eyebrow.textContent='ECG ATLAS · DRAFT';
+    const siblings=data.entries.filter(item=>item.category===entry.category),position=siblings.indexOf(entry);
+    const previous=siblings[position-1],next=siblings[position+1];
+    const pager='<nav class="ecg-pager" aria-label="同类词条">'+(previous?'<a rel="prev" href="'+esc(entryUrl(previous))+'"><small>上一条</small>'+esc(previous.title)+'</a>':'<span></span>')+'<span class="ecg-pager-count">'+esc(category.title)+' · '+(position+1)+' / '+siblings.length+'</span>'+(next?'<a rel="next" href="'+esc(entryUrl(next))+'"><small>下一条</small>'+esc(next.title)+'</a>':'<span></span>')+'</nav>';
     const basic='<span class="class-section-label">基础层 · 默认展开</span>'+diagram(entry.basic.diagram.kind,entry.basic.diagram.caption)+criteriaTable(entry.basic.criteria)+'<h3>诊断要点</h3>'+points(entry.basic.diagnosticPoints)+'<h3>鉴别点</h3>'+points(entry.basic.differentialPoints);
     const periop=[['对手术时机的影响',entry.periop.timing],['麻醉关注点',entry.periop.anesthesia],['术后管理',entry.periop.postoperative],['何时会诊',entry.periop.consultation]].map(([title,text])=>'<section><h3>'+title+'</h3><p>'+esc(text)+'</p></section>').join('');
-    app.innerHTML='<div class="ecg-layer-control">'+riskBadge(entry)+'<span class="ecg-status">'+esc(entry.reviewStatus)+' · 草稿</span><button class="btn" id="ecgLayerToggle" type="button" aria-controls="ecgPeriopLayer" aria-expanded="false">展开围手术期层</button></div>'+section('ecg-basic','基础判读',basic)+'<details class="class-content-section ecg-periop" id="ecgPeriopLayer"><summary><h2>围手术期要点<span class="ecg-hint">对手术、麻醉、术后管理及会诊的影响 · 默认折叠</span></h2></summary>'+periop+'</details>'+related(entry)+section('ecg-references','参考文献',references(entry))+'<nav class="ecg-section-links" aria-label="词条导航"><a href="/ecg/atlas/'+category.id+'">返回'+esc(category.title)+'</a><a href="/ecg/periop">围手术期专区</a></nav>';
+    app.innerHTML='<div class="ecg-layer-control">'+riskBadge(entry)+'<span class="ecg-status">'+esc(entry.reviewStatus)+' · 草稿</span><button class="btn" id="ecgLayerToggle" type="button" aria-controls="ecgPeriopLayer" aria-expanded="false">展开围手术期层</button></div>'+section('ecg-basic','基础判读',basic)+'<details class="class-content-section ecg-periop" id="ecgPeriopLayer"><summary><h2>围手术期要点<span class="ecg-hint">对手术、麻醉、术后管理及会诊的影响 · 默认折叠</span></h2></summary>'+periop+'</details>'+related(entry)+section('ecg-references','参考文献',references(entry))+pager+'<nav class="ecg-section-links ecg-print-hide" aria-label="词条导航"><a href="/ecg/atlas/'+category.id+'">返回'+esc(category.title)+'</a><a href="/ecg/periop">围手术期专区</a><button type="button" class="btn" id="ecgPrint">打印本词条</button></nav>';
+    document.getElementById('ecgPrint').addEventListener('click',()=>{layer.open=true;sync();window.print();});
     const toggle=document.getElementById('ecgLayerToggle'),layer=document.getElementById('ecgPeriopLayer');
     function sync(){toggle.setAttribute('aria-expanded',String(layer.open));toggle.textContent=layer.open?'收起围手术期层':'展开围手术期层';}
     toggle.addEventListener('click',()=>{layer.open=!layer.open;sync();});
@@ -110,9 +128,10 @@
     footerReference.innerHTML='<a href="#ecg-references">参考文献：'+(entry.references.length?entry.references.length+' 条':'待补充')+'</a>';
     const date=document.getElementById('ecgFooterDate');date.textContent=entry.updatedAt;date.dateTime=entry.updatedAt;
     document.getElementById('ecgFooterStatus').textContent=entry.reviewStatus;
-    const footer=document.getElementById('ecgReviewFooter');
     const fitFooter=()=>document.documentElement.style.setProperty('--ecg-footer-height',footer.getBoundingClientRect().height+'px');
-    fitFooter();if(typeof ResizeObserver==='function')new ResizeObserver(fitFooter).observe(footer);else window.addEventListener('resize',fitFooter);
+    fitFooter();
+    if(typeof ResizeObserver==='function'){const observer=new ResizeObserver(fitFooter);observer.observe(footer);cleanup.push(()=>observer.disconnect());}
+    else{window.addEventListener('resize',fitFooter);cleanup.push(()=>window.removeEventListener('resize',fitFooter));}
   }
   function periop(){
     const P=data.periop;
@@ -247,27 +266,127 @@
       section('ecg-ph-source','出处',textbookNote(P.source)+'<p><a class="btn" href="/ecg/basics">返回基础学习 →</a></p>');
   }
   function notFound(){setPage('页面未找到','请从栏目首页或图谱分类重新选择。',[{title:'页面未找到'}]);app.innerHTML='<p><a class="btn" href="/ecg">返回心电图首页</a></p>';}
-  let route=[];try{route=location.pathname.replace(/\/+$/,'').split('/').filter(Boolean).map(decodeURIComponent);}catch{route=[];}
-  if(route[0]!=='ecg')notFound();
-  else if(route.length===1)home();
-  else if(route.length===2&&route[1]==='basics')basics();
-  else if(route.length===2&&route[1]==='periop')periop();
-  else if(route.length===2&&route[1]==='tools')tools();
-  else if(route.length===2&&route[1]==='quiz')quiz();
-  else if(route.length===2&&route[1]==='report')report();
-  else if(route.length===2&&route[1]==='phenomena')phenomena();
-  else if(route[1]==='atlas'){
-    const category=data.categories.find(item=>item.id===route[2]);
-    const entry=data.entries.find(item=>item.id===route[3]&&item.category===route[2]);
-    if(route.length===2)atlas();else if(route.length===3&&category)atlas(category);else if(route.length===4&&entry)details(entry);else notFound();
-  }else notFound();
-  // Deferred scripts create these targets before the measured public header is ready.
-  if(location.hash)requestAnimationFrame(()=>{
-    let id='';try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}
-    const target=document.getElementById(id);
-    if(target&&app.contains(target)){
-      if(target.matches('details'))target.open=true;
-      target.scrollIntoView({behavior:'instant',block:'start'});
+  function view(){
+    let route=[];try{route=location.pathname.replace(/\/+$/,'').split('/').filter(Boolean).map(decodeURIComponent);}catch{route=[];}
+    const pages={basics,periop,tools,quiz,report,phenomena};
+    if(route[0]!=='ecg')return notFound();
+    if(route.length===1)return home();
+    if(route.length===2&&Object.hasOwn(pages,route[1]))return pages[route[1]]();
+    if(route[1]==='atlas'){
+      const category=data.categories.find(item=>item.id===route[2]);
+      const entry=data.entries.find(item=>item.id===route[3]&&item.category===route[2]);
+      if(route.length===2)return atlas();
+      if(route.length===3&&category)return atlas(category);
+      if(route.length===4&&entry)return details(entry);
     }
+    notFound();
+  }
+  function scrollToHash(){
+    let id='';try{id=decodeURIComponent(location.hash.slice(1));}catch{return false;}
+    const target=id&&document.getElementById(id);
+    if(!target||!app.contains(target))return false;
+    if(target.matches('details'))target.open=true;
+    target.scrollIntoView({behavior:'instant',block:'start'});
+    return true;
+  }
+  function render({focus=false,scroll=null}={}){
+    resetShell();
+    view();
+    if(window.HAJIMI_ECG_CALIPERS)window.HAJIMI_ECG_CALIPERS.enhance(app);
+    globalSearch.sync();
+    // Deferred scripts create these targets before the measured public header is ready.
+    requestAnimationFrame(()=>{
+      if(scroll!=null)window.scrollTo({top:scroll,behavior:'instant'});
+      else if(!scrollToHash()&&focus)window.scrollTo({top:0,behavior:'instant'});
+      if(focus){const heading=document.getElementById('ecgTitle');heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}
+    });
+  }
+
+  // Client-side navigation inside /ecg: the data bundle is parsed once and
+  // later views render instantly. Anything unusual falls back to the browser.
+  function internal(anchor,event){
+    if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return null;
+    if(!anchor||anchor.target||anchor.hasAttribute('download')||anchor.origin!==location.origin)return null;
+    if(!/^\/ecg(?:\/|$)/.test(anchor.pathname))return null;
+    return anchor;
+  }
+  if('scrollRestoration' in history)history.scrollRestoration='manual';
+  const remember=()=>{try{history.replaceState({...(history.state||{}),ecgScroll:window.scrollY},'');}catch{}};
+  function navigate(url,{replace=false}={}){
+    const target=new URL(url,location.href);
+    if(target.pathname===location.pathname&&target.search===location.search){
+      if(target.hash!==location.hash){history.pushState(history.state,'',target.href);scrollToHash();}
+      return;
+    }
+    remember();
+    history[replace?'replaceState':'pushState']({},'',target.pathname+target.search+target.hash);
+    render({focus:true});
+  }
+  document.addEventListener('click',event=>{
+    const anchor=internal(event.target.closest&&event.target.closest('a[href]'),event);
+    if(!anchor)return;
+    event.preventDefault();
+    navigate(anchor.href);
   });
+  window.addEventListener('popstate',event=>{
+    const scroll=event.state&&typeof event.state.ecgScroll==='number'?event.state.ecgScroll:null;
+    render({scroll});
+  });
+  window.addEventListener('pagehide',remember);
+
+  // Site-wide ECG search (WAI-ARIA combobox pattern with a listbox popup).
+  const globalSearch=(()=>{
+    const form=document.getElementById('ecgGlobalSearchForm'),input=document.getElementById('ecgGlobalSearch'),list=document.getElementById('ecgGlobalResults');
+    if(!form||!input||!list)return {sync(){}};
+    const S=window.HAJIMI_ECG_SEARCH;
+    let items=[],active=-1;
+    const TYPE={entry:'词条'};
+    function close(){list.hidden=true;list.replaceChildren();input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');items=[];active=-1;}
+    function mark(index){
+      active=index;
+      list.querySelectorAll('[role="option"]').forEach((option,i)=>option.setAttribute('aria-selected',String(i===index)));
+      if(index>=0){input.setAttribute('aria-activedescendant','ecgGlobalOption'+index);list.children[index].scrollIntoView({block:'nearest'});}
+      else input.removeAttribute('aria-activedescendant');
+    }
+    function update(){
+      const query=input.value.trim();
+      if(!query){close();return;}
+      items=searchEngine().search(query,{limit:8});
+      list.innerHTML=items.length?items.map((result,index)=>{
+        const doc=result.doc,text=doc.type==='entry'&&S.terms(query).every(term=>S.normalize(doc.title+' '+doc.aliases.join(' ')).includes(term))?doc.summary:S.snippet(doc.body,query);
+        return '<li role="option" id="ecgGlobalOption'+index+'" aria-selected="false" data-url="'+esc(doc.url)+'"><a href="'+esc(doc.url)+'" tabindex="-1"><span class="ecg-global-meta">'+esc(TYPE[doc.type]||'章节')+' · '+esc(doc.meta)+'</span><strong>'+S.highlight(doc.title,query)+'</strong><span class="ecg-global-snippet">'+S.highlight(text,query)+'</span></a></li>';
+      }).join('')+'<li class="ecg-global-all" role="presentation"><a href="/ecg/atlas?q='+encodeURIComponent(query)+'" tabindex="-1">在图谱库中查看全部词条结果 →</a></li>':'<li class="ecg-global-empty" role="presentation">没有找到“'+esc(query)+'”，换个关键词或英文缩写试试。</li>';
+      list.hidden=false;input.setAttribute('aria-expanded','true');active=-1;
+    }
+    input.addEventListener('input',event=>{if(!event.isComposing)update();});
+    input.addEventListener('compositionend',update);
+    input.addEventListener('focus',()=>{if(input.value.trim())update();});
+    input.addEventListener('keydown',event=>{
+      if(event.key==='ArrowDown'||event.key==='ArrowUp'){
+        if(list.hidden)update();
+        if(!items.length)return;
+        event.preventDefault();
+        mark(event.key==='ArrowDown'?(active+1)%items.length:(active<=0?items.length-1:active-1));
+      }else if(event.key==='Escape'){if(!list.hidden){close();event.preventDefault();}else input.value='';}
+    });
+    form.addEventListener('submit',event=>{
+      event.preventDefault();
+      const query=input.value.trim();
+      const url=active>=0?items[active].doc.url:(items[0]&&items[0].score>=85?items[0].doc.url:'/ecg/atlas'+(query?'?q='+encodeURIComponent(query):''));
+      close();input.blur();navigate(url);
+    });
+    list.addEventListener('mousedown',event=>event.preventDefault());
+    list.addEventListener('click',()=>{input.value='';close();});
+    document.addEventListener('click',event=>{if(!form.contains(event.target))close();});
+    document.addEventListener('keydown',event=>{
+      if(event.key!=='/'||event.metaKey||event.ctrlKey||event.altKey)return;
+      const tag=document.activeElement&&document.activeElement.tagName;
+      if(/^(INPUT|TEXTAREA|SELECT)$/.test(tag)||document.activeElement.isContentEditable)return;
+      const local=document.getElementById('ecgSearch');
+      event.preventDefault();(form.hidden&&local?local:input).focus();
+    });
+    return {sync(){form.hidden=document.body.classList.contains('ecg-atlas-list');close();}};
+  })();
+
+  render();
 })();

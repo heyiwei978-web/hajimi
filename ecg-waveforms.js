@@ -218,5 +218,5 @@
       '<defs><pattern id="'+id+'-small" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M8 0H0V8" fill="none" stroke="#dce4eb" stroke-width=".5"/></pattern><pattern id="'+id+'-big" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="url(#'+id+'-small)"/><path d="M40 0H0V40" fill="none" stroke="#c1d3e1" stroke-width="1"/></pattern></defs>'+
       '<rect width="640" height="'+height+'" fill="#fff"/><rect width="640" height="'+height+'" fill="url(#'+id+'-big)"/>'+rows+labels+'</svg>';
   }
-  window.HAJIMI_ECG_WAVEFORMS=Object.freeze({render,electrodes});
+  window.HAJIMI_ECG_WAVEFORMS=Object.freeze({render,electrodes,kinds:()=>Object.keys(drawings),MS_PER_UNIT:5});
 })();
