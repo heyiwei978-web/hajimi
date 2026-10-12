@@ -162,6 +162,17 @@
     antiarrhythmic:{title:'Ia 类抗心律失常药作用教学示意',description:'II 导联 QRS 轻度增宽、T 波低平，QT 间期延长。',rows:[row('II',[90,310,530].flatMap(c=>beat(c,{qrs:'broad',r:0.9,s:0.4,t:0.45,tAt:98,tw:12})))]}
   });
 
+  // Ninth batch (textbook pacing chapters 23–27).
+  const VP={p:false,qrs:'paced',t:-1,tAt:50,tw:10};
+  Object.assign(drawings,{
+    'pacing-vvi':{title:'VVI 起搏教学示意',description:'II 导联前两个为心室起搏搏动（脉冲后宽 QRS）；第三个为自身窄 QRS，起搏器被抑制并从此重新计时，到期后再发放脉冲。',rows:[row('II',[...[90,250].flatMap(c=>beat(c,VP)),...beat(390,{}),...beat(550,VP)],[76,236,536])]},
+    'atrial-pacing':{title:'AAI 心房起搏教学示意',description:'II 导联每个心房起搏脉冲后跟一个 P 波，随后为自身下传的窄 QRS。',rows:[row('II',beats(N,{pr:30,pAmp:1.2}),N.map(c=>c-34))]},
+    'dual-chamber':{title:'双腔起搏教学示意',description:'上行（房室顺序起搏）：心房脉冲 → P 波 → 心室脉冲 → 宽 QRS。下行（P 波跟踪）：自身 P 波 → 心室脉冲 → 宽 QRS。',rows:[row('II 房室顺序',N.flatMap(c=>[...beat(c,{...VP}),...P(c-34)]),N.flatMap(c=>[c-38,c-14])),row('II P 波跟踪',N.flatMap(c=>[...beat(c,{...VP}),...P(c-34)]),N.map(c=>c-14))]},
+    crt:{title:'双心室起搏教学示意',description:'上行 I 导联：起搏 QRS 以负向为主。下行 V1 导联：起搏 QRS 以 R 波为主（右束支阻滞样），时限较右室心尖起搏窄。',rows:[row('I',N.flatMap(c=>[...beat(c,{p:false,qrs:'broad',r:-0.9,s:-0.2,t:0.8,tAt:44,tw:9}),...P(c-34)]),N.map(c=>c-12)),row('V1',N.flatMap(c=>[...beat(c,{p:false,qrs:'broad',r:1.1,s:0.2,t:-0.8,tAt:44,tw:9}),...P(c-34)]),N.map(c=>c-12))]},
+    'pacing-fusion':{title:'融合波与伪融合波教学示意',description:'II 导联：前两个为完全起搏的宽 QRS；第三个为融合波，形态介于自身与起搏之间；第四个为伪融合波，脉冲叠加在自身窄 QRS 中，QRS 形态与自身相同。',rows:[row('II',[...[90,250].flatMap(c=>beat(c,VP)),...beat(410,{qrs:'broad',r:0.75,s:0.3,t:-0.3,tAt:46,tw:9}),...beat(570,{})],[76,236,398,568])]},
+    pmt:{title:'起搏器介导的心动过速教学示意',description:'II 导联：一个窦性搏动后出现室性早搏，其后每个心室起搏 QRS 后都有倒置的逆行 P 波，被心房通道跟踪，形成连续快速的心室起搏。',rows:[row('II',[...beat(60,{}),...beat(165,{p:false,qrs:'broad',r:-1,s:-0.3,t:1.1,tAt:38,tw:9}),...P(203,-1.5),...[275,375,475,575].flatMap(c=>[...beat(c,{...VP,t:-0.7,tAt:62,tw:8}),...P(c+32,-1.5)])],[261,361,461,561])]}
+  });
+
   // Artifact and lead-reversal sketches for the basics page.
   const noise=(amp,rate,seed=0)=>[x=>amp*(Math.sin(x*rate+seed)*0.6+Math.sin(x*rate*1.9+seed*3)*0.4)];
   Object.assign(drawings,{
