@@ -5,7 +5,7 @@ import {test} from 'node:test';
 
 function load(){
   const context={window:{}};
-  for(const file of ['ecg-data.js','ecg-cases-data.js','ecg-basics-data.js','ecg-periop-data.js','ecg-book-data.js','ecg-book-data-2.js','ecg-book-data-3.js','ecg-book-data-4.js','ecg-waveforms.js','ecg-calculators.js']){
+  for(const file of ['ecg-data.js','ecg-cases-data.js','ecg-basics-data.js','ecg-periop-data.js','ecg-book-data.js','ecg-book-data-2.js','ecg-book-data-3.js','ecg-book-data-4.js','ecg-book-data-5.js','ecg-waveforms.js','ecg-calculators.js']){
     runInNewContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context,{filename:file});
   }
   return context.window;
@@ -37,7 +37,7 @@ test('ECG calculations reject missing, nonpositive and nonfinite input instead o
 test('all ECG atlas drafts keep valid categories, both clinical layers and explicit review metadata',()=>{
   const window=load(),data=window.HAJIMI_ECG_DATA;
   assert.equal(data.schema,1);
-  assert.equal(data.entries.length,86);
+  assert.equal(data.entries.length,94);
   const ids=Array.from(data.entries,entry=>entry.id);
   assert.equal(new Set(ids).size,ids.length,'entry ids are unique');
   for(const id of ['atrial-fibrillation','hyperkalemia','pulmonary-embolism','stemi','complete-heart-block','ventricular-pacing'])assert(ids.includes(id));
@@ -178,4 +178,13 @@ test('textbook batch 9: pacing chapters add modes, dual-chamber, CRT, normal var
   assert.equal(data.entries.filter(entry=>entry.category==='pacing').length,8);
   for(const kind of ['pacing-vvi','atrial-pacing','dual-chamber','crt','pacing-fusion','pmt'])assert.match(W.render(kind),/stroke="#b42318"/,kind+' shows pacing spikes');
   for(const id of ['ventricular-pacing','pacing-malfunction'])assert.match(data.entries.find(entry=>entry.id===id).textbook.chapter,/^第 2[3-7] 章/,id);
+});
+
+test('textbook batch 10: cardiomyopathy, congenital and valvular entries plus PR limit table',()=>{
+  const window=load(),data=window.HAJIMI_ECG_DATA,W=window.HAJIMI_ECG_WAVEFORMS,ids=new Set(data.entries.map(entry=>entry.id));
+  for(const id of ['hypertrophic-cardiomyopathy','arvc','dilated-cardiomyopathy','myocarditis','atrial-septal-defect','shunt-chd','mitral-valve-disease','aortic-stenosis-ecg'])assert(ids.has(id),id);
+  for(const kind of ['hcm','arvc','asd'])assert(W.render(kind).startsWith('<svg'),kind);
+  const P=data.basics.prLimits;assert.equal(P.head.length,6);for(const row of P.rows)assert.equal(row.length,6);
+  assert(data.basics.holter.length>=4);
+  assert.equal(data.categories.find(item=>item.id==='structural').title,'心肌、心包、瓣膜与先心病');
 });
