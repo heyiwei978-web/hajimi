@@ -5,7 +5,7 @@ import {test} from 'node:test';
 
 function load(){
   const context={window:{}};
-  for(const file of ['ecg-data.js','ecg-basics-data.js','ecg-periop-data.js','ecg-waveforms.js','ecg-calculators.js']){
+  for(const file of ['ecg-data.js','ecg-cases-data.js','ecg-basics-data.js','ecg-periop-data.js','ecg-waveforms.js','ecg-calculators.js']){
     runInNewContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context,{filename:file});
   }
   return context.window;
@@ -116,4 +116,19 @@ test('basics data covers electrodes, reversals, axis, intervals and artifacts wi
   assert(W.render('lead-reversal').startsWith('<svg'));
   const svg=W.electrodes();assert.match(svg,/role="img"/);for(const lead of ['V1','V2','V3','V4','V5','V6'])assert(svg.includes('>'+lead+'<'));
   for(const ref of B.references)assert.equal(new URL(ref.url).protocol,'https:');
+});
+
+test('practice cases have four options, a valid answer, a sketch, a report and a working link',()=>{
+  const window=load(),data=window.HAJIMI_ECG_DATA,ids=new Set(data.entries.map(entry=>entry.id));
+  assert(data.cases.length>=12);
+  assert.equal(new Set(data.cases.map(item=>item.id)).size,data.cases.length);
+  for(const item of data.cases){
+    assert.equal(item.options.length,4,item.id);
+    assert(Number.isInteger(item.answer)&&item.answer>=0&&item.answer<4,item.id);
+    assert(window.HAJIMI_ECG_WAVEFORMS.render(item.kind).startsWith('<svg'),item.kind);
+    assert(item.vignette&&item.question&&item.explanation.length>40&&item.report,item.id);
+    assert(item.link?item.link.url.startsWith('/ecg/'):ids.has(item.entry),item.id);
+  }
+  const answers=data.cases.map(item=>item.answer);assert(new Set(answers).size>=3,'answers are not all in the same position');
+  assert(data.report.structure.length>=6&&data.report.rules.length>=4&&data.report.sample.conclusion.length>=2);
 });

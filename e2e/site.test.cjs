@@ -60,12 +60,12 @@ test('homepage is usable without JavaScript and avoids loading clinical data', a
   } finally {await context.close();}
 });
 
-test('ECG routes share the public layout, expose learning sections and keep the quiz explicitly under construction',async()=>{
+test('ECG routes share the public layout, expose learning sections, case practice and report pages',async()=>{
   for(const width of [320,1440]){
     const {page,context,errors}=await pageFor(width);
     try{
       const requests=[];page.on('request',request=>requests.push(new URL(request.url()).pathname));
-      for(const [route,title] of [['','心电图'],['basics','基础学习'],['atlas','图谱库'],['periop','围手术期专区'],['tools','心电图工具'],['quiz','自测']]){
+      for(const [route,title] of [['','心电图'],['basics','基础学习'],['atlas','图谱库'],['periop','围手术期专区'],['tools','心电图工具'],['quiz','病例练习'],['report','报告范例']]){
         const response=await page.goto(base+'/ecg'+(route?'/'+route:''),{waitUntil:'networkidle'});
         assert.equal(response.status(),200);
         assert.equal(await page.locator('h1').innerText(),title);
@@ -74,8 +74,28 @@ test('ECG routes share the public layout, expose learning sections and keep the 
         assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
         assert.match(await page.locator('#ecgReviewFooter').innerText(),/仅供临床参考，不替代医生判断/);
       }
-      assert.match(await page.locator('#ecgApp').innerText(),/建设中/);
-      assert.equal(await page.locator('#ecgApp input').count(),0,'quiz must not imply that questions or scoring are available');
+      await page.goto(base+'/ecg/quiz',{waitUntil:'networkidle'});
+      assert.match(await page.locator('#ecgApp').innerText(),/示意病例/);
+      const first=page.locator('[data-case]').first();
+      await first.getByRole('button',{name:'提交答案'}).click();
+      assert(await first.locator('.ecg-case-error').isVisible(),'an answer is required');
+      await first.locator('input[value="1"]').check();await first.getByRole('button',{name:'提交答案'}).click();
+      assert.match(await first.locator('.ecg-case-feedback').innerText(),/回答正确[\s\S]*规范报告写法/);
+      const second=page.locator('[data-case]').nth(1);
+      await second.locator('input[value="0"]').check();await second.getByRole('button',{name:'提交答案'}).click();
+      assert.match(await second.locator('.ecg-case-feedback').innerText(),/正确答案是 C/);
+      assert.match(await page.locator('#ecgQuizScore').innerText(),/已答 2 \/ \d+ 题 · 答对 1 题/);
+      await page.getByRole('button',{name:'重新开始'}).click();
+      assert.match(await page.locator('#ecgQuizScore').innerText(),/已答 0/);
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      await page.goto(base+'/ecg/report',{waitUntil:'networkidle'});
+      await page.locator('#ecgRpRate').fill('68');await page.locator('#ecgRpPr').fill('224');await page.locator('#ecgRpQt').fill('420');await page.locator('#ecgRpAxis').fill('75');
+      await page.locator('#ecgRpConclusion').fill('窦性心律\n一度房室传导阻滞');
+      await page.getByRole('button',{name:'生成报告'}).click();
+      const reportText=await page.locator('#ecgRpResult').innerText();
+      assert.match(reportText,/心率：68 次\/分/);assert.match(reportText,/QT\/QTc 420\/447 ms/);assert.match(reportText,/\+75°（正常电轴）/);assert.match(reportText,/2\. 一度房室传导阻滞/);
+      await page.locator('#ecgRpRate').fill('');await page.getByRole('button',{name:'生成报告'}).click();
+      assert.match(await page.locator('#ecgRpResult').innerText(),/需要同时填写心率/);
       await page.goto(base+'/ecg/basics',{waitUntil:'networkidle'});
       assert.equal(await page.locator('.ecg-steps>li').count(),6);
       for(const id of ['ecg-calibration','ecg-electrodes','ecg-axis','ecg-intervals','ecg-artifacts'])assert(await page.locator('#'+id).count()===1,id);
