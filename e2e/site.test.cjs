@@ -65,7 +65,7 @@ test('ECG routes share the public layout, expose learning sections, case practic
     const {page,context,errors}=await pageFor(width);
     try{
       const requests=[];page.on('request',request=>requests.push(new URL(request.url()).pathname));
-      for(const [route,title] of [['','心电图'],['basics','基础学习'],['atlas','图谱库'],['periop','围手术期专区'],['tools','心电图工具'],['quiz','病例练习'],['report','报告范例']]){
+      for(const [route,title] of [['','心电图'],['basics','基础学习'],['atlas','图谱库'],['periop','围手术期专区'],['tools','心电图工具'],['quiz','病例练习'],['report','报告范例'],['phenomena','常见心电现象']]){
         const response=await page.goto(base+'/ecg'+(route?'/'+route:''),{waitUntil:'networkidle'});
         assert.equal(response.status(),200);
         assert.equal(await page.locator('h1').innerText(),title);
@@ -134,8 +134,8 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
     const {page,context,errors}=await pageFor(width);
     try{
       await page.goto(base+'/ecg/atlas',{waitUntil:'networkidle'});
-      assert.equal(await page.locator('.ecg-category-grid a').count(),7);
-      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),52);
+      assert.equal(await page.locator('.ecg-category-grid a').count(),8);
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),62);
       const search=page.getByRole('searchbox',{name:'搜索心电图图谱'});
       const searchBounds=await search.boundingBox();assert(searchBounds.y>0&&searchBounds.y+searchBounds.height<900,'atlas search is visible before scrolling through categories');
       // Exact abbreviations match one entry; common Chinese terms rank the title/alias match first.
@@ -152,11 +152,11 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
       assert(await page.locator('#ecgSearchEmpty').isVisible());
       assert.equal(await page.locator('#ecgSearchResults img').count(),0);
       await page.getByRole('button',{name:'清空搜索'}).click();
-      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),52);
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),62);
       assert.equal(new URL(page.url()).searchParams.has('q'),false);
       await page.locator('a[href="/ecg/atlas/conduction"]').click();
       await page.waitForURL(base+'/ecg/atlas/conduction',{waitUntil:'networkidle'});
-      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),11);
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),12);
       assert(await page.locator('#ecgSearchEmpty').isHidden());
       await page.goto(base+'/ecg/atlas/pulmonary',{waitUntil:'networkidle'});
       await page.locator('a[href="/ecg/atlas/pulmonary/pulmonary-embolism"]').click();

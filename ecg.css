@@ -171,3 +171,6 @@ html:has(.ecg-entry-page){scroll-padding-bottom:calc(var(--ecg-footer-height,150
 .ecg-report-sheet p{margin:0 0 4px}
 .ecg-report-text{white-space:pre-wrap;word-break:break-word;font-family:inherit;font-size:16px;line-height:1.85;margin:0 0 10px}
 .ecg-form textarea{width:100%;border:1px solid var(--ws-line,#dfe6ee);border-radius:9px;padding:8px 10px;font:inherit;font-size:16px;margin-top:4px}
+.ecg-textbook{margin-top:14px;padding:12px 14px;border-left:3px solid var(--ws-blue);background:var(--ws-soft);border-radius:8px;line-height:1.7}
+.ecg-textbook strong{margin-right:8px}
+.ecg-textbook .ecg-hint{display:block;margin-top:4px}

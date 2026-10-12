@@ -5,7 +5,7 @@ import {test} from 'node:test';
 
 function load(){
   const context={window:{}};
-  for(const file of ['ecg-data.js','ecg-cases-data.js','ecg-basics-data.js','ecg-periop-data.js','ecg-waveforms.js','ecg-calculators.js']){
+  for(const file of ['ecg-data.js','ecg-cases-data.js','ecg-basics-data.js','ecg-periop-data.js','ecg-book-data.js','ecg-waveforms.js','ecg-calculators.js']){
     runInNewContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context,{filename:file});
   }
   return context.window;
@@ -37,11 +37,11 @@ test('ECG calculations reject missing, nonpositive and nonfinite input instead o
 test('all ECG atlas drafts keep valid categories, both clinical layers and explicit review metadata',()=>{
   const window=load(),data=window.HAJIMI_ECG_DATA;
   assert.equal(data.schema,1);
-  assert.equal(data.entries.length,52);
+  assert.equal(data.entries.length,62);
   const ids=Array.from(data.entries,entry=>entry.id);
   assert.equal(new Set(ids).size,ids.length,'entry ids are unique');
   for(const id of ['atrial-fibrillation','hyperkalemia','pulmonary-embolism','stemi','complete-heart-block','ventricular-pacing'])assert(ids.includes(id));
-  assert.equal(new Set(data.categories.map(category=>category.id)).size,7);
+  assert.equal(new Set(data.categories.map(category=>category.id)).size,8);
   for(const category of data.categories)assert(data.entries.some(entry=>entry.category===category.id),'category '+category.id+' has at least one entry');
   for(const scenario of data.periop.scenarios)if(scenario.entry)assert(ids.includes(scenario.entry),'scenario links to an existing entry');
   for(const entry of data.entries){
@@ -131,4 +131,22 @@ test('practice cases have four options, a valid answer, a sketch, a report and a
   }
   const answers=data.cases.map(item=>item.answer);assert(new Set(answers).size>=3,'answers are not all in the same position');
   assert(data.report.structure.length>=6&&data.report.rules.length>=4&&data.report.sample.conclusion.length>=2);
+});
+
+test('textbook batch: new entries, textbook citations, per-lead normals and phenomena are complete',()=>{
+  const window=load(),data=window.HAJIMI_ECG_DATA,W=window.HAJIMI_ECG_WAVEFORMS,ids=new Set(data.entries.map(entry=>entry.id));
+  for(const id of ['left-atrial-abnormality','right-atrial-abnormality','premature-atrial-contractions','premature-junctional-contractions','congenital-long-qt','short-qt','cpvt','left-posterior-fascicular-block','dextrocardia','low-voltage-effusion'])assert(ids.has(id),id);
+  assert.match(data.textbook.title,/黄宛临床心电图学/);
+  const cited=data.entries.filter(entry=>entry.textbook);
+  assert(cited.length>=17);
+  for(const entry of cited){assert.match(entry.textbook.chapter,/^第 \d+ 章/);assert.match(entry.textbook.pages,/^\d/);}
+  assert(data.basics.textbookNormals.rows.length>=12);
+  for(const row of data.basics.textbookNormals.rows)assert.equal(row.length,2);
+  assert(data.basics.qrsNaming.length>=4);
+  assert.equal(data.phenomena.items.length,11);
+  assert.equal(new Set(data.phenomena.items.map(item=>item.id)).size,11);
+  for(const item of data.phenomena.items){assert(item.title&&item.definition.length>20&&item.significance.length>20);assert(item.ecg.length>=1);}
+  for(const kind of ['lae','rae','pac','pjc','lqts','sqts','cpvt','lpfb','dextrocardia','low-voltage'])assert(W.render(kind).startsWith('<svg'),kind);
+  const lvh=data.entries.find(entry=>entry.id==='left-ventricular-hypertrophy');
+  assert(lvh.basic.criteria.some(([name])=>name.includes('教材')));
 });
