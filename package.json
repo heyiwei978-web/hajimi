@@ -6,7 +6,9 @@
   "scripts": {
     "test": "node --test test/*.test.js",
     "build": "node scripts/build-home.mjs",
-    "test:browser": "npm run build && node --test e2e/*.test.cjs"
+    "test:browser": "npm run build && node --test e2e/*.test.cjs",
+    "audit:clinical": "node scripts/clinical-quality-audit.mjs",
+    "audit:clinical:check": "node scripts/clinical-quality-audit.mjs --check"
   },
   "devDependencies": {
     "playwright": "1.61.1"
