@@ -121,6 +121,23 @@
     aivr:{title:'加速性室性自主心律教学示意',description:'II 导联宽 QRS 规则出现，频率约 60–100 次/分，前无相关 P 波；常见于再灌注后，多可自行终止。',rows:[row('II',[90,240,390,540].flatMap(c=>beat(c,{p:false,qrs:'broad',s:0.6,t:-1,tAt:46,tw:10})))]}
   });
 
+  // Sixth batch (textbook-guided entries): atrial abnormality, premature beats, inherited
+  // channelopathies, posterior fascicular block, dextrocardia and low voltage.
+  const notchedP=(c,pr=36)=>[x=>G(x,c-pr,3.4,-6)+G(x,c-pr+13,3.6,-7)];
+  const biphasicP=(c,pr=36)=>[x=>G(x,c-pr,3,-4)+G(x,c-pr+12,4.5,7)];
+  Object.assign(drawings,{
+    lae:{title:'左心房异常教学示意',description:'II 导联 P 波增宽、双峰（第二峰略高，峰距 >40 ms）；V1 导联 P 波正负双向，终末负向部分宽而深（Ptf-V1 负值增大）。',rows:[row('II',N.flatMap(c=>[...beat(c,{p:false}),...notchedP(c)])),row('V1',N.flatMap(c=>[...beat(c,{p:false,r:0.35,s:1.3,t:0.5}),...biphasicP(c)]))]},
+    rae:{title:'右心房异常教学示意',description:'II 导联 P 波高尖（≥0.25 mV），时限不增宽；V1 导联 P 波直立高尖。',rows:[row('II',beats(N,{pAmp:2.7,pw:2.8})),row('V1',beats(N,{pAmp:2.1,pw:2.8,r:0.4,s:1.1,t:0.4}))]},
+    pac:{title:'房性早搏教学示意',description:'II 导联第三个搏动提前出现，其前 P′ 波形态与窦性 P 波不同，QRS 形态正常；其后为不完全性代偿间歇。',rows:[row('II',[...beats([90,250],{}),...beat(370,{pAmp:-0.8,pr:30}),...beats([540],{})])]},
+    pjc:{title:'交界性早搏教学示意',description:'II 导联第三个搏动提前出现，QRS 形态与窦性相同，其前无 P 波，QRS 后可见倒置的逆行 P′ 波；其后多为完全性代偿间歇。',rows:[row('II',[...beats([90,250],{}),...beat(370,{p:false}),...P(388,-0.8),...beats([570],{})])]},
+    lqts:{title:'先天性长 QT 综合征教学示意',description:'II 导联 QT 间期明显延长，T 波低平并有切迹（双峰）。仅示意形态；不同基因型 T 波形态差异较大。',rows:[row('II',[90,330,570].flatMap(c=>[...beat(c,{t:0.55,tAt:96,tw:9}),x=>G(x,c+122,7,-6)]))]},
+    sqts:{title:'短 QT 综合征教学示意',description:'V3 导联 ST 段几乎消失，T 波紧接 QRS、高尖且对称，QT 间期明显缩短。',rows:[row('V3',beats(N,{r:0.8,s:0.6,t:1.9,tAt:30,tw:6}))]},
+    cpvt:{title:'双向性室性心动过速教学示意',description:'II 导联宽 QRS 心动过速，QRS 主波方向逐搏交替（向上、向下），为 CPVT 的典型发作形式之一；静息心电图通常正常。',rows:[row('II',[62,128,194,260,326,392,458,524,590].flatMap((c,i)=>beat(c,{p:false,qrs:'broad',r:i%2?-0.9:1,s:i%2?-0.3:0.6,t:i%2?0.9:-0.9,tAt:32,tw:8})))]},
+    lpfb:{title:'左后分支阻滞教学示意',description:'I 导联呈 rS（以 S 波为主），III 导联呈 qR（以 R 波为主），提示电轴右偏；QRS 时限基本正常。',rows:[row('I',beats(N,{r:0.35,s:1.3,t:0.5})),row('III',beats(N,{q:0.5,r:1.3,s:0.1}))]},
+    dextrocardia:{title:'镜像右位心教学示意',description:'上行为 I 导联：P 波、QRS 和 T 波全部倒置。下行为 V6 导联：R 波很小、以 S 波为主（胸导联 R 波自 V1 向 V6 逐渐变小）——这是与左右上肢电极接反的关键区别。',rows:[row('I',beats(N,{pAmp:-1,r:-0.8,s:-0.3,t:-1})),row('V6',beats(N,{pAmp:0.6,r:0.18,s:0.7,t:0.3}))]},
+    'low-voltage':{title:'低电压与电交替教学示意',description:'II 导联 QRS 振幅普遍很小，心率偏快，QRS 振幅逐搏高低交替（电交替），提示大量心包积液的可能。',rows:[row('II',[60,160,260,360,460,560].flatMap((c,i)=>beat(c,{pAmp:0.6,r:i%2?0.22:0.42,s:0.1,t:0.3,tAt:44,tw:7})))]}
+  });
+
   // Artifact and lead-reversal sketches for the basics page.
   const noise=(amp,rate,seed=0)=>[x=>amp*(Math.sin(x*rate+seed)*0.6+Math.sin(x*rate*1.9+seed*3)*0.4)];
   Object.assign(drawings,{

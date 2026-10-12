@@ -26,7 +26,7 @@
   function home(){
     setPage('心电图','从基础到围手术期：学习、查阅和床旁计算。');
     const entries=[['basics','基础学习','电活动、导联与电极位置、电轴与间期测量、伪差识别，再用六步法读图。','基'],['atlas','图谱库','按类别逐级查阅，搜索常见心电图词条及其围手术期要点。','图'],['periop','围手术期专区','术前异常心电图处置、骨科麻醉相关风险、术后胸闷流程与术后心肌损伤。','术']];
-    app.innerHTML='<section class="class-section-head"><span>01 / LEARN & READ</span><h2>从这里开始</h2><p>基础层帮助认识波形，围手术期层联系临床场景。</p></section><div class="ecg-entry-grid">'+entries.map(([id,title,description,symbol],index)=>'<a class="class-dept-card is-ready" href="/ecg/'+id+'"><span class="class-dept-index">0'+(index+1)+'</span><div class="class-dept-symbol" aria-hidden="true">'+symbol+'</div><h3>'+title+'</h3><p>'+description+'</p><div class="class-dept-foot"><strong>进入栏目</strong><span aria-hidden="true">→</span></div></a>').join('')+'</div>'+section('ecg-more','工具、练习与报告','<div class="ecg-panel-grid">'+card('/ecg/tools','心电图工具','QTc 四种公式、电轴计算、格数换算、心率估算，以及现有 RCRI 入口。')+card('/ecg/quiz','病例练习','骨科围手术期场景的判读练习，作答后给出解析和规范报告。','示意病例')+card('/ecg/report','报告范例','标准化心电图报告结构、规范写法、范例与报告生成器。')+'</div>');
+    app.innerHTML='<section class="class-section-head"><span>01 / LEARN & READ</span><h2>从这里开始</h2><p>基础层帮助认识波形，围手术期层联系临床场景。</p></section><div class="ecg-entry-grid">'+entries.map(([id,title,description,symbol],index)=>'<a class="class-dept-card is-ready" href="/ecg/'+id+'"><span class="class-dept-index">0'+(index+1)+'</span><div class="class-dept-symbol" aria-hidden="true">'+symbol+'</div><h3>'+title+'</h3><p>'+description+'</p><div class="class-dept-foot"><strong>进入栏目</strong><span aria-hidden="true">→</span></div></a>').join('')+'</div>'+section('ecg-more','工具、练习与报告','<div class="ecg-panel-grid">'+card('/ecg/tools','心电图工具','QTc 四种公式、电轴计算、格数换算、心率估算，以及现有 RCRI 入口。')+card('/ecg/quiz','病例练习','骨科围手术期场景的判读练习，作答后给出解析和规范报告。','示意病例')+card('/ecg/report','报告范例','标准化心电图报告结构、规范写法、范例与报告生成器。')+card('/ecg/phenomena','常见心电现象','超常传导、隐匿性传导、蝉联、干扰脱节、心脏记忆、拖带等 11 种现象。','进阶')+'</div>');
   }
   function basics(){
     setPage('基础学习','先核对记录质量与标定，再按统一顺序判读。以下为成人常用教学参考，资料待审核。',[{title:'基础学习'}]);
@@ -39,6 +39,8 @@
     if(B.axisGuide)parts.push(['ecg-axis','电轴测量',points(B.axisGuide.steps)+table(B.axisGuide.ranges,['电轴','范围与常见原因'])+'<p><a class="btn" href="/ecg/tools#ecg-axis-tool">打开电轴计算工具 →</a></p>']);
     if(B.intervals)parts.push(['ecg-intervals','间期测量方法',table(B.intervals,['项目','测量方法与参考'])+'<p><a class="btn" href="/ecg/tools">打开间期与 QTc 工具 →</a></p>']);
     if(B.artifacts)parts.push(['ecg-artifacts','伪差识别',B.artifacts.map(item=>'<section><h3>'+esc(item.title)+'</h3>'+diagram(item.kind,item.points[0])+points(item.points.slice(1))+'</section>').join('')]);
+    if(B.textbookNormals)parts.push(['ecg-textbook-normals','各导联正常值（教材要点）','<p>按导联逐项整理，便于对照具体导联判读。</p>'+table(B.textbookNormals.rows,['项目','正常范围与要点'])+'<p class="ecg-hint">'+esc(B.textbookNormals.note)+'</p>'+textbookNote(B.textbookNormals.source)]);
+    if(B.qrsNaming)parts.push(['ecg-qrs-naming','QRS 波群命名与测量',points(B.qrsNaming)+'<p><a class="btn" href="/ecg/phenomena">进阶：常见心电现象 →</a></p>']);
     if(B.references)parts.push(['ecg-basics-refs','参考文献','<ol class="ecg-points">'+B.references.map(ref=>'<li><a href="'+esc(ref.url)+'" target="_blank" rel="noopener noreferrer">'+esc(ref.title)+' ↗</a></li>').join('')+'</ol>']);
     app.innerHTML='<nav class="ecg-section-links" aria-label="基础学习目录">'+parts.map(([id,title])=>'<a href="#'+id+'">'+esc(title)+'</a>').join('')+'</nav>'+parts.map(([id,title,html])=>section(id,title,html)).join('');
   }
@@ -79,7 +81,12 @@
   }
   function references(entry){
     const refs=entry.references.filter(reference=>{try{return new URL(reference.url).protocol==='https:';}catch{return false;}});
-    return refs.length?'<ol class="ecg-points">'+refs.map(reference=>'<li><a href="'+esc(reference.url)+'" target="_blank" rel="noopener noreferrer">'+esc(reference.title)+' ↗</a></li>').join('')+'</ol>':'<p>待补充：本词条尚未录入经核实的参考文献。</p>';
+    const list=refs.length?'<ol class="ecg-points">'+refs.map(reference=>'<li><a href="'+esc(reference.url)+'" target="_blank" rel="noopener noreferrer">'+esc(reference.title)+' ↗</a></li>').join('')+'</ol>':'<p>待补充：本词条尚未录入经核实的参考文献。</p>';
+    return list+textbookNote(entry.textbook);
+  }
+  function textbookNote(source){
+    if(!source||!data.textbook)return '';
+    return '<p class="ecg-textbook"><strong>学习教材</strong>'+esc(data.textbook.title)+'，'+esc(source.chapter)+'，第 '+esc(source.pages)+' 页。<span class="ecg-hint">'+esc(data.textbook.note)+'</span></p>';
   }
   function related(entry){
     const items=(entry.related||[]).map(id=>data.entries.find(other=>other.id===id)).filter(Boolean);
@@ -229,6 +236,14 @@
       out.hidden=false;
     });
   }
+  function phenomena(){
+    const P=data.phenomena;
+    setPage('常见心电现象','超常传导、隐匿性传导、蝉联、干扰脱节、心脏记忆等：用电生理机制解释“看起来矛盾”的心电图。',[{title:'心电现象'}]);
+    if(!P){notFound();return;}
+    app.innerHTML='<nav class="ecg-section-links" aria-label="心电现象目录">'+P.items.map(item=>'<a href="#ecg-ph-'+esc(item.id)+'">'+esc(item.title)+'</a>').join('')+'</nav>'+
+      P.items.map(item=>section('ecg-ph-'+item.id,item.title,'<p>'+esc(item.definition)+'</p><h3>心电图表现</h3>'+points(item.ecg)+'<h3>意义与鉴别</h3><p>'+esc(item.significance)+'</p>')).join('')+
+      section('ecg-ph-source','出处',textbookNote(P.source)+'<p><a class="btn" href="/ecg/basics">返回基础学习 →</a></p>');
+  }
   function notFound(){setPage('页面未找到','请从栏目首页或图谱分类重新选择。',[{title:'页面未找到'}]);app.innerHTML='<p><a class="btn" href="/ecg">返回心电图首页</a></p>';}
   let route=[];try{route=location.pathname.replace(/\/+$/,'').split('/').filter(Boolean).map(decodeURIComponent);}catch{route=[];}
   if(route[0]!=='ecg')notFound();
@@ -238,6 +253,7 @@
   else if(route.length===2&&route[1]==='tools')tools();
   else if(route.length===2&&route[1]==='quiz')quiz();
   else if(route.length===2&&route[1]==='report')report();
+  else if(route.length===2&&route[1]==='phenomena')phenomena();
   else if(route[1]==='atlas'){
     const category=data.categories.find(item=>item.id===route[2]);
     const entry=data.entries.find(item=>item.id===route[3]&&item.category===route[2]);
