@@ -5,7 +5,7 @@ import {test} from 'node:test';
 
 function load(){
   const context={window:{}};
-  for(const file of ['ecg-data.js','ecg-periop-data.js','ecg-waveforms.js','ecg-calculators.js']){
+  for(const file of ['ecg-data.js','ecg-basics-data.js','ecg-periop-data.js','ecg-waveforms.js','ecg-calculators.js']){
     runInNewContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context,{filename:file});
   }
   return context.window;
@@ -90,4 +90,30 @@ test('perioperative topic links only to existing entries and cites https sources
   assert(P.postopFlow.length>=5);
   assert(P.injury.rows.length>=4);
   for(const ref of P.references)assert.equal(new URL(ref.url).protocol,'https:');
+});
+
+test('new ECG calculators: four QTc formulas, frontal axis, grid conversion and rate estimates',()=>{
+  const C=load().HAJIMI_ECG_CALCULATORS;
+  const q=C.qtc(400,800);
+  assert(Math.abs(q.framingham-430.8)<1e-9);
+  assert(Math.abs(q.hodges-426.25)<1e-9);
+  const atRate60=C.qtc(400,1000);for(const key of ['bazett','fridericia','framingham','hodges'])assert(Math.abs(atRate60[key]-400)<1e-9);
+  for(const [i,f,deg,label] of [[5,0,0,'正常'],[0,5,90,'正常'],[5,-5,-45,'左偏'],[-5,5,135,'右偏'],[-5,-5,-135,'极度'],[5,-2.9,-30,'正常']]){
+    const r=C.axis(i,f);assert.equal(r.degrees,deg);assert.match(r.category,new RegExp(label));
+  }
+  assert.throws(()=>C.axis(0,0));assert.throws(()=>C.axis('',3));assert.throws(()=>C.axis('x',3));
+  assert.equal(C.boxesToMs(5,25),200);assert.equal(C.boxesToMs(5,50),100);
+  assert.equal(C.mmToMv(10,10),1);assert.equal(C.mmToMv(10,5),2);assert.equal(C.mmToMv(-3,10),-0.3);
+  assert.equal(C.heartRateFromBoxes(20,25),75);assert.equal(C.heartRateFromBoxes(40,50),75);
+  assert.equal(C.heartRateSixSecond(8),80);assert.throws(()=>C.heartRateSixSecond(7.5));assert.throws(()=>C.boxesToMs(0));
+});
+test('basics data covers electrodes, reversals, axis, intervals and artifacts with drawable sketches',()=>{
+  const window=load(),B=window.HAJIMI_ECG_DATA.basics,W=window.HAJIMI_ECG_WAVEFORMS;
+  assert(B.electrodes.chest.length>=4&&B.electrodes.reversals.length>=5);
+  assert.equal(B.axisGuide.ranges.length,4);
+  assert(B.intervals.length>=6);
+  for(const item of B.artifacts)assert(W.render(item.kind).startsWith('<svg'),item.kind);
+  assert(W.render('lead-reversal').startsWith('<svg'));
+  const svg=W.electrodes();assert.match(svg,/role="img"/);for(const lead of ['V1','V2','V3','V4','V5','V6'])assert(svg.includes('>'+lead+'<'));
+  for(const ref of B.references)assert.equal(new URL(ref.url).protocol,'https:');
 });

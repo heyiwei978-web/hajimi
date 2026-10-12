@@ -120,6 +120,29 @@
     mat:{title:'多源性房性心动过速教学示意',description:'II 导联可见 ≥3 种形态不同的 P 波，PR 间期和 RR 间期不等，心率 >100 次/分。',rows:[row('II',[[60,1,26],[150,-0.7,22],[225,1.8,30],[320,0.5,20],[392,-1,26],[490,1.4,32],[565,0.6,24]].flatMap(([c,a,pr])=>beat(c,{pAmp:a,pr,t:0.7,tAt:36,tw:6})))]},
     aivr:{title:'加速性室性自主心律教学示意',description:'II 导联宽 QRS 规则出现，频率约 60–100 次/分，前无相关 P 波；常见于再灌注后，多可自行终止。',rows:[row('II',[90,240,390,540].flatMap(c=>beat(c,{p:false,qrs:'broad',s:0.6,t:-1,tAt:46,tw:10})))]}
   });
+
+  // Artifact and lead-reversal sketches for the basics page.
+  const noise=(amp,rate,seed=0)=>[x=>amp*(Math.sin(x*rate+seed)*0.6+Math.sin(x*rate*1.9+seed*3)*0.4)];
+  Object.assign(drawings,{
+    'artifact-tremor':{title:'肌电干扰（震颤）伪差教学示意',description:'II 导联基线上叠加细小、不规则的高频波动；QRS 仍按原节律规则出现，可被误认为房颤或房扑。',rows:[row('II',[...beats(N,{}),...noise(2.4,1.3,0.7),...noise(1.4,2.7,2.1)])]},
+    'artifact-ac':{title:'交流电干扰（50 Hz）伪差教学示意',description:'II 导联基线呈规则、致密的细小锯齿状波动（工频干扰），波形本身仍可辨认。',rows:[row('II',[...beats(N,{}),x=>1.6*Math.sin(x*Math.PI*0.9)])]},
+    'artifact-wander':{title:'基线漂移教学示意',description:'II 导联基线随呼吸或体动缓慢上下起伏，可干扰 ST 段判断。',rows:[row('II',[...beats(N,{}),x=>12*Math.sin(x/95)])]},
+    'artifact-motion':{title:'运动伪差酷似室速教学示意',description:'II 导联中段出现大幅不规则波动，酷似宽 QRS 心动过速；仔细看可见原有窄 QRS 仍按规则节律“穿行”其中。',rows:[row('II',[...beats([70,190,310,430,550],{}),x=>(x>200&&x<470?-28*Math.sin((x-200)*0.14)*Math.sin(Math.PI*(x-200)/270):0)])]},
+    'lead-reversal':{title:'左右上肢电极接反教学示意',description:'上行为 I 导联：P 波、QRS 和 T 波全部倒置。下行为同一患者 V6 导联：形态正常（胸导联不受影响）。',rows:[row('I',beats(N,{pAmp:-1,r:-0.8,s:-0.3,t:-1})),row('V6',beats(N,{}))]}
+  });
+  // Chest-electrode placement diagram (schematic, not to scale).
+  function electrodes(){
+    const id='ecg-electrodes-'+(++serial);
+    const sites=[['V1',268,214],['V2',332,214],['V3',347,246],['V4',362,278],['V5',438,278],['V6',478,278]];
+    const ribs=[150,182,214,246,278,310].map((y,i)=>'<path d="M300 '+(y-6)+'Q'+(178-i*6)+' '+(y+10)+' '+(132-i*4)+' '+(y+42)+'M300 '+(y-6)+'Q'+(422+i*6)+' '+(y+10)+' '+(468+i*4)+' '+(y+42)+'" fill="none" stroke="#c9d6e2" stroke-width="2"/>').join('');
+    const dots=sites.map(([name,x,y])=>'<circle cx="'+x+'" cy="'+y+'" r="11" fill="#1b66bd"/><text x="'+x+'" y="'+(y+5)+'" fill="#fff" font-size="11" text-anchor="middle" font-weight="700">'+name+'</text>').join('');
+    return '<svg class="ecg-waveform ecg-electrodes" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 380" role="img" aria-labelledby="'+id+'-title '+id+'-desc">'+
+      '<title id="'+id+'-title">胸前导联电极位置示意</title><desc id="'+id+'-desc">V1 胸骨右缘第 4 肋间；V2 胸骨左缘第 4 肋间；V4 左锁骨中线第 5 肋间；V3 位于 V2 与 V4 连线中点；V5 左腋前线、V6 左腋中线，均与 V4 同一水平。</desc>'+
+      '<rect width="600" height="380" fill="#fff"/><path d="M150 70Q300 20 450 70L520 360H80Z" fill="#f6f9fc" stroke="#9fb3c6" stroke-width="2"/>'+ribs+
+      '<rect x="288" y="96" width="24" height="200" rx="10" fill="#e3ebf3" stroke="#9fb3c6"/>'+
+      '<path d="M362 120V340" stroke="#e0a43a" stroke-width="2" stroke-dasharray="6 5"/><path d="M438 140V340" stroke="#e0a43a" stroke-width="2" stroke-dasharray="6 5"/><path d="M478 160V340" stroke="#e0a43a" stroke-width="2" stroke-dasharray="6 5"/>'+
+      '<g fill="#5b6b7b" font-size="13"><text x="300" y="90" text-anchor="middle">胸骨</text><text x="362" y="356" text-anchor="middle">锁骨中线</text><text x="430" y="372" text-anchor="middle">腋前线</text><text x="500" y="356" text-anchor="middle">腋中线</text><text x="166" y="222">第 4 肋间</text><text x="166" y="286">第 5 肋间</text></g>'+dots+'</svg>';
+  }
   function render(kind){
     const drawing=drawings[kind];
     if(!drawing)return '';
@@ -136,5 +159,5 @@
       '<defs><pattern id="'+id+'-small" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M8 0H0V8" fill="none" stroke="#dce4eb" stroke-width=".5"/></pattern><pattern id="'+id+'-big" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="url(#'+id+'-small)"/><path d="M40 0H0V40" fill="none" stroke="#c1d3e1" stroke-width="1"/></pattern></defs>'+
       '<rect width="640" height="'+height+'" fill="#fff"/><rect width="640" height="'+height+'" fill="url(#'+id+'-big)"/>'+rows+labels+'</svg>';
   }
-  window.HAJIMI_ECG_WAVEFORMS=Object.freeze({render});
+  window.HAJIMI_ECG_WAVEFORMS=Object.freeze({render,electrodes});
 })();

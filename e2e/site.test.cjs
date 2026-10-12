@@ -78,6 +78,9 @@ test('ECG routes share the public layout, expose learning sections and keep the 
       assert.equal(await page.locator('#ecgApp input').count(),0,'quiz must not imply that questions or scoring are available');
       await page.goto(base+'/ecg/basics',{waitUntil:'networkidle'});
       assert.equal(await page.locator('.ecg-steps>li').count(),6);
+      for(const id of ['ecg-calibration','ecg-electrodes','ecg-axis','ecg-intervals','ecg-artifacts'])assert(await page.locator('#'+id).count()===1,id);
+      assert(await page.locator('#ecg-artifacts svg[role="img"]').count()>=4);
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'basics stays within the viewport');
       assert.match(await page.locator('#ecg-leads').innerText(),/10 个电极/);
       assert.match(await page.locator('#ecg-paper').innerText(),/40 ms/);
       assert.match(await page.locator('#ecg-normal').innerText(),/120–200 ms/);
@@ -193,6 +196,8 @@ test('ECG tools calculate both QTc formulas and RR heart rate, discard stale res
       await page.locator('#ecgQt').fill('400');await page.locator('#ecgQtRr').fill('800');await page.locator('#ecgQtRr').press('Enter');
       assert.match(await page.locator('#ecgQtResult').innerText(),/Bazett：447 ms/);
       assert.match(await page.locator('#ecgQtResult').innerText(),/Fridericia：431 ms/);
+      assert.match(await page.locator('#ecgQtResult').innerText(),/Framingham：431 ms/);
+      assert.match(await page.locator('#ecgQtResult').innerText(),/Hodges：426 ms/);
       await page.locator('#ecgQtRr').fill('1000');assert.equal(await page.locator('#ecgQtResult').isVisible(),false);
       await page.getByRole('button',{name:'计算 QTc'}).click();assert.match(await page.locator('#ecgQtResult').innerText(),/Bazett：400 ms/);
       await page.locator('#ecgQtRr').fill('0');await page.getByRole('button',{name:'计算 QTc'}).click();
@@ -200,6 +205,10 @@ test('ECG tools calculate both QTc formulas and RR heart rate, discard stale res
       await page.locator('#ecgHeartRr').fill('800');await page.getByRole('button',{name:'计算心率'}).click();
       assert.match(await page.locator('#ecgHeartResult').innerText(),/75.0 次\/分/);
       await page.locator('#ecgHeartRr').fill('');await page.getByRole('button',{name:'计算心率'}).click();assert.match(await page.locator('#ecgHeartResult').innerText(),/完整输入/);
+      await page.locator('#ecgAxisI').fill('5');await page.locator('#ecgAxisF').fill('-5');await page.getByRole('button',{name:'计算电轴'}).click();
+      assert.match(await page.locator('#ecgAxisResult').innerText(),/-45°[\s\S]*左偏/);
+      await page.locator('#ecgGridBoxes').fill('5');await page.getByRole('button',{name:'换算间期'}).click();assert.match(await page.locator('#ecgGridResult').innerText(),/200 ms/);
+      await page.locator('#ecgSixCount').fill('9');await page.getByRole('button',{name:'按 6 秒法计算'}).click();assert.match(await page.locator('#ecgSixResult').innerText(),/90 次/);
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
       await page.getByRole('link',{name:'打开现有 RCRI 工具 →'}).click();
       await page.locator('#dlg').waitFor({state:'visible'});
