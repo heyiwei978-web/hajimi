@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node --test test/*.test.js",
     "build": "node scripts/build-home.mjs",
-    "test:browser": "npm run build && node --test e2e/*.test.cjs"
+    "test:browser": "npm run build && node --test e2e/*.test.cjs",
+    "audit:operative": "node scripts/operative-conditional-audit.mjs"
   },
   "devDependencies": {
     "playwright": "1.61.1"
