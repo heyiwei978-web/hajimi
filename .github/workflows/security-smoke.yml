@@ -35,6 +35,8 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Run unit and runtime audits
         run: npm test
+      - name: Audit completed orthopedic operative narratives (read-only)
+        run: npm run audit:operative
       - name: Install browser for regression checks
         run: npx playwright install --with-deps chromium
       - name: Check responsive layout, search and keyboard flows
