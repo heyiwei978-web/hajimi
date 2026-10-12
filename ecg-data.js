@@ -1173,7 +1173,7 @@ window.HAJIMI_ECG_DATA = {
       related:['stemi','st-elevation-differential','left-bundle-branch-block'],
       basic:{
         summary:'相邻导联出现病理性 Q 波或 QS 波提示既往心肌梗死；术前心电图常见，对评估心功能和围手术期风险有意义。',
-        criteria:[['V2–V3','任何 Q 波 >20 ms，或 QS 波'],['其余导联','同一导联组 ≥2 个相邻导联 Q 波 ≥30 ms 且深 ≥1 mm，或 QS 波'],['V1–V2 等位改变','R 波 >40 ms 且 R/S >1，伴直立 T 波（无传导障碍时提示陈旧性后壁梗死）'],['持续 ST 抬高','梗死后 ST 抬高持续数周以上，提示室壁瘤可能']],
+        criteria:[['V2–V3','任何 Q 波 >20 ms，或 QS 波'],['其余导联','同一导联组 ≥2 个相邻导联 Q 波 ≥30 ms 且深 ≥1 mm，或 QS 波'],['V1–V2 等位改变','R 波 ≥40 ms 且 R/S ≥1，伴直立 T 波（无传导障碍时提示陈旧性后壁梗死）'],['持续 ST 抬高','梗死后 ST 抬高持续数周以上，提示室壁瘤可能']],
         diagram:{kind:'old-mi',caption:'陈旧性心肌梗死教学示意：III 导联宽而深的 Q 波，伴 T 波倒置，ST 段回到基线。'},
         diagnosticPoints:[
           'III 导联单独的 Q 波、aVR 的 QS 波和 V1 的 QS 波可为正常表现，不能单独据此诊断。',
