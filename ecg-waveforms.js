@@ -91,7 +91,7 @@
 
   const sawtooth=(period,amp)=>[x=>{const k=((x%period)+period)%period/period;return amp*(k<0.8?(k/0.8)*2-1:1-(k-0.8)/0.2*2);}];
   Object.assign(drawings,{
-    'atrial-flutter':{title:'典型心房扑动教学示意',description:'II 导联连续的锯齿样扑动波（F 波），波间无等电位线；本例为 4:1 传导，心室率规则。',rows:[row('II',[...sawtooth(32,7),...[60,188,316,444,572].flatMap(c=>beat(c,{p:false,t:0.25,tAt:40,tw:6}))])]},
+    'atrial-flutter':{title:'典型心房扑动教学示意',description:'II 导联连续的锯齿样扑动波（F 波），波间无等电位线；本例为 4:1 传导，心室率规则。',rows:[row('II',[...sawtooth(40,7),...[70,230,390,550].flatMap(c=>beat(c,{p:false,t:0.25,tAt:40,tw:6}))])]},
     wpw:{title:'心室预激（WPW 图形）教学示意',description:'II 导联 PR 间期缩短，QRS 起始部有缓慢上升的 delta 波，QRS 增宽。',rows:[row('II',N.flatMap(c=>[...beat(c,{pr:18,r:1.05}),x=>G(x,c-9,5,-15)]))]},
     brugada:{title:'1 型 Brugada 图形教学示意',description:'V1 导联 QRS 后 ST 段穹窿形抬高（下斜型），随后 T 波倒置。',rows:[row('V1',N.flatMap(c=>[...beat(c,{r:0.4,s:0.6,t:-1.1,tAt:48,tw:8}),x=>(x>c+3?-26*Math.exp(-((x-c-6)**2)/(2*15*15))*(x<c+6?(x-c-3)/3:1):0)]))]},
     pericarditis:{title:'急性心包炎教学示意',description:'II 导联 ST 段凹面向上抬高并 PR 段压低；aVR 导联相反：ST 段压低、PR 段抬高。',rows:[row('II',N.flatMap(c=>[...beat(c,{st:9,t:1.1,tAt:56}),x=>plateau(x,c-22,c-10,3)])),row('aVR',N.flatMap(c=>[...beat(c,{r:-0.7,s:0,st:-4,t:-0.7}),x=>plateau(x,c-22,c-10,-2)]))]},

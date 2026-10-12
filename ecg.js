@@ -26,7 +26,7 @@
   function home(){
     setPage('心电图','从基础到围手术期：学习、查阅和床旁计算。');
     const entries=[['basics','基础学习','电活动、导联与电极位置、电轴与间期测量、伪差识别，再用六步法读图。','基'],['atlas','图谱库','按类别逐级查阅，搜索常见心电图词条及其围手术期要点。','图'],['periop','围手术期专区','术前异常心电图处置、骨科麻醉相关风险、术后胸闷流程与术后心肌损伤。','术']];
-    app.innerHTML='<section class="class-section-head"><span>01 / LEARN & READ</span><h2>从这里开始</h2><p>基础层帮助认识波形，围手术期层联系临床场景。</p></section><div class="ecg-entry-grid">'+entries.map(([id,title,description,symbol],index)=>'<a class="class-dept-card is-ready" href="/ecg/'+id+'"><span class="class-dept-index">0'+(index+1)+'</span><div class="class-dept-symbol" aria-hidden="true">'+symbol+'</div><h3>'+title+'</h3><p>'+description+'</p><div class="class-dept-foot"><strong>进入栏目</strong><span aria-hidden="true">→</span></div></a>').join('')+'</div>'+section('ecg-more','工具与自测','<div class="ecg-panel-grid">'+card('/ecg/tools','心电图工具','QTc 四种公式、电轴计算、格数换算、心率估算，以及现有 RCRI 入口。')+card('/ecg/quiz','自测','建设中：本阶段保留入口，后续加入判读练习。','建设中')+'</div>');
+    app.innerHTML='<section class="class-section-head"><span>01 / LEARN & READ</span><h2>从这里开始</h2><p>基础层帮助认识波形，围手术期层联系临床场景。</p></section><div class="ecg-entry-grid">'+entries.map(([id,title,description,symbol],index)=>'<a class="class-dept-card is-ready" href="/ecg/'+id+'"><span class="class-dept-index">0'+(index+1)+'</span><div class="class-dept-symbol" aria-hidden="true">'+symbol+'</div><h3>'+title+'</h3><p>'+description+'</p><div class="class-dept-foot"><strong>进入栏目</strong><span aria-hidden="true">→</span></div></a>').join('')+'</div>'+section('ecg-more','工具、练习与报告','<div class="ecg-panel-grid">'+card('/ecg/tools','心电图工具','QTc 四种公式、电轴计算、格数换算、心率估算，以及现有 RCRI 入口。')+card('/ecg/quiz','病例练习','骨科围手术期场景的判读练习，作答后给出解析和规范报告。','示意病例')+card('/ecg/report','报告范例','标准化心电图报告结构、规范写法、范例与报告生成器。')+'</div>');
   }
   function basics(){
     setPage('基础学习','先核对记录质量与标定，再按统一顺序判读。以下为成人常用教学参考，资料待审核。',[{title:'基础学习'}]);
@@ -154,8 +154,80 @@
     bind('ecgHeartForm','ecgHeartResult',()=>'<strong>心率约 '+window.HAJIMI_ECG_CALCULATORS.heartRate(document.getElementById('ecgHeartRr').value).toFixed(1)+' 次/分</strong>');
   }
   function quiz(){
-    setPage('自测','建设中',[{title:'自测'}]);
-    app.innerHTML=section('ecg-quiz','建设中','<p>本阶段仅保留自测入口，暂未开放题目或评分。</p><a class="btn" href="/ecg/basics">先学习基础 →</a>');
+    const cases=Array.isArray(data.cases)?data.cases:[];
+    setPage('病例练习','以骨科围手术期场景为背景的心电图判读练习。作答后查看解析、规范报告写法和相关词条。',[{title:'病例练习'}]);
+    if(!cases.length){app.innerHTML=section('ecg-quiz','建设中','<p>暂未开放题目。</p>');return;}
+    const target=item=>{if(item.link)return item.link;const entry=data.entries.find(other=>other.id===item.entry);return entry?{url:entryUrl(entry),title:entry.title}:null;};
+    app.innerHTML='<div class="class-notice"><strong>示意病例 · 非真实患者</strong><span>图形为自绘教学示意，用于练习判读思路，比例不用于测量；真实 12 导联病例待加入。内容待临床医师审核。</span></div>'+
+      '<div class="ecg-quiz-bar"><span id="ecgQuizScore" role="status" aria-live="polite">已答 0 / '+cases.length+' 题</span><button type="button" class="btn" id="ecgQuizReset">重新开始</button></div>'+
+      '<nav class="ecg-section-links" aria-label="题目导航">'+cases.map((item,index)=>'<a href="#'+item.id+'">'+(index+1)+'</a>').join('')+'</nav>'+
+      cases.map((item,index)=>'<section class="class-content-section ecg-case" id="'+item.id+'" data-case="'+item.id+'"><h2><span class="ecg-case-no">'+(index+1)+'</span>'+esc(item.title)+'</h2><p class="ecg-vignette">'+esc(item.vignette)+'</p>'+diagram(item.kind,'病例 '+(index+1)+' 的心电图示意')+
+        '<form class="ecg-case-form" novalidate><fieldset><legend>'+esc(item.question)+'</legend>'+item.options.map((option,i)=>'<label class="ecg-option"><input type="radio" name="'+item.id+'" value="'+i+'"><span>'+String.fromCharCode(65+i)+'. '+esc(option)+'</span></label>').join('')+'</fieldset><button class="btn primary" type="submit">提交答案</button><p class="ecg-case-error" role="alert" hidden>请先选择一个答案。</p></form>'+
+        '<div class="ecg-case-feedback" hidden></div></section>').join('');
+    const results=new Map(),score=document.getElementById('ecgQuizScore');
+    const refresh=()=>{const right=[...results.values()].filter(Boolean).length;score.textContent='已答 '+results.size+' / '+cases.length+' 题 · 答对 '+right+' 题';};
+    for(const item of cases){
+      const box=app.querySelector('[data-case="'+item.id+'"]'),form=box.querySelector('form'),feedback=box.querySelector('.ecg-case-feedback'),error=box.querySelector('.ecg-case-error');
+      form.addEventListener('submit',event=>{
+        event.preventDefault();
+        const picked=form.querySelector('input:checked');
+        if(!picked){error.hidden=false;return;}
+        error.hidden=true;
+        const chosen=Number(picked.value),correct=chosen===item.answer,link=target(item);
+        results.set(item.id,correct);
+        form.querySelectorAll('input').forEach(input=>{input.disabled=true;const label=input.closest('label');label.classList.toggle('is-answer',Number(input.value)===item.answer);label.classList.toggle('is-wrong',input===picked&&!correct);});
+        form.querySelector('button').disabled=true;
+        feedback.innerHTML='<p class="ecg-case-verdict '+(correct?'is-right':'is-wrong')+'">'+(correct?'回答正确。':'回答不正确。正确答案是 '+String.fromCharCode(65+item.answer)+'。')+'</p><h3>解析</h3><p>'+esc(item.explanation)+'</p><h3>规范报告写法</h3><blockquote class="ecg-report-quote">'+esc(item.report)+'</blockquote>'+(link?'<p><a class="btn" href="'+esc(link.url)+'">查看：'+esc(link.title)+' →</a></p>':'');
+        feedback.hidden=false;
+        refresh();
+      });
+    }
+    document.getElementById('ecgQuizReset').addEventListener('click',()=>{results.clear();refresh();for(const box of app.querySelectorAll('[data-case]')){box.querySelector('form').reset();box.querySelectorAll('input,button').forEach(element=>element.disabled=false);box.querySelectorAll('label').forEach(label=>label.classList.remove('is-answer','is-wrong'));const feedback=box.querySelector('.ecg-case-feedback');feedback.hidden=true;feedback.replaceChildren();}window.scrollTo({top:0,behavior:'instant'});});
+    refresh();
+  }
+  function report(){
+    const R=data.report;
+    setPage('报告范例','标准化心电图报告的结构、规范写法与范例；报告生成器只在当前浏览器中运行，不保存、不上传。',[{title:'报告范例'}]);
+    if(!R){notFound();return;}
+    const table=rows=>'<div class="ecg-criteria-wrap"><table class="ecg-criteria"><tbody>'+rows.map(([a,b])=>'<tr><th scope="row">'+esc(a)+'</th><td>'+esc(b)+'</td></tr>').join('')+'</tbody></table></div>';
+    const sample='<h3>'+esc(R.sample.title)+'</h3><div class="ecg-report-sheet">'+R.sample.lines.map(line=>'<p>'+esc(line)+'</p>').join('')+'<p><strong>结论：</strong></p><ol>'+R.sample.conclusion.map(line=>'<li>'+esc(line)+'</li>').join('')+'</ol></div>';
+    const examples=(data.cases||[]).map(item=>'<li><strong>'+esc(item.title)+'：</strong>'+esc(item.report)+'</li>').join('');
+    const opt=values=>values.map(value=>'<option>'+esc(value)+'</option>').join('');
+    const builder='<p>按实际测量填写，未填写的项目不会出现在报告中。请勿填写姓名、住院号等身份信息。</p><form class="ecg-form" id="ecgReportForm" novalidate><div class="ecg-form-grid">'+
+      '<label for="ecgRpRhythm">心律<select id="ecgRpRhythm">'+opt(['窦性心律','窦性心动过速','窦性心动过缓','心房颤动','心房扑动','交界性心律','心室起搏心律'])+'</select></label>'+
+      '<label for="ecgRpRate">心率（次/分）<input id="ecgRpRate" type="number" inputmode="decimal" min="0" step="any" placeholder="例如 72"></label>'+
+      '<label for="ecgRpPr">PR 间期（ms）<input id="ecgRpPr" type="number" inputmode="decimal" min="0" step="any" placeholder="例如 160"></label>'+
+      '<label for="ecgRpQrs">QRS 时限（ms）<input id="ecgRpQrs" type="number" inputmode="decimal" min="0" step="any" placeholder="例如 90"></label>'+
+      '<label for="ecgRpQt">QT 间期（ms）<input id="ecgRpQt" type="number" inputmode="decimal" min="0" step="any" placeholder="例如 400"></label>'+
+      '<label for="ecgRpAxis">电轴（度）<input id="ecgRpAxis" type="number" inputmode="decimal" step="any" placeholder="例如 60"></label>'+
+      '</div><label for="ecgRpFindings">其他描述（ST-T、QRS 形态等，每行一条）<textarea id="ecgRpFindings" rows="3" placeholder="例如：V1–V2 导联 T 波倒置"></textarea></label>'+
+      '<label for="ecgRpConclusion">结论（按重要性排序，每行一条）<textarea id="ecgRpConclusion" rows="3" placeholder="例如：窦性心律&#10;一度房室传导阻滞"></textarea></label>'+
+      '<button class="btn primary" type="submit">生成报告</button><div class="ecg-result" id="ecgRpResult" role="status" aria-live="polite" hidden></div></form>';
+    app.innerHTML='<nav class="ecg-section-links" aria-label="报告目录"><a href="#ecg-report-structure">报告结构</a><a href="#ecg-report-rules">规范写法</a><a href="#ecg-report-sample">完整范例</a><a href="#ecg-report-examples">练习病例报告</a><a href="#ecg-report-builder">报告生成器</a></nav>'+
+      section('ecg-report-structure','报告结构',table(R.structure))+section('ecg-report-rules','规范写法',points(R.rules))+section('ecg-report-sample','完整范例',sample)+
+      section('ecg-report-examples','练习病例的规范报告','<ul class="ecg-points">'+examples+'</ul><p><a class="btn" href="/ecg/quiz">去做病例练习 →</a></p>')+section('ecg-report-builder','报告生成器',builder);
+    const form=document.getElementById('ecgReportForm'),out=document.getElementById('ecgRpResult'),C=window.HAJIMI_ECG_CALCULATORS,v=id=>document.getElementById(id).value.trim();
+    form.addEventListener('input',()=>{out.hidden=true;out.replaceChildren();});
+    form.addEventListener('submit',event=>{
+      event.preventDefault();out.classList.remove('is-error');
+      try{
+        const num=(value,label)=>{const n=Number(value);if(!Number.isFinite(n)||n<=0)throw new RangeError(label+'请输入大于 0 的数值。');return n;};
+        const lines=[],rate=v('ecgRpRate'),qt=v('ecgRpQt'),axisValue=v('ecgRpAxis');
+        lines.push('心律：'+v('ecgRpRhythm')+'。'+(rate?'心率：'+Math.round(num(rate,'心率'))+' 次/分。':''));
+        const intervals=[];
+        if(v('ecgRpPr'))intervals.push('PR 间期 '+Math.round(num(v('ecgRpPr'),'PR 间期'))+' ms');
+        if(v('ecgRpQrs'))intervals.push('QRS 时限 '+Math.round(num(v('ecgRpQrs'),'QRS 时限'))+' ms');
+        if(qt){if(!rate)throw new RangeError('计算 QTc 需要同时填写心率。');const q=C.qtc(num(qt,'QT 间期'),60000/num(rate,'心率'));intervals.push('QT/QTc '+Math.round(Number(qt))+'/'+Math.round(q.bazett)+' ms（Bazett）');}
+        if(intervals.length)lines.push(intervals.join('；')+'。');
+        if(axisValue){const deg=Number(axisValue);if(!Number.isFinite(deg)||deg<=-180||deg>180)throw new RangeError('电轴请输入 −180 至 +180 之间的度数。');const r=C.axis(Math.cos(deg*Math.PI/180),Math.sin(deg*Math.PI/180));lines.push('电轴：'+(deg>0?'+':'')+Math.round(deg)+'°（'+r.category.replace(/（.*$/,'')+'）。');}
+        for(const line of v('ecgRpFindings').split('\n').map(text=>text.trim()).filter(Boolean))lines.push(line.replace(/[。.]?$/,'。'));
+        const conclusion=v('ecgRpConclusion').split('\n').map(text=>text.trim()).filter(Boolean);
+        const text=lines.join('\n')+(conclusion.length?'\n结论：\n'+conclusion.map((line,index)=>(index+1)+'. '+line).join('\n'):'');
+        out.innerHTML='<pre class="ecg-report-text">'+esc(text)+'</pre><button type="button" class="btn" id="ecgRpCopy">复制报告</button>';
+        document.getElementById('ecgRpCopy').addEventListener('click',async event=>{try{await navigator.clipboard.writeText(text);event.target.textContent='已复制';}catch{event.target.textContent='复制失败，请长按文字手动复制';}});
+      }catch(error){out.textContent=error.message;out.classList.add('is-error');}
+      out.hidden=false;
+    });
   }
   function notFound(){setPage('页面未找到','请从栏目首页或图谱分类重新选择。',[{title:'页面未找到'}]);app.innerHTML='<p><a class="btn" href="/ecg">返回心电图首页</a></p>';}
   let route=[];try{route=location.pathname.replace(/\/+$/,'').split('/').filter(Boolean).map(decodeURIComponent);}catch{route=[];}
@@ -165,6 +237,7 @@
   else if(route.length===2&&route[1]==='periop')periop();
   else if(route.length===2&&route[1]==='tools')tools();
   else if(route.length===2&&route[1]==='quiz')quiz();
+  else if(route.length===2&&route[1]==='report')report();
   else if(route[1]==='atlas'){
     const category=data.categories.find(item=>item.id===route[2]);
     const entry=data.entries.find(item=>item.id===route[3]&&item.category===route[2]);
