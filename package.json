@@ -5,6 +5,7 @@
   },
   "scripts": {
     "test": "node --test test/*.test.js",
+    "audit:clinical": "node scripts/audit-clinical-library.mjs",
     "build": "node scripts/build-home.mjs",
     "test:browser": "npm run build && node --test e2e/*.test.cjs"
   },

@@ -7,6 +7,7 @@
         if(byId.has(id))continue;
         const g=strings[group],label=g==='TKA'?'全膝关节置换':g==='THA'?'全髋关节置换':g;
         const record={...extras[extra],_id:id,_hasBody:hasBody,department,group:g,short:strings[short],stage:strings[stage],type:strings[type],desc:strings[desc],name:name<0?label+' · '+strings[short]:strings[name]};
+        if(manifest.identityNamespace==='clinical-v1')record._stableId='clinical-v1-r'+String(id).padStart(6,'0');
         byId.set(id,record);records.push(record);
       }
       records.sort((a,b)=>a._id-b._id);
@@ -30,7 +31,12 @@
       return bodies.get(key);
     },
     ensureRecord(record){return H.ensureGroup(record.department,record.group);},
-    hasAllDepartments(){return records.length===manifest.total;}
+    hasAllDepartments(){return records.length===manifest.total;},
+    findRecord(id){
+      if(typeof id==='number')return byId.get(id)||null;
+      const match=/^clinical-v1-r(\d{6,})$/.exec(String(id));
+      return match?byId.get(Number(match[1]))||null:null;
+    }
   };
   window.HAJIMI_IDEAL_CASES={seeds:manifest.seeds};
   window.HAJIMI_BOOTSTRAP=true;

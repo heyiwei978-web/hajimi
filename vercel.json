@@ -190,6 +190,11 @@
       }
     }
   ],
+  "git": {
+    "deploymentEnabled": {
+      "chore/clinical-library-slimming": false
+    }
+  },
   "buildCommand": "npm run build",
   "outputDirectory": "dist"
 }
