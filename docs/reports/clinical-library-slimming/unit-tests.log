@@ -1,0 +1,29 @@
+
+> test
+> node --test test/*.test.js
+
+✔ test/classification-treatment.test.js (59.678977ms)
+✔ test/classification.test.js (58.359597ms)
+✔ test/clinical-compiler.test.js (1213.297536ms)
+✔ test/clinical-copy-style.test.js (54.343151ms)
+✔ test/clinical-inventory.test.js (1806.956789ms)
+✔ test/content-store.test.js (190.517663ms)
+✔ test/ecg-framework.test.js (2283.616903ms)
+✔ test/ecg.test.js (4563.879748ms)
+✔ test/home-build.test.js (78.180431ms)
+✔ test/mobile-homepage.test.js (42.359426ms)
+✔ test/mobile-navigation.test.js (49.223149ms)
+✔ test/ortho-audit-runtime.test.js (495.232111ms)
+✔ test/pathway.test.js (50.586224ms)
+✔ test/performance-stage2.test.js (58.954055ms)
+✔ test/search-runtime.test.js (66.735851ms)
+✔ test/security.test.js (747.843785ms)
+✔ test/site-optimization.test.js (52.635084ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11888.231635
