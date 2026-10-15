@@ -24,6 +24,7 @@
 | 医学审计 | 5,361公开，修订/归档为0 | [审计输出](clinical-audit.log) |
 | 原/新正文、显示正文、记录字段 | 5,361条全部一致，差异0 | [汇总](hash-summary.json)、[逐条对照](body-hash-comparison.jsonl) |
 | 构建对比 | 正文203份、目录4份、其他HTML9份均不变 | [全部文件大小与哈希](build-comparison.json) |
+| GitHub Actions | 91项单元 + 40项浏览器全部通过，0失败/取消/跳过 | [完整原始日志](github-actions.log)、[结果摘要](github-actions-result.json) |
 
 91项包含新增11项，不与文件级结果重复累加。详细测试分别在独立进程执行 `node --test --test-isolation=none --test-reporter=tap test/<文件>.test.js`；TAP按顺序拼接。
 
@@ -40,11 +41,13 @@
 
 与原始 main 的比较方法沿用首轮：临时目录还原基准，仅在内存观察原生成函数输出，逐条精确 UTF-8 SHA-256 核对，不修改原文件。5,357条固定正文与4条默认动态正文分别校验。45个生成链文件中只有 `departments.js` 的旧链接兼容逻辑变化，医学正文及记录字段哈希仍全部相同。
 
-当前磁盘字节见构建 JSON；不把构建大小当作首次加载网络量。首次加载压缩/缓存/传输性能尚未实测。
+当前dist为271个文件、10,746,810字节，较原始main减少956,371字节（8.17%）。这些是未压缩磁盘字节，不是首次加载网络量。首次加载压缩/缓存/传输性能尚未实测。
 
 ## 浏览器验证
 
-上一版39项浏览器测试已由 GitHub Actions 运行成功：[运行38653187745](https://github.com/heyiwei978-web/hajimi/actions/runs/38653187745)。本地 Chromium 仍因沙箱 socket 权限无法启动，本轮使用 PR 的既有 GitHub Actions 在锁定 Playwright 1.61.1 环境运行完整40项（包含新增旧链接/TKA回归）；结果将在同一 PR 补齐，没有把启动失败计作通过。
+本轮 GitHub Actions [运行38660914339](https://github.com/heyiwei978-web/hajimi/actions/runs/38660914339)已成功：91项单元、40项浏览器全部通过，0失败、取消或跳过。验证的业务实现为 `401487a0f98b058b4cef125a963a59110b3e34ac`，代码树为 `76d57c4b45f8c0df5e54daba6d131df4020029b4`。后续结果补充提交只修改文档/日志，不改业务代码。
+
+本地 Chromium 仍因沙箱 socket 权限无法启动；完整浏览器回归实际在既有 GitHub Actions 的 Node.js 22、锁定 Playwright 1.61.1 环境执行，没有把本地启动失败计作通过。生产安全检查按 workflow_dispatch 条件跳过，没有发起生产请求。上一版39项成功记录仍保留于[首轮运行](https://github.com/heyiwei978-web/hajimi/actions/runs/38653187745)。
 
 新增浏览器用例覆盖375/1440px、旧章节URL、展示序号改变、三条同名TKA稳定/数字ID、章节刷新、正文一致性及公开请求无404。既有搜索、筛选、预览、复制、收藏、患者占位符、CMS冲突/备份/图片、移动端和其他栏目全部回归。
 
