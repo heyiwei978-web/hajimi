@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import {put} from '@vercel/blob';
+import {blob} from './_blob-auth.js';
 import {guardRequest} from './_security.js';
 
 function matchesImage(buffer, type) {
@@ -21,6 +21,6 @@ export default async function handler(req,res) {
   if (!matchesImage(buffer,type)) return res.status(400).json({error:'图片内容与格式不符'});
   const extension = type === 'image/png' ? 'png' : type === 'image/webp' ? 'webp' : 'jpg';
   const pathname = 'cases/' + Date.now() + '-' + crypto.randomBytes(6).toString('hex') + '.' + extension;
-  const blob = await put(pathname,buffer,{access:'private',contentType:type});
-  return res.status(200).json({pathname:blob.pathname});
+  const stored = await blob.put(pathname,buffer,{access:'private',contentType:type});
+  return res.status(200).json({pathname:stored.pathname});
 }

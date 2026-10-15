@@ -1,4 +1,4 @@
-import {get} from '@vercel/blob';
+import {blob as blobClient} from './_blob-auth.js';
 import {guardRequest} from './_security.js';
 import {isAdmin} from './_auth.js';
 import {contentStore} from './_content-store.js';
@@ -8,7 +8,7 @@ const PUBLIC_INDEX_TTL_MS = 60 * 1000;
 
 // Case images are clinical material: anonymous viewers may only load images that a
 // published case references. Drafts, deleted cases and orphaned uploads stay admin-only.
-export function createImageHandler({store = contentStore, blob = {get}, now = () => Date.now()} = {}) {
+export function createImageHandler({store = contentStore, blob = blobClient, now = () => Date.now()} = {}) {
   let cached = null;
 
   async function publishedImages() {
