@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import {get as sdkGet} from '@vercel/blob';
-import {blob, blobAuth, createBlobClient, BlobConfigError} from '../api/_blob-auth.js';
+import {blob, blobAuth, createBlobClient, BlobConfigError, BlobOptionError} from '../api/_blob-auth.js';
 import {contentStore, ContentError} from '../api/_content-store.js';
 import image from '../api/image.js';
 import upload from '../api/upload.js';
@@ -94,7 +94,7 @@ test('T1 blobAuth accepts only a non-empty static read-write token and never ech
   assert.throws(() => blobAuth({}), BlobConfigError);
 });
 
-test('T1 the client checks the token before calling the SDK and drops caller-supplied credentials', async t => {
+test('T1 the client checks the token before calling the SDK and passes only allow-listed options', async t => {
   const calls = [];
   const sdk = {get: async (...args) => { calls.push(['get', ...args]); return null; }, put: async (...args) => { calls.push(['put', ...args]); return {}; }};
   const client = createBlobClient(sdk);
@@ -103,10 +103,29 @@ test('T1 the client checks the token before calling the SDK and drops caller-sup
   await assert.rejects(client.put('a.json', 'x', {access: 'private'}), BlobConfigError);
   assert.equal(calls.length, 0, 'SDK not called without a valid token');
   process.env.BLOB_READ_WRITE_TOKEN = FAKE_TOKEN;
-  await client.get('a.json', {access: 'private', useCache: false, token: 'other', oidcToken: FAKE_OIDC, storeId: OIDC_STORE});
-  await client.put('a.json', 'x', {access: 'private', allowOverwrite: true, oidcToken: FAKE_OIDC});
+  await client.get('a.json', {access: 'private', useCache: false});
+  await client.put('a.json', 'x', {access: 'private', allowOverwrite: true, addRandomSuffix: false, contentType: 'application/json', ifMatch: '"e1"'});
   assert.deepEqual(calls[0], ['get', 'a.json', {access: 'private', useCache: false, token: FAKE_TOKEN}]);
-  assert.deepEqual(calls[1], ['put', 'a.json', 'x', {access: 'private', allowOverwrite: true, token: FAKE_TOKEN}]);
+  assert.deepEqual(calls[1], ['put', 'a.json', 'x', {access: 'private', allowOverwrite: true, addRandomSuffix: false, contentType: 'application/json', ifMatch: '"e1"', token: FAKE_TOKEN}]);
+  calls.length = 0;
+  const rejected = [
+    ['get', {access: 'private', token: 'vercel_blob_rw_Other_x'}],
+    ['get', {access: 'private', oidcToken: FAKE_OIDC}],
+    ['get', {access: 'private', storeId: OIDC_STORE}],
+    ['get', {access: 'private', ifNoneMatch: '"e1"'}],
+    ['get', {access: 'private', allowOverwrite: true}],
+    ['put', {access: 'private', useCache: false}],
+    ['put', {access: 'private', multipart: true}],
+    ['get', {access: 'private', [Symbol('headers')]: {authorization: 'Bearer x'}}],
+    ['get', Object.defineProperty({access: 'private'}, 'headers', {value: {authorization: 'Bearer x'}, enumerable: false})],
+    ['get', Object.assign(Object.create({headers: {authorization: 'Bearer x'}}), {access: 'private'})],
+    ['get', null], ['get', undefined], ['get', 'private'], ['get', []]
+  ];
+  for (const [method, options] of rejected) {
+    const call = method === 'get' ? client.get('a.json', options) : client.put('a.json', 'x', options);
+    await assert.rejects(call, error => error instanceof BlobOptionError && error.code === 'unsupported_option' && !error.message.includes('Bearer'));
+  }
+  assert.equal(calls.length, 0, 'SDK never called with a disallowed option');
 });
 
 // ---- T2 + T3: every call site, real SDK, OIDC conditions present -----------
@@ -236,8 +255,56 @@ test('T6 only api/_blob-auth.js calls the Blob SDK, and it always applies the pi
   const auth = fs.readFileSync(new URL('_blob-auth.js', dir), 'utf8');
   const sdkCalls = [...auth.matchAll(/sdk\.(get|put)\(([^;]*)\)/g)];
   assert.equal(sdkCalls.length, 2);
-  for (const call of sdkCalls) assert.match(call[2], /withToken\(options\)\)?$/, `sdk.${call[1]} passes withToken(options)`);
+  for (const call of sdkCalls) assert.match(call[2], new RegExp(`withToken\\('${call[1]}',options\\)\\)?$`), `sdk.${call[1]} passes withToken('${call[1]}',options)`);
   for (const file of ['_content-store.js', 'image.js', 'upload.js', '_rate-limit.js']) {
     assert.match(fs.readFileSync(new URL(file, dir), 'utf8'), /from '\.\/_blob-auth\.js'/, `${file} uses the pinned client`);
   }
+});
+
+// ---- T8: caller-supplied Authorization headers can never replace the pinned token ----
+
+const HEADER_VARIANTS = [
+  ['lower-case object key', () => ({authorization: 'Bearer vercel_blob_rw_Attacker000001_x'})],
+  ['canonical object key', () => ({Authorization: 'Bearer vercel_blob_rw_Attacker000001_x'})],
+  ['upper-case object key', () => ({AUTHORIZATION: 'Bearer vercel_blob_rw_Attacker000001_x'})],
+  ['Headers instance', () => new Headers({Authorization: 'Bearer vercel_blob_rw_Attacker000001_x'})],
+  ['array of pairs', () => [['authorization', 'Bearer vercel_blob_rw_Attacker000001_x']]],
+  ['unrelated header', () => ({'x-custom': '1'})],
+  ['empty object', () => ({})]
+];
+
+test('T8 control: the published SDK lets options.headers change its Authorization header in get()', async t => {
+  setEnv(t, {BLOB_READ_WRITE_TOKEN: FAKE_TOKEN});
+  const backend = fakeBackend({'probe.json': '{}'});
+  const network = offlineBlob(t, request => backend.handle(request));
+  const attacker = 'Bearer vercel_blob_rw_Attacker000001_x';
+  // Same-case key: the caller's value replaces the SDK's own header outright.
+  await sdkGet('probe.json', {access: 'private', useCache: false, token: FAKE_TOKEN, headers: {authorization: attacker}});
+  // Different case: both values are sent, joined into one ambiguous header.
+  await sdkGet('probe.json', {access: 'private', useCache: false, token: FAKE_TOKEN, headers: {Authorization: attacker}});
+  assert.equal(network.requests.length, 2);
+  assert.equal(network.requests[0].authorization, attacker, 'override exists in the SDK, so the wrapper must block it');
+  assert.ok(network.requests[1].authorization.includes(attacker), 'a differently-cased header is still injected');
+});
+
+for (const [label, make] of HEADER_VARIANTS) {
+  test(`T8 headers option (${label}) is rejected before any request, for get and put`, async t => {
+    setEnv(t, {BLOB_READ_WRITE_TOKEN: FAKE_TOKEN, ...OIDC_PRESENT});
+    const backend = fakeBackend({'probe.json': '{}'});
+    const network = offlineBlob(t, request => backend.handle(request));
+    await assert.rejects(blob.get('probe.json', {access: 'private', useCache: false, headers: make()}), BlobOptionError);
+    await assert.rejects(blob.put('probe.json', '{}', {access: 'private', allowOverwrite: true, headers: make()}), BlobOptionError);
+    assert.equal(network.requests.length, 0, 'nothing was sent');
+    assert.deepEqual(network.escaped, []);
+  });
+}
+
+test('T8 the same calls without headers go out with only the pinned token', async t => {
+  setEnv(t, {BLOB_READ_WRITE_TOKEN: FAKE_TOKEN, ...OIDC_PRESENT});
+  const backend = fakeBackend({'probe.json': '{}'});
+  const network = offlineBlob(t, request => backend.handle(request));
+  await blob.get('probe.json', {access: 'private', useCache: false});
+  await blob.put('probe.json', '{}', {access: 'private', allowOverwrite: true});
+  assert.equal(network.requests.length, 2);
+  assertOnlyStaticToken(network);
 });
