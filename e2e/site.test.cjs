@@ -809,6 +809,34 @@ test('disease navigation starts at the top, preserves record content and chapter
   } finally {await context.close();}
 });
 
+test('legacy chapter URLs and same-name TKA numeric/stable identities survive refresh on desktop and phone',async()=>{
+  for(const width of [375,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      const missing=[];page.on('response',response=>{if(response.status()>=400&&new URL(response.url()).origin===base)missing.push(response.url());});
+      await page.goto(base+'/bl/guke/TKA#record-0-入院记录',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('#caseWorkspace .case-active').getAttribute('id'),'record-0-入院记录');
+      await page.goto(base+'/bl/guke/TKA#record-999-入院记录',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('#caseWorkspace .case-active').getAttribute('id'),'record-0-入院记录','a changed presentation ordinal still resolves the unique original chapter');
+      const links=await page.evaluate(()=>[5159,5359,5360].map(id=>{
+        const record=window.HAJIMI.findRecord(id),stable=window.HAJIMI.findRecord('clinical-v1-r'+String(id).padStart(6,'0'));
+        const article=[...document.querySelectorAll('.record-book-section')].find(a=>templates[Number(a.dataset.recordIndex)]===record);
+        return {id,same:record===stable,name:record.name,key:record.specialCaseKey||null,anchor:article?.id,body:article?.querySelector('.record-book-body')?.textContent};
+      }));
+      assert.deepEqual(links.map(item=>item.key),[null,'tka-special-wound-202607','tka-special-hemarthrosis-202609']);
+      for(const link of links){
+        assert(link.same);assert(link.anchor);assert.equal(link.name,'全膝关节置换 · 出院当天查房记录');
+        await page.goto(base+'/bl/guke/TKA#'+encodeURIComponent(link.anchor),{waitUntil:'networkidle'});
+        const article=page.locator('[id="'+link.anchor+'"]');assert(await article.isVisible());
+        assert.equal(await article.locator('.record-book-body').textContent(),link.body);
+        await page.reload({waitUntil:'networkidle'});assert(await article.isVisible());
+        assert.equal(await page.evaluate(id=>window.HAJIMI.findRecord(id)._id,link.id),link.id);
+      }
+      assert.deepEqual(missing,[]);assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('bottom reading actions follow document order, keep directory selection and preserve print and expanded modes',async()=>{
   for(const width of [320,768,1440]){
     const {page,context,errors}=await pageFor(width,{isMobile:width===320,hasTouch:width===320});

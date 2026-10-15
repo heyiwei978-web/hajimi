@@ -3,4 +3,6 @@
 .vercel
 node_modules
 dist
+content/clinical-library/.revision-update.lock
+content/clinical-library/.revision-*.tmp
 .DS_Store

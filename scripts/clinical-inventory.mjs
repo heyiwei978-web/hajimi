@@ -1,16 +1,31 @@
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
+import {CLINICAL_BASELINE_COMMIT,CLINICAL_BASELINE_HASHES} from './clinical-baseline.mjs';
 
 const directory=new URL('../content/clinical-library/',import.meta.url);
 export const sha256=value=>createHash('sha256').update(value).digest('hex');
 export const recordId=id=>'clinical-v1-r'+String(id).padStart(6,'0');
-const stableCaseId=key=>'clinical-v1-c'+sha256(key).slice(0,20);
-const special=record=>record.specialCase===true||!!record.specialCaseKey;
-const utility=record=>record.group==='通用场景'&&!special(record);
+export const stableCaseId=key=>'clinical-v1-c'+sha256(key).slice(0,20);
+export const special=record=>record.specialCase===true||!!record.specialCaseKey;
+export const utility=record=>record.group==='通用场景'&&!special(record);
 export const caseKey=record=>JSON.stringify([record.department,record.group,
   special(record)?'special':'standard',special(record)?record.specialCaseKey:record.completeCaseKey||'standard']);
 export const identityKey=record=>JSON.stringify([caseKey(record),record.name,record.short,record.stage,record.type]);
-const fail=message=>{throw new Error('Clinical publication blocked: '+message);};
+export const fail=message=>{throw new Error('Clinical publication blocked: '+message);};
+export const canonical=value=>JSON.stringify(value,(_,item)=>item&&typeof item==='object'&&!Array.isArray(item)
+  ?Object.fromEntries(Object.keys(item).sort().map(key=>[key,item[key]])):item);
+export const contentVersion=(record,rendered)=>({bodyKind:typeof record.sourceBody==='string'?'sourceBody':'generated-default',
+  bodyHash:sha256(typeof record.sourceBody==='string'?record.sourceBody:rendered),renderedHash:sha256(rendered),recordHash:sha256(JSON.stringify(record))});
+export const metadataHash=record=>{const {sourceBody,...metadata}=record;return sha256(JSON.stringify(metadata));};
+const versionFields=['bodyKind','bodyHash','renderedHash','recordHash'];
+const versionOf=row=>Object.fromEntries(versionFields.map(key=>[key,row[key]]));
+export const recordFromIdentity=row=>({...row,type:row.recordType,
+  specialCaseKey:row.caseType==='special'?row.sourceCaseKey:undefined,completeCaseKey:row.caseType==='standard'?row.sourceCaseKey:undefined});
+export const emptyRevisions=baseline=>({schemaVersion:1,baselineCommit:baseline.sourceCommit,batches:[]});
+export const proposalDigest=payload=>sha256(canonical(payload));
+const revisionFor=(anchor,journal)=>sha256(canonical({anchor,journal}));
+const hashPattern=/^[a-f0-9]{64}$/;
+const validVersion=value=>value&&['sourceBody','generated-default'].includes(value.bodyKind)&&['bodyHash','renderedHash','recordHash'].every(key=>hashPattern.test(value[key]));
 
 // This ledger describes complete cases first, then their individual documents.
 // Dates, repeated record types and similar titles never establish duplication.
@@ -66,37 +81,96 @@ export function createInventory(source,sourceCommit){
   return {baseline,records};
 }
 
-export function readInventory(){
-  return {baseline:JSON.parse(fs.readFileSync(new URL('baseline.json',directory),'utf8')),
-    records:fs.readFileSync(new URL('records.jsonl',directory),'utf8').trim().split('\n').map(line=>JSON.parse(line)),
-    policy:JSON.parse(fs.readFileSync(new URL('publication.json',directory),'utf8'))};
+export function readInventory(location=directory){
+  const original={};
+  for(const [file,digest]of Object.entries(CLINICAL_BASELINE_HASHES)){
+    let text;try{text=fs.readFileSync(new URL(file,location),'utf8');}catch{fail('missing original identity ledger; restore '+file+' from Git, never reinitialize');}
+    if(sha256(text)!==digest)fail('original identity ledger changed: '+file+'; restore from Git');
+    original[file]=text;
+  }
+  const baseline=JSON.parse(original['baseline.json']);
+  if(baseline.sourceCommit!==CLINICAL_BASELINE_COMMIT)fail('original baseline commit changed');
+  return {baseline,records:original['records.jsonl'].trim().split('\n').map(line=>JSON.parse(line)),
+    policy:JSON.parse(fs.readFileSync(new URL('publication.json',location),'utf8')),
+    revisions:JSON.parse(fs.readFileSync(new URL('revisions.json',location),'utf8'))};
+}
+
+// Replay append-only, reviewed content versions and newly allocated identities.
+// Original ledger rows and original case membership lists are never rewritten.
+export function deriveClinicalState(inventory){
+  const {baseline,records:ledger,policy}=inventory,journal=inventory.revisions||emptyRevisions(baseline);
+  if(baseline.schemaVersion!==1||policy.schemaVersion!==1||policy.baselineCommit!==baseline.sourceCommit
+    ||journal.schemaVersion!==1||journal.baselineCommit!==baseline.sourceCommit||!Array.isArray(journal.batches))fail('unsupported or mismatched inventory');
+  const identities=new Map(),versions=new Map(),keys=new Map(),numbers=new Set();
+  const cases=new Map(structuredClone(baseline.cases).map(item=>[item.caseId,item]));
+  let maxId=-1;
+  const addIdentity=(row,version)=>{
+    if(!Number.isSafeInteger(row.legacyId)||row.legacyId<0||row.recordId!==recordId(row.legacyId)||numbers.has(row.legacyId)||identities.has(row.recordId))fail('duplicate or invalid identity ledger');
+    const key=identityKey(recordFromIdentity(row));
+    if(keys.has(key)||!validVersion(version))fail('ambiguous record identity or invalid content version');
+    identities.set(row.recordId,row);versions.set(row.recordId,version);keys.set(key,row);
+    numbers.add(row.legacyId);maxId=Math.max(maxId,row.legacyId);
+  };
+  for(const original of ledger){
+    const row={...original};for(const key of versionFields)delete row[key];
+    addIdentity(row,versionOf(original));
+  }
+  for(const row of identities.values())if(row.caseId&&!cases.get(row.caseId)?.recordIds.includes(row.recordId))fail('original case ownership changed');
+  const anchor=sha256(canonical({baseline,records:ledger})),prefix=emptyRevisions(baseline);
+  for(const batch of journal.batches){
+    const {proposalHash,approval,...payload}=batch;
+    if(payload.schemaVersion!==1||payload.baselineCommit!==baseline.sourceCommit||payload.expectedRevision!==revisionFor(anchor,prefix)
+      ||proposalHash!==proposalDigest(payload)||!approval||approval.authorizedProposalHash!==proposalHash
+      ||['reviewedBy','reason','reviewReference'].some(key=>typeof approval[key]!=='string'||!approval[key].trim())
+      ||!hashPattern.test(payload.reviewHash)||!hashPattern.test(payload.sourceSnapshotHash)||!/^[a-f0-9]{40}$/.test(payload.sourceCommit)
+      ||!Array.isArray(payload.updates)||!Array.isArray(payload.additions)||!(payload.updates.length+payload.additions.length))fail('invalid or unreviewed content revision');
+    const changed=new Set();
+    for(const update of payload.updates){
+      if(changed.has(update.recordId)||!identities.has(update.recordId)||canonical(versions.get(update.recordId))!==canonical(update.before)
+        ||!validVersion(update.after)||!hashPattern.test(update.metadataHash))fail('stale or invalid content revision');
+      changed.add(update.recordId);versions.set(update.recordId,update.after);
+    }
+    for(const addition of payload.additions){
+      const {identity:row,content}=addition;
+      if(!row||row.legacyId!==maxId+1||row.caseType==='special'&&!row.sourceCaseKey)fail('new identities must append permanent IDs');
+      if([...identities.values()].some(old=>old.name===row.name))fail('new duplicate CMS names need a separate reviewed migration');
+      const key=caseKey(recordFromIdentity(row));
+      const parent=[...cases.values()].find(item=>caseKey({department:item.department,group:item.group,
+        specialCaseKey:item.caseType==='special'?item.sourceCaseKey:undefined,completeCaseKey:item.caseType==='standard'?item.sourceCaseKey:undefined})===key);
+      if(row.caseType==='utility'){
+        if(row.caseId!==null)fail('utility record cannot change case ownership');
+      }else{
+        if(row.caseId!==(parent?.caseId||stableCaseId(key)))fail('new record case ownership changed');
+        if(!parent)cases.set(row.caseId,{caseId:row.caseId,department:row.department,group:row.group,caseType:row.caseType,sourceCaseKey:row.sourceCaseKey,
+          status:'published',recordIds:[],stages:[],recordTypes:[],reason:'reviewed-new-case'});
+        const item=cases.get(row.caseId);item.recordIds.push(row.recordId);
+        if(!item.stages.includes(row.stage))item.stages.push(row.stage);
+        if(!item.recordTypes.includes(row.recordType))item.recordTypes.push(row.recordType);
+      }
+      addIdentity(row,content);
+    }
+    prefix.batches.push(batch);
+  }
+  return {identities,versions,keys,cases,maxId,revision:revisionFor(anchor,journal)};
 }
 
 // The original numeric ID is a value in a committed ledger, never today's array
 // position. Reordering generated objects cannot rebind bodies, links or CMS names.
 export function planClinicalPublication(source,inventory=readInventory(),{cmsAudit=null}={}){
-  const {baseline,records:ledger,policy}=inventory;
-  if(baseline.schemaVersion!==1||policy.schemaVersion!==1||policy.baselineCommit!==baseline.sourceCommit)fail('unsupported or mismatched inventory');
-  if(ledger.length!==source.records.length)fail('record count changed; review the identity ledger before publishing');
-  const byIdentity=new Map(),legacyIds=new Set(),stableIds=new Set();
-  for(const row of ledger){
-    if(!Number.isSafeInteger(row.legacyId)||row.legacyId<0||row.recordId!==recordId(row.legacyId)||legacyIds.has(row.legacyId)||stableIds.has(row.recordId))fail('duplicate or invalid identity ledger');
-    legacyIds.add(row.legacyId);stableIds.add(row.recordId);
-    const record={...row,type:row.recordType,specialCaseKey:row.caseType==='special'?row.sourceCaseKey:undefined,
-      completeCaseKey:row.caseType==='standard'?row.sourceCaseKey:undefined};
-    const key=identityKey(record);
-    if(byIdentity.has(key))fail('ambiguous record identity');
-    byIdentity.set(key,row);
-  }
+  const {baseline,policy}=inventory;
+  const state=deriveClinicalState(inventory);
+  if(state.identities.size!==source.records.length)fail('record count changed; review the identity ledger before publishing');
+  if(!source.renderedBodies||source.renderedBodies.length!==source.records.length)fail('capture rendered medical text before publishing');
   const entries=source.records.map((record,index)=>{
-    const row=byIdentity.get(identityKey(record));
-    if(!row||sha256(JSON.stringify(record))!==row.recordHash)fail('source changed for '+record.name+'; no automatic identity or medical-text rewrite');
-    if(source.renderedBodies&&sha256(source.renderedBodies[index])!==row.renderedHash)fail('rendered medical text changed for '+record.name);
-    return {record,identity:row};
+    const row=state.keys.get(identityKey(record)),version=row&&state.versions.get(row.recordId),actual=contentVersion(record,source.renderedBodies[index]);
+    if(!row||actual.recordHash!==version.recordHash)fail('source changed for '+record.name+'; propose and authorize a content revision');
+    if(actual.renderedHash!==version.renderedHash)fail('rendered medical text changed for '+record.name);
+    if(actual.bodyHash!==version.bodyHash||actual.bodyKind!==version.bodyKind)fail('medical body hash changed for '+record.name);
+    return {record,identity:row,content:version};
   });
   const seen=new Set(entries.map(entry=>entry.identity.recordId));
-  if(seen.size!==ledger.length)fail('the generated source omits or repeats an identity');
-  const cases=new Map(baseline.cases.map(item=>[item.caseId,item]));
+  if(seen.size!==state.identities.size)fail('the generated source omits or repeats an identity');
+  const {cases}=state;
   const decisions=policy.decisions;
   if(!Array.isArray(decisions))fail('publication decisions must be an array');
   const archived=new Set(),replacements=new Map();
@@ -116,8 +190,8 @@ export function planClinicalPublication(source,inventory=readInventory(),{cmsAud
     // bound CMS mapping, not an environment-variable bypass or a UI-only filter.
     if(!cmsAudit||cmsAudit.baselineCommit!==baseline.sourceCommit||typeof cmsAudit.revision!=='string'||!cmsAudit.revision
       ||!Array.isArray(cmsAudit.safeToArchiveRecordIds)||[...archived].some(id=>!cmsAudit.safeToArchiveRecordIds.includes(id)))fail('production CMS overrides/cases have not been verified; keep all records published');
-    for(const row of ledger)if(archived.has(row.recordId)&&row.cmsRisk==='ambiguous-legacy-name')fail('ambiguous legacy CMS names require a separate approved migration');
+    for(const row of state.identities.values())if(archived.has(row.recordId)&&row.cmsRisk==='ambiguous-legacy-name')fail('ambiguous legacy CMS names require a separate approved migration');
   }
   const published=entries.filter(entry=>!archived.has(entry.identity.recordId)).sort((a,b)=>a.identity.legacyId-b.identity.legacyId);
-  return {baseline,published,archived:entries.filter(entry=>archived.has(entry.identity.recordId)),replacements};
+  return {baseline,state,published,archived:entries.filter(entry=>archived.has(entry.identity.recordId)),replacements};
 }

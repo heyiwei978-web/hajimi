@@ -1,0 +1,6 @@
+
+> build
+> node scripts/build-home.mjs
+
+Built lightweight homepage and clinical library in dist/
+Built ECG bundle assets/ecg-8c836155a2e98c91be4d.js (94 entries, 466 KB)

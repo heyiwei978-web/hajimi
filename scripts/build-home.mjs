@@ -3,6 +3,7 @@ import {fileURLToPath} from 'node:url';
 import {compileClinicalSite} from './clinical-compiler.mjs';
 import {compileEcg} from './ecg-compiler.mjs';
 import {PUBLIC_FILES} from './public-assets.mjs';
+import {assertPublicResources} from './public-resources.mjs';
 
 // Keep homepage markup in index.html as the single source for both entry points.
 export function buildHome(source) {
@@ -32,8 +33,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     for(const file of PUBLIC_FILES)copyFileSync(new URL('../'+file,import.meta.url),new URL(file,directory));
     writeFileSync(new URL('home.html',directory),output);
     writeFileSync(new URL('index.html',directory),output);
-    compileClinicalSite(readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);
+    const {manifest}=compileClinicalSite(readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);
     const ecg=compileEcg(directory);
+    assertPublicResources(directory,JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8')),manifest);
     console.log('Built lightweight homepage and clinical library in dist/');
     console.log('Built ECG bundle assets/'+ecg.name+' ('+ecg.entries+' entries, '+Math.round(ecg.bytes/1024)+' KB)');
   }

@@ -1,0 +1,21 @@
+
+> audit:clinical
+> node scripts/audit-clinical-library.mjs
+
+{
+  "records": 5361,
+  "projectGroups": 204,
+  "diseaseOrProcedureGroups": 203,
+  "standardCases": 203,
+  "standardRecords": 5313,
+  "specialCases": 2,
+  "specialRecords": 44,
+  "utilityRecords": 4,
+  "archivedRecords": 0,
+  "publishedRecords": 5361,
+  "bodyHashMismatches": 0,
+  "approvedRevisionBatches": 0,
+  "ledgerRevision": "22e9d724c59441722bbfd54104d8beec89fcd109db204b620295a5036be3f6cf",
+  "ambiguousLegacyNames": 1,
+  "productionCmsAudit": "not-performed"
+}

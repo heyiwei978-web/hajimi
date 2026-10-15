@@ -629,7 +629,23 @@
       root.querySelectorAll('#caseBackToDirectory,.record-back-toc').forEach(function(btn){btn.onclick=backToDirectory;});
       let hash='';
       try{hash=decodeURIComponent(location.hash.slice(1));}catch{hash='';}
-      const initial=articles.findIndex(function(a){return a.id===hash;});
+      // Old chapter URLs include a presentation ordinal. A body timestamp edit
+      // can change sorting; resolve the frozen case/title only when unambiguous.
+      function historicalChapter(list){
+        const exact=list.find(a=>a.id===hash);if(exact)return exact;
+        const matches=list.filter(a=>{
+          const record=templates[Number(a.dataset.recordIndex)];if(!record)return false;
+          const marker='__ordinal__',sample=a.classList.contains('special-record-section')
+            ?specialRecordId(record,marker,record.specialCaseKey):recordBookId(record,marker);
+          const [prefix,suffix]=sample.split(marker);
+          return hash.startsWith(prefix)&&hash.endsWith(suffix)&&/^\d+$/.test(hash.slice(prefix.length,hash.length-suffix.length));
+        });
+        return matches.length===1?matches[0]:null;
+      }
+      const specialTarget=historicalChapter([...document.querySelectorAll('.special-record-section')]);
+      const specialBook=specialTarget?.classList.contains('special-record-section')&&specialTarget.closest('details.special-case-book');
+      if(specialBook)specialBook.open=true;
+      const initial=articles.indexOf(historicalChapter(articles));
       activate(initial<0?0:initial,false);
     }
 

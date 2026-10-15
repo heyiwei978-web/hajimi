@@ -35,8 +35,8 @@ test('the committed baseline preserves complete cases and every special-case doc
   assert.equal(current.plan.archived.length,0);
   assert.deepEqual(current.inventory.baseline.cases.filter(c=>c.caseType==='special').map(c=>c.recordIds.length),[29,15]);
   assert.equal(current.inventory.baseline.ambiguousNames[0].recordIds.length,3);
-  for(const {record,identity}of current.plan.published){
-    if(typeof record.sourceBody==='string')assert.equal(sha256(record.sourceBody),identity.bodyHash);
+  for(const {record,identity,content}of current.plan.published){
+    if(typeof record.sourceBody==='string')assert.equal(sha256(record.sourceBody),content.bodyHash);
     assert.equal(identity.cmsOverrideExists,null);
     assert.equal(identity.cmsCaseExists,null);
   }

@@ -6,7 +6,7 @@ const root=new URL('../',import.meta.url);
 const digest=value=>createHash('sha256').update(value).digest('hex').slice(0,20);
 const slugs={'骨科':'guke','普外科':'puwai','肾内科':'shennei','妇科':'fuke'};
 
-export function loadClinicalSource(html,{audit=false}={}){
+export function loadClinicalSource(html,{audit=false,readSource=file=>fs.readFileSync(new URL(file,root),'utf8')}={}){
   const nodes=new Map(),errors=[];
   const node=()=>({innerHTML:'',textContent:'',hidden:false,dataset:{},options:[],
     classList:{add(){},remove(){},toggle(){},contains(){return false;}},
@@ -21,7 +21,7 @@ export function loadClinicalSource(html,{audit=false}={}){
   const origins=new WeakMap();
   const files=[...html.matchAll(/<script\s+[^>]*?src="\/([^?"]+)(?:\?[^"]*)?"/g)].map(match=>match[1]).filter(file=>!['cms-core.js','workspace.js','library-personal.js','image-upload.js','library-ui.js'].includes(file));
   for(const file of files){
-    vm.runInContext(fs.readFileSync(new URL(file,root),'utf8'),context,{filename:file,timeout:10000});
+    vm.runInContext(readSource(file),context,{filename:file,timeout:10000});
     if(audit)for(const record of vm.runInContext('typeof templates === "undefined" ? [] : templates',context)){
       if(!origins.has(record))origins.set(record,file);
     }
@@ -32,17 +32,16 @@ export function loadClinicalSource(html,{audit=false}={}){
     source.origins=Array.from(vm.runInContext('templates',context),record=>origins.get(record));
     source.renderedBodies=JSON.parse(vm.runInContext('JSON.stringify(templates.map(record=>String(generate(record))))',context));
     source.qualityAudit=JSON.parse(vm.runInContext('JSON.stringify(window.HAJIMI_RECORD_QUALITY_V23 || null)',context));
-    source.sourceFiles=files.map(path=>({path,sha256:createHash('sha256').update(fs.readFileSync(new URL(path,root))).digest('hex')}));
+    source.sourceFiles=files.map(path=>({path,sha256:createHash('sha256').update(readSource(path)).digest('hex')}));
   }
   return source;
 }
 
-export function compileClinicalSite(html,directory,{inventory,cmsAudit}={}){
-  const source=loadClinicalSource(html,{audit:true});
+export function compileClinicalSite(html,directory,{inventory,cmsAudit,source=loadClinicalSource(html,{audit:true})}={}){
   const publication=planClinicalPublication(source,inventory,{cmsAudit});
   const publishedGroups=new Set(publication.published.filter(item=>item.record.department==='骨科').map(item=>item.record.group));
   const manifest={total:publication.published.length,identityNamespace:publication.baseline.identityNamespace,
-    departments:{},groups:source.groups.filter(group=>publishedGroups.has(group)),traumaGroups:source.traumaGroups.filter(group=>publishedGroups.has(group)),
+    departments:{},groups:[...new Set([...source.groups,...publishedGroups])].filter(group=>publishedGroups.has(group)),traumaGroups:source.traumaGroups.filter(group=>publishedGroups.has(group)),
     seeds:Object.fromEntries(Object.entries(source.seeds).filter(([key])=>publishedGroups.has(key)).map(([key,value])=>[key,{category:value.category}])),bodies:{},scripts:{}};
   manifest.scripts.cms=[...html.matchAll(/<script[^>]*src="([^"]+)"/g)].map(match=>match[1]).find(value=>value.startsWith('/cms-core.js?'));
   const write=(prefix,text,extension='js')=>{const filename=prefix+'-'+digest(text)+'.'+extension;fs.writeFileSync(new URL(filename,directory),text);return '/'+filename;};
