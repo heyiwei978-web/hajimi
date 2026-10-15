@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto';
-import {get,put,BlobPreconditionFailedError} from '@vercel/blob';
+import {BlobPreconditionFailedError} from '@vercel/blob';
+import {blob} from './_blob-auth.js';
 
 const CURRENT='cms/content.json';
 const PREFIX='cms/history/';
@@ -17,7 +18,7 @@ function validate(data,status=400){
   }
   return {version:1,templateOverrides:data.templateOverrides,cases:data.cases};
 }
-export function createContentStore(storage={get,put}){
+export function createContentStore(storage=blob){
   async function read(){
     let result;
     try{result=await storage.get(CURRENT,{access:'private',useCache:false});}

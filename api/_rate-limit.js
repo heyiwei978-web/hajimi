@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import {get,put} from '@vercel/blob';
+import {blob} from './_blob-auth.js';
 
 const WINDOW_MS = 15 * 60 * 1000;
 const BLOCK_MS = 15 * 60 * 1000;
@@ -17,7 +17,7 @@ function pathnameFor(req) {
 
 async function readState(pathname) {
   try {
-    const result = await get(pathname,{access:'private',useCache:false});
+    const result = await blob.get(pathname,{access:'private',useCache:false});
     if (!result || result.statusCode !== 200) return null;
     const parsed = JSON.parse(await new Response(result.stream).text());
     if (!parsed || typeof parsed !== 'object') return null;
@@ -29,7 +29,7 @@ async function readState(pathname) {
 
 async function writeState(pathname,state) {
   try {
-    await put(pathname,JSON.stringify(state),{
+    await blob.put(pathname,JSON.stringify(state),{
       access:'private',
       allowOverwrite:true,
       contentType:'application/json; charset=utf-8'
