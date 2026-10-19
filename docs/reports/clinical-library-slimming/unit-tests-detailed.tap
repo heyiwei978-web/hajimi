@@ -1,0 +1,650 @@
+TAP version 13
+# Subtest: every published morphology has treatment considerations with no missing or legacy codes
+ok 1 - every published morphology has treatment considerations with no missing or legacy codes
+  ---
+  duration_ms: 6.017997
+  type: 'test'
+  ...
+# Subtest: critical age, emergency and version distinctions remain explicit
+ok 2 - critical age, emergency and version distinctions remain explicit
+  ---
+  duration_ms: 1.696308
+  type: 'test'
+  ...
+# Subtest: the treatment supplement loads after morphology and before the reader
+ok 3 - the treatment supplement loads after morphology and before the reader
+  ---
+  duration_ms: 0.172861
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23.508195
+TAP version 13
+# Subtest: 17 orthopedic disease dossiers each have detailed fracture morphology, differentiators and references
+ok 1 - 17 orthopedic disease dossiers each have detailed fracture morphology, differentiators and references
+  ---
+  duration_ms: 5.155115
+  type: 'test'
+  ...
+# Subtest: AO/OTA 2018 tibial shaft and intertrochanteric classifications avoid deleted or phantom subtypes
+ok 2 - AO/OTA 2018 tibial shaft and intertrochanteric classifications avoid deleted or phantom subtypes
+  ---
+  duration_ms: 1.574495
+  type: 'test'
+  ...
+# Subtest: pelvic and acetabular systems keep major subtypes and genuine CT-specific Sanders groups
+ok 3 - pelvic and acetabular systems keep major subtypes and genuine CT-specific Sanders groups
+  ---
+  duration_ms: 1.893786
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 24.184325
+TAP version 13
+# Subtest: compiled catalogs and per-disease bodies preserve every original clinical record
+ok 1 - compiled catalogs and per-disease bodies preserve every original clinical record
+  ---
+  duration_ms: 970.340762
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1000.268379
+TAP version 13
+# Subtest: chief physician note has one body paragraph and a blank name
+ok 1 - chief physician note has one body paragraph and a blank name
+  ---
+  duration_ms: 2.614073
+  type: 'test'
+  ...
+# Subtest: attending physician note leaves signature blank without losing clinical content
+ok 2 - attending physician note leaves signature blank without losing clinical content
+  ---
+  duration_ms: 0.731503
+  type: 'test'
+  ...
+# Subtest: core operative records are 4 detailed paragraphs and retain metadata / postoperative plan
+ok 3 - core operative records are 4 detailed paragraphs and retain metadata / postoperative plan
+  ---
+  duration_ms: 1.932935
+  type: 'test'
+  ...
+# Subtest: complex TKA cases keep their unique operative content
+ok 4 - complex TKA cases keep their unique operative content
+  ---
+  duration_ms: 0.776351
+  type: 'test'
+  ...
+# Subtest: production compiler receives normalized sourceBody rather than only a browser display wrapper
+ok 5 - production compiler receives normalized sourceBody rather than only a browser display wrapper
+  ---
+  duration_ms: 0.703832
+  type: 'test'
+  ...
+# Subtest: special case keeps procedure detail but removes nine numbered one-line steps
+ok 6 - special case keeps procedure detail but removes nine numbered one-line steps
+  ---
+  duration_ms: 0.644412
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 25.366098
+TAP version 13
+# Subtest: the committed baseline preserves complete cases and every special-case document
+ok 1 - the committed baseline preserves complete cases and every special-case document
+  ---
+  duration_ms: 21.943355
+  type: 'test'
+  ...
+# Subtest: reordering generated documents retains every original numeric and stable identity
+ok 2 - reordering generated documents retains every original numeric and stable identity
+  ---
+  duration_ms: 79.228092
+  type: 'test'
+  ...
+# Subtest: medical changes, missing records and duplicate identities stop publication
+ok 3 - medical changes, missing records and duplicate identities stop publication
+  ---
+  duration_ms: 61.897734
+  type: 'test'
+  ...
+# Subtest: archiving requires an independent CMS audit and always preserves whole cases
+ok 4 - archiving requires an independent CMS audit and always preserves whole cases
+  ---
+  duration_ms: 1.138437
+  type: 'test'
+  ...
+# Subtest: special cases, different procedures and ambiguous CMS names cannot be archived
+ok 5 - special cases, different procedures and ambiguous CMS names cannot be archived
+  ---
+  duration_ms: 94.011959
+  type: 'test'
+  ...
+# Subtest: public compilation retains exact payloads while excluding authoring sources and duplicate router medical text
+ok 6 - public compilation retains exact payloads while excluding authoring sources and duplicate router medical text
+  ---
+  duration_ms: 724.303607
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1747.840285
+TAP version 13
+# Subtest: only a confirmed missing blob becomes an empty library; read and parse failures block edits
+ok 1 - only a confirmed missing blob becomes an empty library; read and parse failures block edits
+  ---
+  duration_ms: 11.844848
+  type: 'test'
+  ...
+# Subtest: save requires a loaded revision and valid content before touching storage
+ok 2 - save requires a loaded revision and valid content before touching storage
+  ---
+  duration_ms: 1.261212
+  type: 'test'
+  ...
+# Subtest: backup is immutable and must succeed before current content is changed
+ok 3 - backup is immutable and must succeed before current content is changed
+  ---
+  duration_ms: 2.522645
+  type: 'test'
+  ...
+# Subtest: concurrent editors use atomic conditional writes and cannot overwrite each other
+ok 4 - concurrent editors use atomic conditional writes and cannot overwrite each other
+  ---
+  duration_ms: 0.909993
+  type: 'test'
+  ...
+# Subtest: concurrent first writes cannot replace an initial creation
+ok 5 - concurrent first writes cannot replace an initial creation
+  ---
+  duration_ms: 0.376678
+  type: 'test'
+  ...
+# Subtest: restore checks current revision and creates another backup before reverting
+ok 6 - restore checks current revision and creates another backup before reverting
+  ---
+  duration_ms: 0.9416
+  type: 'test'
+  ...
+# Subtest: failed current write preserves the current data and its backup
+ok 7 - failed current write preserves the current data and its backup
+  ---
+  duration_ms: 0.474676
+  type: 'test'
+  ...
+# Subtest: public content hides unpublished cases and backup metadata; history requires authentication
+ok 8 - public content hides unpublished cases and backup metadata; history requires authentication
+  ---
+  duration_ms: 0.877724
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 144.552949
+TAP version 13
+# Subtest: merged ECG data passes build validation: unique slugs, existing sketches, categories and cross-links
+ok 1 - merged ECG data passes build validation: unique slugs, existing sketches, categories and cross-links
+  ---
+  duration_ms: 312.963169
+  type: 'test'
+  ...
+# Subtest: build validation reports broken related links, unknown sketches and insecure references
+ok 2 - build validation reports broken related links, unknown sketches and insecure references
+  ---
+  duration_ms: 301.155486
+  type: 'test'
+  ...
+# Subtest: compiler publishes one hashed bundle and rewrites ecg.html to load it
+ok 3 - compiler publishes one hashed bundle and rewrites ecg.html to load it
+  ---
+  duration_ms: 937.24842
+  type: 'test'
+  ...
+# Subtest: hashed assets are served with an immutable cache policy
+ok 4 - hashed assets are served with an immutable cache policy
+  ---
+  duration_ms: 0.346943
+  type: 'test'
+  ...
+# Subtest: search ranks exact titles and aliases above full-text hits and spans long-form pages
+ok 5 - search ranks exact titles and aliases above full-text hits and spans long-form pages
+  ---
+  duration_ms: 302.128134
+  type: 'test'
+  ...
+# Subtest: search highlighting escapes markup before marking matches
+ok 6 - search highlighting escapes markup before marking matches
+  ---
+  duration_ms: 335.876864
+  type: 'test'
+  ...
+# Subtest: caliper readings convert sketch units to milliseconds and rate
+ok 7 - caliper readings convert sketch units to milliseconds and rate
+  ---
+  duration_ms: 1.284277
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2215.956817
+TAP version 13
+# Subtest: ECG formulas use milliseconds and return independently known QTc and heart-rate results
+ok 1 - ECG formulas use milliseconds and return independently known QTc and heart-rate results
+  ---
+  duration_ms: 309.773467
+  type: 'test'
+  ...
+# Subtest: ECG calculations reject missing, nonpositive and nonfinite input instead of producing misleading results
+ok 2 - ECG calculations reject missing, nonpositive and nonfinite input instead of producing misleading results
+  ---
+  duration_ms: 299.821616
+  type: 'test'
+  ...
+# Subtest: all ECG atlas drafts keep valid categories, both clinical layers and explicit review metadata
+ok 3 - all ECG atlas drafts keep valid categories, both clinical layers and explicit review metadata
+  ---
+  duration_ms: 315.240474
+  type: 'test'
+  ...
+# Subtest: ECG drawings are accessible original inline vectors with unique IDs and no external image embeds
+ok 4 - ECG drawings are accessible original inline vectors with unique IDs and no external image embeds
+  ---
+  duration_ms: 303.13375
+  type: 'test'
+  ...
+# Subtest: perioperative topic links only to existing entries and cites https sources
+ok 5 - perioperative topic links only to existing entries and cites https sources
+  ---
+  duration_ms: 287.201687
+  type: 'test'
+  ...
+# Subtest: new ECG calculators: four QTc formulas, frontal axis, grid conversion and rate estimates
+ok 6 - new ECG calculators: four QTc formulas, frontal axis, grid conversion and rate estimates
+  ---
+  duration_ms: 310.320863
+  type: 'test'
+  ...
+# Subtest: basics data covers electrodes, reversals, axis, intervals and artifacts with drawable sketches
+ok 7 - basics data covers electrodes, reversals, axis, intervals and artifacts with drawable sketches
+  ---
+  duration_ms: 295.083137
+  type: 'test'
+  ...
+# Subtest: practice cases have four options, a valid answer, a sketch, a report and a working link
+ok 8 - practice cases have four options, a valid answer, a sketch, a report and a working link
+  ---
+  duration_ms: 300.83786
+  type: 'test'
+  ...
+# Subtest: textbook batch: new entries, textbook citations, per-lead normals and phenomena are complete
+ok 9 - textbook batch: new entries, textbook citations, per-lead normals and phenomena are complete
+  ---
+  duration_ms: 294.136221
+  type: 'test'
+  ...
+# Subtest: textbook batch 7: arrhythmia chapters add entries, sketches and chapter citations without duplicating related links
+ok 10 - textbook batch 7: arrhythmia chapters add entries, sketches and chapter citations without duplicating related links
+  ---
+  duration_ms: 295.410985
+  type: 'test'
+  ...
+# Subtest: textbook batch 8: infarction, ischemia, pulmonary embolism and drug/electrolyte chapters
+ok 11 - textbook batch 8: infarction, ischemia, pulmonary embolism and drug/electrolyte chapters
+  ---
+  duration_ms: 297.126903
+  type: 'test'
+  ...
+# Subtest: textbook batch 9: pacing chapters add modes, dual-chamber, CRT, normal variants and PMT
+ok 12 - textbook batch 9: pacing chapters add modes, dual-chamber, CRT, normal variants and PMT
+  ---
+  duration_ms: 287.543759
+  type: 'test'
+  ...
+# Subtest: textbook batch 10: cardiomyopathy, congenital and valvular entries plus PR limit table
+ok 13 - textbook batch 10: cardiomyopathy, congenital and valvular entries plus PR limit table
+  ---
+  duration_ms: 297.697193
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3916.688659
+TAP version 13
+# Subtest: homepage build keeps public entries while loading no clinical script chain
+ok 1 - homepage build keeps public entries while loading no clinical script chain
+  ---
+  duration_ms: 1.527173
+  type: 'test'
+  ...
+# Subtest: homepage generation is repeatable and fails on missing source sections
+ok 2 - homepage generation is repeatable and fails on missing source sections
+  ---
+  duration_ms: 0.777333
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 24.625011
+TAP version 13
+# Subtest: mobile homepage cannot be widened by the clinical illustration
+ok 1 - mobile homepage cannot be widened by the clinical illustration
+  ---
+  duration_ms: 1.678952
+  type: 'test'
+  ...
+# Subtest: mobile homepage navigation is width-constrained and horizontally scrollable inside its own row
+ok 2 - mobile homepage navigation is width-constrained and horizontally scrollable inside its own row
+  ---
+  duration_ms: 0.270909
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 19.332167
+TAP version 13
+# Subtest: mobile library pages always expose a site-home route
+ok 1 - mobile library pages always expose a site-home route
+  ---
+  duration_ms: 2.084985
+  type: 'test'
+  ...
+# Subtest: mobile orthopedic drawer uses touch scrolling without visible nested scrollbar
+ok 2 - mobile orthopedic drawer uses touch scrolling without visible nested scrollbar
+  ---
+  duration_ms: 0.512593
+  type: 'test'
+  ...
+# Subtest: sticky header exposes a permanent site-home control without losing the library-home link
+ok 3 - sticky header exposes a permanent site-home control without losing the library-home link
+  ---
+  duration_ms: 0.65668
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18.424909
+TAP version 13
+# Subtest: all clinical generation scripts parse and execute in site load order
+ok 1 - all clinical generation scripts parse and execute in site load order
+  ---
+  duration_ms: 341.271788
+  type: 'test'
+  ...
+# Subtest: index contains no escaped newline artifacts between script tags
+ok 2 - index contains no escaped newline artifacts between script tags
+  ---
+  duration_ms: 0.350749
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 353.721755
+TAP version 13
+# Subtest: orthopedic pathway center has the national ERAS library and responsive shell
+ok 1 - orthopedic pathway center has the national ERAS library and responsive shell
+  ---
+  duration_ms: 3.984149
+  type: 'test'
+  ...
+# Subtest: main site and completed orthopedic records link to the pathway center
+ok 2 - main site and completed orthopedic records link to the pathway center
+  ---
+  duration_ms: 0.835791
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 17.199951
+TAP version 13
+# Subtest: second-stage optimization preserves content while improving paint behavior
+ok 1 - second-stage optimization preserves content while improving paint behavior
+  ---
+  duration_ms: 1.496387
+  type: 'test'
+  ...
+# Subtest: static scripts and styles receive repeat-load caching without caching APIs
+ok 2 - static scripts and styles receive repeat-load caching without caching APIs
+  ---
+  duration_ms: 0.333292
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23.138158
+TAP version 13
+# Subtest: cross-department search finds metadata with Chinese, mixed case and multiple terms
+ok 1 - cross-department search finds metadata with Chinese, mixed case and multiple terms
+  ---
+  duration_ms: 1.738122
+  type: 'test'
+  ...
+# Subtest: department, stage, type and disease filters combine without changing source records
+ok 2 - department, stage, type and disease filters combine without changing source records
+  ---
+  duration_ms: 0.302426
+  type: 'test'
+  ...
+# Subtest: search excludes patient record bodies and handles empty results
+ok 3 - search excludes patient record bodies and handles empty results
+  ---
+  duration_ms: 0.207723
+  type: 'test'
+  ...
+# Subtest: metadata highlighting handles Chinese, case, overlapping terms and literal punctuation
+ok 4 - metadata highlighting handles Chinese, case, overlapping terms and literal punctuation
+  ---
+  duration_ms: 0.447405
+  type: 'test'
+  ...
+# Subtest: highlighted labels and queries cannot inject HTML or turn text into markup
+ok 5 - highlighted labels and queries cannot inject HTML or turn text into markup
+  ---
+  duration_ms: 0.323328
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 20.627181
+TAP version 13
+# Subtest: same-origin admin login works and creates a protected cookie
+ok 1 - same-origin admin login works and creates a protected cookie
+  ---
+  duration_ms: 6.869621
+  type: 'test'
+  ...
+# Subtest: missing signing secret rejects an empty-key forgery and prevents new sessions
+ok 2 - missing signing secret rejects an empty-key forgery and prevents new sessions
+  ---
+  duration_ms: 1.062552
+  type: 'test'
+  ...
+# Subtest: expired, tampered, extra-part and malformed-cookie sessions are rejected
+ok 3 - expired, tampered, extra-part and malformed-cookie sessions are rejected
+  ---
+  duration_ms: 0.607516
+  type: 'test'
+  ...
+# Subtest: cross-site requests and spoofed origins cannot perform admin writes
+ok 4 - cross-site requests and spoofed origins cannot perform admin writes
+  ---
+  duration_ms: 1.318058
+  type: 'test'
+  ...
+# Subtest: login rejects unsupported methods, missing marker, non-JSON, malformed and oversized bodies
+ok 5 - login rejects unsupported methods, missing marker, non-JSON, malformed and oversized bodies
+  ---
+  duration_ms: 0.332302
+  type: 'test'
+  ...
+# Subtest: public session remains readable while admin writes require authentication
+ok 6 - public session remains readable while admin writes require authentication
+  ---
+  duration_ms: 0.301215
+  type: 'test'
+  ...
+# Subtest: valid same-origin admin JSON passes the guard; wrong method and oversized writes do not
+ok 7 - valid same-origin admin JSON passes the guard; wrong method and oversized writes do not
+  ---
+  duration_ms: 1.13392
+  type: 'test'
+  ...
+# Subtest: upload rejects disguised SVG, invalid base64 and oversized bodies before contacting storage
+ok 8 - upload rejects disguised SVG, invalid base64 and oversized bodies before contacting storage
+  ---
+  duration_ms: 10.326614
+  type: 'test'
+  ...
+# Subtest: image paths cannot request other storage files, traversal or SVG content
+ok 9 - image paths cannot request other storage files, traversal or SVG content
+  ---
+  duration_ms: 0.558532
+  type: 'test'
+  ...
+# Subtest: anonymous viewers only get images referenced by a published case
+ok 10 - anonymous viewers only get images referenced by a published case
+  ---
+  duration_ms: 20.838439
+  type: 'test'
+  ...
+# Subtest: salted scrypt admin password hash is preferred and legacy SHA-256 still works
+ok 11 - salted scrypt admin password hash is preferred and legacy SHA-256 still works
+  ---
+  duration_ms: 177.336431
+  type: 'test'
+  ...
+# Subtest: browser-generated PBKDF2 hash (password-hash.js) is accepted by the login check
+ok 12 - browser-generated PBKDF2 hash (password-hash.js) is accepted by the login check
+  ---
+  duration_ms: 258.155791
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 610.868564
+TAP version 13
+# Subtest: main application external scripts are deferred but keep source order
+ok 1 - main application external scripts are deferred but keep source order
+  ---
+  duration_ms: 2.047508
+  type: 'test'
+  ...
+# Subtest: long medical-record and pathway pages use safe offscreen rendering optimization
+ok 2 - long medical-record and pathway pages use safe offscreen rendering optimization
+  ---
+  duration_ms: 1.111667
+  type: 'test'
+  ...
+# Subtest: mobile drawer exposes synchronized accessibility state
+ok 3 - mobile drawer exposes synchronized accessibility state
+  ---
+  duration_ms: 0.569789
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 16.147153

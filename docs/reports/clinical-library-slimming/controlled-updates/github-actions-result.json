@@ -1,0 +1,28 @@
+{
+  "implementationCommit": "401487a0f98b058b4cef125a963a59110b3e34ac",
+  "implementationTree": "76d57c4b45f8c0df5e54daba6d131df4020029b4",
+  "workflowRunId": 38660914339,
+  "workflowUrl": "https://github.com/heyiwei978-web/hajimi/actions/runs/38660914339",
+  "jobId": 116181660351,
+  "conclusion": "success",
+  "unitTests": {
+    "passed": 91,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "browserTests": {
+    "passed": 40,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "productionSecuritySmoke": "skipped (workflow_dispatch only)",
+  "workflowNodeVersion": "22",
+  "playwrightVersion": "1.61.1 (lockfile)",
+  "localBrowser": "blocked by sandbox socket permission; CI ran all browser tests",
+  "medicalRecords": 5361,
+  "realContentRevisionBatches": 0,
+  "realAddedRecords": 0,
+  "archivedRecords": 0
+}

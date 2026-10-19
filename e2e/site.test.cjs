@@ -47,6 +47,14 @@ async function pageFor(width=1440, options={}) {
   return {page, context, errors};
 }
 async function settle(page) {await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));}
+async function openRecordDirectory(page){
+  const panel=page.locator('#caseDirectoryPanel');
+  if(await panel.count()&&!await panel.evaluate(element=>element.open))await page.locator('#caseDirectorySummary').click();
+}
+async function closeRecordDirectory(page){
+  const summary=page.locator('#caseDirectorySummary');
+  if(await summary.isVisible()&&await page.locator('#caseDirectoryPanel').evaluate(element=>element.open))await summary.click();
+}
 
 test('homepage is usable without JavaScript and avoids loading clinical data', async()=>{
   const {page,context}=await pageFor(393,{javaScriptEnabled:false});
@@ -541,11 +549,12 @@ test('cross-department search groups templates into complete case files; filters
     })));
     await page.locator('.case-search-card').first().click();
     await page.locator('#caseWorkspace').waitFor({state:'visible'});
+    await openRecordDirectory(page);
     assert.match(await page.locator('#caseWorkspace .case-nav-family').first().innerText(),/临床病历/);
     assert.match(await page.locator('#caseWorkspace .case-nav-family').nth(1).innerText(),/知情同意/);
-    assert.equal(await page.locator('#caseWorkspace .case-file-reader > .record-book-section:visible').count(),1);
-    await page.locator('#caseShowAll').click();
-    assert((await page.locator('#caseWorkspace .case-file-reader > .record-book-section:visible').count())>1);
+    const chapters=page.locator('#caseWorkspace .case-file-reader > .record-book-section');
+    assert((await chapters.count())>1);
+    assert.equal(await chapters.filter({visible:true}).count(),await chapters.count(),'a case opens with every chapter visible');
     await page.goto(base+'/bl',{waitUntil:'networkidle'});
     await page.locator('#searchInput').fill('术前');
     await page.waitForFunction(()=>document.querySelectorAll('.case-search-card').length===24);
@@ -616,6 +625,7 @@ test('reading sizes update directory and preview, persist and leave copied and p
       const current=page.locator('#caseWorkspace .case-active'),body=current.locator('.record-book-body');
       const original=await body.textContent();
       const controls=page.locator('#recordBookToc .reading-font-controls');
+      await openRecordDirectory(page);
       for(const size of [18,20,22]){
         await controls.locator('[data-reading-font="'+size+'"]').click();
         assert.equal(await body.evaluate(element=>getComputedStyle(element).fontSize),size+'px');
@@ -625,6 +635,7 @@ test('reading sizes update directory and preview, persist and leave copied and p
       }
       const selected=page.locator('.case-nav-item[aria-current="location"]');
       assert(await selected.locator('.case-nav-current-label').isVisible(),'current selection has a text marker');
+      await closeRecordDirectory(page);
       await current.locator('.copy').click();assert.equal(await page.evaluate(()=>window.copiedClinicalText),original);
       await current.locator('.preview').click();
       assert.equal(await page.locator('#previewContent').evaluate(element=>getComputedStyle(element).fontSize),'22px');
@@ -656,8 +667,10 @@ test('reading preferences synchronize between tabs and remain usable with invali
     await page.reload({waitUntil:'networkidle'});
     assert.equal(await page.locator('#recordBookToc [data-reading-font="18"]').getAttribute('aria-pressed'),'true');
     const other=await context.newPage();await other.goto(base+'/bl/puwai/'+encodeURIComponent('肝脓肿'),{waitUntil:'networkidle'});
+    await openRecordDirectory(other);
     await other.locator('#recordBookToc [data-reading-font="20"]').click();
     await page.waitForFunction(()=>document.querySelector('#recordBookToc [data-reading-font="20"]').getAttribute('aria-pressed')==='true');
+    await closeRecordDirectory(other);
     await other.locator('.record-book-section.case-active .preview').click();
     assert.equal(await other.locator('#previewContent').evaluate(element=>getComputedStyle(element).fontSize),'20px');
     await other.locator('#previewDialog [data-reading-font="22"]').click();
@@ -670,6 +683,7 @@ test('reading preferences synchronize between tabs and remain usable with invali
   try{
     await blocked.context.addInitScript(()=>{Storage.prototype.getItem=function(){throw new DOMException('Blocked','SecurityError');};Storage.prototype.setItem=function(){throw new DOMException('Blocked','SecurityError');};});
     await blocked.page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});
+    await openRecordDirectory(blocked.page);
     await blocked.page.locator('#recordBookToc [data-reading-font="22"]').click();
     assert.equal(await blocked.page.locator('.case-active .record-book-body').evaluate(element=>getComputedStyle(element).fontSize),'22px');
     assert.equal(await blocked.page.locator('#recordBookToc .reading-font-note').innerText(),'仅本页生效');
@@ -803,77 +817,102 @@ test('disease navigation starts at the top, preserves record content and chapter
     assert.equal(await page.evaluate(()=>scrollY),0);assert.match(await page.title(),/全膝关节置换/);
     assert((await page.locator('.record-book-body').first().textContent()).length>100);
     const link=page.locator('.record-book-toc a').nth(10);await link.click();await settle(page);
-    const selected=page.locator(await link.getAttribute('href'));assert(await selected.isVisible());assert.equal(await link.getAttribute('aria-current'),'location');assert.equal(await page.locator('#caseWorkspace .case-file-reader > .record-book-section:visible').count(),1);
+    const selected=page.locator(await link.getAttribute('href'));assert(await selected.isVisible());assert.equal(await link.getAttribute('aria-current'),'location');assert.equal(await page.locator('#caseWorkspace .case-file-reader > .record-book-section:visible').count(),await page.locator('#caseWorkspace .case-file-reader > .record-book-section').count());
     await page.emulateMedia({media:'print'});assert.equal(await page.locator('.record-book-toc').evaluate(e=>getComputedStyle(e).display),'none');
     assert.equal(await page.locator('.record-book-body').first().evaluate(e=>getComputedStyle(e).fontSize),'16px');assert.deepEqual(errors,[]);
   } finally {await context.close();}
 });
 
-test('bottom reading actions follow document order, keep directory selection and preserve print and expanded modes',async()=>{
-  for(const width of [320,768,1440]){
-    const {page,context,errors}=await pageFor(width,{isMobile:width===320,hasTouch:width===320});
+test('legacy chapter URLs and same-name TKA numeric/stable identities survive refresh on desktop and phone',async()=>{
+  for(const width of [375,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      const missing=[];page.on('response',response=>{if(response.status()>=400&&new URL(response.url()).origin===base)missing.push(response.url());});
+      await page.goto(base+'/bl/guke/TKA#record-0-入院记录',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('#caseWorkspace .case-active').getAttribute('id'),'record-0-入院记录');
+      await page.goto(base+'/bl/guke/TKA#record-999-入院记录',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('#caseWorkspace .case-active').getAttribute('id'),'record-0-入院记录','a changed presentation ordinal still resolves the unique original chapter');
+      const links=await page.evaluate(()=>[5159,5359,5360].map(id=>{
+        const record=window.HAJIMI.findRecord(id),stable=window.HAJIMI.findRecord('clinical-v1-r'+String(id).padStart(6,'0'));
+        const article=[...document.querySelectorAll('.record-book-section')].find(a=>templates[Number(a.dataset.recordIndex)]===record);
+        return {id,same:record===stable,name:record.name,key:record.specialCaseKey||null,anchor:article?.id,body:article?.querySelector('.record-book-body')?.textContent};
+      }));
+      assert.deepEqual(links.map(item=>item.key),[null,'tka-special-wound-202607','tka-special-hemarthrosis-202609']);
+      for(const link of links){
+        assert(link.same);assert(link.anchor);assert.equal(link.name,'全膝关节置换 · 出院当天查房记录');
+        await page.goto(base+'/bl/guke/TKA#'+encodeURIComponent(link.anchor),{waitUntil:'networkidle'});
+        const article=page.locator('[id="'+link.anchor+'"]');assert(await article.isVisible());
+        assert.equal(await article.locator('.record-book-body').textContent(),link.body);
+        await page.reload({waitUntil:'networkidle'});assert(await article.isVisible());
+        assert.equal(await page.evaluate(id=>window.HAJIMI.findRecord(id)._id,link.id),link.id);
+      }
+      assert.deepEqual(missing,[]);assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('complete records stay visible while directory jumps, scrolling and refresh update the current chapter',async()=>{
+  for(const width of [320,375,768,1440]){
+    const {page,context,errors}=await pageFor(width,{isMobile:width<=375,hasTouch:width<=375});
     try{
       await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});
       const records=page.locator('#caseWorkspace .case-file-reader > .record-book-section');
       const ids=await records.evaluateAll(items=>items.map(item=>item.id));
       const original=await records.first().locator('.record-book-body').textContent();
       const current=page.locator('#caseWorkspace .case-file-reader > .case-active');
-      assert(ids.length>2);
+      const visibleAll=async()=>assert.equal(await records.filter({visible:true}).count(),ids.length);
+      assert(ids.length>2);await visibleAll();
       assert.equal(await current.getAttribute('id'),ids[0]);
-      assert(await page.locator('#casePreviousBottom').isDisabled());
       assert(await page.locator('#casePrevious').isDisabled());
-      assert(await page.locator('.case-nav-item b').evaluateAll(items=>items.every(item=>parseFloat(getComputedStyle(item).fontSize)>=17)));
+      assert.equal(await page.locator('#caseDirectoryPanel').evaluate(element=>element.open),width>720);
+      assert.equal(await page.locator('#caseShowAll,#caseShowSelectedBottom').count(),0);
+      await page.locator('#caseNext').click();await settle(page);
+      assert.equal(await current.getAttribute('id'),ids[1]);await visibleAll();
+      assert.equal(decodeURIComponent(new URL(page.url()).hash.slice(1)),ids[1]);
+      assert(await current.locator('h3').evaluate(element=>element===document.activeElement));
+      const header=await page.locator('.library-topbar').boundingBox();
+      assert((await current.boundingBox()).y>=header.y+header.height+10,'chapter clears the measured header');
+      await records.nth(2).evaluate(element=>element.scrollIntoView({block:'start'}));await settle(page);
+      assert.equal(await current.getAttribute('id'),ids[2],'manual scrolling updates the directory marker');
+      if(width<=720){
+        const directory=await page.locator('#recordBookToc').boundingBox();
+        assert(directory.y>=header.y+header.height,'mobile directory stays below the header');
+        await page.locator('#caseDirectorySummary').click();
+      }
+      await page.locator('[data-case-record="'+ids.at(-1)+'"]').click();await settle(page);
+      assert.equal(await current.getAttribute('id'),ids.at(-1));await visibleAll();
+      assert.equal(await page.locator('#caseDirectoryPanel').evaluate(element=>element.open),width>720,'mobile directory closes after a jump');
+      await page.reload({waitUntil:'networkidle'});
+      assert.equal(await current.getAttribute('id'),ids.at(-1),'refresh restores the anchored chapter');await visibleAll();
       await page.locator('.case-file-bottom-nav').scrollIntoViewIfNeeded();await settle(page);
+      assert(await page.locator('#caseNextBottom').isDisabled());
       assert(await page.locator('.case-file-bottom-actions button:visible').evaluateAll(buttons=>buttons.every(button=>{
         const r=button.getBoundingClientRect(),text=document.createRange();text.selectNodeContents(button);
         return r.left>=0&&r.right<=innerWidth&&r.height>=48&&text.getClientRects().length===1;
       })),`readable bottom actions at ${width}px`);
-      await page.locator('#caseNextBottom').click();await settle(page);
-      assert.equal(await current.getAttribute('id'),ids[1]);
-      assert.equal(decodeURIComponent(new URL(page.url()).hash.slice(1)),ids[1]);
-      assert.match(await page.locator('#caseBottomSection').innerText(),/02 \/ /);
-      assert(await current.locator('h3').evaluate(element=>element===document.activeElement));
-      const record=await current.boundingBox(),header=await page.locator('.library-topbar').boundingBox();
-      assert(record.y>=header.y+header.height+10,'next document clears the header');
       await page.locator('#casePreviousBottom').click();await settle(page);
-      assert.equal(await current.getAttribute('id'),ids[0]);
-      assert.equal(await current.locator('.record-book-body').textContent(),original);
+      assert.equal(await current.getAttribute('id'),ids.at(-2));await visibleAll();
       await page.locator('#caseBackToDirectory').click();await settle(page);
-      const sidebar=await page.locator('#recordBookToc').boundingBox();
-      assert(sidebar.y>=header.y+header.height+10,'return places directory below header');
+      assert(await page.locator('#caseDirectoryPanel').evaluate(element=>element.open));
+      assert.equal(await current.getAttribute('id'),ids.at(-2),'opening the directory keeps the current chapter');
+      const directoryTop=(await page.locator('#recordBookToc').boundingBox()).y,topbar=await page.locator('.library-topbar').boundingBox();
+      assert(directoryTop>=topbar.y+topbar.height-1,`directory heading stays on screen at ${width}px`);
       assert(await page.locator('.case-nav-item[aria-current="location"]').evaluate(element=>{
         const r=element.getBoundingClientRect(),parent=element.closest('aside').getBoundingClientRect();
         return element===document.activeElement&&r.top>=parent.top&&r.bottom<=parent.bottom;
-      }),'return focuses the visible selected document');
-      // Directory groups differ from chronological reading order.
-      await page.locator('[data-case-record="'+ids.at(-1)+'"]').click();
-      assert.equal(await current.getAttribute('id'),ids.at(-1));
-      assert(await page.locator('#caseNextBottom').isDisabled());
-      assert(await page.locator('#caseNext').isDisabled());
-      await page.reload({waitUntil:'networkidle'});
-      assert.equal(await current.getAttribute('id'),ids.at(-1),'refresh restores the selected document');
-      await page.locator('#caseShowAll').click();
-      assert.equal(await records.filter({visible:true}).count(),ids.length);
-      assert.equal(await page.locator('#caseNextBottom').isVisible(),false);
-      assert(await page.locator('#caseShowSelectedBottom').isVisible());
-      await page.locator('#caseShowSelectedBottom').click();await settle(page);
-      assert.equal(await records.filter({visible:true}).count(),1);
-      assert.equal(await current.getAttribute('id'),ids.at(-1));
-      await page.evaluate(()=>{window.print=()=>{};});
-      await page.locator('#printWholeRecord').click();
-      assert.equal(await records.filter({visible:true}).count(),1,'print does not change reading mode');
-      await page.emulateMedia({media:'print'});
-      assert.equal(await records.filter({visible:true}).count(),ids.length,'print includes the complete case file');
+      }),'directory action focuses the visible current chapter');
+      if(width<=720){await page.keyboard.press('Escape');assert.equal(await page.locator('#caseDirectoryPanel').evaluate(element=>element.open),false);}
+      await page.evaluate(()=>{window.print=()=>{};});await page.locator('#printWholeRecord').click();await visibleAll();
+      await page.emulateMedia({media:'print'});await visibleAll();
       assert.equal(await page.locator('.case-file-bottom-nav').isVisible(),false);
-      assert.equal(await page.locator('#previewDialog').isVisible(),false,'closed preview does not add duplicate printed content');
+      assert.equal(await page.locator('#previewDialog').isVisible(),false);
       assert.equal(await records.first().locator('.record-book-body').evaluate(element=>getComputedStyle(element).fontSize),'16px');
-      await page.emulateMedia({media:'screen'});
-      assert.equal(await records.filter({visible:true}).count(),1);
-      assert.equal(await current.locator('.record-book-body').evaluate(element=>getComputedStyle(element).fontSize),'18px');
-      await current.locator('.preview').click();
+      await page.emulateMedia({media:'screen'});await visibleAll();
+      assert.equal(await records.first().locator('.record-book-body').textContent(),original);
+      await records.first().locator('.preview').click();
       assert.equal(await page.locator('#previewContent').evaluate(element=>getComputedStyle(element).fontSize),'18px');
       await page.emulateMedia({media:'print'});
-      assert(await page.locator('#previewContent').isVisible(),'preview printing shows the selected document');
+      assert(await page.locator('#previewContent').isVisible());
       assert.equal(await records.filter({visible:true}).count(),0,'preview printing excludes the complete case file');
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
@@ -1039,6 +1078,7 @@ test('signed-in clinical headers, preview actions and editors remain usable on n
         await page.emulateMedia({media:'print'});assert.equal(await page.locator('#sidebar').isVisible(),false);assert.equal(await page.locator('#drawerMask').isVisible(),false);assert.equal(await page.evaluate(()=>getComputedStyle(document.body).overflow),'visible');
         await page.emulateMedia({media:'screen'});await page.keyboard.press('Escape');
       }
+      await openRecordDirectory(page);
       await page.locator('.record-book-toc a').first().click();await settle(page);
       const record=await page.locator('#caseWorkspace .case-active').boundingBox(),header=await page.locator('.library-topbar').boundingBox();
       assert(record.y>=header.y+header.height+10,`case directory clears the signed-in header at ${width}px`);

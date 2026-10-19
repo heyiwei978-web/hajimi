@@ -1,0 +1,1204 @@
+﻿2026-10-15T00:35:41.0949023Z Current runner version: '2.337.0'
+2026-10-15T00:35:41.0977278Z ##[group]Runner Image Provisioner
+2026-10-15T00:35:41.0978193Z Hosted Compute Agent
+2026-10-15T00:35:41.0978901Z Version: 20261012.601
+2026-10-15T00:35:41.0979830Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+2026-10-15T00:35:41.0980663Z Build Date: 2026-10-12T17:48:21Z
+2026-10-15T00:35:41.0981473Z Worker ID: {d2ab9fdb-cf5f-4047-a982-912e65a01b15}
+2026-10-15T00:35:41.0982282Z Region: northcentralus
+2026-10-15T00:35:41.0982925Z Cloud: Azure
+2026-10-15T00:35:41.0983519Z ##[endgroup]
+2026-10-15T00:35:41.0985070Z ##[group]Operating System
+2026-10-15T00:35:41.0985842Z Ubuntu
+2026-10-15T00:35:41.0986438Z 24.04.5
+2026-10-15T00:35:41.0986967Z LTS
+2026-10-15T00:35:41.0987572Z ##[endgroup]
+2026-10-15T00:35:41.0988264Z ##[group]Runner Image
+2026-10-15T00:35:41.0989011Z Image: ubuntu-24.04
+2026-10-15T00:35:41.0989846Z Version: 20261012.334.1
+2026-10-15T00:35:41.0991268Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-15T00:35:41.0992937Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+2026-10-15T00:35:41.0994029Z ##[endgroup]
+2026-10-15T00:35:41.0995228Z ##[group]GITHUB_TOKEN Permissions
+2026-10-15T00:35:41.0997387Z Contents: read
+2026-10-15T00:35:41.0998056Z Metadata: read
+2026-10-15T00:35:41.0998634Z ##[endgroup]
+2026-10-15T00:35:41.1001627Z Secret source: Actions
+2026-10-15T00:35:41.1002649Z Cache mode: write
+2026-10-15T00:35:41.1003518Z Prepare workflow directory
+2026-10-15T00:35:41.1508551Z Prepare all required actions
+2026-10-15T00:35:41.1582848Z Getting action download info
+2026-10-15T00:35:41.4066570Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-15T00:35:41.5262611Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-10-15T00:35:41.7415548Z Complete job name: unit-tests
+2026-10-15T00:35:41.8210830Z ##[group]Run actions/checkout@v4
+2026-10-15T00:35:41.8211816Z with:
+2026-10-15T00:35:41.8212292Z   repository: heyiwei978-web/hajimi
+2026-10-15T00:35:41.8216130Z   token: ***
+2026-10-15T00:35:41.8216582Z   ssh-strict: true
+2026-10-15T00:35:41.8217038Z   ssh-user: git
+2026-10-15T00:35:41.8217509Z   persist-credentials: true
+2026-10-15T00:35:41.8218012Z   clean: true
+2026-10-15T00:35:41.8218470Z   sparse-checkout-cone-mode: true
+2026-10-15T00:35:41.8219009Z   fetch-depth: 1
+2026-10-15T00:35:41.8219460Z   fetch-tags: false
+2026-10-15T00:35:41.8220117Z   show-progress: true
+2026-10-15T00:35:41.8220585Z   lfs: false
+2026-10-15T00:35:41.8221008Z   submodules: false
+2026-10-15T00:35:41.8221467Z   set-safe-directory: true
+2026-10-15T00:35:41.8221987Z   allow-unsafe-pr-checkout: false
+2026-10-15T00:35:41.8222814Z ##[endgroup]
+2026-10-15T00:35:41.9362205Z Syncing repository: heyiwei978-web/hajimi
+2026-10-15T00:35:41.9365462Z ##[group]Getting Git version info
+2026-10-15T00:35:41.9368777Z Working directory is '/home/runner/work/hajimi/hajimi'
+2026-10-15T00:35:41.9483551Z [command]/usr/bin/git version
+2026-10-15T00:35:41.9674330Z git version 2.55.0
+2026-10-15T00:35:41.9764404Z ##[endgroup]
+2026-10-15T00:35:41.9780377Z Temporarily overriding HOME='/home/runner/work/_temp/708a142a-f6e6-410b-8a2b-5a1e3e4f1a89' before making global git config changes
+2026-10-15T00:35:41.9783270Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-15T00:35:41.9786054Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/hajimi/hajimi
+2026-10-15T00:35:41.9791472Z Deleting the contents of '/home/runner/work/hajimi/hajimi'
+2026-10-15T00:35:41.9793771Z ##[group]Initializing the repository
+2026-10-15T00:35:41.9795843Z [command]/usr/bin/git init /home/runner/work/hajimi/hajimi
+2026-10-15T00:35:41.9929437Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-15T00:35:41.9931897Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-15T00:35:41.9934640Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-15T00:35:41.9936328Z hint: call:
+2026-10-15T00:35:41.9937760Z hint:
+2026-10-15T00:35:41.9939011Z hint: 	git config --global init.defaultBranch <name>
+2026-10-15T00:35:41.9941175Z hint:
+2026-10-15T00:35:41.9942591Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-15T00:35:41.9949527Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-15T00:35:41.9951502Z hint:
+2026-10-15T00:35:41.9960588Z hint: 	git branch -m <name>
+2026-10-15T00:35:41.9969983Z hint:
+2026-10-15T00:35:41.9971946Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-15T00:35:41.9974649Z Initialized empty Git repository in /home/runner/work/hajimi/hajimi/.git/
+2026-10-15T00:35:41.9990576Z [command]/usr/bin/git remote add origin https://github.com/heyiwei978-web/hajimi
+2026-10-15T00:35:41.9999106Z ##[endgroup]
+2026-10-15T00:35:42.0001424Z ##[group]Disabling automatic garbage collection
+2026-10-15T00:35:42.0018944Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-15T00:35:42.0093625Z ##[endgroup]
+2026-10-15T00:35:42.0094877Z ##[group]Setting up auth
+2026-10-15T00:35:42.0096059Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-15T00:35:42.0150540Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-15T00:35:42.0840229Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-15T00:35:42.0848595Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-15T00:35:42.1068916Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-15T00:35:42.2013975Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-15T00:35:42.2016019Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-15T00:35:42.2018028Z ##[endgroup]
+2026-10-15T00:35:42.2018803Z ##[group]Fetching the repository
+2026-10-15T00:35:42.2020534Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +0096bd1af9410dad586c2a7f9a972d42ff69b22c:refs/remotes/pull/25/merge
+2026-10-15T00:35:42.8208255Z From https://github.com/heyiwei978-web/hajimi
+2026-10-15T00:35:42.8227153Z  * [new ref]         0096bd1af9410dad586c2a7f9a972d42ff69b22c -> pull/25/merge
+2026-10-15T00:35:42.8242701Z ##[endgroup]
+2026-10-15T00:35:42.8245076Z ##[group]Determining the checkout info
+2026-10-15T00:35:42.8251618Z ##[endgroup]
+2026-10-15T00:35:42.8253405Z [command]/usr/bin/git sparse-checkout disable
+2026-10-15T00:35:42.8305401Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-15T00:35:42.8345378Z ##[group]Checking out the ref
+2026-10-15T00:35:42.8351462Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/25/merge
+2026-10-15T00:35:42.8853453Z Note: switching to 'refs/remotes/pull/25/merge'.
+2026-10-15T00:35:42.8855093Z 
+2026-10-15T00:35:42.8856186Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-15T00:35:42.8858436Z changes and commit them, and you can discard any commits you make in this
+2026-10-15T00:35:42.8861217Z state without impacting any branches by switching back to a branch.
+2026-10-15T00:35:42.8862688Z 
+2026-10-15T00:35:42.8863681Z If you want to create a new branch to retain commits you create, you may
+2026-10-15T00:35:42.8866088Z do so (now or later) by using -c with the switch command. Example:
+2026-10-15T00:35:42.8867605Z 
+2026-10-15T00:35:42.8868494Z   git switch -c <new-branch-name>
+2026-10-15T00:35:42.8870087Z 
+2026-10-15T00:35:42.8871444Z Or undo this operation with:
+2026-10-15T00:35:42.8872610Z 
+2026-10-15T00:35:42.8873489Z   git switch -
+2026-10-15T00:35:42.8874679Z 
+2026-10-15T00:35:42.8876641Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-15T00:35:42.8878542Z 
+2026-10-15T00:35:42.8880688Z HEAD is now at 0096bd1 Merge 401487a0f98b058b4cef125a963a59110b3e34ac into b32800dfe67e3a5712768977cbc6b7aeb2061086
+2026-10-15T00:35:42.8886770Z ##[endgroup]
+2026-10-15T00:35:42.9116401Z [command]/usr/bin/git log -1 --format=%H
+2026-10-15T00:35:42.9118400Z 0096bd1af9410dad586c2a7f9a972d42ff69b22c
+2026-10-15T00:35:42.9387994Z ##[group]Run actions/setup-node@v4
+2026-10-15T00:35:42.9388939Z with:
+2026-10-15T00:35:42.9390066Z   node-version: 22
+2026-10-15T00:35:42.9390987Z   always-auth: false
+2026-10-15T00:35:42.9391798Z   check-latest: false
+2026-10-15T00:35:42.9396213Z   token: ***
+2026-10-15T00:35:42.9396996Z ##[endgroup]
+2026-10-15T00:35:43.1121893Z (node:2048) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-15T00:35:43.1124924Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-15T00:35:43.1244058Z Found in cache @ /opt/hostedtoolcache/node/22.23.3/x64
+2026-10-15T00:35:43.1248909Z ##[group]Environment details
+2026-10-15T00:35:43.7341434Z node: v22.23.3
+2026-10-15T00:35:43.7343712Z npm: 10.9.9
+2026-10-15T00:35:43.7346408Z yarn: 1.22.22
+2026-10-15T00:35:43.7348950Z ##[endgroup]
+2026-10-15T00:35:43.7530005Z ##[group]Run npm ci --ignore-scripts --no-audit --no-fund
+2026-10-15T00:35:43.7531269Z [36;1mnpm ci --ignore-scripts --no-audit --no-fund[0m
+2026-10-15T00:35:43.7787419Z shell: /usr/bin/bash -e {0}
+2026-10-15T00:35:43.7788335Z ##[endgroup]
+2026-10-15T00:35:45.7991781Z 
+2026-10-15T00:35:45.8001687Z added 33 packages in 2s
+2026-10-15T00:35:45.8453836Z ##[group]Run npm test
+2026-10-15T00:35:45.8454157Z [36;1mnpm test[0m
+2026-10-15T00:35:45.8517308Z shell: /usr/bin/bash -e {0}
+2026-10-15T00:35:45.8517643Z ##[endgroup]
+2026-10-15T00:35:45.9971999Z 
+2026-10-15T00:35:45.9973212Z > test
+2026-10-15T00:35:45.9974245Z > node --test test/*.test.js
+2026-10-15T00:35:45.9974981Z 
+2026-10-15T00:35:46.0545138Z TAP version 13
+2026-10-15T00:35:46.1082055Z # Subtest: every published morphology has treatment considerations with no missing or legacy codes
+2026-10-15T00:35:46.1084421Z ok 1 - every published morphology has treatment considerations with no missing or legacy codes
+2026-10-15T00:35:46.1095400Z   ---
+2026-10-15T00:35:46.1098393Z   duration_ms: 7.424723
+2026-10-15T00:35:46.1120691Z   type: 'test'
+2026-10-15T00:35:46.1121321Z   ...
+2026-10-15T00:35:46.1122297Z # Subtest: critical age, emergency and version distinctions remain explicit
+2026-10-15T00:35:46.1123570Z ok 2 - critical age, emergency and version distinctions remain explicit
+2026-10-15T00:35:46.1124477Z   ---
+2026-10-15T00:35:46.1125062Z   duration_ms: 2.103749
+2026-10-15T00:35:46.1125673Z   type: 'test'
+2026-10-15T00:35:46.1126203Z   ...
+2026-10-15T00:35:46.1127360Z # Subtest: the treatment supplement loads after morphology and before the reader
+2026-10-15T00:35:46.1128685Z ok 3 - the treatment supplement loads after morphology and before the reader
+2026-10-15T00:35:46.1129572Z   ---
+2026-10-15T00:35:46.1131348Z   duration_ms: 0.20853
+2026-10-15T00:35:46.1131990Z   type: 'test'
+2026-10-15T00:35:46.1132531Z   ...
+2026-10-15T00:35:46.1932274Z # Subtest: 17 orthopedic disease dossiers each have detailed fracture morphology, differentiators and references
+2026-10-15T00:35:46.1951279Z ok 4 - 17 orthopedic disease dossiers each have detailed fracture morphology, differentiators and references
+2026-10-15T00:35:46.1966660Z   ---
+2026-10-15T00:35:46.1990494Z   duration_ms: 8.110347
+2026-10-15T00:35:46.1994339Z   type: 'test'
+2026-10-15T00:35:46.2010710Z   ...
+2026-10-15T00:35:46.2031511Z # Subtest: AO/OTA 2018 tibial shaft and intertrochanteric classifications avoid deleted or phantom subtypes
+2026-10-15T00:35:46.2047840Z ok 5 - AO/OTA 2018 tibial shaft and intertrochanteric classifications avoid deleted or phantom subtypes
+2026-10-15T00:35:46.2051270Z   ---
+2026-10-15T00:35:46.2051858Z   duration_ms: 2.437444
+2026-10-15T00:35:46.2052511Z   type: 'test'
+2026-10-15T00:35:46.2053145Z   ...
+2026-10-15T00:35:46.2054253Z # Subtest: pelvic and acetabular systems keep major subtypes and genuine CT-specific Sanders groups
+2026-10-15T00:35:46.2061087Z ok 6 - pelvic and acetabular systems keep major subtypes and genuine CT-specific Sanders groups
+2026-10-15T00:35:46.2064263Z   ---
+2026-10-15T00:35:46.2065118Z   duration_ms: 3.78653
+2026-10-15T00:35:46.2065758Z   type: 'test'
+2026-10-15T00:35:46.2066334Z   ...
+2026-10-15T00:35:48.4201640Z # Subtest: compiled catalogs and per-disease bodies preserve every original clinical record
+2026-10-15T00:35:48.4209501Z ok 7 - compiled catalogs and per-disease bodies preserve every original clinical record
+2026-10-15T00:35:48.4230393Z   ---
+2026-10-15T00:35:48.4250432Z   duration_ms: 2163.720816
+2026-10-15T00:35:48.4270109Z   type: 'test'
+2026-10-15T00:35:48.4270513Z   ...
+2026-10-15T00:35:48.5176187Z # Subtest: chief physician note has one body paragraph and a blank name
+2026-10-15T00:35:48.5210725Z ok 8 - chief physician note has one body paragraph and a blank name
+2026-10-15T00:35:48.5240392Z   ---
+2026-10-15T00:35:48.5245594Z   duration_ms: 5.371268
+2026-10-15T00:35:48.5270177Z   type: 'test'
+2026-10-15T00:35:48.5270864Z   ...
+2026-10-15T00:35:48.5284905Z # Subtest: attending physician note leaves signature blank without losing clinical content
+2026-10-15T00:35:48.5286423Z ok 9 - attending physician note leaves signature blank without losing clinical content
+2026-10-15T00:35:48.5287365Z   ---
+2026-10-15T00:35:48.5287887Z   duration_ms: 1.076526
+2026-10-15T00:35:48.5288457Z   type: 'test'
+2026-10-15T00:35:48.5288987Z   ...
+2026-10-15T00:35:48.5291069Z # Subtest: core operative records are 4 detailed paragraphs and retain metadata / postoperative plan
+2026-10-15T00:35:48.5292941Z ok 10 - core operative records are 4 detailed paragraphs and retain metadata / postoperative plan
+2026-10-15T00:35:48.5293963Z   ---
+2026-10-15T00:35:48.5294490Z   duration_ms: 3.299158
+2026-10-15T00:35:48.5295081Z   type: 'test'
+2026-10-15T00:35:48.5295590Z   ...
+2026-10-15T00:35:48.5296416Z # Subtest: complex TKA cases keep their unique operative content
+2026-10-15T00:35:48.5297468Z ok 11 - complex TKA cases keep their unique operative content
+2026-10-15T00:35:48.5298214Z   ---
+2026-10-15T00:35:48.5298726Z   duration_ms: 1.359706
+2026-10-15T00:35:48.5299278Z   type: 'test'
+2026-10-15T00:35:48.5300393Z   ...
+2026-10-15T00:35:48.5301620Z # Subtest: production compiler receives normalized sourceBody rather than only a browser display wrapper
+2026-10-15T00:35:48.5329036Z ok 12 - production compiler receives normalized sourceBody rather than only a browser display wrapper
+2026-10-15T00:35:48.5360317Z   ---
+2026-10-15T00:35:48.5389064Z   duration_ms: 1.179659
+2026-10-15T00:35:48.5392392Z   type: 'test'
+2026-10-15T00:35:48.5409065Z   ...
+2026-10-15T00:35:48.5410532Z # Subtest: special case keeps procedure detail but removes nine numbered one-line steps
+2026-10-15T00:35:48.5412092Z ok 13 - special case keeps procedure detail but removes nine numbered one-line steps
+2026-10-15T00:35:48.5413003Z   ---
+2026-10-15T00:35:48.5413521Z   duration_ms: 1.071967
+2026-10-15T00:35:48.5414080Z   type: 'test'
+2026-10-15T00:35:48.5414597Z   ...
+2026-10-15T00:35:54.0705048Z # Subtest: the committed baseline preserves complete cases and every special-case document
+2026-10-15T00:35:54.0720897Z ok 14 - the committed baseline preserves complete cases and every special-case document
+2026-10-15T00:35:54.0740240Z   ---
+2026-10-15T00:35:54.0740877Z   duration_ms: 55.734897
+2026-10-15T00:35:54.0741514Z   type: 'test'
+2026-10-15T00:35:54.0742080Z   ...
+2026-10-15T00:35:54.0744802Z # Subtest: reordering generated documents retains every original numeric and stable identity
+2026-10-15T00:35:54.0749075Z ok 15 - reordering generated documents retains every original numeric and stable identity
+2026-10-15T00:35:54.0751667Z   ---
+2026-10-15T00:35:54.0752252Z   duration_ms: 462.458839
+2026-10-15T00:35:54.0752854Z   type: 'test'
+2026-10-15T00:35:54.0753372Z   ...
+2026-10-15T00:35:54.0754373Z # Subtest: medical changes, missing records and duplicate identities stop publication
+2026-10-15T00:35:54.0755975Z ok 16 - medical changes, missing records and duplicate identities stop publication
+2026-10-15T00:35:54.0756954Z   ---
+2026-10-15T00:35:54.0757505Z   duration_ms: 465.497187
+2026-10-15T00:35:54.0758134Z   type: 'test'
+2026-10-15T00:35:54.0758643Z   ...
+2026-10-15T00:35:54.0759942Z # Subtest: archiving requires an independent CMS audit and always preserves whole cases
+2026-10-15T00:35:54.0761506Z ok 17 - archiving requires an independent CMS audit and always preserves whole cases
+2026-10-15T00:35:54.0764235Z   ---
+2026-10-15T00:35:54.0764819Z   duration_ms: 4.718895
+2026-10-15T00:35:54.0765442Z   type: 'test'
+2026-10-15T00:35:54.0765983Z   ...
+2026-10-15T00:35:54.0767036Z # Subtest: special cases, different procedures and ambiguous CMS names cannot be archived
+2026-10-15T00:35:54.0768579Z ok 18 - special cases, different procedures and ambiguous CMS names cannot be archived
+2026-10-15T00:35:54.0769581Z   ---
+2026-10-15T00:35:54.0770408Z   duration_ms: 410.663387
+2026-10-15T00:35:54.0771038Z   type: 'test'
+2026-10-15T00:35:54.0771606Z   ...
+2026-10-15T00:35:54.0772719Z # Subtest: public compilation retains exact payloads while excluding authoring sources and duplicate router medical text
+2026-10-15T00:35:54.0774449Z ok 19 - public compilation retains exact payloads while excluding authoring sources and duplicate router medical text
+2026-10-15T00:35:54.0775438Z   ---
+2026-10-15T00:35:54.0775833Z   duration_ms: 1706.669065
+2026-10-15T00:35:54.0776295Z   type: 'test'
+2026-10-15T00:35:54.0776819Z   ...
+2026-10-15T00:35:55.5111955Z # Subtest: all 5361 legacy numeric lookups and stable IDs resolve the original records after lazy loading
+2026-10-15T00:35:55.5114107Z ok 20 - all 5361 legacy numeric lookups and stable IDs resolve the original records after lazy loading
+2026-10-15T00:35:55.5140818Z   ---
+2026-10-15T00:35:55.5141533Z   duration_ms: 1353.135314
+2026-10-15T00:35:55.5142237Z   type: 'test'
+2026-10-15T00:35:55.5142858Z   ...
+2026-10-15T00:36:21.6641582Z # Subtest: reviewed single-body edit rebuilds while all other 5360 identities and records remain exact
+2026-10-15T00:36:21.6643321Z ok 21 - reviewed single-body edit rebuilds while all other 5360 identities and records remain exact
+2026-10-15T00:36:21.6680189Z   ---
+2026-10-15T00:36:21.6720272Z   duration_ms: 3890.237438
+2026-10-15T00:36:21.6730702Z   type: 'test'
+2026-10-15T00:36:21.6731331Z   ...
+2026-10-15T00:36:21.6732557Z # Subtest: new records inserted before old arrays get permanent appended IDs, including across later updates
+2026-10-15T00:36:21.6734280Z ok 22 - new records inserted before old arrays get permanent appended IDs, including across later updates
+2026-10-15T00:36:21.6735304Z   ---
+2026-10-15T00:36:21.6735812Z   duration_ms: 3624.184508
+2026-10-15T00:36:21.6736383Z   type: 'test'
+2026-10-15T00:36:21.6736865Z   ...
+2026-10-15T00:36:21.6737917Z # Subtest: exact authorization and full review metadata are required; edited or stale proposals fail
+2026-10-15T00:36:21.6739798Z ok 23 - exact authorization and full review metadata are required; edited or stale proposals fail
+2026-10-15T00:36:21.6740997Z   ---
+2026-10-15T00:36:21.6741526Z   duration_ms: 5823.655923
+2026-10-15T00:36:21.6742103Z   type: 'test'
+2026-10-15T00:36:21.6742611Z   ...
+2026-10-15T00:36:21.6743799Z # Subtest: renames, case reassignment, non-body metadata edits, removals and new ambiguous CMS names are blocked
+2026-10-15T00:36:21.6745579Z ok 24 - renames, case reassignment, non-body metadata edits, removals and new ambiguous CMS names are blocked
+2026-10-15T00:36:21.6746634Z   ---
+2026-10-15T00:36:21.6747159Z   duration_ms: 3378.030349
+2026-10-15T00:36:21.6747747Z   type: 'test'
+2026-10-15T00:36:21.6748285Z   ...
+2026-10-15T00:36:21.6749480Z # Subtest: both special cases and the three same-name TKA records keep their exact ownership and CMS keys
+2026-10-15T00:36:21.6751789Z ok 25 - both special cases and the three same-name TKA records keep their exact ownership and CMS keys
+2026-10-15T00:36:21.6752783Z   ---
+2026-10-15T00:36:21.6753285Z   duration_ms: 1700.540356
+2026-10-15T00:36:21.6753868Z   type: 'test'
+2026-10-15T00:36:21.6754367Z   ...
+2026-10-15T00:36:21.6755506Z # Subtest: default generated body changes are individually reviewed even when record objects do not change
+2026-10-15T00:36:21.6757208Z ok 26 - default generated body changes are individually reviewed even when record objects do not change
+2026-10-15T00:36:21.6758244Z   ---
+2026-10-15T00:36:21.6758764Z   duration_ms: 1627.072685
+2026-10-15T00:36:21.6759333Z   type: 'test'
+2026-10-15T00:36:21.6760148Z   ...
+2026-10-15T00:36:21.6761456Z # Subtest: revision persistence is atomic, detects concurrent writers and leaves original anchors untouched
+2026-10-15T00:36:21.6763167Z ok 27 - revision persistence is atomic, detects concurrent writers and leaves original anchors untouched
+2026-10-15T00:36:21.6764217Z   ---
+2026-10-15T00:36:21.6764724Z   duration_ms: 4737.599008
+2026-10-15T00:36:21.6765331Z   type: 'test'
+2026-10-15T00:36:21.6776640Z   ...
+2026-10-15T00:36:21.7103541Z # Subtest: missing or rewritten original ledgers cannot be replaced by a fresh initialization
+2026-10-15T00:36:21.7105429Z ok 28 - missing or rewritten original ledgers cannot be replaced by a fresh initialization
+2026-10-15T00:36:21.7106491Z   ---
+2026-10-15T00:36:21.7107092Z   duration_ms: 74.95346
+2026-10-15T00:36:21.7107682Z   type: 'test'
+2026-10-15T00:36:21.7108216Z   ...
+2026-10-15T00:36:24.3242217Z # Subtest: CLI preview is local and read-only, includes diff review and never auto-applies
+2026-10-15T00:36:24.3251881Z ok 29 - CLI preview is local and read-only, includes diff review and never auto-applies
+2026-10-15T00:36:24.3272309Z   ---
+2026-10-15T00:36:24.3272997Z   duration_ms: 2620.067964
+2026-10-15T00:36:24.3279444Z   type: 'test'
+2026-10-15T00:36:24.3280414Z   ...
+2026-10-15T00:36:24.6301522Z # Subtest: only a confirmed missing blob becomes an empty library; read and parse failures block edits
+2026-10-15T00:36:24.6341166Z ok 30 - only a confirmed missing blob becomes an empty library; read and parse failures block edits
+2026-10-15T00:36:24.6370526Z   ---
+2026-10-15T00:36:24.6390333Z   duration_ms: 13.418769
+2026-10-15T00:36:24.6411891Z   type: 'test'
+2026-10-15T00:36:24.6430109Z   ...
+2026-10-15T00:36:24.6450597Z # Subtest: save requires a loaded revision and valid content before touching storage
+2026-10-15T00:36:24.6452049Z ok 31 - save requires a loaded revision and valid content before touching storage
+2026-10-15T00:36:24.6470116Z   ---
+2026-10-15T00:36:24.6490113Z   duration_ms: 2.910754
+2026-10-15T00:36:24.6510003Z   type: 'test'
+2026-10-15T00:36:24.6510538Z   ...
+2026-10-15T00:36:24.6530637Z # Subtest: backup is immutable and must succeed before current content is changed
+2026-10-15T00:36:24.6550575Z ok 32 - backup is immutable and must succeed before current content is changed
+2026-10-15T00:36:24.6570154Z   ---
+2026-10-15T00:36:24.6570658Z   duration_ms: 2.962271
+2026-10-15T00:36:24.6580372Z   type: 'test'
+2026-10-15T00:36:24.6580836Z   ...
+2026-10-15T00:36:24.6581762Z # Subtest: concurrent editors use atomic conditional writes and cannot overwrite each other
+2026-10-15T00:36:24.6583100Z ok 33 - concurrent editors use atomic conditional writes and cannot overwrite each other
+2026-10-15T00:36:24.6583929Z   ---
+2026-10-15T00:36:24.6584357Z   duration_ms: 1.514468
+2026-10-15T00:36:24.6584824Z   type: 'test'
+2026-10-15T00:36:24.6585240Z   ...
+2026-10-15T00:36:24.6585965Z # Subtest: concurrent first writes cannot replace an initial creation
+2026-10-15T00:36:24.6586977Z ok 34 - concurrent first writes cannot replace an initial creation
+2026-10-15T00:36:24.6587652Z   ---
+2026-10-15T00:36:24.6588078Z   duration_ms: 0.696755
+2026-10-15T00:36:24.6588547Z   type: 'test'
+2026-10-15T00:36:24.6588966Z   ...
+2026-10-15T00:36:24.6589998Z # Subtest: restore checks current revision and creates another backup before reverting
+2026-10-15T00:36:24.6591804Z ok 35 - restore checks current revision and creates another backup before reverting
+2026-10-15T00:36:24.6592687Z   ---
+2026-10-15T00:36:24.6593505Z   duration_ms: 1.820025
+2026-10-15T00:36:24.6594038Z   type: 'test'
+2026-10-15T00:36:24.6594475Z   ...
+2026-10-15T00:36:24.6595256Z # Subtest: failed current write preserves the current data and its backup
+2026-10-15T00:36:24.6598839Z ok 36 - failed current write preserves the current data and its backup
+2026-10-15T00:36:24.6606721Z   ---
+2026-10-15T00:36:24.6607183Z   duration_ms: 0.907373
+2026-10-15T00:36:24.6607646Z   type: 'test'
+2026-10-15T00:36:24.6608079Z   ...
+2026-10-15T00:36:24.6609009Z # Subtest: public content hides unpublished cases and backup metadata; history requires authentication
+2026-10-15T00:36:24.6610671Z ok 37 - public content hides unpublished cases and backup metadata; history requires authentication
+2026-10-15T00:36:24.6611784Z   ---
+2026-10-15T00:36:24.6612206Z   duration_ms: 1.03319
+2026-10-15T00:36:24.6612680Z   type: 'test'
+2026-10-15T00:36:24.6613100Z   ...
+2026-10-15T00:36:27.3823673Z # Subtest: merged ECG data passes build validation: unique slugs, existing sketches, categories and cross-links
+2026-10-15T00:36:27.3843057Z ok 38 - merged ECG data passes build validation: unique slugs, existing sketches, categories and cross-links
+2026-10-15T00:36:27.3860695Z   ---
+2026-10-15T00:36:27.3872032Z   duration_ms: 384.138494
+2026-10-15T00:36:27.3872797Z   type: 'test'
+2026-10-15T00:36:27.3873466Z   ...
+2026-10-15T00:36:27.3874715Z # Subtest: build validation reports broken related links, unknown sketches and insecure references
+2026-10-15T00:36:27.3876502Z ok 39 - build validation reports broken related links, unknown sketches and insecure references
+2026-10-15T00:36:27.3877660Z   ---
+2026-10-15T00:36:27.3878726Z   duration_ms: 387.074548
+2026-10-15T00:36:27.3879513Z   type: 'test'
+2026-10-15T00:36:27.3880442Z   ...
+2026-10-15T00:36:27.3881590Z # Subtest: compiler publishes one hashed bundle and rewrites ecg.html to load it
+2026-10-15T00:36:27.3883175Z ok 40 - compiler publishes one hashed bundle and rewrites ecg.html to load it
+2026-10-15T00:36:27.3885783Z   ---
+2026-10-15T00:36:27.3886483Z   duration_ms: 1134.001193
+2026-10-15T00:36:27.3887239Z   type: 'test'
+2026-10-15T00:36:27.3887875Z   ...
+2026-10-15T00:36:27.3888852Z # Subtest: hashed assets are served with an immutable cache policy
+2026-10-15T00:36:27.3890398Z ok 41 - hashed assets are served with an immutable cache policy
+2026-10-15T00:36:27.3891340Z   ---
+2026-10-15T00:36:27.3892008Z   duration_ms: 0.31761
+2026-10-15T00:36:27.3892744Z   type: 'test'
+2026-10-15T00:36:27.3893329Z   ...
+2026-10-15T00:36:27.3894331Z # Subtest: search ranks exact titles and aliases above full-text hits and spans long-form pages
+2026-10-15T00:36:27.3895732Z ok 42 - search ranks exact titles and aliases above full-text hits and spans long-form pages
+2026-10-15T00:36:27.3896662Z   ---
+2026-10-15T00:36:27.3897268Z   duration_ms: 373.181481
+2026-10-15T00:36:27.3897971Z   type: 'test'
+2026-10-15T00:36:27.3898590Z   ...
+2026-10-15T00:36:27.3899520Z # Subtest: search highlighting escapes markup before marking matches
+2026-10-15T00:36:27.3901158Z ok 43 - search highlighting escapes markup before marking matches
+2026-10-15T00:36:27.3902038Z   ---
+2026-10-15T00:36:27.3902637Z   duration_ms: 369.89587
+2026-10-15T00:36:27.3903322Z   type: 'test'
+2026-10-15T00:36:27.3903894Z   ...
+2026-10-15T00:36:27.3904879Z # Subtest: caliper readings convert sketch units to milliseconds and rate
+2026-10-15T00:36:27.3906171Z ok 44 - caliper readings convert sketch units to milliseconds and rate
+2026-10-15T00:36:27.3907118Z   ---
+2026-10-15T00:36:27.3907721Z   duration_ms: 1.019204
+2026-10-15T00:36:27.3908353Z   type: 'test'
+2026-10-15T00:36:27.3908973Z   ...
+2026-10-15T00:36:32.3891572Z # Subtest: ECG formulas use milliseconds and return independently known QTc and heart-rate results
+2026-10-15T00:36:32.3915585Z ok 45 - ECG formulas use milliseconds and return independently known QTc and heart-rate results
+2026-10-15T00:36:32.3930689Z   ---
+2026-10-15T00:36:32.3949534Z   duration_ms: 384.131971
+2026-10-15T00:36:32.3950767Z   type: 'test'
+2026-10-15T00:36:32.4030365Z   ...
+2026-10-15T00:36:32.4039247Z # Subtest: ECG calculations reject missing, nonpositive and nonfinite input instead of producing misleading results
+2026-10-15T00:36:32.4056530Z ok 46 - ECG calculations reject missing, nonpositive and nonfinite input instead of producing misleading results
+2026-10-15T00:36:32.4077587Z   ---
+2026-10-15T00:36:32.4100336Z   duration_ms: 389.397127
+2026-10-15T00:36:32.4117742Z   type: 'test'
+2026-10-15T00:36:32.4121827Z   ...
+2026-10-15T00:36:32.4141130Z # Subtest: all ECG atlas drafts keep valid categories, both clinical layers and explicit review metadata
+2026-10-15T00:36:32.4159198Z ok 47 - all ECG atlas drafts keep valid categories, both clinical layers and explicit review metadata
+2026-10-15T00:36:32.4180406Z   ---
+2026-10-15T00:36:32.4181114Z   duration_ms: 408.28885
+2026-10-15T00:36:32.4181932Z   type: 'test'
+2026-10-15T00:36:32.4182566Z   ...
+2026-10-15T00:36:32.4183815Z # Subtest: ECG drawings are accessible original inline vectors with unique IDs and no external image embeds
+2026-10-15T00:36:32.4185631Z ok 48 - ECG drawings are accessible original inline vectors with unique IDs and no external image embeds
+2026-10-15T00:36:32.4186727Z   ---
+2026-10-15T00:36:32.4187330Z   duration_ms: 390.855893
+2026-10-15T00:36:32.4187985Z   type: 'test'
+2026-10-15T00:36:32.4188557Z   ...
+2026-10-15T00:36:32.4189833Z # Subtest: perioperative topic links only to existing entries and cites https sources
+2026-10-15T00:36:32.4191326Z ok 49 - perioperative topic links only to existing entries and cites https sources
+2026-10-15T00:36:32.4192322Z   ---
+2026-10-15T00:36:32.4192889Z   duration_ms: 368.858033
+2026-10-15T00:36:32.4193903Z   type: 'test'
+2026-10-15T00:36:32.4194529Z   ...
+2026-10-15T00:36:32.4195787Z # Subtest: new ECG calculators: four QTc formulas, frontal axis, grid conversion and rate estimates
+2026-10-15T00:36:32.4197505Z ok 50 - new ECG calculators: four QTc formulas, frontal axis, grid conversion and rate estimates
+2026-10-15T00:36:32.4198569Z   ---
+2026-10-15T00:36:32.4199124Z   duration_ms: 366.726724
+2026-10-15T00:36:32.4200003Z   type: 'test'
+2026-10-15T00:36:32.4200597Z   ...
+2026-10-15T00:36:32.4201847Z # Subtest: basics data covers electrodes, reversals, axis, intervals and artifacts with drawable sketches
+2026-10-15T00:36:32.4203645Z ok 51 - basics data covers electrodes, reversals, axis, intervals and artifacts with drawable sketches
+2026-10-15T00:36:32.4204756Z   ---
+2026-10-15T00:36:32.4205311Z   duration_ms: 367.89411
+2026-10-15T00:36:32.4205966Z   type: 'test'
+2026-10-15T00:36:32.4206520Z   ...
+2026-10-15T00:36:32.4207675Z # Subtest: practice cases have four options, a valid answer, a sketch, a report and a working link
+2026-10-15T00:36:32.4209328Z ok 52 - practice cases have four options, a valid answer, a sketch, a report and a working link
+2026-10-15T00:36:32.4210507Z   ---
+2026-10-15T00:36:32.4211064Z   duration_ms: 374.332386
+2026-10-15T00:36:32.4211722Z   type: 'test'
+2026-10-15T00:36:32.4212274Z   ...
+2026-10-15T00:36:32.4213507Z # Subtest: textbook batch: new entries, textbook citations, per-lead normals and phenomena are complete
+2026-10-15T00:36:32.4215243Z ok 53 - textbook batch: new entries, textbook citations, per-lead normals and phenomena are complete
+2026-10-15T00:36:32.4216418Z   ---
+2026-10-15T00:36:32.4216975Z   duration_ms: 372.273918
+2026-10-15T00:36:32.4217632Z   type: 'test'
+2026-10-15T00:36:32.4218231Z   ...
+2026-10-15T00:36:32.4219908Z # Subtest: textbook batch 7: arrhythmia chapters add entries, sketches and chapter citations without duplicating related links
+2026-10-15T00:36:32.4222135Z ok 54 - textbook batch 7: arrhythmia chapters add entries, sketches and chapter citations without duplicating related links
+2026-10-15T00:36:32.4223396Z   ---
+2026-10-15T00:36:32.4223963Z   duration_ms: 408.067176
+2026-10-15T00:36:32.4224610Z   type: 'test'
+2026-10-15T00:36:32.4225455Z   ...
+2026-10-15T00:36:32.4226645Z # Subtest: textbook batch 8: infarction, ischemia, pulmonary embolism and drug/electrolyte chapters
+2026-10-15T00:36:32.4228353Z ok 55 - textbook batch 8: infarction, ischemia, pulmonary embolism and drug/electrolyte chapters
+2026-10-15T00:36:32.4229421Z   ---
+2026-10-15T00:36:32.4230181Z   duration_ms: 377.045456
+2026-10-15T00:36:32.4230823Z   type: 'test'
+2026-10-15T00:36:32.4231490Z   ...
+2026-10-15T00:36:32.4232683Z # Subtest: textbook batch 9: pacing chapters add modes, dual-chamber, CRT, normal variants and PMT
+2026-10-15T00:36:32.4234368Z ok 56 - textbook batch 9: pacing chapters add modes, dual-chamber, CRT, normal variants and PMT
+2026-10-15T00:36:32.4235427Z   ---
+2026-10-15T00:36:32.4236006Z   duration_ms: 367.437557
+2026-10-15T00:36:32.4236661Z   type: 'test'
+2026-10-15T00:36:32.4237251Z   ...
+2026-10-15T00:36:32.4238423Z # Subtest: textbook batch 10: cardiomyopathy, congenital and valvular entries plus PR limit table
+2026-10-15T00:36:32.4240377Z ok 57 - textbook batch 10: cardiomyopathy, congenital and valvular entries plus PR limit table
+2026-10-15T00:36:32.4241609Z   ---
+2026-10-15T00:36:32.4242190Z   duration_ms: 366.258033
+2026-10-15T00:36:32.4242788Z   type: 'test'
+2026-10-15T00:36:32.4243363Z   ...
+2026-10-15T00:36:32.4847640Z # Subtest: homepage build keeps public entries while loading no clinical script chain
+2026-10-15T00:36:32.4855839Z ok 58 - homepage build keeps public entries while loading no clinical script chain
+2026-10-15T00:36:32.4861775Z   ---
+2026-10-15T00:36:32.4867232Z   duration_ms: 1.882343
+2026-10-15T00:36:32.4869078Z   type: 'test'
+2026-10-15T00:36:32.4869940Z   ...
+2026-10-15T00:36:32.4870984Z # Subtest: homepage generation is repeatable and fails on missing source sections
+2026-10-15T00:36:32.4872873Z ok 59 - homepage generation is repeatable and fails on missing source sections
+2026-10-15T00:36:32.4873908Z   ---
+2026-10-15T00:36:32.4874472Z   duration_ms: 1.469123
+2026-10-15T00:36:32.4875087Z   type: 'test'
+2026-10-15T00:36:32.4875671Z   ...
+2026-10-15T00:36:32.5371463Z # Subtest: mobile homepage cannot be widened by the clinical illustration
+2026-10-15T00:36:32.5373170Z ok 60 - mobile homepage cannot be widened by the clinical illustration
+2026-10-15T00:36:32.5401472Z   ---
+2026-10-15T00:36:32.5413659Z   duration_ms: 1.301707
+2026-10-15T00:36:32.5414327Z   type: 'test'
+2026-10-15T00:36:32.5414878Z   ...
+2026-10-15T00:36:32.5416178Z # Subtest: mobile homepage navigation is width-constrained and horizontally scrollable inside its own row
+2026-10-15T00:36:32.5418032Z ok 61 - mobile homepage navigation is width-constrained and horizontally scrollable inside its own row
+2026-10-15T00:36:32.5419217Z   ---
+2026-10-15T00:36:32.5420117Z   duration_ms: 1.152245
+2026-10-15T00:36:32.5420790Z   type: 'test'
+2026-10-15T00:36:32.5421341Z   ...
+2026-10-15T00:36:32.5898365Z # Subtest: mobile library pages always expose a site-home route
+2026-10-15T00:36:32.5909857Z ok 62 - mobile library pages always expose a site-home route
+2026-10-15T00:36:32.5910894Z   ---
+2026-10-15T00:36:32.5911491Z   duration_ms: 2.127296
+2026-10-15T00:36:32.5912107Z   type: 'test'
+2026-10-15T00:36:32.5912657Z   ...
+2026-10-15T00:36:32.5935246Z # Subtest: mobile orthopedic drawer uses touch scrolling without visible nested scrollbar
+2026-10-15T00:36:32.5960666Z ok 63 - mobile orthopedic drawer uses touch scrolling without visible nested scrollbar
+2026-10-15T00:36:32.5961971Z   ---
+2026-10-15T00:36:32.5980217Z   duration_ms: 0.619249
+2026-10-15T00:36:32.6010332Z   type: 'test'
+2026-10-15T00:36:32.6015376Z   ...
+2026-10-15T00:36:32.6016422Z # Subtest: sticky header exposes a permanent site-home control without losing the library-home link
+2026-10-15T00:36:32.6017913Z ok 64 - sticky header exposes a permanent site-home control without losing the library-home link
+2026-10-15T00:36:32.6018776Z   ---
+2026-10-15T00:36:32.6019259Z   duration_ms: 0.657441
+2026-10-15T00:36:32.6020012Z   type: 'test'
+2026-10-15T00:36:32.6020491Z   ...
+2026-10-15T00:36:33.1978666Z # Subtest: all clinical generation scripts parse and execute in site load order
+2026-10-15T00:36:33.2001394Z ok 65 - all clinical generation scripts parse and execute in site load order
+2026-10-15T00:36:33.2020870Z   ---
+2026-10-15T00:36:33.2021497Z   duration_ms: 552.073699
+2026-10-15T00:36:33.2022305Z   type: 'test'
+2026-10-15T00:36:33.2023073Z   ...
+2026-10-15T00:36:33.2024136Z # Subtest: index contains no escaped newline artifacts between script tags
+2026-10-15T00:36:33.2025561Z ok 66 - index contains no escaped newline artifacts between script tags
+2026-10-15T00:36:33.2026576Z   ---
+2026-10-15T00:36:33.2027127Z   duration_ms: 0.303833
+2026-10-15T00:36:33.2027683Z   type: 'test'
+2026-10-15T00:36:33.2028199Z   ...
+2026-10-15T00:36:33.2586340Z # Subtest: orthopedic pathway center has the national ERAS library and responsive shell
+2026-10-15T00:36:33.2596513Z ok 67 - orthopedic pathway center has the national ERAS library and responsive shell
+2026-10-15T00:36:33.2597604Z   ---
+2026-10-15T00:36:33.2598249Z   duration_ms: 4.368707
+2026-10-15T00:36:33.2598931Z   type: 'test'
+2026-10-15T00:36:33.2599483Z   ...
+2026-10-15T00:36:33.2600992Z # Subtest: main site and completed orthopedic records link to the pathway center
+2026-10-15T00:36:33.2602526Z ok 68 - main site and completed orthopedic records link to the pathway center
+2026-10-15T00:36:33.2603583Z   ---
+2026-10-15T00:36:33.2604276Z   duration_ms: 1.162163
+2026-10-15T00:36:33.2605001Z   type: 'test'
+2026-10-15T00:36:33.2605734Z   ...
+2026-10-15T00:36:33.3086691Z # Subtest: second-stage optimization preserves content while improving paint behavior
+2026-10-15T00:36:33.3101096Z ok 69 - second-stage optimization preserves content while improving paint behavior
+2026-10-15T00:36:33.3110554Z   ---
+2026-10-15T00:36:33.3111152Z   duration_ms: 1.195316
+2026-10-15T00:36:33.3111853Z   type: 'test'
+2026-10-15T00:36:33.3113009Z   ...
+2026-10-15T00:36:33.3114166Z # Subtest: static scripts and styles receive repeat-load caching without caching APIs
+2026-10-15T00:36:33.3115773Z ok 70 - static scripts and styles receive repeat-load caching without caching APIs
+2026-10-15T00:36:33.3116833Z   ---
+2026-10-15T00:36:33.3117452Z   duration_ms: 0.45058
+2026-10-15T00:36:33.3118142Z   type: 'test'
+2026-10-15T00:36:33.3118766Z   ...
+2026-10-15T00:36:33.3687601Z # Subtest: built HTML, CSS, rewrites and lazy manifests cannot reference missing public resources
+2026-10-15T00:36:33.3704515Z ok 71 - built HTML, CSS, rewrites and lazy manifests cannot reference missing public resources
+2026-10-15T00:36:33.3705857Z   ---
+2026-10-15T00:36:33.3706496Z   duration_ms: 9.512165
+2026-10-15T00:36:33.3707169Z   type: 'test'
+2026-10-15T00:36:33.3707794Z   ...
+2026-10-15T00:36:33.4238713Z # Subtest: cross-department search finds metadata with Chinese, mixed case and multiple terms
+2026-10-15T00:36:33.4241005Z ok 72 - cross-department search finds metadata with Chinese, mixed case and multiple terms
+2026-10-15T00:36:33.4242117Z   ---
+2026-10-15T00:36:33.4242693Z   duration_ms: 1.649503
+2026-10-15T00:36:33.4243340Z   type: 'test'
+2026-10-15T00:36:33.4243910Z   ...
+2026-10-15T00:36:33.4266281Z # Subtest: department, stage, type and disease filters combine without changing source records
+2026-10-15T00:36:33.4281854Z ok 73 - department, stage, type and disease filters combine without changing source records
+2026-10-15T00:36:33.4300261Z   ---
+2026-10-15T00:36:33.4320308Z   duration_ms: 1.124583
+2026-10-15T00:36:33.4320792Z   type: 'test'
+2026-10-15T00:36:33.4321197Z   ...
+2026-10-15T00:36:33.4321988Z # Subtest: search excludes patient record bodies and handles empty results
+2026-10-15T00:36:33.4323186Z ok 74 - search excludes patient record bodies and handles empty results
+2026-10-15T00:36:33.4340153Z   ---
+2026-10-15T00:36:33.4340649Z   duration_ms: 0.242808
+2026-10-15T00:36:33.4370393Z   type: 'test'
+2026-10-15T00:36:33.4379494Z   ...
+2026-10-15T00:36:33.4386072Z # Subtest: metadata highlighting handles Chinese, case, overlapping terms and literal punctuation
+2026-10-15T00:36:33.4387704Z ok 75 - metadata highlighting handles Chinese, case, overlapping terms and literal punctuation
+2026-10-15T00:36:33.4389376Z   ---
+2026-10-15T00:36:33.4390349Z   duration_ms: 0.575736
+2026-10-15T00:36:33.4390957Z   type: 'test'
+2026-10-15T00:36:33.4391465Z   ...
+2026-10-15T00:36:33.4392408Z # Subtest: highlighted labels and queries cannot inject HTML or turn text into markup
+2026-10-15T00:36:33.4393870Z ok 76 - highlighted labels and queries cannot inject HTML or turn text into markup
+2026-10-15T00:36:33.4395082Z   ---
+2026-10-15T00:36:33.4395638Z   duration_ms: 0.373916
+2026-10-15T00:36:33.4396228Z   type: 'test'
+2026-10-15T00:36:33.4396751Z   ...
+2026-10-15T00:36:33.9103914Z # Subtest: same-origin admin login works and creates a protected cookie
+2026-10-15T00:36:33.9130665Z ok 77 - same-origin admin login works and creates a protected cookie
+2026-10-15T00:36:33.9131782Z   ---
+2026-10-15T00:36:33.9150347Z   duration_ms: 13.907269
+2026-10-15T00:36:33.9170244Z   type: 'test'
+2026-10-15T00:36:33.9190158Z   ...
+2026-10-15T00:36:33.9191406Z # Subtest: missing signing secret rejects an empty-key forgery and prevents new sessions
+2026-10-15T00:36:33.9192666Z ok 78 - missing signing secret rejects an empty-key forgery and prevents new sessions
+2026-10-15T00:36:33.9193394Z   ---
+2026-10-15T00:36:33.9193746Z   duration_ms: 3.984812
+2026-10-15T00:36:33.9194138Z   type: 'test'
+2026-10-15T00:36:33.9194476Z   ...
+2026-10-15T00:36:33.9195257Z # Subtest: expired, tampered, extra-part and malformed-cookie sessions are rejected
+2026-10-15T00:36:33.9196416Z ok 79 - expired, tampered, extra-part and malformed-cookie sessions are rejected
+2026-10-15T00:36:33.9196872Z   ---
+2026-10-15T00:36:33.9197081Z   duration_ms: 1.157735
+2026-10-15T00:36:33.9197310Z   type: 'test'
+2026-10-15T00:36:33.9197506Z   ...
+2026-10-15T00:36:33.9197913Z # Subtest: cross-site requests and spoofed origins cannot perform admin writes
+2026-10-15T00:36:33.9198846Z ok 80 - cross-site requests and spoofed origins cannot perform admin writes
+2026-10-15T00:36:33.9199237Z   ---
+2026-10-15T00:36:33.9199437Z   duration_ms: 4.093056
+2026-10-15T00:36:33.9200017Z   type: 'test'
+2026-10-15T00:36:33.9200227Z   ...
+2026-10-15T00:36:33.9200753Z # Subtest: login rejects unsupported methods, missing marker, non-JSON, malformed and oversized bodies
+2026-10-15T00:36:33.9201551Z ok 81 - login rejects unsupported methods, missing marker, non-JSON, malformed and oversized bodies
+2026-10-15T00:36:33.9202008Z   ---
+2026-10-15T00:36:33.9202208Z   duration_ms: 0.761878
+2026-10-15T00:36:33.9202433Z   type: 'test'
+2026-10-15T00:36:33.9202630Z   ...
+2026-10-15T00:36:33.9203059Z # Subtest: public session remains readable while admin writes require authentication
+2026-10-15T00:36:33.9203710Z ok 82 - public session remains readable while admin writes require authentication
+2026-10-15T00:36:33.9204105Z   ---
+2026-10-15T00:36:33.9204300Z   duration_ms: 0.571529
+2026-10-15T00:36:33.9204525Z   type: 'test'
+2026-10-15T00:36:33.9204719Z   ...
+2026-10-15T00:36:33.9205196Z # Subtest: valid same-origin admin JSON passes the guard; wrong method and oversized writes do not
+2026-10-15T00:36:33.9205938Z ok 83 - valid same-origin admin JSON passes the guard; wrong method and oversized writes do not
+2026-10-15T00:36:33.9206377Z   ---
+2026-10-15T00:36:33.9206571Z   duration_ms: 3.714752
+2026-10-15T00:36:33.9206792Z   type: 'test'
+2026-10-15T00:36:33.9206983Z   ...
+2026-10-15T00:36:33.9207485Z # Subtest: upload rejects disguised SVG, invalid base64 and oversized bodies before contacting storage
+2026-10-15T00:36:33.9208266Z ok 84 - upload rejects disguised SVG, invalid base64 and oversized bodies before contacting storage
+2026-10-15T00:36:33.9208730Z   ---
+2026-10-15T00:36:33.9208931Z   duration_ms: 27.631157
+2026-10-15T00:36:33.9209162Z   type: 'test'
+2026-10-15T00:36:33.9209354Z   ...
+2026-10-15T00:36:33.9210473Z # Subtest: image paths cannot request other storage files, traversal or SVG content
+2026-10-15T00:36:33.9211622Z ok 85 - image paths cannot request other storage files, traversal or SVG content
+2026-10-15T00:36:33.9212265Z   ---
+2026-10-15T00:36:33.9212599Z   duration_ms: 0.787487
+2026-10-15T00:36:33.9213226Z   type: 'test'
+2026-10-15T00:36:33.9213563Z   ...
+2026-10-15T00:36:33.9214270Z # Subtest: anonymous viewers only get images referenced by a published case
+2026-10-15T00:36:33.9215315Z ok 86 - anonymous viewers only get images referenced by a published case
+2026-10-15T00:36:33.9215952Z   ---
+2026-10-15T00:36:33.9216278Z   duration_ms: 16.620552
+2026-10-15T00:36:33.9216691Z   type: 'test'
+2026-10-15T00:36:33.9216993Z   ...
+2026-10-15T00:36:33.9217752Z # Subtest: salted scrypt admin password hash is preferred and legacy SHA-256 still works
+2026-10-15T00:36:33.9218994Z ok 87 - salted scrypt admin password hash is preferred and legacy SHA-256 still works
+2026-10-15T00:36:33.9219971Z   ---
+2026-10-15T00:36:33.9220357Z   duration_ms: 184.627814
+2026-10-15T00:36:33.9220813Z   type: 'test'
+2026-10-15T00:36:33.9221210Z   ...
+2026-10-15T00:36:34.2628859Z # Subtest: browser-generated PBKDF2 hash (password-hash.js) is accepted by the login check
+2026-10-15T00:36:34.2630818Z ok 88 - browser-generated PBKDF2 hash (password-hash.js) is accepted by the login check
+2026-10-15T00:36:34.2631997Z   ---
+2026-10-15T00:36:34.2632703Z   duration_ms: 361.914222
+2026-10-15T00:36:34.2634277Z   type: 'test'
+2026-10-15T00:36:34.2636714Z   ...
+2026-10-15T00:36:34.3186659Z # Subtest: main application external scripts are deferred but keep source order
+2026-10-15T00:36:34.3192184Z ok 89 - main application external scripts are deferred but keep source order
+2026-10-15T00:36:34.3193327Z   ---
+2026-10-15T00:36:34.3194095Z   duration_ms: 1.506524
+2026-10-15T00:36:34.3194851Z   type: 'test'
+2026-10-15T00:36:34.3195510Z   ...
+2026-10-15T00:36:34.3197730Z # Subtest: long medical-record and pathway pages use safe offscreen rendering optimization
+2026-10-15T00:36:34.3202202Z ok 90 - long medical-record and pathway pages use safe offscreen rendering optimization
+2026-10-15T00:36:34.3203394Z   ---
+2026-10-15T00:36:34.3204074Z   duration_ms: 1.195667
+2026-10-15T00:36:34.3204793Z   type: 'test'
+2026-10-15T00:36:34.3205474Z   ...
+2026-10-15T00:36:34.3217640Z # Subtest: mobile drawer exposes synchronized accessibility state
+2026-10-15T00:36:34.3218941Z ok 91 - mobile drawer exposes synchronized accessibility state
+2026-10-15T00:36:34.3220188Z   ---
+2026-10-15T00:36:34.3220862Z   duration_ms: 0.758251
+2026-10-15T00:36:34.3221518Z   type: 'test'
+2026-10-15T00:36:34.3222225Z   ...
+2026-10-15T00:36:34.3300361Z 1..91
+2026-10-15T00:36:34.3300736Z # tests 91
+2026-10-15T00:36:34.3301273Z # suites 0
+2026-10-15T00:36:34.3301607Z # pass 91
+2026-10-15T00:36:34.3301932Z # fail 0
+2026-10-15T00:36:34.3302260Z # cancelled 0
+2026-10-15T00:36:34.3302612Z # skipped 0
+2026-10-15T00:36:34.3302941Z # todo 0
+2026-10-15T00:36:34.3303313Z # duration_ms 48296.351732
+2026-10-15T00:36:34.3456135Z ##[group]Run npx playwright install --with-deps chromium
+2026-10-15T00:36:34.3456845Z [36;1mnpx playwright install --with-deps chromium[0m
+2026-10-15T00:36:34.3519909Z shell: /usr/bin/bash -e {0}
+2026-10-15T00:36:34.3520192Z ##[endgroup]
+2026-10-15T00:36:35.2321300Z Installing dependencies...
+2026-10-15T00:36:35.2389365Z Switching to root user to install dependencies...
+2026-10-15T00:36:35.4121390Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-15T00:36:35.4871127Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+2026-10-15T00:36:35.4872440Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+2026-10-15T00:36:35.4960784Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+2026-10-15T00:36:35.5021493Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+2026-10-15T00:36:35.5441243Z Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+2026-10-15T00:36:35.7297566Z Get:7 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1397 kB]
+2026-10-15T00:36:35.7500947Z Get:8 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [308 kB]
+2026-10-15T00:36:35.7585766Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1702 kB]
+2026-10-15T00:36:35.7680958Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1805 kB]
+2026-10-15T00:36:35.7861058Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [411 kB]
+2026-10-15T00:36:35.9030603Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1144 kB]
+2026-10-15T00:36:35.9041918Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [231 kB]
+2026-10-15T00:36:35.9261811Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1221 kB]
+2026-10-15T00:36:35.9315264Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [246 kB]
+2026-10-15T00:36:35.9442165Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1713 kB]
+2026-10-15T00:36:35.9975051Z Get:18 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [581 kB]
+2026-10-15T00:36:36.0134540Z Get:19 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [12.4 kB]
+2026-10-15T00:36:36.0135893Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [392 kB]
+2026-10-15T00:36:36.0137175Z Get:20 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [522 kB]
+2026-10-15T00:36:39.0487901Z Fetched 12.1 MB in 2s (7707 kB/s)
+2026-10-15T00:36:39.9682448Z Reading package lists...
+2026-10-15T00:36:39.9928779Z Reading package lists...
+2026-10-15T00:36:40.2105027Z Building dependency tree...
+2026-10-15T00:36:40.2113915Z Reading state information...
+2026-10-15T00:36:40.3648848Z libasound2t64 is already the newest version (1.2.11-1ubuntu0.3).
+2026-10-15T00:36:40.3650444Z libasound2t64 set to manually installed.
+2026-10-15T00:36:40.3651706Z libatk-bridge2.0-0t64 is already the newest version (2.52.0-1build1).
+2026-10-15T00:36:40.3652807Z libatk-bridge2.0-0t64 set to manually installed.
+2026-10-15T00:36:40.3653786Z libatk1.0-0t64 is already the newest version (2.52.0-1build1).
+2026-10-15T00:36:40.3654676Z libatk1.0-0t64 set to manually installed.
+2026-10-15T00:36:40.3655411Z libatspi2.0-0t64 is already the newest version (2.52.0-1build1).
+2026-10-15T00:36:40.3656002Z libatspi2.0-0t64 set to manually installed.
+2026-10-15T00:36:40.3657046Z libcairo2 is already the newest version (1.18.0-3build1).
+2026-10-15T00:36:40.3657913Z libcairo2 set to manually installed.
+2026-10-15T00:36:40.3658656Z libcups2t64 is already the newest version (2.4.7-1.2ubuntu7.14).
+2026-10-15T00:36:40.3659378Z libcups2t64 set to manually installed.
+2026-10-15T00:36:40.3660412Z libdbus-1-3 is already the newest version (1.14.10-4ubuntu4.1).
+2026-10-15T00:36:40.3661541Z libdbus-1-3 set to manually installed.
+2026-10-15T00:36:40.3662306Z libdrm2 is already the newest version (2.4.125-1ubuntu0.1~24.04.2).
+2026-10-15T00:36:40.3662970Z libdrm2 set to manually installed.
+2026-10-15T00:36:40.3663638Z libgbm1 is already the newest version (25.2.8-0ubuntu0.24.04.4).
+2026-10-15T00:36:40.3664279Z libgbm1 set to manually installed.
+2026-10-15T00:36:40.3665027Z libglib2.0-0t64 is already the newest version (2.80.0-6ubuntu3.9).
+2026-10-15T00:36:40.3665784Z libglib2.0-0t64 set to manually installed.
+2026-10-15T00:36:40.3666522Z libnspr4 is already the newest version (2:4.35-1.1build1).
+2026-10-15T00:36:40.3667200Z libnspr4 set to manually installed.
+2026-10-15T00:36:40.3667895Z libnss3 is already the newest version (2:3.98-1ubuntu0.2).
+2026-10-15T00:36:40.3668556Z libnss3 set to manually installed.
+2026-10-15T00:36:40.3669287Z libpango-1.0-0 is already the newest version (1.52.1+ds-1build1).
+2026-10-15T00:36:40.3670321Z libpango-1.0-0 set to manually installed.
+2026-10-15T00:36:40.3670883Z libx11-6 is already the newest version (2:1.8.7-1ubuntu0.1).
+2026-10-15T00:36:40.3671282Z libx11-6 set to manually installed.
+2026-10-15T00:36:40.3671650Z libxcb1 is already the newest version (1.15-1ubuntu2).
+2026-10-15T00:36:40.3672011Z libxcb1 set to manually installed.
+2026-10-15T00:36:40.3672641Z libxcomposite1 is already the newest version (1:0.4.5-1build3).
+2026-10-15T00:36:40.3673069Z libxcomposite1 set to manually installed.
+2026-10-15T00:36:40.3673486Z libxdamage1 is already the newest version (1:1.1.6-1build1).
+2026-10-15T00:36:40.3673883Z libxdamage1 set to manually installed.
+2026-10-15T00:36:40.3674272Z libxext6 is already the newest version (2:1.3.4-1build2).
+2026-10-15T00:36:40.3674645Z libxext6 set to manually installed.
+2026-10-15T00:36:40.3675033Z libxfixes3 is already the newest version (1:6.0.0-2build1).
+2026-10-15T00:36:40.3675414Z libxfixes3 set to manually installed.
+2026-10-15T00:36:40.3675812Z libxkbcommon0 is already the newest version (1.6.0-1build1).
+2026-10-15T00:36:40.3676220Z libxkbcommon0 set to manually installed.
+2026-10-15T00:36:40.3676622Z libxrandr2 is already the newest version (2:1.5.2-2build1).
+2026-10-15T00:36:40.3677022Z libxrandr2 set to manually installed.
+2026-10-15T00:36:40.3677411Z xvfb is already the newest version (2:21.1.12-1ubuntu1.8).
+2026-10-15T00:36:40.3677963Z fonts-noto-color-emoji is already the newest version (2.047-0ubuntu0.24.04.1).
+2026-10-15T00:36:40.3678538Z libfontconfig1 is already the newest version (2.15.0-1.1ubuntu2).
+2026-10-15T00:36:40.3678976Z libfontconfig1 set to manually installed.
+2026-10-15T00:36:40.3679432Z libfreetype6 is already the newest version (2.13.2+dfsg-1ubuntu0.2).
+2026-10-15T00:36:40.3680634Z libfreetype6 set to manually installed.
+2026-10-15T00:36:40.3681135Z fonts-liberation is already the newest version (1:2.1.5-3).
+2026-10-15T00:36:40.3681562Z fonts-liberation set to manually installed.
+2026-10-15T00:36:40.3682273Z The following additional packages will be installed:
+2026-10-15T00:36:40.3682897Z   xfonts-encodings xfonts-utils
+2026-10-15T00:36:40.3683435Z Recommended packages:
+2026-10-15T00:36:40.3683929Z   fonts-ipafont-mincho fonts-tlwg-loma
+2026-10-15T00:36:40.3844545Z The following NEW packages will be installed:
+2026-10-15T00:36:40.3845889Z   fonts-freefont-ttf fonts-ipafont-gothic fonts-tlwg-loma-otf fonts-unifont
+2026-10-15T00:36:40.3851689Z   fonts-wqy-zenhei xfonts-cyrillic xfonts-encodings xfonts-scalable
+2026-10-15T00:36:40.3852720Z   xfonts-utils
+2026-10-15T00:36:40.4026311Z 0 upgraded, 9 newly installed, 0 to remove and 43 not upgraded.
+2026-10-15T00:36:40.4027305Z Need to get 21.1 MB of archives.
+2026-10-15T00:36:40.4028396Z After this operation, 79.5 MB of additional disk space will be used.
+2026-10-15T00:36:40.4029497Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-15T00:36:40.4499391Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-ipafont-gothic all 00303-21ubuntu1 [3513 kB]
+2026-10-15T00:36:40.5261740Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 fonts-freefont-ttf all 20211204+svn4273-2 [5641 kB]
+2026-10-15T00:36:40.6302039Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-tlwg-loma-otf all 1:0.7.3-1 [107 kB]
+2026-10-15T00:36:40.6577462Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-unifont all 1:15.1.01-1build1 [2993 kB]
+2026-10-15T00:36:40.7291495Z Get:6 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-wqy-zenhei all 0.9.45-8 [7472 kB]
+2026-10-15T00:36:40.8692042Z Get:7 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-encodings all 1:1.0.5-0ubuntu2 [578 kB]
+2026-10-15T00:36:40.9034745Z Get:8 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-utils amd64 1:7.7+6build3 [94.4 kB]
+2026-10-15T00:36:40.9302349Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 xfonts-cyrillic all 1:1.0.5+nmu1 [384 kB]
+2026-10-15T00:36:40.9587625Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-scalable all 1:1.0.3-1.3 [304 kB]
+2026-10-15T00:36:41.2183932Z Fetched 21.1 MB in 1s (37.0 MB/s)
+2026-10-15T00:36:41.2446722Z Selecting previously unselected package fonts-ipafont-gothic.
+2026-10-15T00:36:41.2731501Z (Reading database ... 
+2026-10-15T00:36:41.2732036Z (Reading database ... 5%
+2026-10-15T00:36:41.2732825Z (Reading database ... 10%
+2026-10-15T00:36:41.2733918Z (Reading database ... 15%
+2026-10-15T00:36:41.2734891Z (Reading database ... 20%
+2026-10-15T00:36:41.2735555Z (Reading database ... 25%
+2026-10-15T00:36:41.2735996Z (Reading database ... 30%
+2026-10-15T00:36:41.2736436Z (Reading database ... 35%
+2026-10-15T00:36:41.2736869Z (Reading database ... 40%
+2026-10-15T00:36:41.2738211Z (Reading database ... 45%
+2026-10-15T00:36:41.2738671Z (Reading database ... 50%
+2026-10-15T00:36:41.2774203Z (Reading database ... 55%
+2026-10-15T00:36:41.3525798Z (Reading database ... 60%
+2026-10-15T00:36:41.5568371Z (Reading database ... 65%
+2026-10-15T00:36:41.7643716Z (Reading database ... 70%
+2026-10-15T00:36:41.9493039Z (Reading database ... 75%
+2026-10-15T00:36:42.0514614Z (Reading database ... 80%
+2026-10-15T00:36:42.2031248Z (Reading database ... 85%
+2026-10-15T00:36:42.3248497Z (Reading database ... 90%
+2026-10-15T00:36:42.4331937Z (Reading database ... 95%
+2026-10-15T00:36:42.4333051Z (Reading database ... 100%
+2026-10-15T00:36:42.4334228Z (Reading database ... 203540 files and directories currently installed.)
+2026-10-15T00:36:42.4372073Z Preparing to unpack .../0-fonts-ipafont-gothic_00303-21ubuntu1_all.deb ...
+2026-10-15T00:36:42.4478139Z Unpacking fonts-ipafont-gothic (00303-21ubuntu1) ...
+2026-10-15T00:36:42.6907135Z Selecting previously unselected package fonts-freefont-ttf.
+2026-10-15T00:36:42.7037844Z Preparing to unpack .../1-fonts-freefont-ttf_20211204+svn4273-2_all.deb ...
+2026-10-15T00:36:42.7069684Z Unpacking fonts-freefont-ttf (20211204+svn4273-2) ...
+2026-10-15T00:36:42.7975745Z Selecting previously unselected package fonts-tlwg-loma-otf.
+2026-10-15T00:36:42.8107720Z Preparing to unpack .../2-fonts-tlwg-loma-otf_1%3a0.7.3-1_all.deb ...
+2026-10-15T00:36:42.8153241Z Unpacking fonts-tlwg-loma-otf (1:0.7.3-1) ...
+2026-10-15T00:36:42.8440921Z Selecting previously unselected package fonts-unifont.
+2026-10-15T00:36:42.8557840Z Preparing to unpack .../3-fonts-unifont_1%3a15.1.01-1build1_all.deb ...
+2026-10-15T00:36:42.8568546Z Unpacking fonts-unifont (1:15.1.01-1build1) ...
+2026-10-15T00:36:42.9772245Z Selecting previously unselected package fonts-wqy-zenhei.
+2026-10-15T00:36:42.9901348Z Preparing to unpack .../4-fonts-wqy-zenhei_0.9.45-8_all.deb ...
+2026-10-15T00:36:43.0001754Z Unpacking fonts-wqy-zenhei (0.9.45-8) ...
+2026-10-15T00:36:43.5070493Z Selecting previously unselected package xfonts-encodings.
+2026-10-15T00:36:43.5200210Z Preparing to unpack .../5-xfonts-encodings_1%3a1.0.5-0ubuntu2_all.deb ...
+2026-10-15T00:36:43.5208532Z Unpacking xfonts-encodings (1:1.0.5-0ubuntu2) ...
+2026-10-15T00:36:43.5525780Z Selecting previously unselected package xfonts-utils.
+2026-10-15T00:36:43.5657141Z Preparing to unpack .../6-xfonts-utils_1%3a7.7+6build3_amd64.deb ...
+2026-10-15T00:36:43.5666227Z Unpacking xfonts-utils (1:7.7+6build3) ...
+2026-10-15T00:36:43.6064047Z Selecting previously unselected package xfonts-cyrillic.
+2026-10-15T00:36:43.6196902Z Preparing to unpack .../7-xfonts-cyrillic_1%3a1.0.5+nmu1_all.deb ...
+2026-10-15T00:36:43.6206489Z Unpacking xfonts-cyrillic (1:1.0.5+nmu1) ...
+2026-10-15T00:36:43.6594661Z Selecting previously unselected package xfonts-scalable.
+2026-10-15T00:36:43.6727334Z Preparing to unpack .../8-xfonts-scalable_1%3a1.0.3-1.3_all.deb ...
+2026-10-15T00:36:43.6740901Z Unpacking xfonts-scalable (1:1.0.3-1.3) ...
+2026-10-15T00:36:43.7204720Z Setting up fonts-wqy-zenhei (0.9.45-8) ...
+2026-10-15T00:36:43.7362897Z Setting up fonts-freefont-ttf (20211204+svn4273-2) ...
+2026-10-15T00:36:43.7382684Z Setting up fonts-tlwg-loma-otf (1:0.7.3-1) ...
+2026-10-15T00:36:43.7406253Z Setting up xfonts-encodings (1:1.0.5-0ubuntu2) ...
+2026-10-15T00:36:43.7427019Z Setting up fonts-ipafont-gothic (00303-21ubuntu1) ...
+2026-10-15T00:36:43.7496516Z update-alternatives: using /usr/share/fonts/opentype/ipafont-gothic/ipag.ttf to provide /usr/share/fonts/truetype/fonts-japanese-gothic.ttf (fonts-japanese-gothic.ttf) in auto mode
+2026-10-15T00:36:43.7512290Z Setting up fonts-unifont (1:15.1.01-1build1) ...
+2026-10-15T00:36:43.7533003Z Setting up xfonts-utils (1:7.7+6build3) ...
+2026-10-15T00:36:43.7579098Z Setting up xfonts-cyrillic (1:1.0.5+nmu1) ...
+2026-10-15T00:36:43.7896189Z Setting up xfonts-scalable (1:1.0.3-1.3) ...
+2026-10-15T00:36:43.8272400Z Processing triggers for man-db (2.12.0-4build2) ...
+2026-10-15T00:36:43.8295523Z Not building database; man-db/auto-update is not 'true'.
+2026-10-15T00:36:43.8312680Z Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...
+2026-10-15T00:36:44.5614957Z 
+2026-10-15T00:36:44.5615819Z Running kernel seems to be up-to-date.
+2026-10-15T00:36:44.5616529Z 
+2026-10-15T00:36:44.5617215Z No services need to be restarted.
+2026-10-15T00:36:44.5617842Z 
+2026-10-15T00:36:44.5618335Z No containers need to be restarted.
+2026-10-15T00:36:44.5618841Z 
+2026-10-15T00:36:44.5619331Z No user sessions are running outdated binaries.
+2026-10-15T00:36:44.5620190Z 
+2026-10-15T00:36:44.5620892Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-10-15T00:36:45.5864224Z Downloading Chrome for Testing 149.0.7827.55 (playwright chromium v1228) from https://cdn.playwright.dev/builds/cft/149.0.7827.55/linux64/chrome-linux64.zip
+2026-10-15T00:36:46.6500921Z |                                                                                |   0% of 177 MiB
+2026-10-15T00:36:46.8852570Z |■■■■■■■■                                                                        |  10% of 177 MiB
+2026-10-15T00:36:47.1156765Z |■■■■■■■■■■■■■■■■                                                                |  20% of 177 MiB
+2026-10-15T00:36:47.3291767Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 177 MiB
+2026-10-15T00:36:47.5903135Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 177 MiB
+2026-10-15T00:36:47.8165854Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 177 MiB
+2026-10-15T00:36:48.0254469Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 177 MiB
+2026-10-15T00:36:48.1664938Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 177 MiB
+2026-10-15T00:36:48.2831108Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 177 MiB
+2026-10-15T00:36:48.3932276Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 177 MiB
+2026-10-15T00:36:48.5209561Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 177 MiB
+2026-10-15T00:36:52.0237451Z Chrome for Testing 149.0.7827.55 (playwright chromium v1228) downloaded to /home/runner/.cache/ms-playwright/chromium-1228
+2026-10-15T00:36:52.0241310Z Downloading FFmpeg (playwright ffmpeg v1011) from https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/1011/ffmpeg-linux.zip
+2026-10-15T00:36:53.0205977Z |                                                                                |   0% of 2.3 MiB
+2026-10-15T00:36:53.0251055Z |■■■■■■■■                                                                        |  10% of 2.3 MiB
+2026-10-15T00:36:53.0277980Z |■■■■■■■■■■■■■■■■                                                                |  20% of 2.3 MiB
+2026-10-15T00:36:53.0296833Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.3 MiB
+2026-10-15T00:36:53.0319909Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.3 MiB
+2026-10-15T00:36:53.0341862Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.3 MiB
+2026-10-15T00:36:53.0368212Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.3 MiB
+2026-10-15T00:36:53.0385720Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.3 MiB
+2026-10-15T00:36:53.0410717Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.3 MiB
+2026-10-15T00:36:53.0426616Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.3 MiB
+2026-10-15T00:36:53.0441438Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.3 MiB
+2026-10-15T00:36:53.1262833Z FFmpeg (playwright ffmpeg v1011) downloaded to /home/runner/.cache/ms-playwright/ffmpeg-1011
+2026-10-15T00:36:53.1275513Z Downloading Chrome Headless Shell 149.0.7827.55 (playwright chromium-headless-shell v1228) from https://cdn.playwright.dev/builds/cft/149.0.7827.55/linux64/chrome-headless-shell-linux64.zip
+2026-10-15T00:36:54.2408319Z |                                                                                |   0% of 114.2 MiB
+2026-10-15T00:36:54.6117637Z |■■■■■■■■                                                                        |  10% of 114.2 MiB
+2026-10-15T00:36:54.6931119Z |■■■■■■■■■■■■■■■■                                                                |  20% of 114.2 MiB
+2026-10-15T00:36:54.7681432Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 114.2 MiB
+2026-10-15T00:36:54.8474592Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 114.2 MiB
+2026-10-15T00:36:54.9073768Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 114.2 MiB
+2026-10-15T00:36:54.9701829Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 114.2 MiB
+2026-10-15T00:36:55.0347653Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 114.2 MiB
+2026-10-15T00:36:55.1027216Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 114.2 MiB
+2026-10-15T00:36:55.1677294Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 114.2 MiB
+2026-10-15T00:36:55.2347552Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 114.2 MiB
+2026-10-15T00:36:57.7567586Z Chrome Headless Shell 149.0.7827.55 (playwright chromium-headless-shell v1228) downloaded to /home/runner/.cache/ms-playwright/chromium_headless_shell-1228
+2026-10-15T00:36:57.7856010Z ##[group]Run npm run test:browser
+2026-10-15T00:36:57.7856575Z [36;1mnpm run test:browser[0m
+2026-10-15T00:36:57.7935511Z shell: /usr/bin/bash -e {0}
+2026-10-15T00:36:57.7935789Z ##[endgroup]
+2026-10-15T00:36:57.9062266Z 
+2026-10-15T00:36:57.9062921Z > test:browser
+2026-10-15T00:36:57.9063926Z > npm run build && node --test e2e/*.test.cjs
+2026-10-15T00:36:57.9064684Z 
+2026-10-15T00:36:58.0134144Z 
+2026-10-15T00:36:58.0134759Z > build
+2026-10-15T00:36:58.0135749Z > node scripts/build-home.mjs
+2026-10-15T00:36:58.0136454Z 
+2026-10-15T00:36:59.8141009Z Built lightweight homepage and clinical library in dist/
+2026-10-15T00:36:59.8142657Z Built ECG bundle assets/ecg-8c836155a2e98c91be4d.js (94 entries, 466 KB)
+2026-10-15T00:36:59.8801197Z TAP version 13
+2026-10-15T00:37:01.0461266Z # Subtest: homepage is usable without JavaScript and avoids loading clinical data
+2026-10-15T00:37:01.0578367Z ok 1 - homepage is usable without JavaScript and avoids loading clinical data
+2026-10-15T00:37:01.0680509Z   ---
+2026-10-15T00:37:01.0720391Z   duration_ms: 765.78961
+2026-10-15T00:37:01.0768564Z   type: 'test'
+2026-10-15T00:37:01.0820506Z   ...
+2026-10-15T00:37:24.8488797Z # Subtest: ECG routes share the public layout, expose learning sections, case practice and report pages
+2026-10-15T00:37:24.8502997Z ok 2 - ECG routes share the public layout, expose learning sections, case practice and report pages
+2026-10-15T00:37:24.8509186Z   ---
+2026-10-15T00:37:24.8512255Z   duration_ms: 23807.383395
+2026-10-15T00:37:24.8513162Z   type: 'test'
+2026-10-15T00:37:24.8514053Z   ...
+2026-10-15T00:37:29.3486306Z # Subtest: ECG atlas searches Chinese and exact abbreviations, keeps query on refresh and opens category deep links
+2026-10-15T00:37:29.3503173Z ok 3 - ECG atlas searches Chinese and exact abbreviations, keeps query on refresh and opens category deep links
+2026-10-15T00:37:29.3506033Z   ---
+2026-10-15T00:37:29.3520677Z   duration_ms: 4499.871584
+2026-10-15T00:37:29.3521453Z   type: 'test'
+2026-10-15T00:37:29.3522397Z   ...
+2026-10-15T00:37:32.2411871Z # Subtest: ECG framework navigates in-page, searches the whole section from the keyboard and measures sketches with calipers
+2026-10-15T00:37:32.2431167Z ok 4 - ECG framework navigates in-page, searches the whole section from the keyboard and measures sketches with calipers
+2026-10-15T00:37:32.2449215Z   ---
+2026-10-15T00:37:32.2468582Z   duration_ms: 2890.576469
+2026-10-15T00:37:32.2480245Z   type: 'test'
+2026-10-15T00:37:32.2490259Z   ...
+2026-10-15T00:37:54.0448204Z # Subtest: ECG draft dossiers keep the basic layer visible, synchronize keyboard folding and keep fixed review metadata readable
+2026-10-15T00:37:54.0450688Z ok 5 - ECG draft dossiers keep the basic layer visible, synchronize keyboard folding and keep fixed review metadata readable
+2026-10-15T00:37:54.0456012Z   ---
+2026-10-15T00:37:54.0459501Z   duration_ms: 21804.617308
+2026-10-15T00:37:54.0460528Z   type: 'test'
+2026-10-15T00:37:54.0461030Z   ...
+2026-10-15T00:37:56.5136228Z # Subtest: ECG tools calculate both QTc formulas and RR heart rate, discard stale results and link to the existing RCRI
+2026-10-15T00:37:56.5141503Z ok 6 - ECG tools calculate both QTc formulas and RR heart rate, discard stale results and link to the existing RCRI
+2026-10-15T00:37:56.5170321Z   ---
+2026-10-15T00:37:56.5170702Z   duration_ms: 2452.721714
+2026-10-15T00:37:56.5171982Z   type: 'test'
+2026-10-15T00:37:56.5174061Z   ...
+2026-10-15T00:38:00.0010589Z # Subtest: classification is a separate department-first hub with 17 orthopedic dossiers, references, and deep links
+2026-10-15T00:38:00.0012571Z ok 7 - classification is a separate department-first hub with 17 orthopedic dossiers, references, and deep links
+2026-10-15T00:38:00.0013987Z   ---
+2026-10-15T00:38:00.0014750Z   duration_ms: 3504.280753
+2026-10-15T00:38:00.0015476Z   type: 'test'
+2026-10-15T00:38:00.0016031Z   ...
+2026-10-15T00:38:01.8102935Z # Subtest: every original orthopedic disease now explains fracture-line morphology and differentiates neighboring types
+2026-10-15T00:38:01.8106903Z ok 8 - every original orthopedic disease now explains fracture-line morphology and differentiates neighboring types
+2026-10-15T00:38:01.8108584Z   ---
+2026-10-15T00:38:01.8109217Z   duration_ms: 1809.159245
+2026-10-15T00:38:01.8110236Z   type: 'test'
+2026-10-15T00:38:01.8110841Z   ...
+2026-10-15T00:38:06.4887091Z # Subtest: classification subtype search, comparison table and deep anchors work on phones and desktop
+2026-10-15T00:38:06.4901623Z ok 9 - classification subtype search, comparison table and deep anchors work on phones and desktop
+2026-10-15T00:38:06.4920141Z   ---
+2026-10-15T00:38:06.4963248Z   duration_ms: 4678.0072
+2026-10-15T00:38:06.4985140Z   type: 'test'
+2026-10-15T00:38:06.4988789Z   ...
+2026-10-15T00:38:12.1375054Z # Subtest: homepage search opens shareable clinical results and reset restores department selection
+2026-10-15T00:38:12.1392050Z ok 10 - homepage search opens shareable clinical results and reset restores department selection
+2026-10-15T00:38:12.1410598Z   ---
+2026-10-15T00:38:12.1423368Z   duration_ms: 5648.623723
+2026-10-15T00:38:12.1465288Z   type: 'test'
+2026-10-15T00:38:12.1502347Z   ...
+2026-10-15T00:38:23.5380586Z # Subtest: every orthopedic card keeps both borders inside its category on phones and computers
+2026-10-15T00:38:23.5401350Z ok 11 - every orthopedic card keeps both borders inside its category on phones and computers
+2026-10-15T00:38:23.5412232Z   ---
+2026-10-15T00:38:23.5440900Z   duration_ms: 11401.010387
+2026-10-15T00:38:23.5441632Z   type: 'test'
+2026-10-15T00:38:23.5460008Z   ...
+2026-10-15T00:38:32.1756971Z # Subtest: orthopedic category links land on the selected heading without rebuilding the overview
+2026-10-15T00:38:32.1758645Z ok 12 - orthopedic category links land on the selected heading without rebuilding the overview
+2026-10-15T00:38:32.1800236Z   ---
+2026-10-15T00:38:32.1819976Z   duration_ms: 8637.3185
+2026-10-15T00:38:32.1840263Z   type: 'test'
+2026-10-15T00:38:32.1899417Z   ...
+2026-10-15T00:38:36.5318179Z # Subtest: orthopedic category deep links survive refresh and browser history, and open the matching records
+2026-10-15T00:38:36.5320619Z ok 13 - orthopedic category deep links survive refresh and browser history, and open the matching records
+2026-10-15T00:38:36.5321674Z   ---
+2026-10-15T00:38:36.5322177Z   duration_ms: 4356.071663
+2026-10-15T00:38:36.5322728Z   type: 'test'
+2026-10-15T00:38:36.5323285Z   ...
+2026-10-15T00:38:38.9544422Z # Subtest: cross-department search groups templates into complete case files; filters and empty reset work
+2026-10-15T00:38:38.9569584Z ok 14 - cross-department search groups templates into complete case files; filters and empty reset work
+2026-10-15T00:38:38.9570746Z   ---
+2026-10-15T00:38:38.9571102Z   duration_ms: 2421.993853
+2026-10-15T00:38:38.9571526Z   type: 'test'
+2026-10-15T00:38:38.9571863Z   ...
+2026-10-15T00:38:40.0209025Z # Subtest: department browsing loads only its catalog; record bodies arrive on demand and can retry
+2026-10-15T00:38:40.0215014Z ok 15 - department browsing loads only its catalog; record bodies arrive on demand and can retry
+2026-10-15T00:38:40.0221064Z   ---
+2026-10-15T00:38:40.0221580Z   duration_ms: 1062.957956
+2026-10-15T00:38:40.0222182Z   type: 'test'
+2026-10-15T00:38:40.0222716Z   ...
+2026-10-15T00:38:42.4131938Z # Subtest: search previews show actual matching document names and highlight terms without fetching bodies
+2026-10-15T00:38:42.4151052Z ok 16 - search previews show actual matching document names and highlight terms without fetching bodies
+2026-10-15T00:38:42.4158600Z   ---
+2026-10-15T00:38:42.4188629Z   duration_ms: 2394.201832
+2026-10-15T00:38:42.4191425Z   type: 'test'
+2026-10-15T00:38:42.4191958Z   ...
+2026-10-15T00:38:51.1732499Z # Subtest: reading sizes update directory and preview, persist and leave copied and printed records unchanged
+2026-10-15T00:38:51.1764327Z ok 17 - reading sizes update directory and preview, persist and leave copied and printed records unchanged
+2026-10-15T00:38:51.1771069Z   ---
+2026-10-15T00:38:51.1818628Z   duration_ms: 8759.961334
+2026-10-15T00:38:51.1831331Z   type: 'test'
+2026-10-15T00:38:51.1838959Z   ...
+2026-10-15T00:38:55.1207599Z # Subtest: reading preferences synchronize between tabs and remain usable with invalid or blocked storage
+2026-10-15T00:38:55.1241292Z ok 18 - reading preferences synchronize between tabs and remain usable with invalid or blocked storage
+2026-10-15T00:38:55.1242513Z   ---
+2026-10-15T00:38:55.1260270Z   duration_ms: 3949.548462
+2026-10-15T00:38:55.1260931Z   type: 'test'
+2026-10-15T00:38:55.1275315Z   ...
+2026-10-15T00:38:56.5294626Z # Subtest: a slow earlier disease request cannot replace the newer selection
+2026-10-15T00:38:56.5301316Z ok 19 - a slow earlier disease request cannot replace the newer selection
+2026-10-15T00:38:56.5318467Z   ---
+2026-10-15T00:38:56.5319047Z   duration_ms: 1407.009688
+2026-10-15T00:38:56.5320089Z   type: 'test'
+2026-10-15T00:38:56.5320915Z   ...
+2026-10-15T00:38:57.6170799Z # Subtest: patient summary stays hidden until supplied and disappears after clearing
+2026-10-15T00:38:57.6182284Z ok 20 - patient summary stays hidden until supplied and disappears after clearing
+2026-10-15T00:38:57.6183480Z   ---
+2026-10-15T00:38:57.6184175Z   duration_ms: 1089.349751
+2026-10-15T00:38:57.6184822Z   type: 'test'
+2026-10-15T00:38:57.6185351Z   ...
+2026-10-15T00:39:06.0061122Z # Subtest: disease favorites persist, recent visits deduplicate and another tab reflects removal
+2026-10-15T00:39:06.0105407Z ok 21 - disease favorites persist, recent visits deduplicate and another tab reflects removal
+2026-10-15T00:39:06.0161256Z   ---
+2026-10-15T00:39:06.0192944Z   duration_ms: 8385.488856
+2026-10-15T00:39:06.0215457Z   type: 'test'
+2026-10-15T00:39:06.0220857Z   ...
+2026-10-15T00:39:07.2805786Z # Subtest: blocked browser storage leaves favorites usable in the current page
+2026-10-15T00:39:07.2825552Z ok 22 - blocked browser storage leaves favorites usable in the current page
+2026-10-15T00:39:07.2828959Z   ---
+2026-10-15T00:39:07.2829497Z   duration_ms: 1276.778933
+2026-10-15T00:39:07.2830393Z   type: 'test'
+2026-10-15T00:39:07.2844797Z   ...
+2026-10-15T00:39:08.4906959Z # Subtest: Chinese composition completes before search results are replaced
+2026-10-15T00:39:08.4935309Z ok 23 - Chinese composition completes before search results are replaced
+2026-10-15T00:39:08.4996722Z   ---
+2026-10-15T00:39:08.5024860Z   duration_ms: 1209.817861
+2026-10-15T00:39:08.5037718Z   type: 'test'
+2026-10-15T00:39:08.5071557Z   ...
+2026-10-15T00:39:09.7920633Z # Subtest: keyboard skip link, named dialogs and Enter calculation are usable
+2026-10-15T00:39:09.7932519Z ok 24 - keyboard skip link, named dialogs and Enter calculation are usable
+2026-10-15T00:39:09.7950230Z   ---
+2026-10-15T00:39:09.7999228Z   duration_ms: 1296.993478
+2026-10-15T00:39:09.8040096Z   type: 'test'
+2026-10-15T00:39:09.8061530Z   ...
+2026-10-15T00:39:17.1429904Z # Subtest: duty drafts survive refresh, export accurate handoffs and remain isolated to the tab
+2026-10-15T00:39:17.1432344Z ok 25 - duty drafts survive refresh, export accurate handoffs and remain isolated to the tab
+2026-10-15T00:39:17.1433688Z   ---
+2026-10-15T00:39:17.1434246Z   duration_ms: 7356.166622
+2026-10-15T00:39:17.1434860Z   type: 'test'
+2026-10-15T00:39:17.1435526Z   ...
+2026-10-15T00:39:18.7380714Z # Subtest: duty tool links open the requested calculator, and blocked storage or clipboard is explained
+2026-10-15T00:39:18.7401747Z ok 26 - duty tool links open the requested calculator, and blocked storage or clipboard is explained
+2026-10-15T00:39:18.7404308Z   ---
+2026-10-15T00:39:18.7404893Z   duration_ms: 1593.80158
+2026-10-15T00:39:18.7405487Z   type: 'test'
+2026-10-15T00:39:18.7405969Z   ...
+2026-10-15T00:39:20.0981613Z # Subtest: disease navigation starts at the top, preserves record content and chapter anchors
+2026-10-15T00:39:20.1008259Z ok 27 - disease navigation starts at the top, preserves record content and chapter anchors
+2026-10-15T00:39:20.1070306Z   ---
+2026-10-15T00:39:20.1141842Z   duration_ms: 1359.399707
+2026-10-15T00:39:20.1144488Z   type: 'test'
+2026-10-15T00:39:20.1145313Z   ...
+2026-10-15T00:39:26.6907900Z # Subtest: legacy chapter URLs and same-name TKA numeric/stable identities survive refresh on desktop and phone
+2026-10-15T00:39:26.6921141Z ok 28 - legacy chapter URLs and same-name TKA numeric/stable identities survive refresh on desktop and phone
+2026-10-15T00:39:26.6930886Z   ---
+2026-10-15T00:39:26.6931544Z   duration_ms: 6593.935444
+2026-10-15T00:39:26.6932237Z   type: 'test'
+2026-10-15T00:39:26.6948937Z   ...
+2026-10-15T00:39:34.0470832Z # Subtest: bottom reading actions follow document order, keep directory selection and preserve print and expanded modes
+2026-10-15T00:39:34.0481516Z ok 29 - bottom reading actions follow document order, keep directory selection and preserve print and expanded modes
+2026-10-15T00:39:34.0496585Z   ---
+2026-10-15T00:39:34.0497257Z   duration_ms: 7355.574187
+2026-10-15T00:39:34.0498286Z   type: 'test'
+2026-10-15T00:39:34.0498912Z   ...
+2026-10-15T00:39:35.0535647Z # Subtest: failed content loading keeps administrator editing unavailable
+2026-10-15T00:39:35.0540879Z ok 30 - failed content loading keeps administrator editing unavailable
+2026-10-15T00:39:35.0542379Z   ---
+2026-10-15T00:39:35.0560408Z   duration_ms: 1007.669964
+2026-10-15T00:39:35.0564075Z   type: 'test'
+2026-10-15T00:39:35.0564624Z   ...
+2026-10-15T00:39:36.3617617Z # Subtest: failed template saves preserve the draft and preview; successful retry carries the loaded revision
+2026-10-15T00:39:36.3641640Z ok 31 - failed template saves preserve the draft and preview; successful retry carries the loaded revision
+2026-10-15T00:39:36.3655606Z   ---
+2026-10-15T00:39:36.3680627Z   duration_ms: 1308.099872
+2026-10-15T00:39:36.3713837Z   type: 'test'
+2026-10-15T00:39:36.3721456Z   ...
+2026-10-15T00:39:38.1874113Z # Subtest: administrator can download a backup and restore it with revision protection on phones and computers
+2026-10-15T00:39:38.1876356Z ok 32 - administrator can download a backup and restore it with revision protection on phones and computers
+2026-10-15T00:39:38.1877574Z   ---
+2026-10-15T00:39:38.1878159Z   duration_ms: 1825.096132
+2026-10-15T00:39:38.1878753Z   type: 'test'
+2026-10-15T00:39:38.1879265Z   ...
+2026-10-15T00:39:43.7284172Z # Subtest: central management searches, paginates, edits templates and cases, and maintains image references
+2026-10-15T00:39:43.7302210Z ok 33 - central management searches, paginates, edits templates and cases, and maintains image references
+2026-10-15T00:39:43.7320713Z   ---
+2026-10-15T00:39:43.7330351Z   duration_ms: 5540.448214
+2026-10-15T00:39:43.7360292Z   type: 'test'
+2026-10-15T00:39:43.7377220Z   ...
+2026-10-15T00:39:44.7301616Z # Subtest: central editor preserves a conflicting draft and exports it without overwriting newer data
+2026-10-15T00:39:44.7321266Z ok 34 - central editor preserves a conflicting draft and exports it without overwriting newer data
+2026-10-15T00:39:44.7345194Z   ---
+2026-10-15T00:39:44.7346373Z   duration_ms: 1002.100136
+2026-10-15T00:39:44.7346975Z   type: 'test'
+2026-10-15T00:39:44.7347518Z   ...
+2026-10-15T00:39:45.8381515Z # Subtest: case retry reuses an uploaded image and logout clears private lists and editor drafts
+2026-10-15T00:39:45.8396218Z ok 35 - case retry reuses an uploaded image and logout clears private lists and editor drafts
+2026-10-15T00:39:45.8397373Z   ---
+2026-10-15T00:39:45.8397989Z   duration_ms: 1106.645091
+2026-10-15T00:39:45.8398652Z   type: 'test'
+2026-10-15T00:39:45.8399226Z   ...
+2026-10-15T00:39:47.3265623Z # Subtest: failed admin reads disable management; late responses after logout cannot expose private data
+2026-10-15T00:39:47.3277662Z ok 36 - failed admin reads disable management; late responses after logout cannot expose private data
+2026-10-15T00:39:47.3278907Z   ---
+2026-10-15T00:39:47.3279500Z   duration_ms: 1488.800895
+2026-10-15T00:39:47.3280482Z   type: 'test'
+2026-10-15T00:39:47.3280995Z   ...
+2026-10-15T00:39:48.6380982Z # Subtest: library logout reports failures, then removes unpublished cases and clears their editor drafts
+2026-10-15T00:39:48.6395578Z ok 37 - library logout reports failures, then removes unpublished cases and clears their editor drafts
+2026-10-15T00:39:48.6408972Z   ---
+2026-10-15T00:39:48.6471536Z   duration_ms: 1310.69204
+2026-10-15T00:39:48.6480087Z   type: 'test'
+2026-10-15T00:39:48.6516285Z   ...
+2026-10-15T00:39:54.6940320Z # Subtest: signed-in clinical headers, preview actions and editors remain usable on narrow and short screens
+2026-10-15T00:39:54.6942082Z ok 38 - signed-in clinical headers, preview actions and editors remain usable on narrow and short screens
+2026-10-15T00:39:54.6943092Z   ---
+2026-10-15T00:39:54.6943577Z   duration_ms: 6057.075027
+2026-10-15T00:39:54.6944101Z   type: 'test'
+2026-10-15T00:39:54.6944668Z   ...
+2026-10-15T00:40:02.5710626Z # Subtest: pathway directory selections and direct links leave their title cards below the current header
+2026-10-15T00:40:02.5728145Z ok 39 - pathway directory selections and direct links leave their title cards below the current header
+2026-10-15T00:40:02.5729219Z   ---
+2026-10-15T00:40:02.5730078Z   duration_ms: 7876.974192
+2026-10-15T00:40:02.5730691Z   type: 'test'
+2026-10-15T00:40:02.5731211Z   ...
+2026-10-15T00:40:05.5671716Z # Subtest: the active navigation link stays visible after loading and resizing each standalone page
+2026-10-15T00:40:05.5682568Z ok 40 - the active navigation link stays visible after loading and resizing each standalone page
+2026-10-15T00:40:05.5683628Z   ---
+2026-10-15T00:40:05.5684194Z   duration_ms: 2996.27613
+2026-10-15T00:40:05.5684798Z   type: 'test'
+2026-10-15T00:40:05.5685418Z   ...
+2026-10-15T00:40:05.6311496Z 1..40
+2026-10-15T00:40:05.6312199Z # tests 40
+2026-10-15T00:40:05.6320777Z # suites 0
+2026-10-15T00:40:05.6321533Z # pass 40
+2026-10-15T00:40:05.6322276Z # fail 0
+2026-10-15T00:40:05.6322951Z # cancelled 0
+2026-10-15T00:40:05.6323573Z # skipped 0
+2026-10-15T00:40:05.6324142Z # todo 0
+2026-10-15T00:40:05.6324793Z # duration_ms 185763.857057
+2026-10-15T00:40:05.6574364Z Post job cleanup.
+2026-10-15T00:40:05.7948558Z (node:5415) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-15T00:40:05.7950703Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-15T00:40:05.8245951Z Post job cleanup.
+2026-10-15T00:40:05.9373552Z [command]/usr/bin/git version
+2026-10-15T00:40:05.9442151Z git version 2.55.0
+2026-10-15T00:40:05.9501853Z Temporarily overriding HOME='/home/runner/work/_temp/bf9440c9-2178-4ba9-8262-d4e6ca94dd30' before making global git config changes
+2026-10-15T00:40:05.9524277Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-15T00:40:05.9532062Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/hajimi/hajimi
+2026-10-15T00:40:05.9599189Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-15T00:40:05.9668625Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-15T00:40:06.0057823Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-15T00:40:06.0104151Z http.https://github.com/.extraheader
+2026-10-15T00:40:06.0136492Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-15T00:40:06.0202184Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-15T00:40:06.0588694Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-15T00:40:06.0647952Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-15T00:40:06.1305342Z Cleaning up orphan processes
+2026-10-15T00:40:06.1850746Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
