@@ -1,4 +1,4 @@
-/* Preview only: disease-centered patient-case workspace. Existing clinical text unchanged. */
+/* Disease-centered patient-case workspace. Clinical text and legacy reading styles stay intact. */
 #templateGrid.case-search-results{display:block!important;max-width:none;width:100%;min-width:0}
 .case-search-intro{margin:4px 0 17px;padding:13px 17px;border:1px solid #dce9f9;border-radius:14px;background:#f3f8ff;color:#42546b;font-size:13px;line-height:1.8}
 .case-search-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
@@ -50,10 +50,12 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 #libraryShell .case-file-bottom-actions .btn{min-width:0;min-height:48px;padding:10px 4px;font-size:16px;white-space:nowrap}
 .case-file-bottom-actions .btn:disabled,.case-file-reader-actions .btn:disabled{opacity:.45;cursor:default}
 .case-file-bottom-actions [hidden],.case-file-reader-actions [hidden]{display:none}
-.case-show-all .case-file-bottom-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+.case-show-all:not(.case-continuous-reader) .case-file-bottom-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
 .case-workspace .case-file-reader>.record-book-section{display:none}
 .case-workspace .case-file-reader>.record-book-section.case-active{display:block}
 .case-workspace.case-show-all .case-file-reader>.record-book-section{display:block}
+.case-directory-summary{display:none}
+.case-directory-panel{min-width:0}
 .case-workspace .record-book-section{margin-bottom:14px}
 .case-workspace .record-book-body{overflow-wrap:anywhere;line-height:2}
 .case-workspace .record-book-section-head{gap:12px}
@@ -106,4 +108,21 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 }
 @media print{
  .case-workspace .record-book-body{font-size:16px}
+}
+
+/* The directory follows the full record; selecting a chapter never hides others. */
+@media screen and (min-width:721px){
+ .case-workspace.case-continuous-reader .case-file-sidebar{position:sticky;top:calc(var(--site-header-height,62px) + 12px);max-height:calc(100dvh - var(--site-header-height,62px) - 28px);overscroll-behavior:contain}
+}
+@media screen and (max-width:720px){
+ .case-workspace.case-continuous-reader .case-file-sidebar{position:sticky;top:calc(var(--site-header-height,62px) + 8px);z-index:35;max-height:calc(100dvh - var(--site-header-height,62px) - 24px);overflow:auto;overscroll-behavior:contain;margin-bottom:16px;background:#fff}
+ .case-workspace .case-directory-summary{display:grid;grid-template-columns:auto minmax(0,1fr) 18px;align-items:center;gap:10px;min-height:56px;padding:12px 14px;list-style:none;color:#26364e;cursor:pointer}
+ .case-directory-panel[open]>.case-directory-summary{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid #e9eef5}
+ .case-directory-summary::-webkit-details-marker{display:none}
+ .case-directory-summary strong{font-size:17px;white-space:nowrap}
+ .case-directory-summary #caseDirectoryCurrent{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;color:#586a80}
+ .case-directory-chevron{font-size:20px;text-align:center}
+ .case-directory-panel[open] .case-directory-chevron{transform:rotate(180deg)}
+ .case-directory-panel[open]>.record-book-toc-head{border-top:1px solid #e9eef5}
+ .case-workspace.case-continuous-reader .case-file-reader>.record-book-section{scroll-margin-top:calc(var(--site-header-height,62px) + 92px)}
 }

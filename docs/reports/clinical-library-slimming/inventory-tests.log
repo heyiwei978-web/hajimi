@@ -1,0 +1,14 @@
+✔ the committed baseline preserves complete cases and every special-case document (29.203275ms)
+✔ reordering generated documents retains every original numeric and stable identity (79.991553ms)
+✔ medical changes, missing records and duplicate identities stop publication (83.869808ms)
+✔ archiving requires an independent CMS audit and always preserves whole cases (1.424409ms)
+✔ special cases, different procedures and ambiguous CMS names cannot be archived (121.871516ms)
+✔ public compilation retains exact payloads while excluding authoring sources and duplicate router medical text (795.762035ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2034.597061

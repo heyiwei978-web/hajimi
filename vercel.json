@@ -192,7 +192,9 @@
   ],
   "git": {
     "deploymentEnabled": {
-      "security/blob-static-token": false
+      "security/blob-static-token": false,
+      "chore/clinical-library-slimming": false,
+      "refactor/site-registry-phase1": false
     }
   },
   "buildCommand": "npm run build",

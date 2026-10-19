@@ -126,6 +126,7 @@
     let catalogSize=-1,departmentRecords=new Map(),diseaseRecords=new Map();
     let searchIndex=null,searchIndexSize=-1;
     let routeGeneration=0,activeRoute='';
+    let disposeCaseReader=()=>{};
 
     function pathState(){
       const p=location.pathname.split('/').filter(Boolean);
@@ -319,6 +320,7 @@
       return `<div class="department-toolbar"><div class="department-toolbar-actions"><a class="btn ghost site-home-btn" href="/">⌂ 网站首页</a><button class="btn ghost" id="departmentBack">← ${root?'返回病历首页':'返回科室'}</button></div><span>${label}</span></div>`;
     }
     function renderDepartmentRoot(){
+      disposeCaseReader();disposeCaseReader=()=>{};
       document.body.classList.remove('disease-book-page');
       currentDept=null;resetState();setBrand();
       document.body.classList.add('department-no-sidebar','library-root-page');
@@ -360,6 +362,7 @@
       if(ac)ac.textContent=totalCount;
     }
     function renderDepartmentIndex(){
+      disposeCaseReader();disposeCaseReader=()=>{};
       document.body.classList.remove('library-root-page','disease-book-page');
       if(currentDept==='骨科'){renderOrthoIndex();return;}
       document.body.classList.toggle('department-no-sidebar',currentDept!=='骨科');setBrand();
@@ -546,44 +549,53 @@
         return '<div class="case-nav-family"><h4>'+familyLabels[family]+'</h4>'+groups.map(function(section){
           const items=section.members.map(function(m){
             const id=recordBookId(m.t,m.i);
-            return '<a href="#'+id+'" class="case-nav-item" data-case-record="'+id+'"><span>'+String(m.i+1).padStart(2,'0')+'</span><b>'+escapeHtml(m.t.short||m.t.name)+'</b><small class="case-nav-current-label" aria-hidden="true">当前文书</small></a>';
+            return '<a href="#'+id+'" class="case-nav-item" data-case-record="'+id+'"><span>'+String(m.i+1).padStart(2,'0')+'</span><b>'+escapeHtml(m.t.short||m.t.name)+'</b><small class="case-nav-current-label" aria-hidden="true">当前章节</small></a>';
           }).join('');
           return '<details class="case-nav-group" open><summary><span>'+section.title+'</span><small>'+section.members.length+' 篇</small></summary>'+
             (items?'<nav>'+items+'</nav>':'<p class="case-nav-empty">暂无此类文书</p>')+'</details>';
         }).join('')+'</div>';
       }).join('');
-      return '<div class="record-book-toc-head"><span>PATIENT CASE FILE</span><h3>完整病例目录</h3><p>按文书用途归类，点击阅读</p><div class="reading-font-slot"></div></div>'+nav;
+      return '<div class="record-book-toc-head"><span>PATIENT CASE FILE</span><h3>完整病例目录</h3><p>整套连续阅读，点击目录跳转</p><div class="reading-font-slot"></div></div>'+nav;
     }
     function bindCaseFileReader(){
+      disposeCaseReader();disposeCaseReader=()=>{};
       const root=document.getElementById('caseWorkspace');if(!root)return;
       const articles=[...root.querySelectorAll('.case-file-reader > .record-book-section')];
       const links=[...root.querySelectorAll('[data-case-record]')];
       const status=root.querySelector('#caseCurrentSection');
       const bottomStatus=root.querySelector('#caseBottomSection');
-      const allBtn=document.getElementById('caseShowAll');
       const stepButtons=[...root.querySelectorAll('[data-case-step]')];
-      const selectedBtn=root.querySelector('#caseShowSelectedBottom');
       const directory=root.querySelector('#recordBookToc');
+      const directoryPanel=root.querySelector('#caseDirectoryPanel');
+      const directorySummary=root.querySelector('#caseDirectorySummary');
+      const compactStatus=root.querySelector('#caseDirectoryCurrent');
+      const compactQuery=typeof window.matchMedia==='function'?window.matchMedia('(max-width: 720px)'):null;
+      const isCompact=()=>compactQuery?compactQuery.matches:window.innerWidth<=720;
+      // All chapters stay in the same document. case-active is only a location marker.
+      root.classList.add('case-continuous-reader','case-show-all');
+      if(directoryPanel)directoryPanel.open=!isCompact();
       if(!articles.length){
         if(status)status.textContent='暂无标准文书';
         if(bottomStatus)bottomStatus.textContent='暂无标准文书';
+        if(compactStatus)compactStatus.textContent='暂无标准文书';
         root.querySelectorAll('.case-file-tools button,.case-file-bottom-nav button').forEach(function(btn){btn.disabled=true;});
         return;
       }
-      let selected=0;
+      // pinnedY: page offset left by our own jump. The chosen chapter stays current
+      // until the reader scrolls away, even if a short final chapter cannot reach the top.
+      let selected=-1,frame=0,disposed=false,pinnedY=null;
+      const pinScroll=function(){pinnedY=typeof window.scrollY==='number'?window.scrollY:null;};
       function syncNavigation(){
-        const expanded=root.classList.contains('case-show-all');
         const position=String(selected+1).padStart(2,'0')+' / '+articles.length;
-        if(status)status.textContent=expanded?'全部 '+articles.length+' 篇文书':'正在阅读 '+position+' 篇';
-        if(bottomStatus)bottomStatus.textContent=expanded?'已展开全部 '+articles.length+' 份文书':
-          '第 '+position+' 份 · '+articles[selected].querySelector('h3').textContent;
-        if(allBtn){allBtn.textContent=expanded?'只看当前文书':'展开整套病历';allBtn.setAttribute('aria-pressed',String(expanded));}
-        stepButtons.forEach(function(btn){btn.hidden=expanded;btn.disabled=Number(btn.dataset.caseStep)<0?selected===0:selected===articles.length-1;});
-        if(selectedBtn)selectedBtn.hidden=!expanded;
+        const name=articles[selected].querySelector('h3').textContent;
+        if(status)status.textContent='整套病历 · '+articles.length+' 篇连续文书';
+        if(bottomStatus)bottomStatus.textContent='第 '+position+' 份 · '+name;
+        if(compactStatus)compactStatus.textContent=String(selected+1).padStart(2,'0')+' · '+name;
+        stepButtons.forEach(function(btn){btn.disabled=Number(btn.dataset.caseStep)<0?selected===0:selected===articles.length-1;});
       }
       function revealDirectorySelection(){
         const link=links.find(function(item){return item.dataset.caseRecord===articles[selected].id;});
-        if(link&&directory){
+        if(link&&directory&&(!isCompact()||directoryPanel?.open)){
           link.closest('details').open=true;
           const item=link.getBoundingClientRect(),bounds=directory.getBoundingClientRect();
           if(item.top<bounds.top+12)directory.scrollTop+=item.top-bounds.top-12;
@@ -591,20 +603,41 @@
         }
         return link;
       }
-      function activate(i,scroll){
+      function activate(i,scroll,updateHash=true){
         if(i<0||i>=articles.length)return;
-        root.classList.remove('case-show-all');
         selected=i;
         articles.forEach(function(a,j){a.classList.toggle('case-active',j===i);});
         const id=articles[i].id;
         links.forEach(function(link){const yes=link.dataset.caseRecord===id;link.classList.toggle('is-current',yes);if(yes){link.setAttribute('aria-current','location');link.closest('details').open=true;}else link.removeAttribute('aria-current');});
         syncNavigation();
-        revealDirectorySelection();
+        if(!isCompact())revealDirectorySelection();
         if(scroll){
-          history.replaceState(history.state||{},'',location.pathname+location.search+'#'+encodeURIComponent(id));
-          root.querySelector('.case-file-reader').scrollIntoView({behavior:'instant',block:'start'});
+          if(isCompact()&&directoryPanel)directoryPanel.open=false;
+          if(updateHash){try{history.replaceState(history.state||{},'',location.pathname+location.search+'#'+encodeURIComponent(id));}catch{}}
+          articles[i].scrollIntoView({behavior:'instant',block:'start'});pinScroll();
           const heading=articles[i].querySelector('h3');heading.tabIndex=-1;heading.focus({preventScroll:true});
         }
+      }
+      function syncFromScroll(){
+        frame=0;
+        if(disposed||!root.isConnected||(isCompact()&&directoryPanel?.open))return;
+        if(pinnedY!==null&&Math.abs(window.scrollY-pinnedY)<2)return;
+        pinnedY=null;
+        const header=document.querySelector('.library-topbar');
+        const line=Math.max(0,header?.getBoundingClientRect().bottom||0)+(isCompact()&&directoryPanel?directory.getBoundingClientRect().height+48:24);
+        let index=0;
+        for(let i=0;i<articles.length;i++){
+          if(articles[i].getBoundingClientRect().top>line)break;
+          index=i;
+        }
+        if(index!==selected)activate(index,false,false);
+      }
+      function scheduleReadingSync(){
+        if(!frame&&!disposed)frame=window.requestAnimationFrame(syncFromScroll);
+      }
+      function applyDirectoryMode(){
+        if(directoryPanel)directoryPanel.open=!isCompact();
+        scheduleReadingSync();
       }
       links.forEach(function(link){
         link.addEventListener('click',function(e){
@@ -614,23 +647,65 @@
           activate(idx,true);
         });
       });
-      if(allBtn)allBtn.onclick=function(){
-        const expand=!root.classList.contains('case-show-all');root.classList.toggle('case-show-all',expand);
-        syncNavigation();
-      };
       stepButtons.forEach(function(btn){btn.onclick=function(){activate(selected+Number(btn.dataset.caseStep),true);};});
-      if(selectedBtn)selectedBtn.onclick=function(){activate(selected,true);};
       function backToDirectory(e){
         e.preventDefault();
+        if(isCompact()&&directoryPanel)directoryPanel.open=true;
         const link=revealDirectorySelection();
-        root.scrollIntoView({behavior:'instant',block:'start'});
         if(link)link.focus({preventScroll:true});
+        // The directory is sticky and normally already on screen. Only nudge the page
+        // when its top is hidden (e.g. pushed up at the end of the record), so the
+        // reading position and the current chapter are kept.
+        if(directory&&typeof window.scrollBy==='function'){
+          const header=document.querySelector('.library-topbar');
+          const limit=Math.max(0,header?.getBoundingClientRect().bottom||0);
+          const top=directory.getBoundingClientRect().top;
+          if(top<limit||top>window.innerHeight-56){window.scrollBy({top:top-limit-8,behavior:'instant'});pinScroll();}
+        }
       }
       root.querySelectorAll('#caseBackToDirectory,.record-back-toc').forEach(function(btn){btn.onclick=backToDirectory;});
-      let hash='';
-      try{hash=decodeURIComponent(location.hash.slice(1));}catch{hash='';}
-      const initial=articles.findIndex(function(a){return a.id===hash;});
-      activate(initial<0?0:initial,false);
+      // Old chapter URLs include a presentation ordinal. A body timestamp edit
+      // can change sorting; resolve the frozen case/title only when unambiguous.
+      function historicalChapter(list,hash){
+        const exact=list.find(a=>a.id===hash);if(exact)return exact;
+        const matches=list.filter(a=>{
+          const record=templates[Number(a.dataset.recordIndex)];if(!record)return false;
+          const marker='__ordinal__',sample=a.classList.contains('special-record-section')
+            ?specialRecordId(record,marker,record.specialCaseKey):recordBookId(record,marker);
+          const [prefix,suffix]=sample.split(marker);
+          return hash.startsWith(prefix)&&hash.endsWith(suffix)&&/^\d+$/.test(hash.slice(prefix.length,hash.length-suffix.length));
+        });
+        return matches.length===1?matches[0]:null;
+      }
+      function restoreChapter(){
+        let hash='';try{hash=decodeURIComponent(location.hash.slice(1));}catch{}
+        const specialTarget=historicalChapter([...document.querySelectorAll('.special-record-section')],hash);
+        const specialBook=specialTarget?.closest('details.special-case-book');
+        if(specialBook){specialBook.open=true;specialTarget.scrollIntoView({behavior:'instant',block:'start'});}
+        const initial=articles.indexOf(historicalChapter(articles,hash));
+        if(initial>=0)activate(initial,true,false);
+        else if(selected<0)activate(0,false,false);
+      }
+      function directoryEscape(e){
+        if(e.key==='Escape'&&isCompact()&&directoryPanel?.open){directoryPanel.open=false;directorySummary?.focus({preventScroll:true});}
+      }
+      window.addEventListener('scroll',scheduleReadingSync,{passive:true});
+      window.addEventListener('resize',scheduleReadingSync,{passive:true});
+      window.addEventListener('hashchange',restoreChapter);
+      compactQuery?.addEventListener('change',applyDirectoryMode);
+      directoryPanel?.addEventListener('toggle',scheduleReadingSync);
+      directory?.addEventListener('keydown',directoryEscape);
+      disposeCaseReader=()=>{
+        disposed=true;
+        if(frame)window.cancelAnimationFrame(frame);
+        window.removeEventListener('scroll',scheduleReadingSync);
+        window.removeEventListener('resize',scheduleReadingSync);
+        window.removeEventListener('hashchange',restoreChapter);
+        compactQuery?.removeEventListener('change',applyDirectoryMode);
+        directoryPanel?.removeEventListener('toggle',scheduleReadingSync);
+        directory?.removeEventListener('keydown',directoryEscape);
+      };
+      restoreChapter();
     }
 
     function renderDisease(){
@@ -695,22 +770,21 @@
       const signedCount=grouping.find(function(x){return x.key==='consent';}).members.length;
       if(grid)grid.innerHTML=toolbar(currentDept+' · '+labelFor(state.group),false)+hero+
         '<div class="source-template-note"><strong>示例患者 · 整套病历：</strong>各章节取自本病种现有示例模板，使用前请核对患者身份、日期、检查结果、真实手术经过及签字信息；特殊病例另行归档，不与标准病例混用。</div>'+
-        '<section id="caseWorkspace" class="case-workspace record-book-layout">'+
-          '<aside class="record-book-toc case-file-sidebar" id="recordBookToc">'+caseFileNav(list)+'</aside>'+
+        '<section id="caseWorkspace" class="case-workspace case-continuous-reader case-show-all record-book-layout">'+
+          '<aside class="record-book-toc case-file-sidebar" id="recordBookToc" aria-label="完整病历目录">'+
+            '<details id="caseDirectoryPanel" class="case-directory-panel" open><summary id="caseDirectorySummary" class="case-directory-summary"><strong>病历目录</strong><span id="caseDirectoryCurrent"></span><span class="case-directory-chevron" aria-hidden="true">⌄</span></summary>'+caseFileNav(list)+'</details></aside>'+
           '<div class="record-book-content case-file-reader-wrap">'+
             '<div class="case-file-tools"><div><span class="case-file-eyebrow">CASE READER</span><strong id="caseCurrentSection">'+list.length+' 篇文书</strong><small>临床病历 '+(list.length-signedCount)+' 篇 · 签字沟通 '+signedCount+' 篇</small></div><div class="case-file-reader-actions">'+
-              '<button id="casePrevious" data-case-step="-1" class="btn ghost" type="button">← 上一篇</button>'+
-              '<button id="caseNext" data-case-step="1" class="btn ghost" type="button">下一篇 →</button>'+
-              '<button id="caseShowAll" class="btn ghost" type="button" aria-pressed="false">展开整套病历</button>'+
+              '<button id="casePrevious" data-case-step="-1" class="btn ghost" type="button">← 上一章</button>'+
+              '<button id="caseNext" data-case-step="1" class="btn ghost" type="button">下一章 →</button>'+
             '</div></div>'+
             '<div class="case-file-reader">'+allChapters+'</div>'+
             '<nav class="case-file-bottom-nav" aria-label="病历阅读操作">'+
               '<strong id="caseBottomSection" aria-live="polite" aria-atomic="true"></strong>'+
               '<div class="case-file-bottom-actions">'+
-                '<button id="casePreviousBottom" data-case-step="-1" class="btn ghost" type="button">← 上一份</button>'+
-                '<button id="caseBackToDirectory" class="btn ghost" type="button">返回目录</button>'+
-                '<button id="caseNextBottom" data-case-step="1" class="btn primary" type="button">下一份 →</button>'+
-                '<button id="caseShowSelectedBottom" class="btn primary" type="button" hidden>只看当前文书</button>'+
+                '<button id="casePreviousBottom" data-case-step="-1" class="btn ghost" type="button">← 上一章</button>'+
+                '<button id="caseBackToDirectory" class="btn ghost" type="button">病历目录</button>'+
+                '<button id="caseNextBottom" data-case-step="1" class="btn primary" type="button">下一章 →</button>'+
               '</div>'+
             '</nav>'+
           '</div>'+
@@ -753,6 +827,7 @@
       render();
     }
     async function applyRoute(){
+      disposeCaseReader();disposeCaseReader=()=>{};
       activeRoute=location.pathname+location.search;
       const generation=++routeGeneration;
       document.getElementById('templateGrid').classList.remove('search-results','case-search-results');
@@ -780,6 +855,7 @@
     }
 
     function renderSearchResults(department){
+      disposeCaseReader();disposeCaseReader=()=>{};
       if(!searchIndex||searchIndexSize!==templates.length){
         searchIndex=createHajimiSearch(templates);searchIndexSize=templates.length;
       }

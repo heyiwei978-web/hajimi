@@ -1,0 +1,239 @@
+{
+  "baselineCommit": "b32800dfe67e3a5712768977cbc6b7aeb2061086",
+  "algorithm": "SHA-256 over exact UTF-8; no normalization",
+  "records": 5361,
+  "fixedSourceBodyRecords": 5357,
+  "generatedDefaultRecords": 4,
+  "bodyMismatches": 0,
+  "renderedMismatches": 0,
+  "recordMismatches": 0,
+  "specialRecords": 44,
+  "specialMismatches": 0,
+  "generationSources": [
+    {
+      "path": "search-core.js",
+      "beforeHash": "b29f84b9a2597a848ceecad6259065515cd90fd5a9f7bb7f40e627fc3bca3cb7",
+      "afterHash": "b29f84b9a2597a848ceecad6259065515cd90fd5a9f7bb7f40e627fc3bca3cb7"
+    },
+    {
+      "path": "app.js",
+      "beforeHash": "634b1d2b18fc6a95f0294d31113255f989996aea5f4fffa42c6488d25eaf5a79",
+      "afterHash": "634b1d2b18fc6a95f0294d31113255f989996aea5f4fffa42c6488d25eaf5a79"
+    },
+    {
+      "path": "ideal-cases.js",
+      "beforeHash": "77dac2d7675fb0304715509bb2c212baf6d53de5b2f12162d6db50b0f0b2abec",
+      "afterHash": "77dac2d7675fb0304715509bb2c212baf6d53de5b2f12162d6db50b0f0b2abec"
+    },
+    {
+      "path": "orthopedic-expansion-a.js",
+      "beforeHash": "85a07700a01f70fcdd197649a49bd9534f819d46e4386ba3a52252e1f4d5a458",
+      "afterHash": "85a07700a01f70fcdd197649a49bd9534f819d46e4386ba3a52252e1f4d5a458"
+    },
+    {
+      "path": "orthopedic-expansion-b.js",
+      "beforeHash": "d44e446691b8955cd2f0173cf92720dc3a1dce6bc1812eeacc5fedac6cecb897",
+      "afterHash": "d44e446691b8955cd2f0173cf92720dc3a1dce6bc1812eeacc5fedac6cecb897"
+    },
+    {
+      "path": "orthopedic-expansion-c.js",
+      "beforeHash": "c2b84ff56b68877ec9edab859a05b405bb8d2c8505b3e741cbe9d741deb0a9d6",
+      "afterHash": "c2b84ff56b68877ec9edab859a05b405bb8d2c8505b3e741cbe9d741deb0a9d6"
+    },
+    {
+      "path": "orthopedic-expansion-d.js",
+      "beforeHash": "94e308f9fe10324b7e9569e6317cd8a0d4119e05bda736f0ff8163b55552d245",
+      "afterHash": "94e308f9fe10324b7e9569e6317cd8a0d4119e05bda736f0ff8163b55552d245"
+    },
+    {
+      "path": "orthopedic-expansion-e.js",
+      "beforeHash": "091fd577a7bfe40756f41e6de7ff16dd4ba3acd4168a7e675e569d769ca30588",
+      "afterHash": "091fd577a7bfe40756f41e6de7ff16dd4ba3acd4168a7e675e569d769ca30588"
+    },
+    {
+      "path": "orthopedic-expansion-f.js",
+      "beforeHash": "8eaf07a63dfef4c5867ca1b766cccbffe1b3a54f7570823684dea64b652de1ef",
+      "afterHash": "8eaf07a63dfef4c5867ca1b766cccbffe1b3a54f7570823684dea64b652de1ef"
+    },
+    {
+      "path": "orthopedic-expansion-g.js",
+      "beforeHash": "5069bda44cf4c67c52440232e169452e0359f6b78a3ac852e8d163eedbc60af7",
+      "afterHash": "5069bda44cf4c67c52440232e169452e0359f6b78a3ac852e8d163eedbc60af7"
+    },
+    {
+      "path": "record-quality-v3.js",
+      "beforeHash": "cfa05660c8535bb7fa475d26467457d973d8c001adc9c90dd21c134ab726a744",
+      "afterHash": "cfa05660c8535bb7fa475d26467457d973d8c001adc9c90dd21c134ab726a744"
+    },
+    {
+      "path": "record-quality-v4.js",
+      "beforeHash": "c43a9507278277cc843ba94737178ce42c4bce1daa341ec9985c2bf44b27b601",
+      "afterHash": "c43a9507278277cc843ba94737178ce42c4bce1daa341ec9985c2bf44b27b601"
+    },
+    {
+      "path": "record-quality-v5.js",
+      "beforeHash": "1b01cf719aabe5e8819d338f650b05467e54db9d3770ef6e3c9d3d0130320c11",
+      "afterHash": "1b01cf719aabe5e8819d338f650b05467e54db9d3770ef6e3c9d3d0130320c11"
+    },
+    {
+      "path": "record-quality-v6.js",
+      "beforeHash": "4e9d8163ce47de541216a4233826f5608af31ba377ae5428eefd691c03c5d4a4",
+      "afterHash": "4e9d8163ce47de541216a4233826f5608af31ba377ae5428eefd691c03c5d4a4"
+    },
+    {
+      "path": "record-quality-v7.js",
+      "beforeHash": "c47bd4d6de130ab7eee926674db34de7fca9e0cffbacc59ca40a33ff5a0bdb0a",
+      "afterHash": "c47bd4d6de130ab7eee926674db34de7fca9e0cffbacc59ca40a33ff5a0bdb0a"
+    },
+    {
+      "path": "record-quality-v8.js",
+      "beforeHash": "a1e856b0fb8fbdcd24385a1150967d70f60fce24ae14725acc7969e6a6c8356e",
+      "afterHash": "a1e856b0fb8fbdcd24385a1150967d70f60fce24ae14725acc7969e6a6c8356e"
+    },
+    {
+      "path": "record-quality-v9.js",
+      "beforeHash": "79be387f4a0e1765daaa494adc998e8521312370e7f9e3452bc6a2d3589ba38d",
+      "afterHash": "79be387f4a0e1765daaa494adc998e8521312370e7f9e3452bc6a2d3589ba38d"
+    },
+    {
+      "path": "record-quality-v10.js",
+      "beforeHash": "618d2c83fa426e5c37e7ed14e7c8b7d80cc7ca96e044bb4df95b511b294979cc",
+      "afterHash": "618d2c83fa426e5c37e7ed14e7c8b7d80cc7ca96e044bb4df95b511b294979cc"
+    },
+    {
+      "path": "record-quality-v11.js",
+      "beforeHash": "0a52b1c35e7cfb40a0b4a423943ca6c1ee2c576650e832a1dee7d5ccf7281923",
+      "afterHash": "0a52b1c35e7cfb40a0b4a423943ca6c1ee2c576650e832a1dee7d5ccf7281923"
+    },
+    {
+      "path": "record-quality-v12.js",
+      "beforeHash": "d64d577f5983df5619047cfddacada71473dfeb3c0960cdbefae48ab1ac6cff6",
+      "afterHash": "d64d577f5983df5619047cfddacada71473dfeb3c0960cdbefae48ab1ac6cff6"
+    },
+    {
+      "path": "record-quality-v13.js",
+      "beforeHash": "b20fa3c8e3cbcaf7790ddd58a9cd3d44f21aaee0f551e8ee4c462039b2009261",
+      "afterHash": "b20fa3c8e3cbcaf7790ddd58a9cd3d44f21aaee0f551e8ee4c462039b2009261"
+    },
+    {
+      "path": "record-quality-v14.js",
+      "beforeHash": "788c5dd0761e85ceed92b5ef1901dd9e83fe10cd997864b728b87a61511a59eb",
+      "afterHash": "788c5dd0761e85ceed92b5ef1901dd9e83fe10cd997864b728b87a61511a59eb"
+    },
+    {
+      "path": "record-quality-v15.js",
+      "beforeHash": "e4f797430e37ebb1e2a49cdf9d6a54b64959439554751d93e8055d053d13b4ce",
+      "afterHash": "e4f797430e37ebb1e2a49cdf9d6a54b64959439554751d93e8055d053d13b4ce"
+    },
+    {
+      "path": "record-quality-v16.js",
+      "beforeHash": "ce63988d4d814b16dc574ecbcbf3c67a4224762891a146c09d96d99671f7d3e0",
+      "afterHash": "ce63988d4d814b16dc574ecbcbf3c67a4224762891a146c09d96d99671f7d3e0"
+    },
+    {
+      "path": "record-quality-v17.js",
+      "beforeHash": "ab6d5a18ef8978d93f45264fa6740794cde71cba61973524474afd49e7c99659",
+      "afterHash": "ab6d5a18ef8978d93f45264fa6740794cde71cba61973524474afd49e7c99659"
+    },
+    {
+      "path": "record-quality-v18.js",
+      "beforeHash": "2a2b5ffb45f99191306906f917cd05089999de846661ba4b0c1e66dedcfdd7ba",
+      "afterHash": "2a2b5ffb45f99191306906f917cd05089999de846661ba4b0c1e66dedcfdd7ba"
+    },
+    {
+      "path": "record-quality-v19.js",
+      "beforeHash": "8a5a77087a57aa9eda9a2140de745e6a3bc0b44c7ac03eb454c183300b256190",
+      "afterHash": "8a5a77087a57aa9eda9a2140de745e6a3bc0b44c7ac03eb454c183300b256190"
+    },
+    {
+      "path": "record-quality-v20.js",
+      "beforeHash": "5698fcab8cc7e9bea97b9b73ef60ae62a367ec54b1e0ac89f3d56234e9bded19",
+      "afterHash": "5698fcab8cc7e9bea97b9b73ef60ae62a367ec54b1e0ac89f3d56234e9bded19"
+    },
+    {
+      "path": "record-quality-v21.js",
+      "beforeHash": "60163f86539b0d9efc89e2a3eae0a8fb83e2db75a7d551437cd9760552cf9f7e",
+      "afterHash": "60163f86539b0d9efc89e2a3eae0a8fb83e2db75a7d551437cd9760552cf9f7e"
+    },
+    {
+      "path": "record-quality-v22.js",
+      "beforeHash": "cef82b8ba2bd3f2fca9ea53a6c56c05a9b25100863e3bda7fe2016ca48729a08",
+      "afterHash": "cef82b8ba2bd3f2fca9ea53a6c56c05a9b25100863e3bda7fe2016ca48729a08"
+    },
+    {
+      "path": "record-quality-v24.js",
+      "beforeHash": "95be9d727dd514dcfe7a6ea609a843de44e064656a175c510503d7491ddb129d",
+      "afterHash": "95be9d727dd514dcfe7a6ea609a843de44e064656a175c510503d7491ddb129d"
+    },
+    {
+      "path": "record-quality-v23.js",
+      "beforeHash": "3cd002648a946ab0c08789442bc7f4dfd77fdd1ebca1bd1ce4a04220ef258338",
+      "afterHash": "3cd002648a946ab0c08789442bc7f4dfd77fdd1ebca1bd1ce4a04220ef258338"
+    },
+    {
+      "path": "departments.js",
+      "beforeHash": "167fef2ecdc8473976c41005f6cb6e289e1fcc32e98a88b01afe1f49d9a66c54",
+      "afterHash": "fd7f75b35f58dfd9313473e15776372a2b269d52c68fc93cb07b93b8c17bdf1a"
+    },
+    {
+      "path": "ideal-other-cases.js",
+      "beforeHash": "7a4cfead6db84e50855fa71fccc7a03d5eec211b4f098bc6f0608bf1f7c7ca01",
+      "afterHash": "7a4cfead6db84e50855fa71fccc7a03d5eec211b4f098bc6f0608bf1f7c7ca01"
+    },
+    {
+      "path": "tka-special-cases.js",
+      "beforeHash": "3bcf27dc25696579bf8084378e3127bbec496a2270aa59bcd14c1beb1325148f",
+      "afterHash": "3bcf27dc25696579bf8084378e3127bbec496a2270aa59bcd14c1beb1325148f"
+    },
+    {
+      "path": "ortho-protocols-a.js",
+      "beforeHash": "2776a060d4374a2dcd9eac827cdf046d89704e50bc5754c6064abe618998256d",
+      "afterHash": "2776a060d4374a2dcd9eac827cdf046d89704e50bc5754c6064abe618998256d"
+    },
+    {
+      "path": "ortho-protocols-b.js",
+      "beforeHash": "51a11eebb0516fad1207d2afc6a8e201b30a9cbb68a96fa41b39d5c300d029c7",
+      "afterHash": "51a11eebb0516fad1207d2afc6a8e201b30a9cbb68a96fa41b39d5c300d029c7"
+    },
+    {
+      "path": "ortho-protocols-c.js",
+      "beforeHash": "66ef10b5f707dcb99b61a90d76078209e809ab8e474eb9ddc9df145adac81384",
+      "afterHash": "66ef10b5f707dcb99b61a90d76078209e809ab8e474eb9ddc9df145adac81384"
+    },
+    {
+      "path": "ortho-protocols-d.js",
+      "beforeHash": "b7c2d690a9046509e1b417d271d0c6dccf8f69212a158ebd26afc9005329568b",
+      "afterHash": "b7c2d690a9046509e1b417d271d0c6dccf8f69212a158ebd26afc9005329568b"
+    },
+    {
+      "path": "ortho-protocols-e.js",
+      "beforeHash": "2c28a745c998a76646009f55da4f8a447bd169f6efa35f5fa5d14686e8ff5d1d",
+      "afterHash": "2c28a745c998a76646009f55da4f8a447bd169f6efa35f5fa5d14686e8ff5d1d"
+    },
+    {
+      "path": "ortho-protocols-f.js",
+      "beforeHash": "c8e6629a48d50265ef79c42cb2b0b0ed052a39940c24efd57d717c2547fac501",
+      "afterHash": "c8e6629a48d50265ef79c42cb2b0b0ed052a39940c24efd57d717c2547fac501"
+    },
+    {
+      "path": "ortho-protocols-refinement.js",
+      "beforeHash": "7142e668e2e70edef690b3405f88a1250ebf7dd801bcf66c10c85d02c5b666d0",
+      "afterHash": "7142e668e2e70edef690b3405f88a1250ebf7dd801bcf66c10c85d02c5b666d0"
+    },
+    {
+      "path": "record-clinical-style-v25.js",
+      "beforeHash": "0082fd1e69fe07c44456081c444b917c5e734061da3f00f860e3411a665b1b19",
+      "afterHash": "0082fd1e69fe07c44456081c444b917c5e734061da3f00f860e3411a665b1b19"
+    },
+    {
+      "path": "record-clinical-style-v26.js",
+      "beforeHash": "340f0c1d6a8e996fb72a1a58f935d61a126f2c6aa7b0431bf24208c21f763664",
+      "afterHash": "340f0c1d6a8e996fb72a1a58f935d61a126f2c6aa7b0431bf24208c21f763664"
+    },
+    {
+      "path": "record-course-v27.js",
+      "beforeHash": "d9e29ffbbc39d1b1d7c06b57cb85b1166573064b4e6adc67291d05bec8068016",
+      "afterHash": "d9e29ffbbc39d1b1d7c06b57cb85b1166573064b4e6adc67291d05bec8068016"
+    }
+  ]
+}

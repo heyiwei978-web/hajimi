@@ -1,11 +1,32 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {createHash} from 'node:crypto';
+import {planClinicalPublication} from './clinical-inventory.mjs';
+import {DEPARTMENTS} from '../config/site-modules.mjs';
+import {renderRouterDepartments} from './department-build.mjs';
 const root=new URL('../',import.meta.url);
 const digest=value=>createHash('sha256').update(value).digest('hex').slice(0,20);
-const slugs={'骨科':'guke','普外科':'puwai','肾内科':'shennei','妇科':'fuke'};
 
-export function loadClinicalSource(html){
+// Build-only projection. UI capability flags must never filter clinical data.
+export function clinicalDepartmentSlugs(published=[],departments=DEPARTMENTS){
+  if(!Array.isArray(departments)||!departments.length)throw new Error('Clinical build failed: department registry is empty');
+  const names=new Set(),slugs=new Set(),entries=[];
+  for(const {name,slug}of departments){
+    if(typeof name!=='string'||!name.trim()||name!==name.trim()||typeof slug!=='string'||!/^[a-z]+$/.test(slug)){
+      throw new Error('Clinical build failed: invalid department name or slug');
+    }
+    if(names.has(name))throw new Error('Clinical build failed: duplicate department name: '+name);
+    if(slugs.has(slug))throw new Error('Clinical build failed: duplicate department slug: '+slug);
+    names.add(name);slugs.add(slug);entries.push([name,slug]);
+  }
+  const mapping=Object.fromEntries(entries);
+  for(const {record}of published){
+    if(!Object.hasOwn(mapping,record.department))throw new Error('Clinical build failed: unmapped department: '+record.department);
+  }
+  return mapping;
+}
+
+export function loadClinicalSource(html,{audit=false,readSource=file=>fs.readFileSync(new URL(file,root),'utf8')}={}){
   const nodes=new Map(),errors=[];
   const node=()=>({innerHTML:'',textContent:'',hidden:false,dataset:{},options:[],
     classList:{add(){},remove(){},toggle(){},contains(){return false;}},
@@ -17,23 +38,39 @@ export function loadClinicalSource(html){
     addEventListener(){},dispatchEvent(){},scrollTo(){},console:{log(){},warn(){},error(...items){errors.push(items.map(String).join(' '));}}};
   context.window=context;
   vm.createContext(context);
+  const origins=new WeakMap();
   const files=[...html.matchAll(/<script\s+[^>]*?src="\/([^?"]+)(?:\?[^"]*)?"/g)].map(match=>match[1]).filter(file=>!['cms-core.js','workspace.js','library-personal.js','image-upload.js','library-ui.js'].includes(file));
-  for(const file of files)vm.runInContext(fs.readFileSync(new URL(file,root),'utf8'),context,{filename:file,timeout:10000});
+  for(const file of files){
+    vm.runInContext(readSource(file),context,{filename:file,timeout:10000});
+    if(audit)for(const record of vm.runInContext('typeof templates === "undefined" ? [] : templates',context)){
+      if(!origins.has(record))origins.set(record,file);
+    }
+  }
   if(errors.length)throw new Error('Clinical build failed: '+errors.join('\n'));
-  return JSON.parse(vm.runInContext('JSON.stringify({records:templates,groups,traumaGroups,seeds:window.HAJIMI_IDEAL_CASES.seeds})',context));
+  const source=JSON.parse(vm.runInContext('JSON.stringify({records:templates,groups,traumaGroups,seeds:window.HAJIMI_IDEAL_CASES.seeds})',context));
+  if(audit){
+    source.origins=Array.from(vm.runInContext('templates',context),record=>origins.get(record));
+    source.renderedBodies=JSON.parse(vm.runInContext('JSON.stringify(templates.map(record=>String(generate(record))))',context));
+    source.qualityAudit=JSON.parse(vm.runInContext('JSON.stringify(window.HAJIMI_RECORD_QUALITY_V23 || null)',context));
+    source.sourceFiles=files.map(path=>({path,sha256:createHash('sha256').update(readSource(path)).digest('hex')}));
+  }
+  return source;
 }
 
-export function compileClinicalSite(html,directory){
-  const source=loadClinicalSource(html);
-  const manifest={total:source.records.length,departments:{},groups:source.groups,traumaGroups:source.traumaGroups,
-    seeds:Object.fromEntries(Object.entries(source.seeds).map(([key,value])=>[key,{category:value.category}])),bodies:{},scripts:{}};
+export function compileClinicalSite(html,directory,{inventory,cmsAudit,source=loadClinicalSource(html,{audit:true})}={}){
+  const publication=planClinicalPublication(source,inventory,{cmsAudit});
+  const slugs=clinicalDepartmentSlugs(publication.published);
+  const publishedGroups=new Set(publication.published.filter(item=>item.record.department==='骨科').map(item=>item.record.group));
+  const manifest={total:publication.published.length,identityNamespace:publication.baseline.identityNamespace,
+    departments:{},groups:[...new Set([...source.groups,...publishedGroups])].filter(group=>publishedGroups.has(group)),traumaGroups:source.traumaGroups.filter(group=>publishedGroups.has(group)),
+    seeds:Object.fromEntries(Object.entries(source.seeds).filter(([key])=>publishedGroups.has(key)).map(([key,value])=>[key,{category:value.category}])),bodies:{},scripts:{}};
   manifest.scripts.cms=[...html.matchAll(/<script[^>]*src="([^"]+)"/g)].map(match=>match[1]).find(value=>value.startsWith('/cms-core.js?'));
   const write=(prefix,text,extension='js')=>{const filename=prefix+'-'+digest(text)+'.'+extension;fs.writeFileSync(new URL(filename,directory),text);return '/'+filename;};
   for(const [department,slug]of Object.entries(slugs)){
     const strings=[],pool=new Map(),extras=[],extraPool=new Map(),rows=[];
     const intern=value=>{value=value||'';if(!pool.has(value)){pool.set(value,strings.length);strings.push(value);}return pool.get(value);};
     const bodies=new Map();
-    source.records.forEach((record,id)=>{
+    publication.published.forEach(({record,identity:{legacyId:id}})=>{
       if(record.department!==department)return;
       const extra={...record};for(const key of ['department','group','name','short','stage','type','desc','sourceBody'])delete extra[key];
       const extraKey=JSON.stringify(extra);if(!extraPool.has(extraKey)){extraPool.set(extraKey,extras.length);extras.push(extra);}
@@ -52,10 +89,14 @@ export function compileClinicalSite(html,directory){
   const header=app.indexOf('const types =');
   if(header<0)throw new Error('Clinical app header marker missing');
   manifest.scripts.app=write('app-runtime','const traumaGroups=window.HAJIMI.manifest.traumaGroups;\nconst groups=window.HAJIMI.manifest.groups;\n'+app.slice(header,start)+'const templates=window.HAJIMI.records;\n'+app.slice(end));
-  manifest.scripts.router=write('department-runtime',fs.readFileSync(new URL('departments.js',root),'utf8'));
+  const router=fs.readFileSync(new URL('departments.js',root),'utf8'),seedStart=router.lastIndexOf('\n})([');
+  if(seedStart<0)throw new Error('Department seed boundary missing');
+  // The bootstrap always loads compiled catalogs; do not ship an unreachable
+  // second copy of department medical source text inside the router.
+  manifest.scripts.router=write('department-runtime',renderRouterDepartments(router.slice(0,seedStart)+'\n})([]);\n'));
   const manifestFile=write('library-manifest','window.HAJIMI_MANIFEST='+JSON.stringify(manifest)+';');
-  const scripts=`<script defer src="/library-ui.js?v=20261011-mvp1"></script>\n<script defer src="/search-core.js?v=20261011-mvp1"></script>\n<script defer src="/library-personal.js?v=20261009-personal1"></script>\n<script defer src="/image-upload.js?v=20261009-manager1"></script>\n<script defer src="${manifestFile}"></script>\n<script defer src="/library-loader.js?v=20261009-lazy1"></script>\n<script defer src="/workspace.js?v=20261009-layout1"></script>`;
+  const scripts=`<script defer src="/library-ui.js?v=20261011-mvp1"></script>\n<script defer src="/search-core.js?v=20261011-mvp1"></script>\n<script defer src="/library-personal.js?v=20261009-personal1"></script>\n<script defer src="/image-upload.js?v=20261009-manager1"></script>\n<script defer src="${manifestFile}"></script>\n<script defer src="/library-loader.js?v=20261014-identity1"></script>\n<script defer src="/workspace.js?v=20261009-layout1"></script>`;
   const runtimeHtml=html.replace(/<script\b[^>]*src="\/[^"]+"[^>]*><\/script>\s*/g,'').replace('</body>',scripts+'\n</body>');
   fs.writeFileSync(new URL('library.html',directory),runtimeHtml);
-  return {source,manifest};
+  return {source,manifest,publication};
 }
