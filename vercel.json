@@ -192,6 +192,7 @@
   ],
   "git": {
     "deploymentEnabled": {
+      "main": false,
       "security/blob-static-token": false,
       "chore/clinical-library-slimming": false,
       "refactor/site-registry-phase1": false
