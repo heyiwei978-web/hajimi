@@ -28,11 +28,11 @@
 生产平台：Vercel  
 生产域名：`wdyxzl.icu`
 
-此仓库作为 hajimi 网站的唯一源码。后续修改优先提交到 GitHub，再由 Vercel 自动部署。
+此仓库作为 hajimi 网站的唯一源码。后续修改先完成本地验证并提交 GitHub；Git 合并与生产发布分别审阅和授权。
 
 敏感配置只保存在 Vercel Environment Variables，不提交到仓库。
 
-Git integration status: connected to Vercel for automatic deployment.
+GitHub 已连接 Vercel；当前 `vercel.json` 禁用 `main`、`security/blob-static-token`、`chore/clinical-library-slimming`、`refactor/site-registry-phase1` 四个分支的自动部署。发布按[发布与核验流程](docs/deployment-workflow.md)执行，不能把 Git 连接状态当作自动发布许可。
 
 
 ## 开发与检查
