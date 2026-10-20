@@ -56,7 +56,7 @@ async function closeRecordDirectory(page){
   if(await summary.isVisible()&&await page.locator('#caseDirectoryPanel').evaluate(element=>element.open))await summary.click();
 }
 
-test('optional chronic conditions update the full orthopedic reader, preview and copy on desktop and phone',async()=>{
+test('chronic-condition resources are separate, selectable and never rewrite reviewed case copies',async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width);
     try{
@@ -65,26 +65,26 @@ test('optional chronic conditions update the full orthopedic reader, preview and
       assert.equal(await panel.locator('input[data-comorbidity]').count(),8);
       const first=page.locator('.case-file-reader > .record-book-section').first().locator('.record-book-body');
       const baseline=await first.textContent();
-      const surgical=page.locator('.case-file-reader > .record-book-section').filter({has:page.getByRole('heading',{name:'手术记录',exact:true})}).first().locator('.record-book-body');
-      assert(await surgical.count()>0,'surgical report not found');
-      const surgeryBaseline=await surgical.textContent();
+      const surgery=page.locator('.case-file-reader > .record-book-section').filter({has:page.getByRole('heading',{name:'手术记录',exact:true})}).first().locator('.record-book-body');
+      const operation=await surgery.textContent();
+      await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.__comorbidityCopy=value;}}}));
       await panel.locator('input[data-comorbidity="cad"]').check();
       await panel.locator('input[data-comorbidity="htn"]').check();
-      assert.match(await first.textContent(),/合并慢性病补充/);
-      assert.match(await first.textContent(),/冠心病/);
-      assert.match(await first.textContent(),/高血压/);
-      assert.equal(await surgical.textContent(),surgeryBaseline,'operation must not be augmented');
-      await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.__comorbidityCopy=value;}}}));
-      await page.locator('#copyWholeRecord').click();
+      assert.match(await panel.locator('#comorbidityNotes').innerText(),/冠心病/);
+      assert.match(await panel.locator('#comorbidityNotes').innerText(),/心脏超声/);
+      assert.match(await panel.locator('#comorbidityNotes').innerText(),/高血压/);
+      assert.equal(await first.textContent(),baseline,'original patient history must not change');
+      assert.equal(await surgery.textContent(),operation,'original operation must not change');
+      await panel.locator('#copyComorbidities').click();
       await page.waitForFunction(()=>typeof window.__comorbidityCopy==='string');
       assert.match(await page.evaluate(()=>window.__comorbidityCopy),/冠心病/);
       assert.match(await page.evaluate(()=>window.__comorbidityCopy),/高血压/);
-      await panel.locator('input[data-comorbidity="cad"]').uncheck();
-      await panel.locator('input[data-comorbidity="htn"]').uncheck();
-      assert.equal(await first.textContent(),baseline,'deselect restores the original source exactly');
-      assert.equal(await surgical.textContent(),surgeryBaseline);
+      await page.locator('#copyWholeRecord').click();
+      assert.doesNotMatch(await page.evaluate(()=>window.__comorbidityCopy),/【冠心病｜独立补充模块】/,'full record copy must remain the original example');
+      await panel.locator('#clearComorbidities').click();
       assert.equal(await panel.locator('#comorbiditySelectionStatus').textContent(),'0 项已选择');
-      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'module must not introduce horizontal overflow');
+      assert.equal(await panel.locator('#copyComorbidities').isDisabled(),true);
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
   }
