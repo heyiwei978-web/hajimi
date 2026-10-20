@@ -428,9 +428,8 @@
     function recordBookId(t,i){
       return 'record-'+i+'-'+String(t.short||t.name||'section').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]+/g,'-').slice(0,40);
     }
-    function augmentedBookBody(t){const base=String(generate(t));return window.HAJIMI_COMORBIDITIES?.compose(t,base)??base;}
     function recordBookText(list){
-      return list.map((t,i)=>`第${String(i+1).padStart(2,'0')}章  ${t.short||t.name}\n${augmentedBookBody(t)}`).join('\n\n========================================\n\n');
+      return list.map((t,i)=>`第${String(i+1).padStart(2,'0')}章  ${t.short||t.name}\n${generate(t)}`).join('\n\n========================================\n\n');
     }
     function recordChapter(t,i){
       const id=recordBookId(t,i),idx=templates.indexOf(t);
@@ -443,7 +442,7 @@
             <button class="btn primary copy" data-index="${idx}" type="button">复制本章节</button>
           </div>
         </header>
-        <div class="record-book-body">${escapeHtml(augmentedBookBody(t))}</div>
+        <div class="record-book-body">${escapeHtml(String(generate(t)))}</div>
         <a class="record-back-toc" href="#recordBookToc">↑ 回到目录</a>
       </article>`;
     }
@@ -810,17 +809,7 @@
       const printWhole=document.getElementById('printWholeRecord');if(printWhole)printWhole.onclick=()=>window.print();
 
       bindCaseFileReader();
-      window.HAJIMI_COMORBIDITIES?.bind(()=>{
-        document.querySelectorAll('.case-file-reader > .record-book-section').forEach(article=>{
-          const row=templates[Number(article.dataset.recordIndex)];
-          const body=article.querySelector('.record-book-body');
-          if(row&&body)body.textContent=augmentedBookBody(row);
-        });
-        const preview=document.getElementById('previewDialog');
-        if(preview?.open&&state.activeTemplate){
-          document.getElementById('previewContent').textContent=augmentedBookBody(state.activeTemplate);
-        }
-      });
+      window.HAJIMI_COMORBIDITIES?.bind();
       window.HAJIMI_UI?.mount();
 
       document.querySelectorAll('.copy-special-case').forEach((btn)=>{
