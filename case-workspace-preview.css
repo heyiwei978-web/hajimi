@@ -126,3 +126,19 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
  .case-directory-panel[open]>.record-book-toc-head{border-top:1px solid #e9eef5}
  .case-workspace.case-continuous-reader .case-file-reader>.record-book-section{scroll-margin-top:calc(var(--site-header-height,62px) + 92px)}
 }
+
+/* Optional chronic-condition overlay: outside the immutable clinical record. */
+.comorbidity-panel{margin:28px 0 34px;padding:24px;border:1px solid #d7e1ed;border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(26,56,88,.05)}
+.comorbidity-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.comorbidity-head h3{margin:6px 0 8px;color:#17334f;font-size:1.32rem}
+.comorbidity-head p{margin:0;max-width:850px;color:#536478;line-height:1.75;font-size:.94rem}
+.comorbidity-grid{margin-top:20px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.comorbidity-choice{display:flex;align-items:center;gap:10px;min-height:52px;padding:11px 14px;border:1px solid #d9e3ef;border-radius:12px;background:#f8fbff;color:#1c3b58;font-weight:600;cursor:pointer;user-select:none}
+.comorbidity-choice:has(input:checked){border-color:#3976b4;background:#edf5ff;box-shadow:inset 0 0 0 1px #3976b4}
+.comorbidity-choice input{width:17px;height:17px;flex:none;accent-color:#23649f}
+.comorbidity-choice:focus-within{outline:2px solid #3b82c3;outline-offset:2px}
+.comorbidity-footer{margin-top:16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#627386;font-size:.86rem;line-height:1.6}
+#comorbiditySelectionStatus{color:#255b8c;font-weight:700}
+@media(max-width:920px){.comorbidity-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.comorbidity-panel{padding:18px 14px;margin:20px 0}.comorbidity-head{flex-direction:column}.comorbidity-grid{gap:9px}.comorbidity-choice{padding:10px;min-height:48px;font-size:.91rem}}
+@media print{.comorbidity-panel{display:none!important}}
