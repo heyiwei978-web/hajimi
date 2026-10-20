@@ -136,7 +136,7 @@ test('revision persistence is atomic, detects concurrent writers and leaves orig
   assert.deepEqual(fs.readFileSync(new URL('revisions.json',location)),bytes);
   for(const [name,hash]of originals)assert.equal(sha256(fs.readFileSync(new URL(name,location))),hash);
   assert.equal(fs.readdirSync(location).filter(file=>file.startsWith('.')).length,0);
-  assert.equal(readInventory(location).revisions.batches.length,1);
+  assert.equal(readInventory(location).revisions.batches.length,current.inventory.revisions.batches.length+1);
 });
 
 test('missing or rewritten original ledgers cannot be replaced by a fresh initialization',async t=>{

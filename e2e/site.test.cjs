@@ -56,6 +56,38 @@ async function closeRecordDirectory(page){
   if(await summary.isVisible()&&await page.locator('#caseDirectoryPanel').evaluate(element=>element.open))await summary.click();
 }
 
+test('reviewed intertrochanteric case exposes 30 consistent teaching chapters on phone and desktop',async()=>{
+  for(const width of [320,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+      const chapters=page.locator('article.record-book-section:not(.record-book-reserved)');
+      await chapters.first().waitFor();assert.equal(await chapters.count(),30);
+      const bodies=await chapters.locator('.record-book-body').allTextContents();
+      assert(bodies.every(text=>text.startsWith('【完全虚构的教学标准病例｜第三轮修订】')));
+      assert(!bodies.some(text=>/VAS|NRS|Hb\s*134|PLT\s*238|CRP\s*3\.6|手术日期：2026-09-08/.test(text)));
+      const titles=await chapters.locator('h3').allTextContents();
+      assert(titles.indexOf('术后第2天病程')<titles.indexOf('术后第2天晚间双下肢静脉彩超结果分析记录'));
+      assert(titles.indexOf('术后第4天病程记录')<titles.indexOf('术后第5天病程'));
+      assert(titles.indexOf('出院小结')<titles.indexOf('出院医嘱单（单独复制版）'));
+      await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.__reviewedCaseCopy=value;}}}));
+      await chapters.first().getByRole('button',{name:'复制本章节',exact:true}).click();
+      await page.waitForFunction(()=>typeof window.__reviewedCaseCopy==='string');
+      assert.match(await page.evaluate(()=>window.__reviewedCaseCopy),/完全虚构的教学标准病例/);
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      await openRecordDirectory(page);
+      await page.locator('#recordBookToc a').filter({hasText:'出院医嘱单（单独复制版）'}).click();
+      await settle(page);
+      const last=chapters.filter({has:page.getByRole('heading',{name:'出院医嘱单（单独复制版）',exact:true})});
+      assert(await last.isVisible());assert.deepEqual(errors,[]);
+      if(process.env.HAJIMI_CASE_SCREENSHOT_ROOT){
+        fs.mkdirSync(process.env.HAJIMI_CASE_SCREENSHOT_ROOT,{recursive:true});
+        await page.screenshot({path:path.join(process.env.HAJIMI_CASE_SCREENSHOT_ROOT,'intertrochanteric-'+width+'.png')});
+      }
+    }finally{await context.close();}
+  }
+});
+
 test('homepage is usable without JavaScript and avoids loading clinical data', async()=>{
   const {page,context}=await pageFor(393,{javaScriptEnabled:false});
   try {await page.goto(base+'/');assert(await page.locator('#portalHome').isVisible());
