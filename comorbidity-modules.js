@@ -53,56 +53,82 @@
   ];
   const chosen=new Set();
   const get=id=>modules.find(item=>item.id===id);
-  function section(record){
-    if(!record||record.specialCase||record.department!=='骨科'||record.group==='通用场景')return '';
-    const title=String(record.short||record.name||'');
-    const kind=String(record.type||'');
-    if(/手术记录|手术安全核查|手术清点|麻醉记录|同意书|知情同意|选择治疗方案|手术谈话|麻醉术后访视/.test(title+' '+kind))return '';
-    if(/会诊申请/.test(title+' '+kind))return 'consult';
-    if(/会诊回报/.test(title+' '+kind))return '';
-    if(/出院/.test(title))return 'discharge';
-    if(record.stage==='术后' && /病程|查房|康复|护理|复查|评估/.test(title+' '+kind))return 'postop';
-    if(/术前讨论|术前小结|术前.*查房|主刀.*查房|术前访视/.test(title))return 'preop';
-    if(record.stage==='术前' && /查房|病程|评估/.test(title+' '+kind))return 'preop';
-    if(record.stage==='入院' && /入院|病程|查房|首次/.test(title+' '+kind))return 'history';
-    return '';
+  // This is a separate, opt-in writing resource, NOT a patch of the sample case.
+  // Existing cases often explicitly deny chronic conditions: mixing the text
+  // without reconciling that history would create contradictory medical records.
+  function selectedItems(){return modules.filter(item=>chosen.has(item.id));}
+  const fields=[
+    ['history','入院记录与既往史'],
+    ['preop','术前查房、术前小结及风险评估'],
+    ['consult','专科会诊申请与检查理由'],
+    ['postop','术后病程与监测'],
+    ['discharge','出院当天查房及随访']
+  ];
+  function escape(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+  function separateText(){
+    return selectedItems().map(item=>
+      '【'+item.name+'｜独立补充模块】\n'+
+      fields.map(([field,title])=>title+'：'+item[field]).join('\n\n')
+    ).join('\n\n========================================\n\n');
   }
-  function compose(record,original){
-    const category=section(record);
-    const snippets=category?[...chosen].map(get).filter(Boolean).map(item=>item.name+'：'+item[category]).filter(line=>!line.endsWith('undefined')):[];
-    if(!snippets.length)return original;
-    const supplementary='合并慢性病评估与处理（须根据患者实际资料逐项核实）：'+snippets.join(' ');
-    const signature=/\n\n医师签名：/;
-    if(/病程|查房/.test(String(record.short||''))&&signature.test(original)){
-      return String(original).replace(signature,' '+supplementary+'\n\n医师签名：');
-    }
-    return String(original)+'\n\n【合并慢性病补充（使用前逐项核实）】\n'+snippets.join('\n');
+  function renderSelected(){
+    const items=selectedItems();
+    return items.length
+      ?items.map(item=>'<article class="comorbidity-detail"><h4>'+escape(item.name)+'</h4>'+
+        fields.map(([field,title])=>'<div><strong>'+escape(title)+'</strong><p>'+escape(item[field])+'</p></div>').join('')+
+        '</article>').join('')
+      :'<p class="comorbidity-empty">尚未选择慢性病。可多选后查看各阶段的独立补充资料。</p>';
   }
+  // Intentionally identity-only; prevent source text and full-record copy from
+  // gaining contradictory claims when a sample patient denies a condition.
+  function compose(record,original){return original;}
   function html(){
     return '<section id="comorbidityPanel" class="comorbidity-panel" aria-labelledby="comorbidityTitle">'+
       '<div class="comorbidity-head"><div><span class="case-file-eyebrow">OPTIONAL COMORBIDITIES</span><h3 id="comorbidityTitle">合并慢性病管理</h3>'+
-      '<p>勾选患者已确诊的慢性病，在适用的入院、会诊、术前、术后及出院章节追加待核对补充内容；不更改原始模板、手术记录或特殊病例。</p></div>'+
+      '<p>在整套标准病历后查阅独立的慢性病补充资料。勾选后分别展示入院、术前、会诊、术后及出院参考段落。</p></div>'+
       '<button id="clearComorbidities" class="btn ghost" type="button">清空选择</button></div>'+
+      '<p class="comorbidity-caution">原始教学病例可能已明确记载“否认慢性病史”及特定检查结果。本模块不与原病例自动拼接，正式使用前须先按真实病史、检查、医嘱及手术时机逐项修改，避免同一病历前后矛盾。</p>'+
       '<div class="comorbidity-grid">'+modules.map(item=>
-        '<label class="comorbidity-choice"><input type="checkbox" data-comorbidity="'+item.id+'"'+(chosen.has(item.id)?' checked':'')+'><span>'+item.name+'</span></label>'
-      ).join('')+'</div><div class="comorbidity-footer"><span id="comorbiditySelectionStatus" role="status">'+chosen.size+' 项已选择</span>'+
-      '<span>检查结果、药物和手术时机均须依据真实情况确定；本模块仅作书写辅助。</span></div></section>';
+        '<label class="comorbidity-choice"><input type="checkbox" data-comorbidity="'+item.id+'"'+(chosen.has(item.id)?' checked':'')+'><span>'+escape(item.name)+'</span></label>'
+      ).join('')+'</div>'+
+      '<div class="comorbidity-actions"><span id="comorbiditySelectionStatus" role="status">'+chosen.size+' 项已选择</span>'+
+      '<button id="copyComorbidities" class="btn primary" type="button"'+(chosen.size?'':' disabled')+'>仅复制已选慢性病补充</button></div>'+
+      '<div id="comorbidityNotes" class="comorbidity-notes">'+renderSelected()+'</div>'+
+      '<div class="comorbidity-footer"><span>检查结果、用药、处理结论及实际操作均须核对。</span><span>不会修改原始病历或“复制完整病历”的内容。</span></div></section>';
   }
-  function bind(refresh){
+  function bind(){
     const panel=document.getElementById('comorbidityPanel');
     if(!panel)return;
+    const notes=panel.querySelector('#comorbidityNotes');
+    const status=panel.querySelector('#comorbiditySelectionStatus');
+    const copy=panel.querySelector('#copyComorbidities');
+    const redraw=()=>{
+      status.textContent=chosen.size+' 项已选择';
+      copy.disabled=chosen.size===0;
+      notes.innerHTML=renderSelected();
+    };
     panel.querySelectorAll('[data-comorbidity]').forEach(input=>input.addEventListener('change',()=>{
-      if(input.checked)chosen.add(input.dataset.comorbidity);else chosen.delete(input.dataset.comorbidity);
-      panel.querySelector('#comorbiditySelectionStatus').textContent=chosen.size+' 项已选择';
-      refresh();
+      if(input.checked)chosen.add(input.dataset.comorbidity);
+      else chosen.delete(input.dataset.comorbidity);
+      redraw();
     }));
-    const clear=panel.querySelector('#clearComorbidities');
-    clear.addEventListener('click',()=>{
+    panel.querySelector('#clearComorbidities').addEventListener('click',()=>{
       chosen.clear();
       panel.querySelectorAll('[data-comorbidity]').forEach(input=>{input.checked=false;});
-      panel.querySelector('#comorbiditySelectionStatus').textContent='0 项已选择';
-      refresh();
+      redraw();
     });
+    copy.addEventListener('click',async()=>{
+      const value=separateText();if(!value)return;
+      let ok=false;
+      try{await navigator.clipboard.writeText(value);ok=true;}catch{
+        const input=document.createElement('textarea');
+        input.value=value;document.body.appendChild(input);input.select();
+        try{ok=document.execCommand('copy');}catch{}
+        input.remove();
+      }
+      status.textContent=ok?'已复制 '+chosen.size+' 项补充资料':'复制失败，请核对浏览器权限';
+    });
+    redraw();
   }
-  root.HAJIMI_COMORBIDITIES=Object.freeze({modules,section,compose,html,bind,selected:()=>[...chosen]});
+  root.HAJIMI_COMORBIDITIES=Object.freeze({modules,compose,html,bind,separateText,selected:()=>[...chosen]});
 })(typeof window!=='undefined'?window:globalThis);
