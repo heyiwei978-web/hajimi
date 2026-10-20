@@ -63,5 +63,5 @@ test('surgical, consent, special case, scenario and other departments remain unt
     {...base,department:'普外科',short:'术前查房',stage:'术前',type:'查房'}
   ])assert.equal(f.m.compose(record,'原始不变'),'原始不变');
   f.clear.handler();
-  assert.deepEqual(f.m.selected(),[]);assert.equal(f.refreshes(),2);
+  assert.deepEqual(Array.from(f.m.selected()),[]);assert.equal(f.refreshes(),2);
 });
