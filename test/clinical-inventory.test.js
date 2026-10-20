@@ -31,7 +31,7 @@ function archiveDuplicate(inventory){
 test('the committed baseline preserves complete cases and every special-case document',()=>{
   assert.deepEqual(current.inventory.baseline.summary,{records:5361,projectGroups:204,diseaseOrProcedureGroups:203,
     standardCases:203,standardRecords:5313,specialCases:2,specialRecords:44,utilityRecords:4,archivedRecords:0});
-  assert.equal(current.plan.published.length,5361);
+  assert.equal(current.plan.published.length,current.inventory.baseline.summary.records+current.inventory.revisions.batches.reduce((count,batch)=>count+batch.additions.length,0));
   assert.equal(current.plan.archived.length,0);
   assert.deepEqual(current.inventory.baseline.cases.filter(c=>c.caseType==='special').map(c=>c.recordIds.length),[29,15]);
   assert.equal(current.inventory.baseline.ambiguousNames[0].recordIds.length,3);
@@ -84,7 +84,7 @@ test('special cases, different procedures and ambiguous CMS names cannot be arch
 test('public compilation retains exact payloads while excluding authoring sources and duplicate router medical text',t=>{
   const directory=fs.mkdtempSync(path.join(os.tmpdir(),'clinical-slim-test-'));t.after(()=>fs.rmSync(directory,{recursive:true,force:true}));
   const {manifest}=compileClinicalSite(fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),pathToFileURL(directory+'/'));
-  assert.equal(manifest.total,5361);
+  assert.equal(manifest.total,current.plan.published.length);
   const router=fs.readFileSync(path.join(directory,manifest.scripts.router.slice(1)),'utf8');
   const nonOrtho=current.source.records.find(r=>r.department==='普外科');
   assert(!router.includes(nonOrtho.sourceBody.slice(0,120)),'medical seed text must exist only in its lazy body resource');

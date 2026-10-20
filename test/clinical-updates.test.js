@@ -38,14 +38,14 @@ test('reviewed single-body edit rebuilds while all other 5360 identities and rec
   assert.equal(canonical(current.inventory),before,'preview/apply never mutate the original inventory');
   assert.deepEqual(updated.baseline,current.inventory.baseline);assert.deepEqual(updated.records,current.inventory.records);
   const plan=planClinicalPublication(source,updated);
-  for(let i=0;i<5361;i++){
+  for(let i=0;i<current.plan.published.length;i++){
     assert.deepEqual(plan.published[i].identity,current.plan.published[i].identity);
     if(i!==4){assert.deepEqual(plan.published[i].record,current.source.records[i]);assert.deepEqual(plan.published[i].content,current.plan.published[i].content);}
   }
   const oldDir=temp(t),newDir=temp(t),html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
   const oldBuild=compileClinicalSite(html,oldDir),newBuild=compileClinicalSite(html,newDir,{source,inventory:updated});
   const oldBodies=payloads(oldDir,oldBuild.manifest),newBodies=payloads(newDir,newBuild.manifest);
-  assert.equal(newBodies.size,5357);assert.equal(newBuild.manifest.total,5361);
+  assert.equal(newBodies.size,current.plan.published.filter(entry=>typeof entry.record.sourceBody==='string').length);assert.equal(newBuild.manifest.total,current.plan.published.length);
   assert.deepEqual([...newBodies.keys()],[...oldBodies.keys()]);
   assert.deepEqual([...oldBodies].filter(([id,body])=>body!==newBodies.get(id)).map(([id])=>id),[4]);
   assert.equal(newBodies.get(4),source.records[4].sourceBody);
@@ -59,17 +59,17 @@ test('new records inserted before old arrays get permanent appended IDs, includi
   const add=label=>({...template,name:template.group+' · '+label,short:label,sourceBody:'合成新增正文 '+label});
   source.records.unshift(add('合成新增 A'));source.renderedBodies.unshift(source.records[0].sourceBody);
   const proposal=proposeClinicalUpdate(source,current.source,current.inventory,{sourceCommit:commit});
-  assert.equal(proposal.additions[0].identity.legacyId,5361);
+  assert.equal(proposal.additions[0].identity.legacyId,current.plan.state.maxId+1);
   const next=applyClinicalUpdate(source,current.source,current.inventory,proposal,authorize(proposal));
   const plan=planClinicalPublication(source,next);
-  for(let i=0;i<5361;i++)assert.deepEqual(plan.published[i].identity,current.plan.published[i].identity);
+  for(let i=0;i<current.plan.published.length;i++)assert.deepEqual(plan.published[i].identity,current.plan.published[i].identity);
   const again=structuredClone(source);again.records.unshift(add('合成新增 B'));again.renderedBodies.unshift(again.records[0].sourceBody);
   const second=proposeClinicalUpdate(again,source,next,{sourceCommit:commit});
-  assert.equal(second.additions[0].identity.legacyId,5362);
+  assert.equal(second.additions[0].identity.legacyId,current.plan.state.maxId+2);
   const final=applyClinicalUpdate(again,source,next,second,authorize(second));
   const reverse={...again,records:[...again.records].reverse(),renderedBodies:[...again.renderedBodies].reverse()};
-  assert.deepEqual(planClinicalPublication(reverse,final).published.slice(0,5362).map(e=>e.identity),plan.published.map(e=>e.identity));
-  assert.equal(deriveClinicalState(final).identities.get('clinical-v1-r005361').name,source.records[0].name);
+  assert.deepEqual(planClinicalPublication(reverse,final).published.slice(0,current.plan.published.length+1).map(e=>e.identity),plan.published.map(e=>e.identity));
+  assert.equal(deriveClinicalState(final).identities.get('clinical-v1-r'+String(current.plan.state.maxId+1).padStart(6,'0')).name,source.records[0].name);
 });
 
 test('exact authorization and full review metadata are required; edited or stale proposals fail',()=>{
@@ -117,7 +117,7 @@ test('default generated body changes are individually reviewed even when record 
   assert.equal(ids.length,4);assert.equal(proposal.updates.length,4);
   for(const update of proposal.updates){assert.equal(update.before.recordHash,update.after.recordHash);assert.notEqual(update.before.renderedHash,update.after.renderedHash);}
   const next=applyClinicalUpdate(source,current.source,current.inventory,proposal,authorize(proposal));
-  assert.equal(planClinicalPublication(source,next).published.length,5361);
+  assert.equal(planClinicalPublication(source,next).published.length,current.plan.published.length);
 });
 
 test('revision persistence is atomic, detects concurrent writers and leaves original anchors untouched',t=>{

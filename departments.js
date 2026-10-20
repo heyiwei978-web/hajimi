@@ -447,7 +447,17 @@
       </article>`;
     }
     function sortRecordList(raw){
+      // The reviewed case includes supplementary forms with explicitly unknown
+      // clock times. Keep their reviewed document order without inventing times.
+      const reviewedIntertrochanteric = raw.length > 0 && raw.every(t =>
+        t.department === '骨科' && t.group === '股骨转子间骨折' &&
+        String(t.sourceBody || '').startsWith("【完全虚构的教学标准病例｜第三轮修订】"));
+      const reviewedOrder = reviewedIntertrochanteric ? ["入院记录", "首次病程记录", "主治医师首次查房记录", "主任医师首次查房记录", "选择治疗方案沟通记录", "多学科术前讨论", "手术知情同意记录", "麻醉知情同意书", "麻醉术前访视记录", "术前小结", "术前主刀查房", "手术安全核查记录", "麻醉记录", "手术记录", "手术清点记录", "术后首次病程记录", "麻醉术后访视记录", "术后主刀查房记录", "术后第1天病程", "术后第2天病程", "术后第2天晚间双下肢静脉彩超结果分析记录", "术后第3天病程", "影像复查及结果分析", "康复评估与训练记录", "术后第4天病程记录", "术后第5天病程", "出院当天查房记录", "出院前主治医师查房记录", "出院小结", "出院医嘱单（单独复制版）"] : [];
       return [...raw].sort((a,b)=>{
+        if(reviewedIntertrochanteric){
+          const ao=reviewedOrder.indexOf(a.short),bo=reviewedOrder.indexOf(b.short);
+          if(ao>=0 && bo>=0 && ao!==bo)return ao-bo;
+        }
         if(Number.isFinite(a.recordOrder)||Number.isFinite(b.recordOrder)){
           const ao=Number.isFinite(a.recordOrder)?a.recordOrder:9999;
           const bo=Number.isFinite(b.recordOrder)?b.recordOrder:9999;
@@ -724,7 +734,7 @@
         :'1 套完整病历 · '+list.length+' 个现有章节';
       if(empty)empty.hidden=(list.length+specialRaw.length)>0;
 
-      const isDischarge=(t)=>/出院小结|出院记录|出院病历/.test((t.short||'')+' '+(t.name||''));
+      const isDischarge=(t)=>/出院小结|出院记录|出院病历/.test((t.short||'')+' '+(t.name||''))||(t.group==='股骨转子间骨折'&&t.type==='出院医嘱');
       const beforeDischarge=list.filter((t)=>!isDischarge(t));
       const dischargeItems=list.filter(isDischarge);
       const tocBefore=beforeDischarge.map((t)=>{const i=list.indexOf(t);return `<a href="#${recordBookId(t,i)}"><span>${String(i+1).padStart(2,'0')}</span><b>${t.short||t.name}</b><small>${t.stage}</small></a>`;}).join('');

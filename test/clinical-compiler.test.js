@@ -26,11 +26,11 @@ test('compiled catalogs and per-disease bodies preserve every original clinical 
   }
   const newDischargeRounds=source.records.filter(r=>r.department==='骨科'&&r.short==='出院当天查房记录');
   assert.ok(newDischargeRounds.length>=200,'Every orthopedic model patient needs a discharge-day round');
-  assert.equal(records.length,5159+newDischargeRounds.length);
+  assert.equal(records.length,source.records.length);
   // Convert cross-context objects before comparison; all public fields, flags,
   // special-case ordering and every body must survive the data split unchanged.
   assert.deepEqual(JSON.parse(JSON.stringify(records)),source.records);
-  assert.equal(manifest.departments.guke.count,5132+newDischargeRounds.length);
+  assert.equal(manifest.departments.guke.count,source.records.filter(record=>record.department==='骨科').length);
   // Regression: these assertions read published per-disease JSON, not preview-only scripts.
   const femur=records.find(r=>r.department==='骨科'&&r.group==='股骨转子间骨折'&&r.short==='手术记录'&&!r.specialCase);
   assert.ok(femur?.sourceBody,'股骨转子间骨折手术记录缺失');

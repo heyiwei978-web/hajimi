@@ -1,5 +1,544 @@
 {
   "schemaVersion": 1,
   "baselineCommit": "b32800dfe67e3a5712768977cbc6b7aeb2061086",
-  "batches": []
+  "batches": [
+    {
+      "schemaVersion": 1,
+      "baselineCommit": "b32800dfe67e3a5712768977cbc6b7aeb2061086",
+      "expectedRevision": "22e9d724c59441722bbfd54104d8beec89fcd109db204b620295a5036be3f6cf",
+      "sourceCommit": "b90f719c8c6dc12616adb25e00f3b948091263f9",
+      "sourceSnapshotHash": "e06cc2f4e8e1bec9f6aa7e5126d8a799d5082fad3a8292c2b662c52c0aca16fe",
+      "updates": [
+        {
+          "recordId": "clinical-v1-r000083",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "7f7dbf557584984557d1ad30801701c2e3d4b75f34370739de8558ad300b39f8",
+            "renderedHash": "7f7dbf557584984557d1ad30801701c2e3d4b75f34370739de8558ad300b39f8",
+            "recordHash": "9150431e3236a6fac1281a755d93db3bf2d179daa58734b49bb85f4298d72a10"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "6d9eddfd5087f9fc413c2ecb8f0e1fbb88048353bd0dd4701a37c17110db96e4",
+            "renderedHash": "6d9eddfd5087f9fc413c2ecb8f0e1fbb88048353bd0dd4701a37c17110db96e4",
+            "recordHash": "b4d2e5911b288f201d0cf68ffdda9d77cb8ad92aa680db8a767343b0557f4483"
+          },
+          "metadataHash": "d21e8b6897061397eb52614228b01f6e0b3075dda5d143d73c33438ad833309c"
+        },
+        {
+          "recordId": "clinical-v1-r000084",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "00dd4ce6c1952e4bbf1eeeb09272e68e509ad73264f8da7f8463e530d4ef9a06",
+            "renderedHash": "3be64479fe4577ba24c05ee148375348fe4e1229c3b8af920fe6d17b4befd82b",
+            "recordHash": "79c7604ef320ad8c6756e5c06c7faf6c79a593432d3f0df6cbac12f1c641b9fb"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "857fda4de15e0690f69f67f82a8409ed010c5d419eda95fa08eaf356437f5ae9",
+            "renderedHash": "8392bd8dc744deb167efc958ecc370a6b615af9981432407334fbb09410f5beb",
+            "recordHash": "c4eef147c80700d29034adec08e5f759cda583bdbf26d91080663897f6e4c61f"
+          },
+          "metadataHash": "028cb806ac60a9f666d9b9b46f5902202059dc91d5e01631b0a96bf41cd82cf0"
+        },
+        {
+          "recordId": "clinical-v1-r000085",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "d31609359f51be3138a9ee8afba84ef52954baa40806cb4f048f16f08d560736",
+            "renderedHash": "505f23471b2acc0af81129233f5bd7841e4c6274f4fbd8af26137995c46f568c",
+            "recordHash": "0093ba5bd45209d43d3731b6672865b3a1e577145f92ab2e144d6830f6a5420a"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "7b0d2059417a960619eda980830272b2ef093010c78ead92f95da482ffdbf35d",
+            "renderedHash": "50a1070201a8615bc39924741d9c3e0c9d38183f65f094a7407d9babc9250705",
+            "recordHash": "a730a5dde50eec58283abce949a000346caa7c29ea61b315352afa8e3434193a"
+          },
+          "metadataHash": "1575ce05e50f17e49e496317a13504fa6dd1b46296a5198f14af67a487034ee8"
+        },
+        {
+          "recordId": "clinical-v1-r000086",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "d712769daa0f941cea115cd66f2493921c99b79822d06d69f89f586de26edac5",
+            "renderedHash": "80a3fba204773c91940474238350827c7a1e7d11b841c1c69efbafcbff84c00b",
+            "recordHash": "b05f571de618b2f87c337e6f6f759e6b3e28111f0a33ef0e488deeb56a01d2a5"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "ef5ccb04c93ed1f67f2d771bbb8d4c0ea97c62278e188cadb061b0aee1a7f906",
+            "renderedHash": "7ceec505ca614c13f053f48820c20b30eac2c6bf5fe0755b44fc3e20a3d354ff",
+            "recordHash": "0dacef11c04d3598d07b6d8539bc4b59168d935fa70bbf1896f4162f2d7adb76"
+          },
+          "metadataHash": "0c0018532eeb4d9dcea5f5c272c11f9a41c220e082db539143754c10a4a2aac5"
+        },
+        {
+          "recordId": "clinical-v1-r000087",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "1022793afd38338ccdca89f8f127969da65890e98ff6fb4570d9af93f67568f6",
+            "renderedHash": "1022793afd38338ccdca89f8f127969da65890e98ff6fb4570d9af93f67568f6",
+            "recordHash": "0274cb79cab7f4530a420a603e28b27bddaf3cfcd70f96bc94c2be1617982b28"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "7342ea9de37537912e68693581b64e41de5474bc00210117e12a0972c0f8e07a",
+            "renderedHash": "7342ea9de37537912e68693581b64e41de5474bc00210117e12a0972c0f8e07a",
+            "recordHash": "f6b3f86f15a0a0bb3d6cc3bfa54c3ffdca6141ec0d7697116bca5b80c1385fe0"
+          },
+          "metadataHash": "cc4f35e4f624878496c929082f376160fe42f194f84a44f38ec099bf55007ffe"
+        },
+        {
+          "recordId": "clinical-v1-r000088",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "619795e854c15f5f8e2ce86ab570c8f82a70a1c5f4b18f2ac5aff2225ec50c9c",
+            "renderedHash": "204cad17c4ee49fdbd5aa018453a0af668ed01b7382d50cb3752572df3630a53",
+            "recordHash": "d459fcb0a67ef24955b4320501158b9c1765c0f72f9c35febd70a8e5124b9299"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "cab9ea7c9aa45d285e4aaa545e45fb45371d4ffc4980995549ae6dc49f3276db",
+            "renderedHash": "d9909a14db0e74c09226da68e2f352e1f73033c5982a720de8918e79e1dcf9aa",
+            "recordHash": "b353ff04854159b5dd8bbc0094e8b2dbd23b359f6f8c373d6c6ec79750c4d47d"
+          },
+          "metadataHash": "d1558a9805cd2096d4af5f113f7dfe5272851583e44c0222d360bbf6bedf0bc9"
+        },
+        {
+          "recordId": "clinical-v1-r000089",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "cc212704ade163a2e92b68ec802e7c8f1b66f7cb7e2be1a791ee755229f4e4a7",
+            "renderedHash": "cc212704ade163a2e92b68ec802e7c8f1b66f7cb7e2be1a791ee755229f4e4a7",
+            "recordHash": "09b217d5df408658c6db6daae6e033d7a0d511c0b94aa3d1f283b1f9177e3dc4"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "aa0853efb77991c4c1ac98efdd7432d4f959ed8d509b477041606912ba4d0785",
+            "renderedHash": "aa0853efb77991c4c1ac98efdd7432d4f959ed8d509b477041606912ba4d0785",
+            "recordHash": "6d30f17d3ef01fd9e2b393d48150f5da7d15a68472e6d9c99d3d071b406c319c"
+          },
+          "metadataHash": "d8e2dacde7a986d88a28aa99ce16158bbd2cf6679db4aa79f4901b4c8e789884"
+        },
+        {
+          "recordId": "clinical-v1-r000090",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "76a9786646f5977ab922c31e9144e93d1af9cd0310fc13ab8d1b06439f6a48a2",
+            "renderedHash": "76a9786646f5977ab922c31e9144e93d1af9cd0310fc13ab8d1b06439f6a48a2",
+            "recordHash": "8b323f3e0511e3c8720557b34038daadbe9855f7e71821e4f4640c833791a870"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "d41cbfa3c164d6617435ea5fc0b18410465d2537c2b6c2df01681cafe02e2e16",
+            "renderedHash": "d41cbfa3c164d6617435ea5fc0b18410465d2537c2b6c2df01681cafe02e2e16",
+            "recordHash": "905dbcc3e4afafc55f54046c0573f2a3b388b1bf08e8aab53a4066a003a9e02f"
+          },
+          "metadataHash": "d6ac4521e5ba5c2ce9a811ebbe38bd52bc687407bf1e1cea4b95158273b4ddf5"
+        },
+        {
+          "recordId": "clinical-v1-r000091",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "f13e79af0035c8ded011fe22ba2507ac6b3a530bb2fd2562239a83b62ab2fd8a",
+            "renderedHash": "f13e79af0035c8ded011fe22ba2507ac6b3a530bb2fd2562239a83b62ab2fd8a",
+            "recordHash": "5ec4a37c002f501addc26e95def7e2d01ae24a7ff88d5aa367327edd3b6a69b2"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "4dbc0a048197b4459d88e2a492a4467cc5bea18d3a938438c34752115b5b9d2e",
+            "renderedHash": "4dbc0a048197b4459d88e2a492a4467cc5bea18d3a938438c34752115b5b9d2e",
+            "recordHash": "005c6382e7ffbc9622bbf1f150b6749bec38f26f2719b8f365fcb66b4e85a08f"
+          },
+          "metadataHash": "ad955b806b57e496a5889e05f26f5cf8b2f0e890bd180744c66bcd1ab63949a7"
+        },
+        {
+          "recordId": "clinical-v1-r000092",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "9c908128f2251d2012f3c43192748d2b88b60571d455bcf4adf01b9a29d38a42",
+            "renderedHash": "9c908128f2251d2012f3c43192748d2b88b60571d455bcf4adf01b9a29d38a42",
+            "recordHash": "d176c44e92c6cf5a251d2438bae1be304e2edb8cf7a12eab5ed55c3475b64435"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "41d9a5aa4b213a95efa6d2286425489b42cf152177275bb0e14ced8b56fd2890",
+            "renderedHash": "41d9a5aa4b213a95efa6d2286425489b42cf152177275bb0e14ced8b56fd2890",
+            "recordHash": "61c41d8251bdc133536265a15a1a07270e295b3300968951c2cdd8a8081251d1"
+          },
+          "metadataHash": "fec6767fdd721fe229434965693c4f20b8e393837cda90b8e734581b0fb9cd84"
+        },
+        {
+          "recordId": "clinical-v1-r000093",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "f15b7f63d2237da1e7fbf055c2f23a9846486f89477e9c0277b7ee510cf73ac6",
+            "renderedHash": "f15b7f63d2237da1e7fbf055c2f23a9846486f89477e9c0277b7ee510cf73ac6",
+            "recordHash": "18e6350f8249c5ffe0b58578eb13e9226ef6a50749ca05c57d3963c607dc30d4"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "30fcb6574f71c61f51bc0e9d5f7ad43346ce21da2eb2462384a71fb0d0fbcbc5",
+            "renderedHash": "30fcb6574f71c61f51bc0e9d5f7ad43346ce21da2eb2462384a71fb0d0fbcbc5",
+            "recordHash": "5e0bce2634a81bac1f35dcf9ae325f62b8211326d37c48d4e15b2f391162eb17"
+          },
+          "metadataHash": "0041ab6563cc8c0f9cb3b6f8cbaac4abb82dfc13df9adb31655810f0cd17771c"
+        },
+        {
+          "recordId": "clinical-v1-r000094",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "33c98375c0ab7174ae9b5f75a3e91ee6edb8f1ababb522697da93f016c1f923a",
+            "renderedHash": "33c98375c0ab7174ae9b5f75a3e91ee6edb8f1ababb522697da93f016c1f923a",
+            "recordHash": "aabb29862b8d161498160e62493e42516b23b61e00823592d365e2a0cc3a2bae"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "dfe89003f374d26267c27fa848a112d060ebf2025b59723f53b1d75a1336418d",
+            "renderedHash": "dfe89003f374d26267c27fa848a112d060ebf2025b59723f53b1d75a1336418d",
+            "recordHash": "4d1e52efbef457f2763fe0e5d17f91ef8f04aeca6f6d0d7fe78c7ed937e5473f"
+          },
+          "metadataHash": "f111bc3ea7e1636858f51d72f0af2805da5183e276c7f00470b7ce42974902ef"
+        },
+        {
+          "recordId": "clinical-v1-r000095",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "633a10fbede96bf847de307bcf3595efe07f4044e443497fb909e5dc16cb14d5",
+            "renderedHash": "633a10fbede96bf847de307bcf3595efe07f4044e443497fb909e5dc16cb14d5",
+            "recordHash": "d4da6e96c555118d8fd227e592c1cde3a407451c37463612795637f911ef6674"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "1eaaf895124f23eaa19326c809db704d95634d0288eed1c5000344b84a38ac6c",
+            "renderedHash": "1eaaf895124f23eaa19326c809db704d95634d0288eed1c5000344b84a38ac6c",
+            "recordHash": "0b50ab80f221edb28635d97be95a0f3df5e381ab76236b2459096ddf914db1dd"
+          },
+          "metadataHash": "19d52f18a1b42f04ccaaf5598f079c95e8abc61baca3f011598c6059a121cb53"
+        },
+        {
+          "recordId": "clinical-v1-r000096",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "389eb1a2f2af4942d1c3905d7ba19adabb82f49e1ef8fa373c855fbc478bbc30",
+            "renderedHash": "389eb1a2f2af4942d1c3905d7ba19adabb82f49e1ef8fa373c855fbc478bbc30",
+            "recordHash": "52910009e01a882c1d07a3e968baa03243817792d5bbd51bff998506eb202edf"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "861a4dbf0d58a4d1e6f3cc5b611bd4fdf91b49c838070289b3e1e1b40250a591",
+            "renderedHash": "861a4dbf0d58a4d1e6f3cc5b611bd4fdf91b49c838070289b3e1e1b40250a591",
+            "recordHash": "5d4ea605e8b01b2d5d3659ac60742c0dda9ddd8035ea857424988e5e722f43d0"
+          },
+          "metadataHash": "bb5a482746aeba6eff9e2d9cb2345a7e09cf70340037a0948da35a3b2e040a4d"
+        },
+        {
+          "recordId": "clinical-v1-r000097",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "f4e65129617f760cfacde7c1acea10232adbf29614edf06c301a1f2cb50de437",
+            "renderedHash": "f4e65129617f760cfacde7c1acea10232adbf29614edf06c301a1f2cb50de437",
+            "recordHash": "11270051619afcc95fa67db8872c916db72803a723d853407cbac20df71e8484"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "08101a86fcd7fbb0db64984585a1753b79825b99361e60a62100df768f459be1",
+            "renderedHash": "82f3a572aad29dbd94b629cf8fd62e6bf5fbbb0dfaea45aa2a12a78e70494c59",
+            "recordHash": "a7c302b5f3866bc126f7b5bdbeabce468a745f1578f280d09547707e33eff630"
+          },
+          "metadataHash": "c6463d2560a0b8e3d513f80e1f5513d5db9b785584f81c78da0bd2f3fc159777"
+        },
+        {
+          "recordId": "clinical-v1-r000098",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "93201093ea12b424d79090821738b1e48b5cd3bec84780112599bd4bf0d2294c",
+            "renderedHash": "66430e1e6c9093017cb89833a0968888303293c3607a69552963b9d54f36b57a",
+            "recordHash": "dbfc33cff2d6e869395f57e86224cb765d5a16979963dfec6e32bc033eec739c"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "3863c10d4708f80d597770040515878b1d99d313ed2b23c7b3732e91873c73b8",
+            "renderedHash": "c4c6b39f615948989d6d42337a3101e31ea8bc1e950e65061da97664bdfb06fc",
+            "recordHash": "cf97437c96e05838dabb6fc4b1ae85b39125f286e12e7d62adeab2c1174a1ca4"
+          },
+          "metadataHash": "deff3121230a2b7c5f4e736cc4ad27be772bd8938bc695f2ae30266fce7d2a7b"
+        },
+        {
+          "recordId": "clinical-v1-r000099",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "95bdcc227db147fc62618d6273684ab6a48a52d40bc3e663da76cd50c14998a8",
+            "renderedHash": "95bdcc227db147fc62618d6273684ab6a48a52d40bc3e663da76cd50c14998a8",
+            "recordHash": "80ea3b8eec90b58bea9e98d1a5d086a656e877ae975ce1558695dab1cd55fc10"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "65f57d07173e323cf9a6e3f66f88a38dcf49069d3ca5e43220e5b106923e2bee",
+            "renderedHash": "65f57d07173e323cf9a6e3f66f88a38dcf49069d3ca5e43220e5b106923e2bee",
+            "recordHash": "84474830bc181fb4b9a61af53b2ad9257c0b1043588b7fdb7e319335f25ddb19"
+          },
+          "metadataHash": "494061edd47063a29c8fa8dc698df2c5366862d323843f587040dc47ac5ac2c5"
+        },
+        {
+          "recordId": "clinical-v1-r000100",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "74bba7a904e95312f887f534f4d38aa1cb08edd9dd7bbd9cb131369ca5b6b97c",
+            "renderedHash": "d14d88d47af9b545940f01aceb14f336e0fedfa7745992ce06c3ecf9dec4b882",
+            "recordHash": "921ab40ba2b1d32735971a9ca26bd564e20f50a01ae40b95589eee35f546bad1"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "3b36e87d05c6bf9f43457853e55b1be7408867d51e66f6e38efa17f3dfb20d3d",
+            "renderedHash": "fca4ae825f3bf2c3a1e1cc2443015bc0b287f71a606c1bb3221dbfd52d9a92f0",
+            "recordHash": "be4ab628df732754c6433922eaa68d8048d2bc146b793ef790d58598ef59b54c"
+          },
+          "metadataHash": "a61c927d8cb30e3523220a82556bee0b4fd4110e7f6e3d561871b6709e146215"
+        },
+        {
+          "recordId": "clinical-v1-r000101",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "769e37b77301d0fb2393c1d71fd9cdb2d5c6f2b6448f3194f40b83bd0e33d397",
+            "renderedHash": "0e8503a363ed2cdfeadc64d97c523c75b8ec03e6ca1101428ce28a379209dd26",
+            "recordHash": "f37aa0a69b28e9f2abd17b78c1a8181c7ae3a6430657ac738afca665a38201c0"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "c15b851bed2bbe0f103638f71b50d2a3590f1c86bac83d7e68ecff573903f03c",
+            "renderedHash": "651c4e573a6dfe26b7111570e6734a269c3c222613f443738f3e231327c4594e",
+            "recordHash": "b064d61c674749eef9628b1de6b326deba9c8f8e3362272d00ff219565d38d0b"
+          },
+          "metadataHash": "65c0bf75c3d7b392058b33cce5407ca9bbd28d956534f48e43a80a5d958c0ab4"
+        },
+        {
+          "recordId": "clinical-v1-r000102",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "014048750e158daf91994ac13cf2675cb6d54fa53b8ee404aa2159e371579ab8",
+            "renderedHash": "ba316fa1c3b2bc30a345f464caeb57d6a1ae8aa9026c690fc9a041ecde8821d5",
+            "recordHash": "a0e17ba249a84be04106b448ecacc381a132e6ad657574b1fe74e1ba192138df"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "27a798aaf7c8ba330f9f9350f7216d3b7da19930d975f2a736be0fb91edbbf5f",
+            "renderedHash": "80f92a37a418ac5c91d97137d0d2aa91767f04c2937081f8038d7a5be9aa13f2",
+            "recordHash": "0b1b62e2e4b4749b20923d2740f344133d7640fccb8fbb0ab0c78239e38101e3"
+          },
+          "metadataHash": "2981a4ce7746523ff260121055d6006a62c6d65782aaf51cee0fbc7ef0551f70"
+        },
+        {
+          "recordId": "clinical-v1-r000103",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "88e9b617e1eccca1094162dc650f32d396c910c82f65ff6d66d4cd451fdd7428",
+            "renderedHash": "9d5cc7aacb5071730b146cca8123fc74b49e396465e832cf21daeec750efddd2",
+            "recordHash": "4e29a3c556317d1d1fc7a3b997592b9d56d59de68b1aebf628187c9eb487d163"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "bcc006ae8599d68e5dfcdd6a85f99c71577ef2c25925c82663043ae79c0fead7",
+            "renderedHash": "dd2b119584321d8f95af66365d3686b51ae0d5951dbf752c61c46fa3491ba436",
+            "recordHash": "e98857004ba0849c8a634e77570fb883acd71f7d2ae6b7aa7ecd310b22260c14"
+          },
+          "metadataHash": "ac661c026e750463e71c53b39952999e69dcd822268dd433ad03cb4a4a56297c"
+        },
+        {
+          "recordId": "clinical-v1-r000104",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "9633477da2fb53475a83e86827c1be14d55f06b20339df4b3fd7a5618832e238",
+            "renderedHash": "d2044d463b9b2cf184f5a6d342ebdbe41660262505401468863fd7ff8d78b763",
+            "recordHash": "8b7a44353b81799858c2e94cbfada8b5358785b367229efc2eca5507de977ae0"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "236bd1715488f2abaf183156b8594890d29ec2e42704acd44aea9c9771a6b9b7",
+            "renderedHash": "02932346eda0a6e39efc569cfc45d9f65d3dd1718945cc5607b3be72b89f4570",
+            "recordHash": "5ac523ce6fcc2f419282da1743d334c967151a48d34583dc9b46b3015be7fe59"
+          },
+          "metadataHash": "da94733155a2ea015361e4980885c826e8d67218ea977d56ea1d9834dbc9763c"
+        },
+        {
+          "recordId": "clinical-v1-r000105",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "5d37a249af8689ab2d6779b593559485e2a09f7475e8c1d72b0ff44100501095",
+            "renderedHash": "5d37a249af8689ab2d6779b593559485e2a09f7475e8c1d72b0ff44100501095",
+            "recordHash": "60fbf3c467c9aa7c01aa97861a39e3644b49df25d2e3bede2f3d968f85773c65"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "baed8d54c02c3250f32dc6c3db19a6007565e5af461a3aa5d7b08def3232c1f8",
+            "renderedHash": "baed8d54c02c3250f32dc6c3db19a6007565e5af461a3aa5d7b08def3232c1f8",
+            "recordHash": "882d10ec7f46e30b90c87a6a06d1175ea55b5a332754f4b2011484c1b014a430"
+          },
+          "metadataHash": "75f752b62363d1c8f137f847f4f757be852af81e4514cf345a1d0381d1ae1f72"
+        },
+        {
+          "recordId": "clinical-v1-r000106",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "03634dac35303f01fb2847e2e639e8df1fa05d93f9c7f96dc1989c59cfe134bb",
+            "renderedHash": "03634dac35303f01fb2847e2e639e8df1fa05d93f9c7f96dc1989c59cfe134bb",
+            "recordHash": "f9aedb1753df5b23b3821bc4363a3aca290ed0a4f1930f73e1a57086bb53bb50"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "2460d1f3334fa64984ca9730f96bcfabfc1bef29c984b743dbde5d2fcb4a2c01",
+            "renderedHash": "2460d1f3334fa64984ca9730f96bcfabfc1bef29c984b743dbde5d2fcb4a2c01",
+            "recordHash": "48cc46b476be4e0f8c2684c0fae37b42f5bd8f85de85515140ea2f1a6ab4f763"
+          },
+          "metadataHash": "a6eaf00274b453df50446e4dd2675746689b247ee19f7328f8bb4049c505ac57"
+        },
+        {
+          "recordId": "clinical-v1-r000107",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "fac0a1382f1b39fc6fc4c31ecec9d0872ef215c6ce58c7e190fc0c352d6fc68c",
+            "renderedHash": "f34c046aa6d7e95847fb59928a405347a0fd11c00a91e1714ae86e44e8b267cd",
+            "recordHash": "7e63e5a1abe662a82323ca2c62d47621ecc49023bbb594a27b4edba66de0fb82"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "a5fd7f5e52178c2c8512c6f906af5388e49db3bc98be41c44af4f712e5e565ea",
+            "renderedHash": "d392f60ebca4e729defa97a106b681beabcf4825f6f622619927ef4f670a815b",
+            "recordHash": "d7a9c86c76db6bde9ee8349b3e37541a2ca5613047e1461f7b0df234e83affde"
+          },
+          "metadataHash": "9ef3569595b927232f86aac7ac76ce02dd888fe2f52fbcfdb8e92205d31622f6"
+        },
+        {
+          "recordId": "clinical-v1-r000108",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "61f6a9566db7086b6e8ce082cbf5ddabae5ccb62eea34c3d753d398ffa449458",
+            "renderedHash": "61f6a9566db7086b6e8ce082cbf5ddabae5ccb62eea34c3d753d398ffa449458",
+            "recordHash": "9e0724a4901fc18714c5a75913a004ab2d519ede593ea220aec9490f7837b9ea"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "90db48ddc02e7b6ef5f259375c787b3780530c2f4e0b7688f34eab8e3d94c0b1",
+            "renderedHash": "90db48ddc02e7b6ef5f259375c787b3780530c2f4e0b7688f34eab8e3d94c0b1",
+            "recordHash": "f47c93992a40668d2a9e148d4cd11833f85f92eee64165649ec314c080120bad"
+          },
+          "metadataHash": "8e4a2339ab33d1d00149539e9498096a90b3b4bd6c00bbbf424e5f05c8b7e0c5"
+        },
+        {
+          "recordId": "clinical-v1-r005162",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "4e081e1b1e550457244135cc924157722960a5065b797eff91a9a96e783e2dbc",
+            "renderedHash": "661f1941a6adc57f3d81d745216ed8b3de6e11c7f70ff1ca0680b74d7c108847",
+            "recordHash": "457122e0a9e9bbc429ae1cf3ffc46c292363f06d0625a129b7b027abe03db999"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "90743a537f2e5636014d8d79b1544e55f554386ee74273fb3dd1313b36eb6678",
+            "renderedHash": "ae7199f6065b2587e049f2bf41e234408ea48863c158cf790770e25ab146eff2",
+            "recordHash": "b4b1925f17e640cbc1d1b012931c861d7a6ef95f44f5da94cf1d0f95d354f26c"
+          },
+          "metadataHash": "1a4ba9c15b55fb701d3004e45f3a738c7262bcb3d1983177b36048b9f86ad3fb"
+        }
+      ],
+      "additions": [
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005361",
+            "legacyId": 5361,
+            "department": "骨科",
+            "group": "股骨转子间骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c6e2bdb522492c3e82674",
+            "sourceCaseKey": "standard",
+            "stage": "术后",
+            "recordType": "出院医嘱",
+            "name": "股骨转子间骨折 · 出院医嘱单（单独复制版）",
+            "short": "出院医嘱单（单独复制版）",
+            "specialCase": false,
+            "introducedBy": "record-intertrochanteric-v28.js",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "2eb9ae78a26bafcfff3d2213310633e16ace548ea73a496d7830694654a3c4a5",
+            "renderedHash": "2eb9ae78a26bafcfff3d2213310633e16ace548ea73a496d7830694654a3c4a5",
+            "recordHash": "e1f2550cd2b859ae1f931fedb9b292345535688c89118800216b99a95f73b3ed"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005362",
+            "legacyId": 5362,
+            "department": "骨科",
+            "group": "股骨转子间骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c6e2bdb522492c3e82674",
+            "sourceCaseKey": "standard",
+            "stage": "术后",
+            "recordType": "检查结果分析",
+            "name": "股骨转子间骨折 · 术后第2天晚间双下肢静脉彩超结果分析记录",
+            "short": "术后第2天晚间双下肢静脉彩超结果分析记录",
+            "specialCase": false,
+            "introducedBy": "record-intertrochanteric-v28.js",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "02cbb2881acee7c2d0772d70f31fdfb6670beba14ff60729a06498e73f2c9df4",
+            "renderedHash": "02cbb2881acee7c2d0772d70f31fdfb6670beba14ff60729a06498e73f2c9df4",
+            "recordHash": "15a68fe30661d22f73cb5251fae61c3c35278ab42ff9a4cca470c6e34692d71e"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005363",
+            "legacyId": 5363,
+            "department": "骨科",
+            "group": "股骨转子间骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c6e2bdb522492c3e82674",
+            "sourceCaseKey": "standard",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "股骨转子间骨折 · 术后第4天病程记录",
+            "short": "术后第4天病程记录",
+            "specialCase": false,
+            "introducedBy": "record-intertrochanteric-v28.js",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "6fc24c42f87baa9b54b9e00d36675efce39033a98a97ea8245556350829071c7",
+            "renderedHash": "c558bce84d7c30ec762ec373bd593609ce986b9f1d390699c66af8376d10e8b9",
+            "recordHash": "4d73948a93daaa9d8d7de55f478bd28cc3e3ef630dc748ca40fbe5744e2f68b1"
+          }
+        }
+      ],
+      "reviewHash": "c80fb955e93c7e90a2d49050aab705c1c7cdf3fc511516002ed6df712f09a9ab",
+      "proposalHash": "22f1584e0367c5a9bd1b9a19b591e314fe2aeee7ca2937cdf21c05ada5249d2f",
+      "approval": {
+        "authorizedProposalHash": "22f1584e0367c5a9bd1b9a19b591e314fe2aeee7ca2937cdf21c05ada5249d2f",
+        "reviewedBy": "用户提供第三轮虚构教学修订稿；Codex完成来源与一致性核对",
+        "reason": "用户在收到新旧文书与引用时序核对结果后明确要求“上线吧”；限定本病例27篇修订和3篇新增。",
+        "reviewReference": "user-request-2026-10-21:上线吧; input-sha256=000a441e225b97a6e857c96e30bcfb7fe8178fb6135c3bcefa181aec19f6246d; review=intertrochanteric-prepublication-review-20261021/result.md"
+      }
+    }
+  ]
 }
