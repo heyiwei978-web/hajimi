@@ -193,10 +193,10 @@
   "git": {
     "deploymentEnabled": {
       "main": false,
+      "feat/ortho-comorbidity-modules-20261021": false,
       "security/blob-static-token": false,
       "chore/clinical-library-slimming": false,
-      "refactor/site-registry-phase1": false,
-      "feat/ortho-comorbidity-modules-20261021": false
+      "refactor/site-registry-phase1": false
     }
   },
   "buildCommand": "npm run build",
