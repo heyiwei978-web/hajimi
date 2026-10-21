@@ -776,6 +776,7 @@
         </section>`;
 
       const allChapters=list.map(function(t,i){return recordChapter(t,i);}).join('');
+      const comorbidityPanel=currentDept==='骨科'&&state.group!=='通用场景' ? (window.HAJIMI_COMORBIDITIES?.html()||'') : '';
       const grouping=caseFileSections(list);
       const signedCount=grouping.find(function(x){return x.key==='consent';}).members.length;
       if(grid)grid.innerHTML=toolbar(currentDept+' · '+labelFor(state.group),false)+hero+
@@ -798,7 +799,7 @@
               '</div>'+
             '</nav>'+
           '</div>'+
-        '</section>'+specialBundle.html;
+        '</section>'+comorbidityPanel+specialBundle.html;
 
       const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateDepartment(currentDept);
       bindTemplateActions();
@@ -808,6 +809,7 @@
       const printWhole=document.getElementById('printWholeRecord');if(printWhole)printWhole.onclick=()=>window.print();
 
       bindCaseFileReader();
+      window.HAJIMI_COMORBIDITIES?.bind();
       window.HAJIMI_UI?.mount();
 
       document.querySelectorAll('.copy-special-case').forEach((btn)=>{
