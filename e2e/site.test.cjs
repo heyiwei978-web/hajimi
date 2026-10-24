@@ -1261,3 +1261,23 @@ test('the active navigation link stays visible after loading and resizing each s
     assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
+
+test('elements carrying the hidden attribute are never displayed, and the password result appears only after generating',async()=>{
+  for(const width of [375,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      for(const route of ['/','/bl','/bl/guke','/bl/guke/TKA','/classification','/ecg','/pathway','/tools','/duty','/admin','/admin/password']){
+        await page.goto(base+route,{waitUntil:'networkidle'});
+        const shown=await page.evaluate(()=>[...document.querySelectorAll('[hidden]')].filter(element=>getComputedStyle(element).display!=='none').map(element=>element.id||element.className));
+        assert.deepEqual(shown,[],route+' shows hidden elements');
+      }
+      assert(!await page.locator('#hashResult').isVisible());
+      await page.locator('#pw1').fill('correct horse battery');
+      await page.locator('#pw2').fill('correct horse battery');
+      await page.locator('#hashForm button[type=submit]').click();
+      await page.locator('#hashResult').waitFor({state:'visible'});
+      assert.match(await page.getByLabel('密码校验码').inputValue(),/^pbkdf2\$/);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
