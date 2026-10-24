@@ -7,7 +7,11 @@
     "test": "node --test test/*.test.js",
     "audit:clinical": "node scripts/audit-clinical-library.mjs",
     "build": "node scripts/build-home.mjs",
-    "test:browser": "npm run build && node --test e2e/*.test.cjs"
+    "test:browser": "npm run build && node --test e2e/*.test.cjs",
+    "audit:quality": "node scripts/clinical-quality-audit.mjs",
+    "audit:quality:check": "node scripts/clinical-quality-audit.mjs --check",
+    "audit:operative": "node scripts/operative-conditional-audit.mjs",
+    "audit:conditional": "node scripts/clinical-conditional-language-audit.mjs"
   },
   "devDependencies": {
     "playwright": "1.61.1"
