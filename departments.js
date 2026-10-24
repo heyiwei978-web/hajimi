@@ -98,7 +98,7 @@
         key:'spine',
         title:'脊柱外科',
         eyebrow:'SPINE',
-        desc:'腰椎间盘、椎管狭窄、滑脱、颈椎脊髓病、后纵韧带骨化及脊柱侧弯。',
+        desc:'颈椎、胸椎及其他保留的脊柱疾病与术式。',
         items:spineGroups,
         reserve:[]
       },
@@ -863,7 +863,15 @@
       currentDept=r.department||null;if(!currentDept){renderDepartmentRoot();return;}
       resetState();
       if(r.disease&&allDisease(currentDept).includes(r.disease)){state.group=r.disease;renderDisease();}
-      else{renderDepartmentIndex();applyRouteSearch();}
+      else{
+        renderDepartmentIndex();
+        const withdrawn=window.HAJIMI_MANIFEST?.withdrawnGroups?.some(item=>item.department===currentDept&&item.group===r.disease);
+        if(withdrawn){
+          document.title='病种已移出 · 哈基米工作站';
+          document.getElementById('templateGrid').insertAdjacentHTML('afterbegin',
+            '<p class="intro-note" role="status">该病种已移出病历库。请从下方目录选择其他病种。</p>');
+        }else applyRouteSearch();
+      }
     }
 
     function renderSearchResults(department){

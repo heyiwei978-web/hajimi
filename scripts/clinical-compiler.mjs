@@ -64,6 +64,10 @@ export function compileClinicalSite(html,directory,{inventory,cmsAudit,source=lo
   const manifest={total:publication.published.length,identityNamespace:publication.baseline.identityNamespace,
     departments:{},groups:[...new Set([...source.groups,...publishedGroups])].filter(group=>publishedGroups.has(group)),traumaGroups:source.traumaGroups.filter(group=>publishedGroups.has(group)),
     seeds:Object.fromEntries(Object.entries(source.seeds).filter(([key])=>publishedGroups.has(key)).map(([key,value])=>[key,{category:value.category}])),bodies:{},scripts:{}};
+  const publicKeys=new Set(publication.published.map(({record:r})=>r.department+'\0'+r.group));
+  manifest.withdrawnGroups=[...new Map(publication.withdrawn.map(({record:r})=>
+    [r.department+'\0'+r.group,{department:r.department,group:r.group}]))]
+    .filter(([key])=>!publicKeys.has(key)).map(([,value])=>value);
   manifest.scripts.cms=[...html.matchAll(/<script[^>]*src="([^"]+)"/g)].map(match=>match[1]).find(value=>value.startsWith('/cms-core.js?'));
   const write=(prefix,text,extension='js')=>{const filename=prefix+'-'+digest(text)+'.'+extension;fs.writeFileSync(new URL(filename,directory),text);return '/'+filename;};
   for(const [department,slug]of Object.entries(slugs)){
@@ -95,7 +99,7 @@ export function compileClinicalSite(html,directory,{inventory,cmsAudit,source=lo
   // second copy of department medical source text inside the router.
   manifest.scripts.router=write('department-runtime',renderRouterDepartments(router.slice(0,seedStart)+'\n})([]);\n'));
   const manifestFile=write('library-manifest','window.HAJIMI_MANIFEST='+JSON.stringify(manifest)+';');
-  const scripts=`<script defer src="/library-ui.js?v=20261011-mvp1"></script>\n<script defer src="/search-core.js?v=20261011-mvp1"></script>\n<script defer src="/library-personal.js?v=20261009-personal1"></script>\n<script defer src="/comorbidity-modules.js?v=20261021-comorb1"></script>\n<script defer src="/image-upload.js?v=20261009-manager1"></script>\n<script defer src="${manifestFile}"></script>\n<script defer src="/library-loader.js?v=20261014-identity1"></script>\n<script defer src="/workspace.js?v=20261009-layout1"></script>`;
+  const scripts=`<script defer src="/library-ui.js?v=20261011-mvp1"></script>\n<script defer src="/search-core.js?v=20261011-mvp1"></script>\n<script defer src="/library-personal.js?v=20261024-lumbar1"></script>\n<script defer src="/comorbidity-modules.js?v=20261021-comorb1"></script>\n<script defer src="/image-upload.js?v=20261009-manager1"></script>\n<script defer src="${manifestFile}"></script>\n<script defer src="/library-loader.js?v=20261014-identity1"></script>\n<script defer src="/workspace.js?v=20261009-layout1"></script>`;
   const runtimeHtml=html.replace(/<script\b[^>]*src="\/[^"]+"[^>]*><\/script>\s*/g,'').replace('</body>',scripts+'\n</body>');
   fs.writeFileSync(new URL('library.html',directory),runtimeHtml);
   return {source,manifest,publication};

@@ -6,6 +6,7 @@
     const result=[];
     for(const item of Array.isArray(list)?list:[]){
       if(!item||!Object.hasOwn(departments,item.department)||typeof item.group!=='string'||!item.group.trim()||item.group.length>180||/[\u0000-\u001f]/.test(item.group))continue;
+      if(window.HAJIMI_MANIFEST?.withdrawnGroups?.some(value=>same(value,item)))continue;
       const value={department:item.department,group:item.group};
       if(!result.some(existing=>same(existing,value)))result.push(value);
     }
