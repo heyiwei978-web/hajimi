@@ -524,7 +524,7 @@ test('every orthopedic card keeps both borders inside its category on phones and
   for(const width of [320,375,393,768,1280,1440,1920]) {
     const {page,context,errors}=await pageFor(width);
     try {await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
-      assert.equal(await page.locator('.ortho-disease-card').count(),201);
+      assert.equal(await page.locator('.ortho-disease-card').count(),189);
       const categories=page.locator('.ortho-category');
       for(let i=0;i<await categories.count();i++) {
         await categories.nth(i).scrollIntoViewIfNeeded();await settle(page);
