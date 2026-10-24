@@ -136,6 +136,18 @@ test('upload rejects disguised SVG, invalid base64 and oversized bodies before c
   }
 });
 
+test('upload reports a storage failure as a JSON 503 instead of throwing', async t => {
+  const cookie = adminEnvironment(t);
+  const previous = process.env.BLOB_READ_WRITE_TOKEN;
+  delete process.env.BLOB_READ_WRITE_TOKEN;
+  t.after(() => { if (previous !== undefined) process.env.BLOB_READ_WRITE_TOKEN = previous; });
+  const png = Buffer.from([137,80,78,71,13,10,26,10,0,0,0,0]).toString('base64');
+  const res = response();
+  await upload(request({headers:{cookie},body:{type:'image/png',data:png}}),res);
+  assert.equal(res.code,503);
+  assert.equal(res.body.error,'图片保存失败，请稍后重试');
+});
+
 test('image paths cannot request other storage files, traversal or SVG content', async () => {
   for (const path of ['cms/content.json','cases/../content.json','cases/hidden.svg',['cases/a.jpg','cms/content.json']]) {
     const res = response(); await image(request({method:'GET',query:{path}}),res); assert.equal(res.code,400);
