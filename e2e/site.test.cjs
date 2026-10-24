@@ -1281,3 +1281,25 @@ test('elements carrying the hidden attribute are never displayed, and the passwo
     }finally{await context.close();}
   }
 });
+
+test('reviewed TKA chronology and operative prompts survive chapter copying on phone and desktop',async()=>{
+ for(const width of [375,1440]){
+  const {page,context,errors}=await pageFor(width);
+  try{
+   await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});
+   const chapters=page.locator('#caseWorkspace .case-file-reader > .record-book-section');
+   await chapters.first().locator('.record-book-body').waitFor();
+   await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.__reviewCopy=value;}}}));
+   for(const [name,expected] of [['术后第1天病程',/120ml[^。；]*本日未拔管/],['术后第2天病程',/55ml[^。；]*本日未拔管/],['术后第3天病程',/已于今日拔除/],['出院当天查房记录',/教学示例/],['手术记录',/【待核实是否实施：/]]){
+    const chapter=chapters.filter({has:page.getByRole('heading',{name,exact:true})});
+    const text=await chapter.locator('.record-book-body').textContent();assert.match(text,expected);
+    assert(!text.includes('右膝切口及引流/拔管过程平稳'));
+    await page.evaluate(()=>{window.__reviewCopy=null;});
+    await chapter.getByRole('button',{name:'复制本章节',exact:true}).click();
+    await page.waitForFunction(()=>typeof window.__reviewCopy==='string');
+    assert.equal(await page.evaluate(()=>window.__reviewCopy),text);
+   }
+   assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+ }
+});
