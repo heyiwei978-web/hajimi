@@ -31,7 +31,7 @@ function payloads(location,manifest){
   return new Map(Object.values(manifest.bodies).flatMap(file=>JSON.parse(fs.readFileSync(new URL(file.slice(1),location),'utf8'))));
 }
 
-test('reviewed single-body edit rebuilds while all other 5360 identities and records remain exact',t=>{
+test('reviewed single-body edit rebuilds while all other published identities and records remain exact',t=>{
   const before=canonical(current.inventory),{source,proposal,next}=changed(),updated=next();
   assert.equal(proposal.updates.length,1);assert.equal(proposal.additions.length,0);
   assert.match(proposal.review[0].sourceBodyDiff,/\+合成测试正文/);
@@ -40,7 +40,7 @@ test('reviewed single-body edit rebuilds while all other 5360 identities and rec
   const plan=planClinicalPublication(source,updated);
   for(let i=0;i<current.plan.published.length;i++){
     assert.deepEqual(plan.published[i].identity,current.plan.published[i].identity);
-    if(i!==4){assert.deepEqual(plan.published[i].record,current.source.records[i]);assert.deepEqual(plan.published[i].content,current.plan.published[i].content);}
+    if(plan.published[i].identity.legacyId!==4){assert.deepEqual(plan.published[i].record,current.plan.published[i].record);assert.deepEqual(plan.published[i].content,current.plan.published[i].content);}
   }
   const oldDir=temp(t),newDir=temp(t),html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
   const oldBuild=compileClinicalSite(html,oldDir),newBuild=compileClinicalSite(html,newDir,{source,inventory:updated});
@@ -101,8 +101,10 @@ test('renames, case reassignment, non-body metadata edits, removals and new ambi
 test('both special cases and the three same-name TKA records keep their exact ownership and CMS keys',()=>{
   const ids=[5159,5359,5360],{source,next}=changed(5359),updated=next(),plan=planClinicalPublication(source,updated);
   for(const id of ids){
-    assert.deepEqual(plan.published[id].identity,current.plan.published[id].identity);
-    assert.equal(plan.published[id].record.name,'全膝关节置换 · 出院当天查房记录');
+    const actual=plan.published.find(entry=>entry.identity.legacyId===id);
+    const previous=current.plan.published.find(entry=>entry.identity.legacyId===id);
+    assert.deepEqual(actual.identity,previous.identity);
+    assert.equal(actual.record.name,'全膝关节置换 · 出院当天查房记录');
   }
   assert.deepEqual([...plan.state.cases.values()].filter(c=>c.caseType==='special'),current.inventory.baseline.cases.filter(c=>c.caseType==='special'));
   assert.equal(plan.published.filter(e=>e.identity.specialCase).length,44);

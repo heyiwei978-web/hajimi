@@ -7,17 +7,20 @@ import {pathToFileURL} from 'node:url';
 import test from 'node:test';
 import {compileClinicalSite} from '../scripts/clinical-compiler.mjs';
 
-test('all 5361 legacy numeric lookups and stable IDs resolve the original records after lazy loading',async t=>{
+test('retained numeric and stable IDs resolve originals; withdrawn IDs remain unavailable',async t=>{
   const folder=fs.mkdtempSync(path.join(os.tmpdir(),'clinical-links-'));t.after(()=>fs.rmSync(folder,{recursive:true,force:true}));
-  const directory=pathToFileURL(folder+'/'),{source,manifest}=compileClinicalSite(fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);
+  const directory=pathToFileURL(folder+'/'),{source,manifest,publication}=compileClinicalSite(fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);
   const context={window:{HAJIMI_MANIFEST:manifest},location:{pathname:'/bl'},console,
     document:{createElement(){return {};},head:{append(){}}},fetch:async url=>({ok:true,json:async()=>JSON.parse(fs.readFileSync(new URL(url.slice(1),directory),'utf8'))})};
   vm.createContext(context);vm.runInContext(fs.readFileSync(new URL('../library-loader.js',import.meta.url),'utf8'),context);
   for(const item of Object.values(manifest.departments))vm.runInContext(fs.readFileSync(new URL(item.catalog.slice(1),directory),'utf8'),context);
   const H=context.window.HAJIMI;
-  for(let id=0;id<5361;id++){
+  const withdrawn=new Set(publication.withdrawn.map(entry=>entry.identity.legacyId));
+  for(let id=0;id<source.records.length;id++){
     const row=H.findRecord(id),stable=H.findRecord('clinical-v1-r'+String(id).padStart(6,'0'));
-    assert.equal(row,stable);assert.equal(row.name,source.records[id].name);assert.equal(row.group,source.records[id].group);
+    assert.equal(row,stable);
+    if(withdrawn.has(id)){assert.equal(row,null);continue;}
+    assert.equal(row.name,source.records[id].name);assert.equal(row.group,source.records[id].group);
     assert.equal(row.specialCaseKey,source.records[id].specialCaseKey);
   }
   // The three same-name records must remain distinct before and after body load.

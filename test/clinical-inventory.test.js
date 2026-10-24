@@ -31,7 +31,7 @@ function archiveDuplicate(inventory){
 test('the committed baseline preserves complete cases and every special-case document',()=>{
   assert.deepEqual(current.inventory.baseline.summary,{records:5361,projectGroups:204,diseaseOrProcedureGroups:203,
     standardCases:203,standardRecords:5313,specialCases:2,specialRecords:44,utilityRecords:4,archivedRecords:0});
-  assert.equal(current.plan.published.length,current.inventory.baseline.summary.records+current.inventory.revisions.batches.reduce((count,batch)=>count+batch.additions.length,0));
+  assert.equal(current.plan.published.length+current.plan.withdrawn.length,current.inventory.baseline.summary.records+current.inventory.revisions.batches.reduce((count,batch)=>count+batch.additions.length,0));
   assert.equal(current.plan.archived.length,0);
   assert.deepEqual(current.inventory.baseline.cases.filter(c=>c.caseType==='special').map(c=>c.recordIds.length),[29,15]);
   assert.equal(current.inventory.baseline.ambiguousNames[0].recordIds.length,3);
@@ -46,7 +46,8 @@ test('reordering generated documents retains every original numeric and stable i
   const reordered={...current.source,records:[...current.source.records].reverse(),renderedBodies:[...current.source.renderedBodies].reverse()};
   const result=planClinicalPublication(reordered,current.inventory);
   assert.deepEqual(result.published.map(x=>x.identity.recordId),current.plan.published.map(x=>x.identity.recordId));
-  assert.deepEqual(result.published.map(x=>x.record),current.source.records);
+  assert.deepEqual(result.published.map(x=>x.record),current.plan.published.map(x=>x.record));
+  assert.deepEqual(result.withdrawn.map(x=>x.identity.recordId).sort(),current.plan.withdrawn.map(x=>x.identity.recordId).sort());
 });
 
 test('medical changes, missing records and duplicate identities stop publication',()=>{

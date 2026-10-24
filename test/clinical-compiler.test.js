@@ -7,10 +7,10 @@ import test from 'node:test';
 import {pathToFileURL} from 'node:url';
 import {compileClinicalSite} from '../scripts/clinical-compiler.mjs';
 
-test('compiled catalogs and per-disease bodies preserve every original clinical record',t=>{
+test('compiled catalogs and per-disease bodies preserve every retained clinical record',t=>{
   const directory=fs.mkdtempSync(path.join(os.tmpdir(),'hajimi-clinical-'));
   t.after(()=>fs.rmSync(directory,{recursive:true,force:true}));
-  const {source,manifest}=compileClinicalSite(fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),pathToFileURL(directory+'/'));
+  const {source,manifest,publication}=compileClinicalSite(fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),pathToFileURL(directory+'/'));
   const records=[];
   for(const department of Object.values(manifest.departments)){
     vm.runInNewContext(fs.readFileSync(path.join(directory,department.catalog.slice(1)),'utf8'),{window:{HAJIMI:{acceptCatalog(name,{strings,extras,rows}){
@@ -26,13 +26,13 @@ test('compiled catalogs and per-disease bodies preserve every original clinical 
   }
   const newDischargeRounds=source.records.filter(r=>r.department==='骨科'&&r.short==='出院当天查房记录');
   assert.ok(newDischargeRounds.length>=200,'Every orthopedic model patient needs a discharge-day round');
-  assert.equal(records.length,source.records.length);
+  assert.equal(records.filter(Boolean).length,publication.published.length);
   // Convert cross-context objects before comparison; all public fields, flags,
   // special-case ordering and every body must survive the data split unchanged.
-  assert.deepEqual(JSON.parse(JSON.stringify(records)),source.records);
-  assert.equal(manifest.departments.guke.count,source.records.filter(record=>record.department==='骨科').length);
+  assert.deepEqual(JSON.parse(JSON.stringify(records.filter(Boolean))),publication.published.map(entry=>entry.record));
+  assert.equal(manifest.departments.guke.count,publication.published.filter(({record})=>record.department==='骨科').length);
   // Regression: these assertions read published per-disease JSON, not preview-only scripts.
-  const femur=records.find(r=>r.department==='骨科'&&r.group==='股骨转子间骨折'&&r.short==='手术记录'&&!r.specialCase);
+  const femur=records.find(r=>r&&r.department==='骨科'&&r.group==='股骨转子间骨折'&&r.short==='手术记录'&&!r.specialCase);
   assert.ok(femur?.sourceBody,'股骨转子间骨折手术记录缺失');
   const start=femur.sourceBody.indexOf('手术经过：\n');
   assert.ok(start>=0,'手术经过缺失');
@@ -43,14 +43,14 @@ test('compiled catalogs and per-disease bodies preserve every original clinical 
   assert.doesNotMatch(procedure,/^\s*\d+[.、．]/m,'正式发布JSON不得保留逐行编号步骤');
   assert.match(procedure,/大转子顶点/,'手术记录必须具有与术式匹配的具体解剖入路');
 
-  const round=records.find(r=>r.department==='骨科'&&r.group==='股骨转子间骨折'&&r.short==='主任医师首次查房记录');
+  const round=records.find(r=>r&&r.department==='骨科'&&r.group==='股骨转子间骨折'&&r.short==='主任医师首次查房记录');
   assert.ok(round?.sourceBody,'主任医师查房记录缺失');
   assert.match(round.sourceBody,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/,'主诊断、正文与医师签名须分开');
   assert.match(round.sourceBody,/________主任医师查房后指出：/,'缺少主任查房后指出的具体表述');
   assert.equal(round.sourceBody.split('\n\n').length,4,'病程记录必须保持独立的主诊断、单段正文与医师签名');
   // Whole-library clinical style regression: verify the publishable JSON for all ordinary orthopedic surgery records.
   const ordinaryOperations=records.filter(r=>r.department==='骨科'&&/手术记录/.test(r.short||'')&&!r.specialCase&&typeof r.sourceBody==='string');
-  assert.ok(ordinaryOperations.length>=200,'Too few orthopedic operation records were covered by the audit');
+  assert.ok(ordinaryOperations.length>=180,'Too few retained orthopedic operation records were covered by the audit');
   for(const r of ordinaryOperations){
     const match=r.sourceBody.match(/手术经过[：:]\s*\n([\s\S]*?)(?=\n\n(?:术后计划|术后医嘱|术后处理|术者签名|手术者签名)[：:]|$)/);
     assert.ok(match,r.group+'：缺少手术经过');
@@ -92,9 +92,9 @@ test('compiled catalogs and per-disease bodies preserve every original clinical 
     assert.doesNotMatch(section[1],/^\s*\d+[.、．]/m,r.short+'：不能保留编号式步骤');
   }
   // Guard against a generic operative route masking a more appropriate named approach.
-  const scoliosis=records.find(r=>r.department==='骨科'&&r.group==='脊柱侧弯'&&r.short==='手术记录');
+  const scoliosis=records.find(r=>r&&r.department==='骨科'&&r.group==='脊柱侧弯'&&r.short==='手术记录');
   if(scoliosis)assert.match(scoliosis.sourceBody,/椎体去旋转|旋棒/, '脊柱侧弯矫形术应包含矫形与去旋转技术，不得退化为普通脊柱骨折固定');
-  const haglund=records.find(r=>r.department==='骨科'&&r.group&&/Haglund/.test(r.group)&&r.short==='手术记录');
+  const haglund=records.find(r=>r&&r.department==='骨科'&&r.group&&/Haglund/.test(r.group)&&r.short==='手术记录');
   if(haglund)assert.match(haglund.sourceBody,/跟骨后上方|跟腱止点/,'Haglund成形不能套用单纯跟腱腱体缝合术');
   const entry=fs.readFileSync(path.join(directory,'library.html'),'utf8');
   assert(!entry.includes('/record-quality-v'));

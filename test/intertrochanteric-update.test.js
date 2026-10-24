@@ -14,7 +14,7 @@ const old=loadClinicalSource(fs.readFileSync(new URL('../index.html',import.meta
 const selected=current.plan.published.filter(entry=>entry.record.department==='骨科'&&entry.record.group==='股骨转子间骨折');
 
 test('the reviewed case updates all 27 established documents and appends three identities without touching other 5334 records',()=>{
-  assert.equal(current.plan.published.length,5364);assert.equal(selected.length,30);
+  assert.equal(current.source.records.length,5364);assert.equal(current.plan.published.length+current.plan.withdrawn.length,5364);assert.equal(selected.length,30);
   const before=new Map(old.records.map((record,index)=>[identityKey(record),{record,body:old.renderedBodies[index]}]));
   let unchanged=0,updates=0,additions=0;
   for(let index=0;index<current.source.records.length;index++){

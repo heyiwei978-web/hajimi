@@ -192,6 +192,27 @@ export function planClinicalPublication(source,inventory=readInventory(),{cmsAud
       ||!Array.isArray(cmsAudit.safeToArchiveRecordIds)||[...archived].some(id=>!cmsAudit.safeToArchiveRecordIds.includes(id)))fail('production CMS overrides/cases have not been verified; keep all records published');
     for(const row of state.identities.values())if(archived.has(row.recordId)&&row.cmsRisk==='ambiguous-legacy-name')fail('ambiguous legacy CMS names require a separate approved migration');
   }
-  const published=entries.filter(entry=>!archived.has(entry.identity.recordId)).sort((a,b)=>a.identity.legacyId-b.identity.legacyId);
-  return {baseline,state,published,archived:entries.filter(entry=>archived.has(entry.identity.recordId)),replacements};
+  // Explicit owner-requested withdrawals remove whole cases from public output.
+  // This does not archive duplicates, rebind IDs/CMS names, or delete stored data;
+  // the original ledger and source remain intact and can be republished.
+  const withdrawals=policy.withdrawals??[],withdrawn=new Set(),withdrawnCases=new Set();
+  if(!Array.isArray(withdrawals))fail('withdrawals must be an array');
+  for(const decision of withdrawals){
+    const item=cases.get(decision.caseId);
+    if(decision.status!=='withdrawn'||!item||item.caseType!=='standard'
+      ||decision.department!==item.department||decision.group!==item.group
+      ||['reason','authorizedBy','authorizationReference'].some(key=>typeof decision[key]!=='string'||!decision[key].trim()))
+      fail('withdraw only an explicitly authorized complete standard case');
+    const ids=decision.recordIds;
+    if(!Array.isArray(ids)||new Set(ids).size!==ids.length||ids.length!==item.recordIds.length
+      ||ids.some(id=>!item.recordIds.includes(id)))fail('withdrawal must name every current document of the complete case');
+    if(withdrawnCases.has(item.caseId)||ids.some(id=>archived.has(id))||[...replacements.values()].includes(item.caseId))
+      fail('duplicate or conflicting case withdrawal');
+    withdrawnCases.add(item.caseId);
+    for(const id of ids)withdrawn.add(id);
+  }
+  const published=entries.filter(entry=>!archived.has(entry.identity.recordId)&&!withdrawn.has(entry.identity.recordId))
+    .sort((a,b)=>a.identity.legacyId-b.identity.legacyId);
+  return {baseline,state,published,archived:entries.filter(entry=>archived.has(entry.identity.recordId)),
+    withdrawn:entries.filter(entry=>withdrawn.has(entry.identity.recordId)),replacements};
 }

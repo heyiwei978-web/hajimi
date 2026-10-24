@@ -74,7 +74,8 @@ async function main(args){
     diseaseOrProcedureGroups:new Set(rows.filter(r=>r.caseType!=='utility').map(r=>r.department+'\0'+r.group)).size,
     standardRecords:rows.filter(r=>r.caseType==='standard').length,utilityRecords:rows.filter(r=>r.caseType==='utility').length,
     specialCases:cases.filter(c=>c.caseType==='special').length,specialRecords:rows.filter(r=>r.specialCase).length,publishedRecords:plan.published.length,
-    archivedRecords:plan.archived.length,bodyHashMismatches:0,
+    archivedRecords:plan.archived.length,withdrawnRecords:plan.withdrawn.length,
+    withdrawnCases:new Set(plan.withdrawn.map(entry=>entry.identity.caseId)).size,bodyHashMismatches:0,
     approvedRevisionBatches:inventory.revisions.batches.length,ledgerRevision:plan.state.revision,
     ambiguousLegacyNames:inventory.baseline.ambiguousNames.length,productionCmsAudit:inventory.policy.productionCmsAudit},null,2));
 }
