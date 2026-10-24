@@ -712,8 +712,9 @@ test('search previews show actual matching document names and highlight terms wi
     try{
       const requests=[];page.on('request',request=>requests.push(new URL(request.url()).pathname));
       await page.goto(base+'/bl?q='+encodeURIComponent('tka 术后'),{waitUntil:'networkidle'});
-      const card=page.locator('.case-search-card');await card.first().waitFor({state:'visible'});
-      assert.equal(await card.count(),1);
+      const cards=page.locator('.case-search-card');await cards.first().waitFor({state:'visible'});
+      assert.equal(await cards.count(),3,'standard and both special templates are distinct results');
+      const card=cards.first();
       assert.equal(await card.locator('.case-search-code .search-hit').innerText(),'TKA');
       assert((await card.locator('.case-search-matches .search-hit').count())>0);
       const names=await card.locator('.case-search-matches li b').allTextContents();
@@ -725,7 +726,7 @@ test('search previews show actual matching document names and highlight terms wi
       assert.equal(await page.locator('.case-search-card h3 .search-hit').innerText(),'肝脓肿');
       await page.locator('#searchInput').fill('');await page.locator('#stageFilter').selectOption('术中');
       await page.locator('.case-search-matches').first().waitFor({state:'visible'});
-      assert.equal(await page.locator('.case-search-matches h4').first().innerText(),'符合筛选的文书');
+      assert.equal(await page.locator('.case-search-matches h4').first().innerText(),'符合筛选的章节');
       assert.equal(await page.locator('.case-search-card .search-hit').count(),0,'clearing the query clears highlighting');
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
