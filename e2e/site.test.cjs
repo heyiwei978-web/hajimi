@@ -56,6 +56,56 @@ async function closeRecordDirectory(page){
   if(await summary.isVisible()&&await page.locator('#caseDirectoryPanel').evaluate(element=>element.open))await summary.click();
 }
 
+test('template totals count complete cases before and after catalogs load; utility records stay separate',async()=>{
+  for(const width of [375,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/bl',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('#templateCount').innerText(),'193');
+      assert.equal(await page.evaluate(()=>templates.length),0,'complete-case totals do not require chapter loading');
+      assert.match(await page.locator('#resultCount').innerText(),/193 套完整病历模板/);
+      assert.match(await page.locator('[data-department="骨科"]').innerText(),/190 套/);
+      await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('#templateCount').innerText(),'190');
+      assert.deepEqual(await page.locator('.ortho-stats strong').allTextContents(),['190','188','2','1']);
+      assert.doesNotMatch(await page.locator('#resultCount').innerText(),/5013|份模板/);
+      assert.doesNotMatch(await page.locator('.ortho-category-head').allTextContents().then(xs=>xs.join(' ')),/份模板/);
+      await page.goto(base+'/bl/puwai',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('#templateCount').innerText(),'1');
+      await page.goto(base+'/bl/guke/'+encodeURIComponent('通用场景'),{waitUntil:'networkidle'});
+      assert.equal(await page.locator('#templateCount').innerText(),'1 组');
+      assert.match(await page.locator('#resultCount').innerText(),/4 条记录/);
+      assert.doesNotMatch(await page.locator('.record-book-hero').innerText(),/1 套完整病历/);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('search returns one standard TKA template and two distinct special templates with intact whole-case copying',async()=>{
+  const {page,context,errors}=await pageFor(393);
+  try{
+    await page.goto(base+'/bl',{waitUntil:'networkidle'});
+    await page.locator('#searchInput').fill('TKA');
+    await page.waitForFunction(()=>document.querySelectorAll('.case-search-card').length===3);
+    assert.match(await page.locator('#resultCount').innerText(),/3 套病历模板/);
+    const entries=await page.evaluate(()=>window.HAJIMI.manifest.caseTemplates.items.filter(x=>x.group==='TKA'));
+    const selected=entries.find(x=>x.caseType==='special');
+    await page.locator('[data-case-id="'+encodeURIComponent(selected.caseId)+'"]').click();
+    await page.waitForURL('**?case='+encodeURIComponent(selected.caseId));
+    const book=page.locator('details.special-case-book').filter({has:page.locator('[data-special-key="'+selected.sourceCaseKey+'"]')});
+    assert(await book.evaluate(el=>el.open));
+    assert.equal(await book.locator('.record-book-section').count(),selected.chapterCount);
+    assert.equal(await page.locator('#caseWorkspace .case-file-reader > .record-book-section').count(),28);
+    await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.__completeCaseCopy=value;}}}));
+    await book.locator('.copy-special-case').click();
+    await page.waitForFunction(()=>typeof window.__completeCaseCopy==='string');
+    assert.equal((await page.evaluate(()=>window.__completeCaseCopy)).match(/^第\d+章/gm).length,selected.chapterCount);
+    await page.locator('#copyWholeRecord').click();
+    assert.equal((await page.evaluate(()=>window.__completeCaseCopy)).match(/^第\d+章/gm).length,28,'standard copy never includes special-case chapters');
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('chronic-condition resources are separate, selectable and never rewrite reviewed case copies',async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width);

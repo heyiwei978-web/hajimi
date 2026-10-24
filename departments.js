@@ -180,7 +180,32 @@
     }
     function listForDept(dep){ensureCatalog();return departmentRecords.get(dep)||[];}
     function recordsForDisease(dep,group){ensureCatalog();return diseaseRecords.get(dep+'\0'+group)||[];}
-    function departmentCount(dep){return window.HAJIMI?Object.values(window.HAJIMI.manifest.departments).find(item=>item.name===dep)?.count||0:listForDept(dep).length;}
+    function caseEntries(dep,groups){
+      let items=window.HAJIMI?.manifest.caseTemplates?.items;
+      if(!items){
+        const byCase=new Map();
+        for(const t of templates){
+          const type=t.group==='通用场景'?'utility':t.specialCase?'special':'standard';
+          const key=JSON.stringify([t.department,t.group,type,t.specialCaseKey||t.completeCaseKey||'standard']);
+          if(!byCase.has(key))byCase.set(key,{caseId:key,department:t.department,group:t.group,caseType:type,
+            sourceCaseKey:t.specialCaseKey||t.completeCaseKey||'standard',title:t.specialCaseTitle||labelFor(t.group),chapterIds:[]});
+          byCase.get(key).chapterIds.push(t._id??templates.indexOf(t));
+        }
+        items=[...byCase.values()].map(item=>({...item,chapterCount:item.chapterIds.length}));
+      }
+      return items.filter(item=>(!dep||item.department===dep)&&(!groups||groups.includes(item.group)));
+    }
+    function caseTotals(dep,groups){
+      const items=caseEntries(dep,groups);
+      return {total:items.filter(x=>x.caseType!=='utility').length,standard:items.filter(x=>x.caseType==='standard').length,
+        special:items.filter(x=>x.caseType==='special').length,utility:items.filter(x=>x.caseType==='utility').length};
+    }
+    function departmentCount(dep){return caseTotals(dep).total;}
+    function templateStat(count,label='完整病历模板'){
+      const number=document.getElementById('templateCount'),caption=document.getElementById('templateCountLabel');
+      if(number)number.textContent=count;if(caption)caption.textContent=label;
+    }
+
     function allDisease(dep){return diseaseMap[dep]||[...new Set(listForDept(dep).map((t)=>t.group))];}
     function deptCard(dep){
       const d=departments.find((x)=>x.name===dep),n=departmentCount(dep);
@@ -195,7 +220,7 @@
           <span class="department-icon">${meta.icon}</span>
           <span class="department-eyebrow">${meta.eyebrow}</span>
         </div>
-        <div class="department-card-top"><span>科室模板</span><strong>${n} 份</strong></div>
+        <div class="department-card-top"><span>科室模板</span><strong>${n} 套</strong></div>
         <h3>${dep}</h3>
         <p>${d?.desc||'病历模板'}</p>
         <small>${meta.hint}</small>
@@ -204,7 +229,7 @@
     }
     function diseaseCard(dep,g){
       const items=recordsForDisease(dep,g);
-      const chips=['入院','术前','术中','术后'].map((s)=>{const n=items.filter((t)=>t.stage===s).length;return n?`<span>${s} ${n}</span>`:''}).join('');
+      const chips=['入院','术前','术中','术后'].map((s)=>{const n=items.filter((t)=>t.stage===s).length;return n?`<span>${s} ${n}章</span>`:''}).join('');
       return `<article class="project-card disease-card" data-disease="${encodeURIComponent(g)}" role="button" tabindex="0"><div class="project-card-top"><span class="project-kind">${dep}</span><strong>1 套完整病历</strong></div><h3>${labelFor(g)}</h3><p>一个病种一个连续病历页面，目录可直达术前讨论、手术记录及术后各日病程。</p><div class="project-stage-chips">${chips}</div><div class="project-open">打开完整病历 <span>→</span></div></article>`;
     }
     function orthoDiseaseCard(g){
@@ -214,16 +239,17 @@
       const stageOrder=['入院','术前','术中','术后'];
       const chips=stageOrder.map((stage)=>{
         const n=standardItems.filter((t)=>t.stage===stage).length;
-        return n?`<span>${stage}<b>${n}</b></span>`:'';
+        return n?`<span>${stage}<b>${n}章</b></span>`:'';
       }).join('');
-      const meta=specialCases.length?`1 套标准 · ${specialCases.length} 个特殊病例`:`1 套 · ${standardItems.length} 章节`;
-      const copy=specialCases.length?'标准病历与术后特殊病例分开归档，特殊病例按各自真实时间线连续阅读。':'全部记录整合到同一病种页面，按病历顺序连续阅读并通过目录快速跳转。';
+      const utility=g==='通用场景';
+      const meta=utility?`1 组 · ${standardItems.length} 条记录`:specialCases.length?`1 套标准 · ${specialCases.length} 套特殊病例`:`1 套 · ${standardItems.length} 个章节`;
+      const copy=utility?'检查理由、会诊和沟通等通用记录单独整理，不计作完整病历模板。':specialCases.length?'标准病历与术后特殊病例分开归档，特殊病例按各自真实时间线连续阅读。':'全部记录整合到同一病种页面，按病历顺序连续阅读并通过目录快速跳转。';
       return `<article class="ortho-disease-card" data-disease="${encodeURIComponent(g)}" role="button" tabindex="0">
-        <div class="ortho-card-top"><span>完整病历</span><strong>${meta}</strong></div>
+        <div class="ortho-card-top"><span>${utility?'通用记录':'完整病历模板'}</span><strong>${meta}</strong></div>
         <h3>${labelFor(g)}</h3>
         <p>${copy}</p>
         <div class="ortho-stage-chips">${chips}</div>
-        <div class="ortho-open">打开完整病历 <span>↗</span></div>
+        <div class="ortho-open">${utility?'查看通用记录':'打开整套模板'} <span>↗</span></div>
       </article>`;
     }
     function orthoReserveCard(name){
@@ -253,26 +279,25 @@
       const num=document.getElementById('resultCount');
       const grid=document.getElementById('templateGrid');
       const empty=document.getElementById('emptyState');
-      const jointCount=list.filter((t)=>jointGroups.includes(t.group)).length;
-      const traumaCount=list.filter((t)=>adultTraumaGroups.includes(t.group)).length;
-      const diseaseCount=[...new Set(list.map((t)=>t.group))].length;
+      const totals=caseTotals('骨科');
+      const diseaseCount=new Set(list.filter(t=>t.group!=='通用场景').map(t=>t.group)).size;
       if(title)title.textContent='骨科模板总览';
-      if(num)num.textContent=`${diseaseCount} 个项目 · ${list.length} 份模板`;
+      if(num)num.textContent=`${diseaseCount} 个病种 / 术式 · ${totals.total} 套完整病历模板`;
       if(empty)empty.hidden=true;
       if(grid){
         grid.innerHTML=`
-          ${toolbar(`骨科 · ${list.length} 份模板`,false)}
+          ${toolbar(`骨科 · ${totals.standard} 套标准模板 · ${totals.special} 套特殊病例`,false)}
           <section class="ortho-hero">
             <div class="ortho-hero-copy">
               <div class="ortho-eyebrow">ORTHOPAEDICS · TEMPLATE WORKSPACE</div>
               <h2>骨科病历模板</h2>
-              <p>按专科方向组织疾病与术式，进入项目后再按入院、术前、术中、术后查看具体记录。现有模板内容保持不变，仅重组浏览结构。</p>
+              <p>一个病种 / 术式对应一套标准病历模板，入院、术前、手术、术后、出院记录均为套内章节。特殊病例单独保留，通用记录另列。</p>
             </div>
             <div class="ortho-stats">
-              <div><strong>${list.length}</strong><span>全部模板</span></div>
-              <div><strong>${jointCount}</strong><span>关节置换</span></div>
-              <div><strong>${traumaCount}</strong><span>创伤骨科</span></div>
-              <div><strong>${diseaseCount}</strong><span>现有项目</span></div>
+              <div><strong>${totals.total}</strong><span>完整病历模板</span></div>
+              <div><strong>${totals.standard}</strong><span>标准模板</span></div>
+              <div><strong>${totals.special}</strong><span>特殊病例</span></div>
+              <div><strong>${totals.utility}</strong><span>通用记录组</span></div>
             </div>
           </section>
           <nav class="ortho-jump" aria-label="骨科模板分类">
@@ -287,7 +312,7 @@
                     <h3>${section.title}</h3>
                     <p>${section.desc}</p>
                   </div>
-                  <strong>${section.items.reduce((sum,g)=>sum+recordsForDisease('骨科',g).length,0)} 份模板</strong>
+                  <strong>${section.key==='soft'?caseTotals('骨科',section.items).utility+' 组通用记录':caseTotals('骨科',section.items).total+' 套完整模板'}</strong>
                 </div>
                 <div class="ortho-disease-grid">
                   ${section.items.map(orthoDiseaseCard).join('')}
@@ -310,8 +335,8 @@
       if(back)back.onclick=()=>navigateRoot();
       bindDiseaseCards();
       const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');
-      if(tc)tc.textContent=list.length;
-      if(ac)ac.textContent=list.length;
+      templateStat(totals.total);
+      if(ac)ac.textContent=totals.total;
       // The catalog loads asynchronously, so an initial fragment may arrive
       // before its category exists. Restore it once the overview is rendered.
       scrollToOrthoCategory();
@@ -325,11 +350,11 @@
       currentDept=null;resetState();setBrand();
       document.body.classList.add('department-no-sidebar','library-root-page');
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
-      const totalCount=window.HAJIMI?.manifest.total||templates.length;
+      const totalCount=caseTotals().total;
       const orthoCount=departmentCount('骨科');
       const otherCount=totalCount-orthoCount;
       if(title)title.textContent='选择科室';
-      if(num)num.textContent=departments.length+' 个科室 · '+totalCount+' 份模板';
+      if(num)num.textContent=departments.length+' 个科室 · '+totalCount+' 套完整病历模板';
       if(empty)empty.hidden=true;
       if(grid)grid.innerHTML=`
         <div class="library-root-home-row"><a class="btn ghost site-home-btn" href="/">⌂ 返回网站首页</a></div>
@@ -342,10 +367,10 @@
           <div class="library-overview-copy">
             <span>CLINICAL TEMPLATE LIBRARY</span>
             <h2>从科室进入，快速找到需要的病历。</h2>
-            <p>按科室、疾病或术式、住院阶段和记录类型组织。现有内容保持不变，后续可继续增加科室、疾病、案例影像和专项记录。</p>
+            <p>按完整病例管理模板。每套包含入院到出院的连续章节，可复制整套，也可单独复制某一章节；通用记录不计入完整模板数量。</p>
           </div>
           <div class="library-overview-stats">
-            <div><strong>${totalCount}</strong><span>全部模板</span></div>
+            <div><strong>${totalCount}</strong><span>完整病历模板</span></div>
             <div><strong>${departments.length}</strong><span>科室分类</span></div>
             <div><strong>${orthoCount}</strong><span>骨科模板</span></div>
             <div><strong>${otherCount}</strong><span>其他科室</span></div>
@@ -358,7 +383,7 @@
         c.onclick=go;c.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
       });
       const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');
-      if(tc)tc.textContent=totalCount;
+      templateStat(totalCount);
       if(ac)ac.textContent=totalCount;
     }
     function renderDepartmentIndex(){
@@ -369,14 +394,14 @@
       const list=listForDept(currentDept);
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
       const diseases=allDisease(currentDept);
-      if(title)title.textContent=currentDept+' · 疾病/术式';if(num)num.textContent=diseases.length+' 个项目 · '+list.length+' 份模板';if(empty)empty.hidden=true;
-      if(grid)grid.innerHTML=toolbar(currentDept+' · '+list.length+' 份模板',false)+'<div class="project-grid">'+diseases.map((g)=>diseaseCard(currentDept,g)).join('')+'</div>';
+      if(title)title.textContent=currentDept+' · 疾病/术式';if(num)num.textContent=diseases.length+' 个病种 / 术式 · '+departmentCount(currentDept)+' 套完整病历模板';if(empty)empty.hidden=true;
+      if(grid)grid.innerHTML=toolbar(currentDept+' · '+departmentCount(currentDept)+' 套完整病历模板',false)+'<div class="project-grid">'+diseases.map((g)=>diseaseCard(currentDept,g)).join('')+'</div>';
       const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateRoot();
       document.querySelectorAll('[data-disease]').forEach((c)=>{
         const go=()=>navigateDisease(decodeURIComponent(c.dataset.disease));
         c.onclick=go;c.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
       });
-      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=list.length;if(ac)ac.textContent=list.length;
+      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');templateStat(departmentCount(currentDept));if(ac)ac.textContent=departmentCount(currentDept);
     }
     function recordPriority(t){
       const s=((t.short||'')+' '+(t.name||'')+' '+(t.type||'')).replace(/\s+/g,'');
@@ -722,14 +747,15 @@
       document.body.classList.remove('library-root-page');
       document.body.classList.add('department-no-sidebar','disease-book-page');
       setBrand();
-      const raw=(coreFiltered?coreFiltered():templates).filter((t)=>t.department===currentDept&&t.group===state.group);
+      const raw=recordsForDisease(currentDept,state.group);
       const specialRaw=raw.filter((t)=>t.specialCase);
       const standardRaw=raw.filter((t)=>!t.specialCase);
       const list=sortRecordList(standardRaw);
+      const utility=state.group==='通用场景';
       const specialBundle=buildSpecialCaseBooks(specialRaw);
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
       if(title)title.textContent=currentDept+' · '+labelFor(state.group);
-      if(num)num.textContent=specialBundle.groups.length
+      if(num)num.textContent=utility?'1 组通用记录 · '+list.length+' 条记录':specialBundle.groups.length
         ?'1 套标准病历 · '+list.length+' 个章节 · '+specialBundle.groups.length+' 个特殊病例'
         :'1 套完整病历 · '+list.length+' 个现有章节';
       if(empty)empty.hidden=(list.length+specialRaw.length)>0;
@@ -768,11 +794,11 @@
         <section class="disease-hero record-book-hero">
           <div>
             <span>${currentDept==='骨科'?'ORTHOPAEDICS':'CLINICAL RECORD'} · COMPLETE MEDICAL RECORD</span>
-            <h2>${labelFor(state.group)} · 完整病历</h2>
-            <p>一个疾病只保留一个连续病历页面。顺序参照住院病历书写流程，目录可直接跳转到首次病程、查房、术前讨论、手术记录和术后各日病程。</p>
-            <div class="record-book-hero-actions"><button id="copyWholeRecord" class="btn primary" type="button">复制完整病历</button><button id="printWholeRecord" class="btn ghost" type="button">打印整套病历</button><button id="favoriteDisease" class="btn ghost" type="button" aria-pressed="false">☆ 收藏病种</button>${pathwayHref?'<a class="btn ghost" href="'+pathwayHref+'">查看临床路径</a>':''}</div>
+            <h2>${labelFor(state.group)} · ${utility?'通用记录':'完整病历模板'}</h2>
+            <p>${utility?'通用检查理由、会诊及沟通记录单独整理，按实际临床场景选用。':'一套模板包含入院、术前、手术、术后和出院章节，可连续阅读、整套复制，也可单独复制某一章节。特殊病例另行归档。'}</p>
+            <div class="record-book-hero-actions"><button id="copyWholeRecord" class="btn primary" type="button">${utility?'复制全部通用记录':'复制完整病历'}</button><button id="printWholeRecord" class="btn ghost" type="button">${utility?'打印通用记录':'打印整套病历'}</button><button id="favoriteDisease" class="btn ghost" type="button" aria-pressed="false">☆ 收藏病种</button>${pathwayHref?'<a class="btn ghost" href="'+pathwayHref+'">查看临床路径</a>':''}</div>
           </div>
-          <strong>1<small>套标准病历 · ${list.length} 个现有章节${specialBundle.groups.length?' · '+specialBundle.groups.length+'个特殊病例':''}</small></strong>
+          <strong>1<small>${utility?'组通用记录 · '+list.length+' 条记录':'套标准模板 · '+list.length+' 个章节'}${specialBundle.groups.length?' · 另有 '+specialBundle.groups.length+' 套特殊病例':''}</small></strong>
         </section>`;
 
       const allChapters=list.map(function(t,i){return recordChapter(t,i);}).join('');
@@ -780,7 +806,7 @@
       const grouping=caseFileSections(list);
       const signedCount=grouping.find(function(x){return x.key==='consent';}).members.length;
       if(grid)grid.innerHTML=toolbar(currentDept+' · '+labelFor(state.group),false)+hero+
-        '<div class="source-template-note"><strong>示例患者 · 整套病历：</strong>各章节取自本病种现有示例模板，使用前请核对患者身份、日期、检查结果、真实手术经过及签字信息；特殊病例另行归档，不与标准病例混用。</div>'+
+        '<div class="source-template-note">'+(utility?'<strong>通用记录：</strong>按真实临床问题选用和修改，不作为完整住院病例。':'<strong>示例患者 · 整套病历：</strong>使用前核对患者身份、日期、检查结果、真实诊疗经过及签字信息；特殊病例另行归档，不与标准病例混用。')+'</div>'+
         '<section id="caseWorkspace" class="case-workspace case-continuous-reader case-show-all record-book-layout">'+
           '<aside class="record-book-toc case-file-sidebar" id="recordBookToc" aria-label="完整病历目录">'+
             '<details id="caseDirectoryPanel" class="case-directory-panel" open><summary id="caseDirectorySummary" class="case-directory-summary"><strong>病历目录</strong><span id="caseDirectoryCurrent"></span><span class="case-directory-chevron" aria-hidden="true">⌄</span></summary>'+caseFileNav(list)+'</details></aside>'+
@@ -809,6 +835,15 @@
       const printWhole=document.getElementById('printWholeRecord');if(printWhole)printWhole.onclick=()=>window.print();
 
       bindCaseFileReader();
+      const selectedId=new URLSearchParams(location.search).get('case');
+      const selected=caseEntries(currentDept,[state.group]).find(item=>item.caseId===selectedId&&item.caseType==='special');
+      if(selected){
+        document.querySelectorAll('details.special-case-book').forEach(book=>{
+          if(book.querySelector('.copy-special-case')?.dataset.specialKey===selected.sourceCaseKey){
+            book.open=true;book.scrollIntoView({behavior:'instant',block:'start'});
+          }
+        });
+      }
       window.HAJIMI_COMORBIDITIES?.bind();
       window.HAJIMI_UI?.mount();
 
@@ -818,7 +853,7 @@
           if(g)copyText(recordBookText(g.records));
         };
       });
-      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');if(tc)tc.textContent=specialBundle.groups.length?'1 套 + '+specialBundle.groups.length+' 特殊':'1 套';if(ac)ac.textContent=departmentCount(currentDept);
+      const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');templateStat(utility?'1 组':'1 套',utility?'通用记录组':'当前完整病历模板');if(ac)ac.textContent=departmentCount(currentDept);
     }
     async function finishNavigation(){
       const path=location.pathname;
@@ -880,10 +915,13 @@
         searchIndex=createHajimiSearch(templates);searchIndexSize=templates.length;
       }
       const matching=searchIndex(state,department);
-      const grouped=new Map();
+      const grouped=new Map(),membership=new Map();
+      caseEntries().forEach(item=>item.chapterIds.forEach(id=>membership.set(id,item)));
       matching.forEach(function(t){
-        const key=t.department+'\0'+t.group;
-        if(!grouped.has(key))grouped.set(key,{department:t.department,group:t.group,count:0,examples:[]});
+        const item=membership.get(t._id??templates.indexOf(t));
+        if(!item)return;
+        const key=item.caseId;
+        if(!grouped.has(key))grouped.set(key,{...item,count:0,examples:[]});
         const entry=grouped.get(key);
         entry.count++;
         if(entry.examples.length<3&&!entry.examples.some(item=>item.name===t.name&&item.specialCaseKey===t.specialCaseKey))entry.examples.push(t);
@@ -894,16 +932,18 @@
       document.body.classList.toggle('department-no-sidebar',department!=='骨科');
       setBrand();
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
-      if(title)title.textContent=(department||'全部科室')+' · 搜索结果 · 完整病例';
-      if(num)num.textContent=cases.length+' 套病例 · 匹配 '+matching.length+' 份文书';
+      if(title)title.textContent=(department||'全部科室')+' · 搜索结果 · 完整病历模板';
+      const templateMatches=cases.filter(c=>c.caseType!=='utility').length,referenceMatches=cases.length-templateMatches;
+      if(num)num.textContent=templateMatches+' 套病历模板'+(referenceMatches?' · '+referenceMatches+' 组通用记录':'')+' · 匹配 '+matching.length+' 个章节';
+      templateStat(templateMatches,'匹配的完整病历模板');
       if(empty)empty.hidden=cases.length>0;
       if(!grid)return;
       grid.classList.add('search-results','case-search-results');
-      grid.innerHTML='<p class="case-search-intro">每个病种只显示一个入口。打开后可在左侧查看住院病历、手术与术后记录，以及独立整理的知情同意和沟通签字材料。</p><div class="case-search-grid"></div>';
+      grid.innerHTML='<p class="case-search-intro">每套完整病历只显示一个结果，匹配到的章节列在套内。特殊病例分别显示，打开后仍可阅读和复制整套记录。</p><div class="case-search-grid"></div>';
       const container=grid.querySelector('.case-search-grid');
       let shown=0;
       function renderCard(c){
-        const count=recordsForDisease(c.department,c.group).filter(function(x){return !x.specialCase;}).length;
+        const count=c.chapterCount;
         const highlight=value=>highlightHajimiSearch(value,state.q);
         const icon=name=>window.HAJIMI_UI?.icon(name)||'';
         const terms=state.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -914,12 +954,12 @@
             (showDesc?'<span class="case-match-description">'+highlight(desc)+'</span>':'')+'</div></li>';
         }).join('');
         const code=labelFor(c.group)!==c.group?'<span class="case-search-code">'+highlight(c.group)+'</span>':'';
-        return '<article class="case-search-card" data-case-group="'+encodeURIComponent(c.group)+'" data-case-department="'+encodeURIComponent(c.department)+'" tabindex="0" role="button">'+
-        '<div class="case-search-card-top"><span>完整病例 · '+highlight(c.department)+'</span>'+code+'<span>'+count+' 篇现有文书</span></div>'+
-        '<h3>'+highlight(labelFor(c.group))+'</h3><p>整合入院、术前、手术、术后康复、出院记录以及独立的签字同意与沟通资料。</p>'+
-        '<div class="case-search-matches"><h4>'+(state.q.trim()?'匹配文书':'符合筛选的文书')+'</h4><ul>'+examples+'</ul>'+
-        (c.count>c.examples.length?'<small class="case-match-more">另有 '+(c.count-c.examples.length)+' 篇匹配文书</small>':'')+'</div>'+
-        '<div class="case-search-card-bottom"><small>搜索匹配 '+c.count+' 篇</small><b>打开完整病历 '+icon('next')+'</b></div></article>';
+        return '<article class="case-search-card" data-case-group="'+encodeURIComponent(c.group)+'" data-case-department="'+encodeURIComponent(c.department)+'" data-case-id="'+encodeURIComponent(c.caseId)+'" tabindex="0" role="button">'+
+        '<div class="case-search-card-top"><span>'+(c.caseType==='utility'?'通用记录':c.caseType==='special'?'特殊病例模板':'完整病历模板')+' · '+highlight(c.department)+'</span>'+code+'<span>内含 '+count+(c.caseType==='utility'?' 条记录':' 个章节')+'</span></div>'+
+        '<h3>'+highlight(c.title)+'</h3><p>'+(c.caseType==='utility'?'按实际临床问题选用检查理由、会诊及沟通等通用记录。':'整合入院、术前、手术、术后康复、出院记录以及独立的签字同意与沟通资料。')+'</p>'+
+        '<div class="case-search-matches"><h4>'+(state.q.trim()?'匹配章节':'符合筛选的章节')+'</h4><ul>'+examples+'</ul>'+
+        (c.count>c.examples.length?'<small class="case-match-more">另有 '+(c.count-c.examples.length)+' 个匹配章节</small>':'')+'</div>'+
+        '<div class="case-search-card-bottom"><small>匹配 '+c.count+' 个章节</small><b>'+(c.caseType==='utility'?'查看通用记录':'打开整套模板')+' '+icon('next')+'</b></div></article>';
       }
       function append(){
         container.querySelector('.search-more')?.remove();
@@ -927,7 +967,7 @@
         shown+=next.length;
         container.insertAdjacentHTML('beforeend',next.map(renderCard).join(''));
         if(shown<cases.length){
-          container.insertAdjacentHTML('beforeend','<div class="search-more"><span>已显示 '+shown+' / '+cases.length+' 套病例</span><button class="btn ghost" type="button">显示更多</button></div>');
+          container.insertAdjacentHTML('beforeend','<div class="search-more"><span>已显示 '+shown+' / '+cases.length+' 个整合结果</span><button class="btn ghost" type="button">显示更多</button></div>');
           container.querySelector('.search-more button').onclick=append;
         }
         container.querySelectorAll('.case-search-card').forEach(function(card){
@@ -935,7 +975,9 @@
           card.dataset.bound='yes';
           const open=function(){
             const dep=decodeURIComponent(card.dataset.caseDepartment),g=decodeURIComponent(card.dataset.caseGroup);
-            history.pushState({},'', '/bl/'+deptToSlug[dep]+'/'+encodeURIComponent(g));
+            const selected=caseEntries(dep,[g]).find(item=>item.caseId===decodeURIComponent(card.dataset.caseId));
+            const query=selected?.caseType==='special'?'?case='+encodeURIComponent(selected.caseId):'';
+            history.pushState({},'', '/bl/'+deptToSlug[dep]+'/'+encodeURIComponent(g)+query);
             finishNavigation();
           };
           card.onclick=open;
