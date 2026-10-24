@@ -7,6 +7,25 @@ import {renderRouterDepartments} from './department-build.mjs';
 const root=new URL('../',import.meta.url);
 const digest=value=>createHash('sha256').update(value).digest('hex').slice(0,20);
 
+// A template is one complete case. Chapters retain their original IDs and text.
+export function compileCaseTemplates(published){
+  const cases=new Map();
+  for(const {record,identity}of published){
+    const caseId=identity.caseId||'utility:'+record.department+':'+record.group;
+    if(!cases.has(caseId)){
+      const label=record.group==='TKA'?'全膝关节置换':record.group==='THA'?'全髋关节置换':record.group;
+      cases.set(caseId,{caseId,department:record.department,group:record.group,caseType:identity.caseType,
+        sourceCaseKey:identity.sourceCaseKey,title:record.specialCaseTitle||label,chapterIds:[]});
+    }
+    cases.get(caseId).chapterIds.push(identity.legacyId);
+  }
+  const items=[...cases.values()].map(item=>({...item,chapterCount:item.chapterIds.length}));
+  return {total:items.filter(item=>item.caseType!=='utility').length,
+    standard:items.filter(item=>item.caseType==='standard').length,
+    special:items.filter(item=>item.caseType==='special').length,
+    utilityGroups:items.filter(item=>item.caseType==='utility').length,items};
+}
+
 // Build-only projection. UI capability flags must never filter clinical data.
 export function clinicalDepartmentSlugs(published=[],departments=DEPARTMENTS){
   if(!Array.isArray(departments)||!departments.length)throw new Error('Clinical build failed: department registry is empty');
@@ -64,6 +83,7 @@ export function compileClinicalSite(html,directory,{inventory,cmsAudit,source=lo
   const manifest={total:publication.published.length,identityNamespace:publication.baseline.identityNamespace,
     departments:{},groups:[...new Set([...source.groups,...publishedGroups])].filter(group=>publishedGroups.has(group)),traumaGroups:source.traumaGroups.filter(group=>publishedGroups.has(group)),
     seeds:Object.fromEntries(Object.entries(source.seeds).filter(([key])=>publishedGroups.has(key)).map(([key,value])=>[key,{category:value.category}])),bodies:{},scripts:{}};
+  manifest.caseTemplates=compileCaseTemplates(publication.published);
   const publicKeys=new Set(publication.published.map(({record:r})=>r.department+'\0'+r.group));
   manifest.withdrawnGroups=[...new Map(publication.withdrawn.map(({record:r})=>
     [r.department+'\0'+r.group,{department:r.department,group:r.group}]))]
