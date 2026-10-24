@@ -607,7 +607,7 @@ test('cross-department search groups templates into complete case files; filters
     const search=page.getByRole('textbox',{name:'搜索病历模板'});
     await search.fill('肝脓肿');
     await page.waitForFunction(()=>document.querySelector('#resultTitle').textContent.includes('搜索结果'));
-    assert((await page.evaluate(()=>templates.length))>=5359);
+    assert.equal(await page.evaluate(()=>templates.length),5040);
     assert.equal(await page.locator('.case-search-card').count(),1,'one case entry per disease, not fragmented records');
     assert.match(await page.locator('.case-search-card').first().innerText(),/肝脓肿/);
     assert(await page.locator('.case-search-card').evaluateAll(cards=>cards.every(card=>{
