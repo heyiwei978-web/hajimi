@@ -21,6 +21,11 @@ export default async function handler(req,res) {
   if (!matchesImage(buffer,type)) return res.status(400).json({error:'图片内容与格式不符'});
   const extension = type === 'image/png' ? 'png' : type === 'image/webp' ? 'webp' : 'jpg';
   const pathname = 'cases/' + Date.now() + '-' + crypto.randomBytes(6).toString('hex') + '.' + extension;
-  const stored = await blob.put(pathname,buffer,{access:'private',contentType:type});
-  return res.status(200).json({pathname:stored.pathname});
+  try {
+    const stored = await blob.put(pathname,buffer,{access:'private',contentType:type});
+    return res.status(200).json({pathname:stored.pathname});
+  } catch {
+    // Keep the JSON error contract the editor relies on; never echo storage errors.
+    return res.status(503).json({error:'图片保存失败，请稍后重试'});
+  }
 }

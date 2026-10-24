@@ -204,8 +204,11 @@ for (const value of BAD_TOKENS) {
     assert.equal(imageRes.code, 404, 'image keeps its existing 404-on-failure behaviour');
 
     const cookie = adminCookie(t);
-    // Existing behaviour kept: the upload handler does not catch storage errors (Vercel answers 500).
-    await assert.rejects(upload(request({headers: {cookie}, body: {type: 'image/png', data: PNG.toString('base64')}}), response()), BlobConfigError);
+    // The upload handler reports storage failures as a JSON 503 and never leaks the cause.
+    const uploadRes = response();
+    await upload(request({headers: {cookie}, body: {type: 'image/png', data: PNG.toString('base64')}}), uploadRes);
+    assert.equal(uploadRes.code, 503);
+    assert.deepEqual(uploadRes.body, {error: '图片保存失败，请稍后重试'});
 
     await assert.rejects(blob.get('x.json', {access: 'private'}), BlobConfigError);
     await assert.rejects(blob.put('x.json', 'x', {access: 'private'}), BlobConfigError);
