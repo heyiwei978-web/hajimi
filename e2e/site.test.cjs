@@ -68,7 +68,7 @@ test('template totals count complete cases before and after catalogs load; utili
       await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
       assert.equal(await page.locator('#templateCount').innerText(),'190');
       assert.deepEqual(await page.locator('.ortho-stats strong').allTextContents(),['190','188','2','1']);
-      assert.doesNotMatch(await page.locator('#resultCount').innerText(),/5013|份模板/);
+      assert.doesNotMatch(await page.locator('#resultCount').innerText(),/5025|份模板/);
       assert.doesNotMatch(await page.locator('.ortho-category-head').allTextContents().then(xs=>xs.join(' ')),/份模板/);
       await page.goto(base+'/bl/puwai',{waitUntil:'networkidle'});
       assert.equal(await page.locator('#templateCount').innerText(),'1');
@@ -95,13 +95,13 @@ test('search returns one standard TKA template and two distinct special template
     const book=page.locator('details.special-case-book').filter({has:page.locator('[data-special-key="'+selected.sourceCaseKey+'"]')});
     assert(await book.evaluate(el=>el.open));
     assert.equal(await book.locator('.record-book-section').count(),selected.chapterCount);
-    assert.equal(await page.locator('#caseWorkspace .case-file-reader > .record-book-section').count(),28);
+    assert.equal(await page.locator('#caseWorkspace .case-file-reader > .record-book-section').count(),40);
     await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.__completeCaseCopy=value;}}}));
     await book.locator('.copy-special-case').click();
     await page.waitForFunction(()=>typeof window.__completeCaseCopy==='string');
     assert.equal((await page.evaluate(()=>window.__completeCaseCopy)).match(/^第\d+章/gm).length,selected.chapterCount);
     await page.locator('#copyWholeRecord').click();
-    assert.equal((await page.evaluate(()=>window.__completeCaseCopy)).match(/^第\d+章/gm).length,28,'standard copy never includes special-case chapters');
+    assert.equal((await page.evaluate(()=>window.__completeCaseCopy)).match(/^第\d+章/gm).length,40,'standard copy never includes special-case chapters');
     assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
@@ -657,7 +657,7 @@ test('cross-department search groups templates into complete case files; filters
     const search=page.getByRole('textbox',{name:'搜索病历模板'});
     await search.fill('肝脓肿');
     await page.waitForFunction(()=>document.querySelector('#resultTitle').textContent.includes('搜索结果'));
-    assert.equal(await page.evaluate(()=>templates.length),5040);
+    assert.equal(await page.evaluate(()=>templates.length),5052);
     assert.equal(await page.locator('.case-search-card').count(),1,'one case entry per disease, not fragmented records');
     assert.match(await page.locator('.case-search-card').first().innerText(),/肝脓肿/);
     assert(await page.locator('.case-search-card').evaluateAll(cards=>cards.every(card=>{
@@ -1282,7 +1282,7 @@ test('elements carrying the hidden attribute are never displayed, and the passwo
   }
 });
 
-test('reviewed TKA chronology and operative prompts survive chapter copying on phone and desktop',async()=>{
+test('reviewed TKA chronology and specified operative design survive chapter copying on phone and desktop',async()=>{
  for(const width of [375,1440]){
   const {page,context,errors}=await pageFor(width);
   try{
@@ -1290,7 +1290,7 @@ test('reviewed TKA chronology and operative prompts survive chapter copying on p
    const chapters=page.locator('#caseWorkspace .case-file-reader > .record-book-section');
    await chapters.first().locator('.record-book-body').waitFor();
    await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.__reviewCopy=value;}}}));
-   for(const [name,expected] of [['术后第1天病程',/120ml[^。；]*本日未拔管/],['术后第2天病程',/55ml[^。；]*本日未拔管/],['术后第3天病程',/已于今日拔除/],['出院当天查房记录',/教学示例/],['手术记录',/【待核实是否实施：/]]){
+   for(const [name,expected] of [['术后第1天病程',/120mL[^。；]*本日未拔管/],['术后第2天病程',/55mL[^。；]*本日未拔管/],['术后第3天病程',/09:30拔除引流管/],['出院当天查房记录',/术后第14天/],['手术记录',/后交叉韧带保留型/]]){
     const chapter=chapters.filter({has:page.getByRole('heading',{name,exact:true})});
     const text=await chapter.locator('.record-book-body').textContent();assert.match(text,expected);
     assert(!text.includes('右膝切口及引流/拔管过程平稳'));
@@ -1298,6 +1298,37 @@ test('reviewed TKA chronology and operative prompts survive chapter copying on p
     await chapter.getByRole('button',{name:'复制本章节',exact:true}).click();
     await page.waitForFunction(()=>typeof window.__reviewCopy==='string');
     assert.equal(await page.evaluate(()=>window.__reviewCopy),text);
+   }
+   assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+ }
+});
+
+test('TKA full stay shows forty chapters, daily POD1-14 and chronologically ordered reports with exact copying',async()=>{
+ for(const width of [375,1440]){
+  const {page,context,errors}=await pageFor(width);
+  try{
+   await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});
+   const chapters=page.locator('#caseWorkspace .case-file-reader > .record-book-section');
+   assert.equal(await chapters.count(),40);
+   const titles=await chapters.locator('h3').allTextContents();
+   const texts=await chapters.locator('.record-book-body').allTextContents();
+   assert(texts.every(t=>t.startsWith('【虚构教学标准病例')));
+   assert(!texts.some(t=>/VAS|NRS|疼痛评分/.test(t)));
+   assert(titles.indexOf('手术日术前查房记录')<titles.indexOf('手术记录'));
+   assert(titles.indexOf('术后第2天病程')<titles.indexOf('术后第2天晚间右下肢静脉超声结果分析记录'));
+   assert(titles.indexOf('术后第2天晚间右下肢静脉超声结果分析记录')<titles.indexOf('术后第3天病程'));
+   assert(titles.indexOf('术后第14天病程')<titles.indexOf('出院当天查房记录'));
+   assert(titles.indexOf('出院当天查房记录')<titles.indexOf('出院小结'));
+   await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async t=>{window.__tkaDailyCopy=t;}}}));
+   for(let d=1;d<=14;d++){
+    const name='术后第'+d+'天病程';const i=titles.indexOf(name);assert(i>=0);
+    const text=texts[i];assert(text.includes('记录时间：2026-09-'+String(d+4).padStart(2,'0')));
+    assert(text.includes('主治医师查房后指出：'));
+    await page.evaluate(()=>{window.__tkaDailyCopy=null;});
+    await chapters.nth(i).getByRole('button',{name:'复制本章节',exact:true}).click();
+    await page.waitForFunction(()=>typeof window.__tkaDailyCopy==='string');
+    assert.equal(await page.evaluate(()=>window.__tkaDailyCopy),text);
    }
    assert.deepEqual(errors,[]);
   }finally{await context.close();}

@@ -6,7 +6,7 @@ import vm from 'node:vm';
 import test from 'node:test';
 import {pathToFileURL} from 'node:url';
 import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
-import {planClinicalPublication} from '../scripts/clinical-inventory.mjs';
+import {identityKey,planClinicalPublication} from '../scripts/clinical-inventory.mjs';
 import {compileClinicalSite} from '../scripts/clinical-compiler.mjs';
 
 const current=auditClinicalLibrary();
@@ -18,8 +18,8 @@ test('lumbar withdrawal removes exactly 12 complete cases and preserves unrelate
   const {plan,source,inventory}=current;
   assert.deepEqual([...new Set(plan.withdrawn.map(e=>e.record.group))].sort(),[...expectedGroups].sort());
   assert.equal(plan.withdrawn.length,324);
-  assert.equal(plan.published.length,5040);
-  assert.equal(plan.published.filter(e=>e.record.department==='骨科').length,5013);
+  assert.equal(plan.published.length,5052);
+  assert.equal(plan.published.filter(e=>e.record.department==='骨科').length,5025);
   assert.equal(plan.archived.length,0);
   for(const decision of inventory.policy.withdrawals){
     const actual=plan.withdrawn.filter(e=>e.identity.caseId===decision.caseId);
@@ -33,8 +33,9 @@ test('lumbar withdrawal removes exactly 12 complete cases and preserves unrelate
     '脊髓型颈椎病','胸椎黄韧带骨化症','脊柱结核','脊柱转移瘤']){
     assert(plan.published.some(e=>e.record.group===group),group+' must remain published');
   }
+  const byIdentity=new Map(source.records.map(record=>[identityKey(record),record]));
   for(const entry of [...plan.published,...plan.withdrawn]){
-    assert.deepEqual(entry.record,source.records[entry.identity.legacyId]);
+    assert.deepEqual(entry.record,byIdentity.get(identityKey(entry.record)));
     assert.equal(entry.identity.recordId,'clinical-v1-r'+String(entry.identity.legacyId).padStart(6,'0'));
   }
   assert.equal(plan.published.filter(e=>e.record.specialCase).length,44);

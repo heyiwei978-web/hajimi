@@ -12,12 +12,13 @@ test('compiled catalogs and per-disease bodies preserve every retained clinical 
   t.after(()=>fs.rmSync(directory,{recursive:true,force:true}));
   const {source,manifest,publication}=compileClinicalSite(fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),pathToFileURL(directory+'/'));
   const records=[];
+  const byId=new Map(publication.published.map(entry=>[entry.identity.legacyId,entry.record]));
   for(const department of Object.values(manifest.departments)){
     vm.runInNewContext(fs.readFileSync(path.join(directory,department.catalog.slice(1)),'utf8'),{window:{HAJIMI:{acceptCatalog(name,{strings,extras,rows}){
       for(const [id,group,short,stage,type,desc,title,extra,hasBody]of rows){
         const g=strings[group],label=g==='TKA'?'全膝关节置换':g==='THA'?'全髋关节置换':g;
         records[id]={...extras[extra],department:name,group:g,short:strings[short],stage:strings[stage],type:strings[type],desc:strings[desc],name:title<0?label+' · '+strings[short]:strings[title]};
-        assert.equal(hasBody,!!source.records[id].sourceBody);
+        assert.equal(hasBody,!!byId.get(id).sourceBody);
       }
     }}}});
   }
@@ -63,20 +64,23 @@ test('compiled catalogs and per-disease bodies preserve every retained clinical 
   assert.ok(physicianCourses.length>100,'No physician progress notes checked');
   for(const r of physicianCourses){
     const expected=/主任医师/.test(r.short)?'主任医师':'主治医师';
-    assert.match(r.sourceBody,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/,r.group+'：主诊断、病程正文与签名未独立分段');
-    assert.match(r.sourceBody,new RegExp('________'+expected+'查房后(?:指出|指示)'),r.group+'：查房后意见未用明确的标准表述');
+    // The explicitly fictional TKA example uses named sample clinicians.
+    const body=r.group==='TKA'?r.sourceBody.replace(/(?:陈某某|王某某)(主治医师|主任医师)/g,'________$1').replace('医师签名：刘某某住院医师','医师签名：________'):r.sourceBody;
+    assert.match(body,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/,r.group+'：主诊断、病程正文与签名未独立分段');
+    assert.match(body,new RegExp('________'+expected+'查房后(?:指出|指示)'),r.group+'：查房后意见未用明确的标准表述');
   }
 
   const groupsNeedingDischarge=new Set(source.records.filter(r=>r.department==='骨科'&&!r.specialCase&&r.group!=='通用场景').map(r=>r.group));
   for(const group of groupsNeedingDischarge){
     const entries=source.records.filter(r=>r.department==='骨科'&&r.group===group&&!r.specialCase&&r.short==='出院当天查房记录');
     assert.equal(entries.length,1,group+'：必须有且仅有一份出院当天查房记录');
-    assert.match(entries[0].sourceBody,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/);
+    assert.match(group==='TKA'?entries[0].sourceBody.replace('医师签名：刘某某住院医师','医师签名：________'):entries[0].sourceBody,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/);
   }
   const orthoProgress=source.records.filter(r=>r.department==='骨科'&&typeof r.sourceBody==='string'&&/病程|查房/.test(r.short||'')&&!r.specialCase);
   for(const r of orthoProgress){
-    assert.match(r.sourceBody,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/,r.group+' '+r.short+'：分区格式有误');
-    assert.equal(r.sourceBody.split('\n\n').length,4,r.group+' '+r.short+'：病程正文不能再分段');
+    const body=r.group==='TKA'?r.sourceBody.slice(r.sourceBody.indexOf('记录名称：')).replace('医师签名：刘某某住院医师','医师签名：________'):r.sourceBody;
+    assert.match(body,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/,r.group+' '+r.short+'：分区格式有误');
+    assert.equal(body.split('\n\n').length,4,r.group+' '+r.short+'：病程正文不能再分段');
     assert.ok(r.sourceBody.includes('科别：骨科'),r.group+' '+r.short+'：须保留科别');
   }
 

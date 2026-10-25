@@ -64,5 +64,6 @@ test('audits original site records without changing the baseline library',()=>{
     r.group==='TKA' && r.department==='骨科' && !r.specialCase &&
     r.short===name && String(r.sourceBody||'').trim()),name);
   assert.equal(result.counts.error,0,JSON.stringify(result.findings.filter(x=>x.severity==='error'),null,2));
-  assert(result.counts.review>0,'existing TKA quality issues must remain visible for review');
+  assert(!codes(result).includes('AMBIGUOUS_DRAIN_STATE'),'the rewritten case must distinguish retained and removed drains');
+  assert(!codes(result).includes('POSSIBLE_JOINED_FIELD'),'the rewritten discharge round must not join header fields into prose');
 });
