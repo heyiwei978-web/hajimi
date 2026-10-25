@@ -18,8 +18,8 @@ test('lumbar withdrawal removes exactly 12 complete cases and preserves unrelate
   const {plan,source,inventory}=current;
   assert.deepEqual([...new Set(plan.withdrawn.map(e=>e.record.group))].sort(),[...expectedGroups].sort());
   assert.equal(plan.withdrawn.length,324);
-  assert.equal(plan.published.length,5052);
-  assert.equal(plan.published.filter(e=>e.record.department==='骨科').length,5025);
+  assert.equal(plan.published.length,5057);
+  assert.equal(plan.published.filter(e=>e.record.department==='骨科').length,5030);
   assert.equal(plan.archived.length,0);
   for(const decision of inventory.policy.withdrawals){
     const actual=plan.withdrawn.filter(e=>e.identity.caseId===decision.caseId);

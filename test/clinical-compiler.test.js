@@ -64,8 +64,8 @@ test('compiled catalogs and per-disease bodies preserve every retained clinical 
   assert.ok(physicianCourses.length>100,'No physician progress notes checked');
   for(const r of physicianCourses){
     const expected=/主任医师/.test(r.short)?'主任医师':'主治医师';
-    // The explicitly fictional TKA example uses named sample clinicians.
-    const body=r.group==='TKA'?r.sourceBody.replace(/(?:陈某某|王某某)(主治医师|主任医师)/g,'________$1').replace('医师签名：刘某某住院医师','医师签名：________'):r.sourceBody;
+    // The explicitly fictional arthroplasty examples uses named sample clinicians.
+    const body=['TKA','THA'].includes(r.group)?r.sourceBody.replace(/(?:陈某某|王某某)(主治医师|主任医师)/g,'________$1').replace('医师签名：刘某某住院医师','医师签名：________'):r.sourceBody;
     assert.match(body,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/,r.group+'：主诊断、病程正文与签名未独立分段');
     assert.match(body,new RegExp('________'+expected+'查房后(?:指出|指示)'),r.group+'：查房后意见未用明确的标准表述');
   }
@@ -74,11 +74,11 @@ test('compiled catalogs and per-disease bodies preserve every retained clinical 
   for(const group of groupsNeedingDischarge){
     const entries=source.records.filter(r=>r.department==='骨科'&&r.group===group&&!r.specialCase&&r.short==='出院当天查房记录');
     assert.equal(entries.length,1,group+'：必须有且仅有一份出院当天查房记录');
-    assert.match(group==='TKA'?entries[0].sourceBody.replace('医师签名：刘某某住院医师','医师签名：________'):entries[0].sourceBody,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/);
+    assert.match(['TKA','THA'].includes(group)?entries[0].sourceBody.replace('医师签名：刘某某住院医师','医师签名：________'):entries[0].sourceBody,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/);
   }
   const orthoProgress=source.records.filter(r=>r.department==='骨科'&&typeof r.sourceBody==='string'&&/病程|查房/.test(r.short||'')&&!r.specialCase);
   for(const r of orthoProgress){
-    const body=r.group==='TKA'?r.sourceBody.slice(r.sourceBody.indexOf('记录名称：')).replace('医师签名：刘某某住院医师','医师签名：________'):r.sourceBody;
+    const body=['TKA','THA'].includes(r.group)?r.sourceBody.slice(r.sourceBody.indexOf('记录名称：')).replace('医师签名：刘某某住院医师','医师签名：________'):r.sourceBody;
     assert.match(body,/\n\n主诊断：[^\n]+\n\n病程记录：[^\n]+\n\n医师签名：________$/,r.group+' '+r.short+'：分区格式有误');
     assert.equal(body.split('\n\n').length,4,r.group+' '+r.short+'：病程正文不能再分段');
     assert.ok(r.sourceBody.includes('科别：骨科'),r.group+' '+r.short+'：须保留科别');

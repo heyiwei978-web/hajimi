@@ -68,7 +68,7 @@ test('template totals count complete cases before and after catalogs load; utili
       await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
       assert.equal(await page.locator('#templateCount').innerText(),'190');
       assert.deepEqual(await page.locator('.ortho-stats strong').allTextContents(),['190','188','2','1']);
-      assert.doesNotMatch(await page.locator('#resultCount').innerText(),/5025|份模板/);
+      assert.doesNotMatch(await page.locator('#resultCount').innerText(),/5030|份模板/);
       assert.doesNotMatch(await page.locator('.ortho-category-head').allTextContents().then(xs=>xs.join(' ')),/份模板/);
       await page.goto(base+'/bl/puwai',{waitUntil:'networkidle'});
       assert.equal(await page.locator('#templateCount').innerText(),'1');
@@ -657,7 +657,7 @@ test('cross-department search groups templates into complete case files; filters
     const search=page.getByRole('textbox',{name:'搜索病历模板'});
     await search.fill('肝脓肿');
     await page.waitForFunction(()=>document.querySelector('#resultTitle').textContent.includes('搜索结果'));
-    assert.equal(await page.evaluate(()=>templates.length),5052);
+    assert.equal(await page.evaluate(()=>templates.length),5057);
     assert.equal(await page.locator('.case-search-card').count(),1,'one case entry per disease, not fragmented records');
     assert.match(await page.locator('.case-search-card').first().innerText(),/肝脓肿/);
     assert(await page.locator('.case-search-card').evaluateAll(cards=>cards.every(card=>{
@@ -1329,6 +1329,29 @@ test('TKA full stay shows forty chapters, daily POD1-14 and chronologically orde
     await chapters.nth(i).getByRole('button',{name:'复制本章节',exact:true}).click();
     await page.waitForFunction(()=>typeof window.__tkaDailyCopy==='string');
     assert.equal(await page.evaluate(()=>window.__tkaDailyCopy),text);
+   }
+   assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+ }
+});
+
+test('THA displays its own complete stay and daily rounds with exact copying on phone and desktop',async()=>{
+ for(const width of [375,1440]){
+  const {page,context,errors}=await pageFor(width);
+  try{
+   await page.goto(base+'/bl/guke/THA',{waitUntil:'networkidle'});
+   const chapters=page.locator('#caseWorkspace .case-file-reader > .record-book-section');assert.equal(await chapters.count(),32);
+   const names=await chapters.locator('h3').allTextContents(),texts=await chapters.locator('.record-book-body').allTextContents();
+   assert(texts.every(t=>t.startsWith('【虚构教学标准病例｜THA')));assert(!texts.some(t=>/VAS|NRS|疼痛评分/.test(t)));
+   assert(names.indexOf('手术日术前查房记录')<names.indexOf('手术记录'));
+   assert(names.indexOf('术后第2天病程')<names.indexOf('术后第2天晚间右下肢静脉超声结果分析记录'));
+   assert(names.indexOf('术后第2天晚间右下肢静脉超声结果分析记录')<names.indexOf('术后第3天病程'));
+   assert(names.indexOf('出院当天查房记录')<names.indexOf('出院小结'));
+   assert.match(texts[names.indexOf('出院小结')],/今日尚未拆线/);
+   await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async t=>{window.__thaCopy=t;}}}));
+   for(let d=1;d<=6;d++){
+    const i=names.indexOf('术后第'+d+'天病程');assert(i>=0);assert(texts[i].includes('记录时间：2026-09-'+String(d+5).padStart(2,'0')));
+    await page.evaluate(()=>{window.__thaCopy=null;});await chapters.nth(i).getByRole('button',{name:'复制本章节',exact:true}).click();await page.waitForFunction(()=>typeof window.__thaCopy==='string');assert.equal(await page.evaluate(()=>window.__thaCopy),texts[i]);
    }
    assert.deepEqual(errors,[]);
   }finally{await context.close();}
