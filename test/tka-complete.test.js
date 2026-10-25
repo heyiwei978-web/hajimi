@@ -21,7 +21,7 @@ test('TKA complete-case rewrite preserves every other record, both special cases
   else{assert.deepEqual(r,old.r);assert.equal(after.renderedBodies[i],old.body);untouched++;}
   previous.delete(identityKey(r));
  }
- assert.equal(previous.size,0);assert.equal(updates,28);assert.equal(added,12);assert.equal(untouched,5336);
+ assert.equal(previous.size,0);assert.equal(updates,28);assert.equal(added,12);assert.equal(untouched,before.records.length-28);
  assert.equal(selected.length,40);
  const p=current.plan.published.filter(e=>e.record.group==='TKA'&&!e.record.specialCase);
  assert.equal(new Set(p.map(e=>e.identity.caseId)).size,1);
