@@ -16,12 +16,13 @@ test('retained numeric and stable IDs resolve originals; withdrawn IDs remain un
   for(const item of Object.values(manifest.departments))vm.runInContext(fs.readFileSync(new URL(item.catalog.slice(1),directory),'utf8'),context);
   const H=context.window.HAJIMI;
   const withdrawn=new Set(publication.withdrawn.map(entry=>entry.identity.legacyId));
-  for(let id=0;id<source.records.length;id++){
+  const byId=new Map([...publication.published,...publication.withdrawn].map(entry=>[entry.identity.legacyId,entry.record]));
+  for(const [id,expected] of byId){
     const row=H.findRecord(id),stable=H.findRecord('clinical-v1-r'+String(id).padStart(6,'0'));
     assert.equal(row,stable);
     if(withdrawn.has(id)){assert.equal(row,null);continue;}
-    assert.equal(row.name,source.records[id].name);assert.equal(row.group,source.records[id].group);
-    assert.equal(row.specialCaseKey,source.records[id].specialCaseKey);
+    assert.equal(row.name,expected.name);assert.equal(row.group,expected.group);
+    assert.equal(row.specialCaseKey,expected.specialCaseKey);
   }
   // The three same-name records must remain distinct before and after body load.
   const rows=[5159,5359,5360].map(id=>H.findRecord(id));

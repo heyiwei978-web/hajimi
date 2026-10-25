@@ -13,7 +13,7 @@ const current=auditClinicalLibrary(),catalog=compileCaseTemplates(current.plan.p
 test('complete templates own every published chapter exactly once, with special and utility cases separate',()=>{
   assert.equal(catalog.total,193);assert.equal(catalog.standard,191);assert.equal(catalog.special,2);assert.equal(catalog.utilityGroups,1);
   const chapters=catalog.items.flatMap(item=>item.chapterIds);
-  assert.equal(chapters.length,5040);assert.equal(new Set(chapters).size,5040);
+  assert.equal(chapters.length,5052);assert.equal(new Set(chapters).size,5052);
   assert.deepEqual([...chapters].sort((a,b)=>a-b),current.plan.published.map(x=>x.identity.legacyId).sort((a,b)=>a-b));
   for(const item of catalog.items){
     assert.equal(item.chapterCount,item.chapterIds.length);
@@ -22,7 +22,7 @@ test('complete templates own every published chapter exactly once, with special 
     if(item.caseType!=='utility')assert(owners.every(x=>x.identity.caseId===item.caseId));
   }
   const tka=catalog.items.filter(x=>x.group==='TKA');
-  assert.equal(tka.length,3);assert.deepEqual(tka.map(x=>x.chapterCount),[28,29,15]);
+  assert.equal(tka.length,3);assert.deepEqual(tka.map(x=>x.chapterCount),[40,29,15]);
   assert.equal(catalog.items.find(x=>x.caseType==='utility').chapterCount,4);
   assert(!catalog.items.some(x=>x.group==='腰椎间盘突出症'));
 });
@@ -30,7 +30,7 @@ test('complete templates own every published chapter exactly once, with special 
 test('whole-case counts are available before lazy catalogs load and never use the chapter total',()=>{
   const source=fs.readFileSync(new URL('../departments.js',import.meta.url),'utf8');
   const start=source.indexOf('function caseEntries('),end=source.indexOf('function allDisease(',start);
-  const context={window:{HAJIMI:{manifest:{total:5040,caseTemplates:catalog}}},templates:[],labelFor:g=>g};
+  const context={window:{HAJIMI:{manifest:{total:5052,caseTemplates:catalog}}},templates:[],labelFor:g=>g};
   vm.runInNewContext(source.slice(start,end)+'\nglobalThis.countCases=caseTotals;',context);
   assert.equal(context.countCases().total,193);
   assert.equal(context.countCases('骨科').total,190);
@@ -47,7 +47,7 @@ test('case integration keeps every published body and original numeric identity 
   const directory=pathToFileURL(folder+'/');
   const before=JSON.stringify(current.source.records);
   const {manifest,publication}=compileClinicalSite(fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);
-  assert.equal(manifest.total,5040,'the internal lazy-loading contract still counts chapters');
+  assert.equal(manifest.total,5052,'the internal lazy-loading contract still counts chapters');
   assert.deepEqual(manifest.caseTemplates,catalog);
   const bodies=new Map(Object.values(manifest.bodies).flatMap(file=>JSON.parse(fs.readFileSync(new URL(file.slice(1),directory),'utf8'))));
   for(const entry of publication.published)if(entry.record.sourceBody)assert.equal(bodies.get(entry.identity.legacyId),entry.record.sourceBody);
