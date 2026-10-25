@@ -1357,3 +1357,22 @@ test('THA displays its own complete stay and daily rounds with exact copying on 
   }finally{await context.close();}
  }
 });
+
+test('clavicle complete case shows corrected chronology and exact chapter copying on desktop and phone',async()=>{
+ for(const width of [375,1440]){
+  const {page,context,errors}=await pageFor(width);
+  try{
+   await page.goto(base+'/bl/guke/'+encodeURIComponent('锁骨骨折'),{waitUntil:'networkidle'});
+   const chapters=page.locator('#caseWorkspace .case-file-reader > .record-book-section');assert.equal(await chapters.count(),26);
+   const names=await chapters.locator('h3').allTextContents(),texts=await chapters.locator('.record-book-body').allTextContents();
+   assert(texts.every(t=>t.startsWith('【虚构教学标准病例｜锁骨骨折')));assert(!texts.some(t=>/VAS|NRS|疼痛评分|假体|____|医师核实并记录/.test(t)));
+   assert(names.indexOf('术后第2天病程')<names.indexOf('影像复查及结果分析'));assert(names.indexOf('影像复查及结果分析')<names.indexOf('康复评估与训练记录'));assert(names.indexOf('出院当天查房记录')<names.indexOf('出院小结'));
+   assert.match(texts[names.indexOf('出院小结')],/今日尚未拆线/);
+   await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async t=>{window.__clavicleCopy=t;}}}));
+   for(const n of ['手术记录','术后第1天病程','术后第2天病程','术后第3天病程','影像复查及结果分析','康复评估与训练记录','出院当天查房记录','出院小结']){
+    const i=names.indexOf(n);assert(i>=0);await page.evaluate(()=>{window.__clavicleCopy=null;});await chapters.nth(i).getByRole('button',{name:'复制本章节',exact:true}).click();await page.waitForFunction(()=>typeof window.__clavicleCopy==='string');assert.equal(await page.evaluate(()=>window.__clavicleCopy),texts[i]);
+   }
+   assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+ }
+});
