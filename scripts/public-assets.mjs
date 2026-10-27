@@ -7,14 +7,14 @@ export const PUBLIC_PAGES=[
 export const PUBLIC_STYLES=[
   'accessibility.css','admin.css','case-workspace-preview.css','classification-home.css',
   'classification.css','cms.css','duty.css','ecg.css','library-personal.css','pathway.css',
-  'styles.css','tools-page.css','tools-polish.css','ui-polish.css','workspace-design.css'
+  'styles.css','tools-page.css','tools-polish.css','ui-polish.css','workspace-design.css','private-gallery.css'
 ];
 export const PUBLIC_SCRIPTS=[
   'admin-content.js','admin.js','classification-data.js','classification-detail-v2-lower.js',
   'classification-detail-v2-upper.js','classification-detail-v2-pelvis-foot.js',
   'classification-treatment.js','classification.js','cms-core.js','duty.js','home.js',
   'image-upload.js','library-loader.js','library-personal.js','library-ui.js','comorbidity-modules.js',
-  'password-hash.js','pathway-official.js','pathway.js','search-core.js','tools-page.js','workspace.js'
+  'password-hash.js','pathway-official.js','pathway.js','search-core.js','tools-page.js','workspace.js','private-gallery.js'
 ];
 // These non-clinical-record source URLs were already public. Keep them unchanged
 // in this scoped task; the ECG compiler still produces its existing bundle.
