@@ -14,7 +14,7 @@ export const PUBLIC_SCRIPTS=[
   'classification-detail-v2-upper.js','classification-detail-v2-pelvis-foot.js',
   'classification-treatment.js','classification.js','cms-core.js','duty.js','home.js',
   'image-upload.js','library-loader.js','library-personal.js','library-ui.js','comorbidity-modules.js',
-  'password-hash.js','pathway-official.js','pathway.js','search-core.js','tools-page.js','workspace.js'
+  'password-hash.js','pathway-official.js','pathway.js','route-shell.js','search-core.js','tools-page.js','workspace.js'
 ];
 // These non-clinical-record source URLs were already public. Keep them unchanged
 // in this scoped task; the ECG compiler still produces its existing bundle.

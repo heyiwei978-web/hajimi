@@ -32,6 +32,9 @@ body.ecg-page{
 .ecg-page .ecg-card small,.ecg-page .ecg-card b{font-size:15px;line-height:1.7;color:var(--ws-blue)}
 .ecg-entry-grid,.ecg-category-grid,.ecg-panel-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-bottom:24px}
 .ecg-page .class-content-section{padding:20px;margin-top:18px;scroll-margin-top:calc(var(--site-header-height,72px) + 16px);scroll-margin-bottom:calc(var(--ecg-footer-height,140px) + 16px)}
+/* Reserve the content area while the ECG bundle loads (avoids a layout shift). */
+#ecgApp>p[role="status"]:only-child{min-height:70vh;margin:0}
+.ecg-atlas-list .ecg-global-search{display:none}
 .ecg-page #ecgApp section[id]{scroll-margin-top:calc(var(--site-header-height,72px) + 16px)}
 .ecg-page .class-content-section p,.ecg-page .class-content-section li{font-size:17px;line-height:1.9}
 .ecg-page .class-content-section h3{font-size:20px;margin:22px 0 10px;line-height:1.5}

@@ -1612,3 +1612,5 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   }
   #libraryShell .site-home-mark svg{width:16px;height:16px}
 }
+/* Reserve the template list while catalogs load so the guide below does not jump into view and back out. */
+#templateGrid:empty,#templateGrid>.library-loading:only-child{min-height:70vh}

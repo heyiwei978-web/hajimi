@@ -15,7 +15,10 @@ export function buildHome(source) {
   if (headEnd < 0 || start < headEnd || end <= start) {
     throw new Error('Homepage sections missing from index.html');
   }
-  const head = source.slice(0, headEnd + '</head>'.length);
+  // The homepage renders no record reader or favorites panel; skip their
+  // render-blocking stylesheets (the library page still loads them).
+  const head = source.slice(0, headEnd + '</head>'.length)
+    .replace(/<link rel="stylesheet" href="\/(?:library-personal|case-workspace-preview)\.css[^"]*">\n?/g, '');
   const portal = source.slice(start, end).trim().replace(/^(<div id="portalHome"[^>]*?) hidden/, '$1');
   return `${head}\n<body class="portal-mode">\n<a class="skip-link" href="#homeContent">跳到主要内容</a>\n${portal}\n<script defer src="/workspace.js?v=20261009-layout1"></script>\n<script defer src="/home.js?v=20261009-quality1"></script>\n</body></html>\n`;
 }

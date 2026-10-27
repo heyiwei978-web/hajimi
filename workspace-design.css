@@ -354,6 +354,8 @@
   #libraryShell .filter-row{grid-template-columns:minmax(0,1fr);gap:10px}
   #libraryShell .filter-row label{display:grid;grid-template-columns:66px minmax(0,1fr);gap:8px;white-space:normal}
   #libraryShell .result-head h2{font-size:1.25rem}
+  /* The count fills in after the catalog loads; keep it on its own line from the start. */
+  body:not(.library-root-page) #libraryShell .result-head>div{flex-basis:100%}
   .library-overview{padding:20px}
   .library-overview h2{font-size:1.375rem}
   .library-overview-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
