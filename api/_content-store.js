@@ -18,10 +18,10 @@ function validate(data,status=400){
   }
   return {version:1,templateOverrides:data.templateOverrides,cases:data.cases};
 }
-export function createContentStore(storage=blob){
+export function createContentStore(storage=blob,{currentPath=CURRENT,historyPrefix=PREFIX}={}){
   async function read(){
     let result;
-    try{result=await storage.get(CURRENT,{access:'private',useCache:false});}
+    try{result=await storage.get(currentPath,{access:'private',useCache:false});}
     catch{throw new ContentError(503,'资料读取失败，请稍后重试；现有资料未被修改');}
     if(result===null)return {data:{version:1,templateOverrides:{},cases:[]},revision:EMPTY_REVISION,history:[]};
     if(result?.statusCode!==200||!result.blob?.etag)throw new ContentError(503,'资料读取失败，已停止修改');
@@ -39,7 +39,7 @@ export function createContentStore(storage=blob){
     const now=new Date().toISOString();
     const id=Date.now()+'-'+randomUUID();
     const metadata={id,createdAt:now,user,action,templateCount:Object.keys(current.data.templateOverrides).length,caseCount:current.data.cases.length};
-    try{await storage.put(PREFIX+id+'.json',JSON.stringify({metadata,content:current.data}),{
+    try{await storage.put(historyPrefix+id+'.json',JSON.stringify({metadata,content:current.data}),{
       access:'private',addRandomSuffix:false,allowOverwrite:false,contentType:'application/json; charset=utf-8'
     });}catch{throw new ContentError(503,'自动备份失败，已停止保存；现有资料未被修改');}
     return metadata;
@@ -55,7 +55,7 @@ export function createContentStore(storage=blob){
     const updatedAt=new Date().toISOString();
     const document={...next,_history:history,_updatedAt:updatedAt};
     let result;
-    try{result=await storage.put(CURRENT,JSON.stringify(document),{
+    try{result=await storage.put(currentPath,JSON.stringify(document),{
       access:'private',addRandomSuffix:false,allowOverwrite:current.revision!==EMPTY_REVISION,
       ...(current.revision!==EMPTY_REVISION?{ifMatch:current.revision}:{}),contentType:'application/json; charset=utf-8'
     });}catch(error){
@@ -70,7 +70,7 @@ export function createContentStore(storage=blob){
   async function historyContent(id,current){
     if(typeof id!=='string'||!current.history.some(item=>item.id===id))throw new ContentError(404,'备份不存在');
     try{
-      const result=await storage.get(PREFIX+id+'.json',{access:'private',useCache:false});
+      const result=await storage.get(historyPrefix+id+'.json',{access:'private',useCache:false});
       if(!result||result.statusCode!==200)throw new ContentError(404,'备份不存在');
       const document=JSON.parse(await new Response(result.stream).text());
       return validate(document.content,503);

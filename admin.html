@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="/styles.css?v=20261007-library4">
 <link rel="stylesheet" href="/cms.css?v=20261009-layout1">
 <link rel="stylesheet" href="/admin.css?v=20261009-manager1">
+<link rel="stylesheet" href="/private-gallery.css?v=20261027-private1">
 <link rel="stylesheet" href="/ui-polish.css?v=20261011-jump1">
 <link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
 <link rel="stylesheet" href="/workspace-design.css?v=20261011-layout2">
@@ -66,6 +67,23 @@
       <div><span>当前模式</span><strong class="admin-mode-text">开发者</strong><small>登录状态有效</small></div>
     </div>
 
+    <section id="privateGallery" class="admin-guide private-gallery" aria-labelledby="privateGalleryTitle" hidden>
+      <div class="admin-card-head"><div><span>仅当前管理员可见</span><h2 id="privateGalleryTitle">私人图片库</h2></div><button id="privateRefresh" class="admin-secondary" type="button">刷新图片库</button></div>
+      <p class="manager-note">在这里保存 DR、外伤及术中图片。图片与说明仅在管理员登录后读取。上传前请去除画面中的姓名、住院号、二维码等信息。</p>
+      <form id="privateUploadForm">
+        <fieldset id="privateUploadFields" disabled><legend>添加私人图片</legend>
+          <div class="private-form-row"><label>标题<input name="title" maxlength="100" required placeholder="例如：转子间骨折术前 DR"></label><label>分类<select name="category"><option>DR</option><option>外伤</option><option>术中</option><option>其他</option></select></label></div>
+          <label>说明（可选）<textarea name="description" maxlength="2000" rows="3" placeholder="仅填写脱敏后的教学要点"></textarea></label>
+          <label>选择图片<input name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple required></label>
+          <p class="manager-note">支持多张 JPG、PNG、WebP，逐张保存。上传副本会压缩并重新编码；画面内文字需先自行遮盖。此图片库最多保存500张。</p>
+          <button id="privateUploadButton" class="admin-primary" type="submit">保存到私人图片库</button>
+        </fieldset>
+      </form>
+      <p id="privateProgress" role="status" aria-live="polite"></p><p id="privateError" class="admin-error" role="alert" hidden></p>
+      <div class="private-form-row"><label>搜索私人图片<input id="privateSearch" type="search" placeholder="标题或说明"></label><label>分类筛选<select id="privateCategory"><option value="">全部分类</option><option>DR</option><option>外伤</option><option>术中</option><option>其他</option></select></label></div>
+      <p id="privateSummary" role="status" aria-live="polite"></p><div id="privateList" class="private-gallery-grid"></div>
+      <button id="privateMore" class="admin-secondary" type="button" hidden>显示更多</button>
+    </section>
     <section id="adminContentManager" class="admin-guide admin-manager" aria-labelledby="managerTitle">
       <div class="admin-card-head"><div><span>集中管理</span><h2 id="managerTitle">模板修改、案例与图片</h2></div><a class="admin-secondary" href="/bl">进入病历库添加资料 →</a></div>
       <p class="manager-note">这里列出已保存的模板修改、全部案例及图片引用。选择病历库中的模板后，可添加新的案例或正文修改。</p>
@@ -140,7 +158,8 @@
 </form></dialog>
 <script defer src="/image-upload.js?v=20261009-manager1"></script>
 <script defer src="/admin-content.js?v=20261009-manager1"></script>
-<script defer src="/admin.js?v=20261009-manager1"></script>
+<script defer src="/private-gallery.js?v=20261027-private1"></script>
+<script defer src="/admin.js?v=20261027-private1"></script>
 <script defer src="/workspace.js?v=20261009-layout1"></script>
 </body>
 </html>

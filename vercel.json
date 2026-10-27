@@ -193,6 +193,7 @@
   "git": {
     "deploymentEnabled": {
       "main": false,
+      "feat/private-gallery-20261027": false,
       "feat/ortho-comorbidity-modules-20261021": false,
       "security/blob-static-token": false,
       "chore/clinical-library-slimming": false,

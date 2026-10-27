@@ -62,10 +62,11 @@
   function showAuth(auth,user){
     epoch++;content=null;revision=null;historyList.replaceChildren();downloadCurrent.disabled=true;
     window.HAJIMI_ADMIN_CONTENT.clear();
+    window.HAJIMI_PRIVATE_GALLERY.clear();
     loginPanel.hidden=auth;dashboard.hidden=!auth;status.classList.toggle('online',auth);
     status.querySelector('strong').textContent=auth?'已登录 · '+(user||'admin'):'未登录管理后台';
     status.querySelector('small').textContent=auth?'可维护模板、案例和备份':'登录后显示管理工具';
-    if(auth)loadDashboard();
+    if(auth){loadDashboard();window.HAJIMI_PRIVATE_GALLERY.load();}
   }
   document.getElementById('refreshHistory').onclick=loadDashboard;
   downloadCurrent.onclick=()=>{if(content)download({version:1,templateOverrides:content.templateOverrides,cases:content.cases},'hajimi-content-'+new Date().toISOString().slice(0,10)+'.json');};
@@ -75,5 +76,15 @@
     catch(ex){error.textContent=ex.message;error.hidden=false;}finally{button.disabled=false;button.textContent='登录管理后台';}
   });
   document.getElementById('adminLogout').onclick=async()=>{try{await json('/api/logout',{method:'POST',body:'{}'});showAuth(false);notify('已退出管理模式');}catch(ex){notify(ex.message);}};
-  json('/api/session',{cache:'no-store'}).then(session=>showAuth(!!session.authenticated,session.user)).catch(()=>showAuth(false));
+  async function verifySession(){
+    const generation=epoch;
+    try{const session=await json('/api/session',{cache:'no-store'});if(generation===epoch&&(!session.authenticated||dashboard.hidden))showAuth(!!session.authenticated,session.user);}
+    catch{if(generation===epoch)showAuth(false);}
+  }
+  window.addEventListener('hajimi:auth-lost',()=>showAuth(false));
+  window.addEventListener('pagehide',()=>showAuth(false));
+  window.addEventListener('pageshow',event=>{if(event.persisted)verifySession();});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)verifySession();});
+  setInterval(()=>{if(!document.hidden&&!dashboard.hidden)verifySession();},60000);
+  verifySession();
 })();
