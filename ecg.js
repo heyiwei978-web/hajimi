@@ -26,7 +26,7 @@
   }
   function setPage(title,description,crumbs=[]){
     document.body.classList.toggle('ecg-subpage',crumbs.length>0);
-    document.title=title+'｜心电图 · 哈基米工作站';
+    document.title=(title==='心电图'?'':title+'｜')+'心电图 · 哈基米工作站';
     document.getElementById('ecgTitle').textContent=title;
     document.getElementById('ecgDescription').textContent=description;
     const items=[{title:'首页',url:'/'},{title:'心电图',url:'/ecg'},...crumbs];
@@ -268,6 +268,7 @@
   function notFound(){setPage('页面未找到','请从栏目首页或图谱分类重新选择。',[{title:'页面未找到'}]);app.innerHTML='<p><a class="btn" href="/ecg">返回心电图首页</a></p>';}
   function view(){
     let route=[];try{route=location.pathname.replace(/\/+$/,'').split('/').filter(Boolean).map(decodeURIComponent);}catch{route=[];}
+    if(route[0]==='ecg.html')route[0]='ecg';
     const pages={basics,periop,tools,quiz,report,phenomena};
     if(route[0]!=='ecg')return notFound();
     if(route.length===1)return home();

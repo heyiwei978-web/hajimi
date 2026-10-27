@@ -197,7 +197,10 @@ test('ECG routes share the public layout, expose learning sections, case practic
         assert(await page.locator('header nav a.active').evaluate(element=>{const r=element.getBoundingClientRect(),nav=element.closest('nav').getBoundingClientRect();return r.left>=nav.left-1&&r.right<=nav.right+1;}));
         assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
         assert.match(await page.locator('#ecgReviewFooter').innerText(),/仅供临床参考，不替代医生判断/);
+        assert.equal(await page.title(),(route?title+'｜':'')+'心电图 · 哈基米工作站');
       }
+      await page.goto(base+'/ecg.html',{waitUntil:'networkidle'});
+      assert.equal(await page.locator('h1').innerText(),'心电图','direct /ecg.html opens the ECG home, not 页面未找到');
       await page.goto(base+'/ecg/quiz',{waitUntil:'networkidle'});
       assert.match(await page.locator('#ecgApp').innerText(),/示意病例/);
       const first=page.locator('[data-case]').first();
