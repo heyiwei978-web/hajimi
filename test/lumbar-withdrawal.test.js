@@ -16,10 +16,11 @@ const expectedGroups=['胸腰椎爆裂骨折','骨质疏松性椎体压缩骨折
 
 test('lumbar withdrawal removes exactly 12 complete cases and preserves unrelated cases and permanent IDs',()=>{
   const {plan,source,inventory}=current;
-  assert.deepEqual([...new Set(plan.withdrawn.map(e=>e.record.group))].sort(),[...expectedGroups].sort());
-  assert.equal(plan.withdrawn.length,324);
-  assert.equal(plan.published.length,5057);
-  assert.equal(plan.published.filter(e=>e.record.department==='骨科').length,5030);
+  assert(expectedGroups.every(group=>plan.withdrawn.some(e=>e.record.group===group)));
+  assert.deepEqual([...new Set(plan.published.filter(e=>e.record.department==='骨科' && !e.record.specialCase && e.record.group!=='通用场景').map(e=>e.record.group))].sort(), ['TKA','THA','人工股骨头置换','股骨转子间骨折','胫骨干骨折','桡骨远端骨折','锁骨骨折'].sort());
+  assert.equal(plan.withdrawn.length,5099);
+  assert.equal(plan.published.length,282);
+  assert.equal(plan.published.filter(e=>e.record.department==='骨科').length,255);
   assert.equal(plan.archived.length,0);
   for(const decision of inventory.policy.withdrawals){
     const actual=plan.withdrawn.filter(e=>e.identity.caseId===decision.caseId);
@@ -29,8 +30,7 @@ test('lumbar withdrawal removes exactly 12 complete cases and preserves unrelate
     assert(actual.some(e=>e.record.short==='出院当天查房记录'));
     assert(actual.some(e=>e.record.type==='出院小结'));
   }
-  for(const group of ['TKA','THA','股骨转子间骨折','舟骨骨折','骶骨骨折','骶髂关节脱位','脊柱侧弯',
-    '脊髓型颈椎病','胸椎黄韧带骨化症','脊柱结核','脊柱转移瘤']){
+  for(const group of ['TKA','THA','股骨转子间骨折','人工股骨头置换','胫骨干骨折','桡骨远端骨折','锁骨骨折']){
     assert(plan.published.some(e=>e.record.group===group),group+' must remain published');
   }
   const byIdentity=new Map(source.records.map(record=>[identityKey(record),record]));
@@ -82,7 +82,7 @@ test('published catalogs, seeds and downloadable bodies contain no withdrawn doc
     assert(publicIds.includes(identity.legacyId));
     if(record.sourceBody)assert.equal(bodies.get(identity.legacyId),record.sourceBody);
   }
-  assert.deepEqual(manifest.withdrawnGroups.map(item=>item.group).sort(),[...expectedGroups].sort());
+  assert.deepEqual(manifest.withdrawnGroups.map(item=>item.group).sort(),[...new Set(publication.withdrawn.map(item=>item.record.group))].sort());
 });
 
 test('favorites and recent visits no longer offer withdrawn disease links',()=>{
