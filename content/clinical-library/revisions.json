@@ -2996,6 +2996,56 @@
         "reason": "User authorized complete clavicle teaching-case correction after comprehensive audit; preserve all identities and other cases.",
         "reviewReference": "User 2026-10-25 修改吧; docs/clavicle-complete-case-20261025.md"
       }
+    },
+    {
+      "schemaVersion": 1,
+      "baselineCommit": "b32800dfe67e3a5712768977cbc6b7aeb2061086",
+      "expectedRevision": "4a426602ab6869550afaf6924e007a9c2487b48741c59fb008d9080ca5c62087",
+      "sourceCommit": "f3f25455b2a2d23bb1137cf83952440c78eb3abe",
+      "sourceSnapshotHash": "4627caf4b353eb2b39d7578e1617490c8fd84911df4e9f74f67679601192ee21",
+      "updates": [
+        {
+          "recordId": "clinical-v1-r000085",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "e1ac56cb2367e74ed4847a0db71ad6f78c7b3e3fab5b89d323f274f93a3944a7",
+            "renderedHash": "61869ee165a9a59b2fdc1bd90b58bab3ec64256cef6b6d5d981419dfd027fc0f",
+            "recordHash": "a1cf33dd19ff89854ddc96bc4f3d8b3b49f0abe06b17faee12c7e3d82d2803b2"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "507ee6743e906fbb46b1f0c32439aad8ebb375f9948b8ad44be4ea097e2d9cc4",
+            "renderedHash": "0709b8910c4fd1e825b8ef2935bba530ac7b769581fce7932392ed1762115082",
+            "recordHash": "e26f80bc2d2e69760ae552de76447f476d339fd0cdc4dab1c79108d2f1fba8f8"
+          },
+          "metadataHash": "1575ce05e50f17e49e496317a13504fa6dd1b46296a5198f14af67a487034ee8"
+        },
+        {
+          "recordId": "clinical-v1-r000093",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "aa8efad3d4d8c4a7575f167d23f885a3efb765db765716bfa79b3d7f5115b8e7",
+            "renderedHash": "aa8efad3d4d8c4a7575f167d23f885a3efb765db765716bfa79b3d7f5115b8e7",
+            "recordHash": "166c4d82db9bff641571b3f3860ef4bad2c7fcc85aec85810eb51561c2589edd"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "956203f3cee5da4b23d2b698e111f69410e8fa0bc4a1f27f3e4289b99611d9a6",
+            "renderedHash": "956203f3cee5da4b23d2b698e111f69410e8fa0bc4a1f27f3e4289b99611d9a6",
+            "recordHash": "840483380c4dcaf88bc4051f8b716f959b36e0a59cecb78c5a44a6453288eff5"
+          },
+          "metadataHash": "0041ab6563cc8c0f9cb3b6f8cbaac4abb82dfc13df9adb31655810f0cd17771c"
+        }
+      ],
+      "additions": [],
+      "reviewHash": "002d2b49a46ee4381dfa0fe8d65c22f1c37d935e6e9337ec7be80196f00f2fa9",
+      "proposalHash": "10dccf5bf235c682b6e854385e9e850cf965cb0b057858ea56993c84ee9ffe75",
+      "approval": {
+        "authorizedProposalHash": "10dccf5bf235c682b6e854385e9e850cf965cb0b057858ea56993c84ee9ffe75",
+        "reviewedBy": "ChatGPT：限范围编辑与医学措辞一致性核对，非临床签字认证",
+        "reason": "User-requested fictional intertrochanteric preop note refinement without changing diagnosis, dates, operation, or other records",
+        "reviewReference": "User 2026-10-28 instructions; User 2026-10-29 处理吧; PR #40"
+      }
     }
   ]
 }
