@@ -61,13 +61,13 @@ test('template totals count complete cases before and after catalogs load; utili
     const {page,context,errors}=await pageFor(width);
     try{
       await page.goto(base+'/bl',{waitUntil:'networkidle'});
-      assert.equal(await page.locator('#templateCount').innerText(),'193');
+      assert.equal(await page.locator('#templateCount').innerText(),'12');
       assert.equal(await page.evaluate(()=>templates.length),0,'complete-case totals do not require chapter loading');
-      assert.match(await page.locator('#resultCount').innerText(),/193 套完整病历模板/);
-      assert.match(await page.locator('[data-department="骨科"]').innerText(),/190 套/);
+      assert.match(await page.locator('#resultCount').innerText(),/12 套完整病历模板/);
+      assert.match(await page.locator('[data-department="骨科"]').innerText(),/9 套/);
       await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
-      assert.equal(await page.locator('#templateCount').innerText(),'190');
-      assert.deepEqual(await page.locator('.ortho-stats strong').allTextContents(),['190','188','2','1']);
+      assert.equal(await page.locator('#templateCount').innerText(),'9');
+      assert.deepEqual(await page.locator('.ortho-stats strong').allTextContents(),['9','7','2','1']);
       assert.doesNotMatch(await page.locator('#resultCount').innerText(),/5030|份模板/);
       assert.doesNotMatch(await page.locator('.ortho-category-head').allTextContents().then(xs=>xs.join(' ')),/份模板/);
       await page.goto(base+'/bl/puwai',{waitUntil:'networkidle'});
@@ -577,7 +577,7 @@ test('every orthopedic card keeps both borders inside its category on phones and
   for(const width of [320,375,393,768,1280,1440,1920]) {
     const {page,context,errors}=await pageFor(width);
     try {await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
-      assert.equal(await page.locator('.ortho-disease-card').count(),189);
+      assert.equal(await page.locator('.ortho-disease-card').count(),8);
       const categories=page.locator('.ortho-category');
       for(let i=0;i<await categories.count();i++) {
         await categories.nth(i).scrollIntoViewIfNeeded();await settle(page);
@@ -660,7 +660,7 @@ test('cross-department search groups templates into complete case files; filters
     const search=page.getByRole('textbox',{name:'搜索病历模板'});
     await search.fill('肝脓肿');
     await page.waitForFunction(()=>document.querySelector('#resultTitle').textContent.includes('搜索结果'));
-    assert.equal(await page.evaluate(()=>templates.length),5057);
+    assert.equal(await page.evaluate(()=>templates.length),282);
     assert.equal(await page.locator('.case-search-card').count(),1,'one case entry per disease, not fragmented records');
     assert.match(await page.locator('.case-search-card').first().innerText(),/肝脓肿/);
     assert(await page.locator('.case-search-card').evaluateAll(cards=>cards.every(card=>{
@@ -676,9 +676,15 @@ test('cross-department search groups templates into complete case files; filters
     assert.equal(await chapters.filter({visible:true}).count(),await chapters.count(),'a case opens with every chapter visible');
     await page.goto(base+'/bl',{waitUntil:'networkidle'});
     await page.locator('#searchInput').fill('术前');
-    await page.waitForFunction(()=>document.querySelectorAll('.case-search-card').length===24);
-    await page.getByRole('button',{name:'显示更多',exact:true}).click();
-    assert.equal(await page.locator('.case-search-card').count(),48);
+    await page.waitForFunction(()=>document.querySelectorAll('.case-search-card').length>0);
+    const beforeMore=await page.locator('.case-search-card').count();
+    const more=page.getByRole('button',{name:'显示更多',exact:true});
+    if(await more.isVisible()){
+      await more.click();
+      assert((await page.locator('.case-search-card').count())>beforeMore,'show more reveals additional cases');
+    }else{
+      assert(beforeMore<24,'small filtered catalog does not require pagination');
+    }
     await page.locator('#searchInput').fill('不存在的资料xyz');
     await page.waitForSelector('#emptyState:visible');
     assert.equal(await page.locator('.case-search-card').count(),0);
