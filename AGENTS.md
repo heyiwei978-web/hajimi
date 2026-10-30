@@ -120,9 +120,13 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 - 一个 PR 只做一件事。医学内容改动与界面/代码改动分开提交、分开 PR。
 - 提交信息用简短前缀 + 中文或英文说明，例如 `fix(ui): toast 读屏播报`、`clinical: …`、`docs: …`。
 - PR 描述写清：改了什么、为什么、影响哪些页面、跑了哪些检查及结果、截图（界面改动时）、未完成或有风险的地方。
-- **合并与生产发布是两个独立授权步骤**：
-  - `vercel.json` 的 `git.deploymentEnabled` 禁用了 `main` 等分支的自动部署，**保留这些规则，不要删除**。
-  - 不要自行合并 PR、创建生产部署、提升（promote）、回滚或修改别名/域名，除非任务明确授权该具体操作。发布按 `docs/deployment-workflow.md` 执行。
+- **合并即上线**：`main` 已启用 Vercel 自动部署，PR 合并到 `main` 后会自动发布到生产（`wdyxzl.icu`）。因此：
+  - 合并 PR 等于发布上线。**不要自行合并 PR**，除非任务明确授权合并该 PR。
+  - 合并前确认 CI 全部通过、Vercel 预览部署检查无误；涉及医学内容的 PR 须已完成医学审核授权。
+  - 合并后核对对应提交的生产部署为 READY、正式域名改动生效；失败时查看构建与运行日志并汇报，不要自行回滚。
+  - 不要手动创建生产部署、提升（promote）、回滚或修改别名/域名，除非任务明确授权该具体操作。
+  - `vercel.json` 的 `git.deploymentEnabled` 中仍禁用的历史分支规则保留，不要删除。
+  - 详细要求见 `docs/deployment-workflow.md`。
 - 不要改写历史记录类文档（例如 `docs/` 中的审核记录、发布收据）；有新进展时新增记录。
 
 ## 10. 任务完成的标准

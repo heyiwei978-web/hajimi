@@ -2,16 +2,29 @@
 
 此文说明仓库的发布边界，不执行构建、部署或配置变更。当前实际线上状态以对应发布记录和平台核对为准。
 
-## Git 连接与自动部署
+## 当前流程：合并即上线（2026-10-30 起）
 
-GitHub 已连接 Vercel，但连接本身不代表每个分支都启用了自动部署。当前 `vercel.json` 的 `git.deploymentEnabled` 明确禁用以下四个分支：
+站点负责人决定：PR 合并到 `main` 后直接发布到生产。
 
-- `main`
-- `security/blob-static-token`
-- `chore/clinical-library-slimming`
-- `refactor/site-registry-phase1`
+- `vercel.json` 不再禁用 `main` 的自动部署。合并到 `main` 后，Vercel 自动从 `main` 构建并发布到 Production（`wdyxzl.icu`）。
+- **合并即授权发布**：批准合并 PR 就等于批准它上线，因此合并前必须确认：
+  1. CI（`Site quality and security`：单元测试、`audit:quality:check`、浏览器回归）全部通过；
+  2. Vercel 为该 PR 生成的预览部署可以正常打开，改动页面在手机和电脑宽度下检查过；
+  3. 涉及医学内容的 PR 已按 `docs/clinical-identity-ledger-update-plan.md` 完成医学审核与授权。
+- 合并后核对：Vercel 中对应 `main` 提交的生产部署状态为 READY，正式域名能打开、改动生效；如有异常，查看构建日志与运行日志。
+- 出现问题时，优先提交修复 PR 再次合并上线；需要回滚到旧部署时，由站点负责人单独决定。
+- `vercel.json` 仍禁用以下历史分支的自动部署，保留这些规则：
+  - `feat/private-gallery-20261027`
+  - `feat/ortho-comorbidity-modules-20261021`
+  - `security/blob-static-token`
+  - `chore/clinical-library-slimming`
+  - `refactor/site-registry-phase1`
 
-保留这些规则。代码审阅、Git 合并、创建暂存部署和正式入口切换是独立步骤，不能从某一步已获授权推导后续生产操作也已获准。其他分支的部署行为仍需单独核对，不在这里作全局禁用承诺。
+以下各节保留为**手动发布或特殊情况**（例如不经 `main` 的暂存部署、提升指定旧构建、回滚）的核验要求。
+
+## 历史说明：Git 连接与自动部署
+
+2026-10-30 以前，`main` 的自动部署被禁用，代码审阅、Git 合并、创建暂存部署和正式入口切换按独立步骤分别授权。该限制已按上节取消；其他非 `main` 分支的部署行为仍需单独核对。
 
 ## 使用已验证的源码与构建
 
