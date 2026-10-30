@@ -470,6 +470,68 @@
         <a class="record-back-toc" href="#recordBookToc">↑ 回到目录</a>
       </article>`;
     }
+    // Display-only chapter merging. Records, their order and every body stay
+    // unchanged; a merged chapter is a contiguous span of the sorted list, so
+    // interleaved reports (e.g. POD2 evening ultrasound) keep their place.
+    const CHAPTER_MERGES=[
+      {key:'admission-rounds',test:t=>/^(入院当日查房记录|主治医师首次查房记录|主任医师首次查房记录)$/.test(String(t.short||'')),
+        title:()=>'入院查房记录'},
+      {key:'postop-days',test:t=>/^术后第\d+天病程/.test(String(t.short||'')),
+        title:members=>{const days=members.map(t=>Number((String(t.short||'').match(/^术后第(\d+)天病程/)||[])[1])).filter(Number.isFinite);
+          return days.length?'术后病程（第'+Math.min(...days)+'–'+Math.max(...days)+'天）':'术后病程';}}
+    ];
+    function caseChapterUnits(list,enabled=true){
+      const spans=[];
+      if(enabled)CHAPTER_MERGES.forEach(rule=>{
+        const hits=list.map((t,i)=>rule.test(t)?i:-1).filter(i=>i>=0);
+        if(hits.length<2)return;
+        const start=hits[0],end=hits[hits.length-1];
+        if(spans.some(s=>start<=s.end&&end>=s.start))return;
+        spans.push({rule,start,end});
+      });
+      const units=[];
+      for(let i=0;i<list.length;i++){
+        const span=spans.find(s=>s.start===i);
+        if(span){
+          const members=list.slice(span.start,span.end+1);
+          units.push({merged:true,key:span.rule.key,members,title:span.rule.title(members.filter(span.rule.test)),first:span.start});
+          i=span.end;
+        }else units.push({merged:false,members:[list[i]],title:list[i].short||list[i].name,first:i});
+      }
+      return units;
+    }
+    function caseUnitId(u,i){
+      return u.merged?'record-group-'+u.key:recordBookId(u.members[0],i);
+    }
+    function caseUnitBody(u){
+      return u.merged?u.members.map(t=>`【${t.short||t.name}】\n${generate(t)}`).join('\n\n'):String(generate(u.members[0]));
+    }
+    function caseUnitsText(units){
+      return units.map((u,i)=>`第${String(i+1).padStart(2,'0')}章  ${u.title}\n${caseUnitBody(u)}`).join('\n\n========================================\n\n');
+    }
+    function caseUnitChapter(u,i,list){
+      if(!u.merged)return recordChapter(u.members[0],i);
+      const id=caseUnitId(u,i),first=u.members[0];
+      const parts=u.members.map(function(t){
+        const idx=templates.indexOf(t),partId=recordBookId(t,list.indexOf(t));
+        return `<section class="record-merged-part" id="${partId}" data-record-index="${idx}">
+          <div class="record-merged-part-head"><h4>${escapeHtml(String(t.short||t.name))}</h4>
+            <div class="record-merged-part-actions"><button class="btn ghost preview" data-index="${idx}" type="button">查看 / 编辑</button><button class="btn ghost copy" data-index="${idx}" type="button">复制这一份</button></div></div>
+          <div class="record-book-body">${escapeHtml(String(generate(t)))}</div>
+        </section>`;
+      }).join('');
+      return `<article class="record-book-section record-book-merged" id="${id}" data-record-index="${templates.indexOf(first)}" data-unit-index="${i}">
+        <header class="record-book-section-head">
+          <div class="record-chapter-no">${String(i+1).padStart(2,'0')}</div>
+          <div class="record-chapter-title"><span>${first.stage} · 共 ${u.members.length} 份记录</span><h3>${escapeHtml(u.title)}</h3></div>
+          <div class="record-chapter-actions">
+            <button class="btn primary copy-unit" data-unit="${i}" type="button">复制本章节</button>
+          </div>
+        </header>
+        ${parts}
+        <a class="record-back-toc" href="#recordBookToc">↑ 回到目录</a>
+      </article>`;
+    }
     function sortRecordList(raw){
       // The reviewed case includes supplementary forms with explicitly unknown
       // clock times. Keep their reviewed document order without inventing times.
@@ -575,17 +637,21 @@
         return {key:def[0],title:def[1],hint:def[2],family:def[3],members:members};
       });
     }
-    function caseFileNav(list){
-      const sections=caseFileSections(list);
+    function caseFileNav(units){
+      // Directory entries follow the displayed chapters; merged chapters sit in
+      // the section of their first record.
+      const sections=caseFileSections(units.map(u=>u.members[0])).map(function(section){
+        return Object.assign({},section,{members:section.members.map(function(m){const u=units[m.i];return {t:u.members[0],i:m.i,u:u};})});
+      });
       const familyLabels={clinical:'一、临床病历',consent:'二、知情同意与沟通签字',extra:'三、检查与会诊'};
       const nav=Object.keys(familyLabels).map(function(family){
         const groups=sections.filter(function(x){return x.family===family;});
         return '<div class="case-nav-family"><h4>'+familyLabels[family]+'</h4>'+groups.map(function(section){
           const items=section.members.map(function(m){
-            const id=recordBookId(m.t,m.i);
-            return '<a href="#'+id+'" class="case-nav-item" data-case-record="'+id+'"><span>'+String(m.i+1).padStart(2,'0')+'</span><b>'+escapeHtml(m.t.short||m.t.name)+'</b><small class="case-nav-current-label" aria-hidden="true">当前章节</small></a>';
+            const id=caseUnitId(m.u,m.i);
+            return '<a href="#'+id+'" class="case-nav-item" data-case-record="'+id+'"><span>'+String(m.i+1).padStart(2,'0')+'</span><b>'+escapeHtml(String(m.u.title))+(m.u.merged?' <em class="case-nav-count">'+m.u.members.length+' 份</em>':'')+'</b><small class="case-nav-current-label" aria-hidden="true">当前章节</small></a>';
           }).join('');
-          return '<details class="case-nav-group" open><summary><span>'+section.title+'</span><small>'+section.members.length+' 篇</small></summary>'+
+          return '<details class="case-nav-group" open><summary><span>'+section.title+'</span><small>'+section.members.length+' 章</small></summary>'+
             (items?'<nav>'+items+'</nav>':'<p class="case-nav-empty">暂无此类文书</p>')+'</details>';
         }).join('')+'</div>';
       }).join('');
@@ -622,7 +688,7 @@
       function syncNavigation(){
         const position=String(selected+1).padStart(2,'0')+' / '+articles.length;
         const name=articles[selected].querySelector('h3').textContent;
-        if(status)status.textContent='整套病历 · '+articles.length+' 篇连续文书';
+        if(status)status.textContent='整套病历 · '+articles.length+' 章';
         if(bottomStatus)bottomStatus.textContent='第 '+position+' 份 · '+name;
         if(compactStatus)compactStatus.textContent=String(selected+1).padStart(2,'0')+' · '+name;
         stepButtons.forEach(function(btn){btn.disabled=Number(btn.dataset.caseStep)<0?selected===0:selected===articles.length-1;});
@@ -717,7 +783,11 @@
         const specialBook=specialTarget?.closest('details.special-case-book');
         if(specialBook){specialBook.open=true;specialTarget.scrollIntoView({behavior:'instant',block:'start'});}
         const initial=articles.indexOf(historicalChapter(articles,hash));
+        // A record inside a merged chapter keeps its old chapter link as its own anchor.
+        const part=initial<0?historicalChapter([...root.querySelectorAll('.record-merged-part')],hash):null;
+        const partChapter=part?articles.indexOf(part.closest('.record-book-section')):-1;
         if(initial>=0)activate(initial,true,false);
+        else if(partChapter>=0){activate(partChapter,false,false);part.scrollIntoView({behavior:'instant',block:'start'});pinScroll();}
         else if(selected<0)activate(0,false,false);
       }
       function directoryEscape(e){
@@ -751,12 +821,13 @@
       const standardRaw=raw.filter((t)=>!t.specialCase);
       const list=sortRecordList(standardRaw);
       const utility=state.group==='通用场景';
+      const units=caseChapterUnits(list,!utility);
       const specialBundle=buildSpecialCaseBooks(specialRaw);
       const title=document.getElementById('resultTitle'),num=document.getElementById('resultCount'),grid=document.getElementById('templateGrid'),empty=document.getElementById('emptyState');
       if(title)title.textContent=currentDept+' · '+labelFor(state.group);
       if(num)num.textContent=utility?'1 组通用记录 · '+list.length+' 条记录':specialBundle.groups.length
-        ?'1 套标准病历 · '+list.length+' 个章节 · '+specialBundle.groups.length+' 个特殊病例'
-        :'1 套完整病历 · '+list.length+' 个现有章节';
+        ?'1 套标准病历 · '+units.length+' 个章节 · '+specialBundle.groups.length+' 个特殊病例'
+        :'1 套完整病历 · '+units.length+' 个章节 · '+list.length+' 份文书';
       if(empty)empty.hidden=(list.length+specialRaw.length)>0;
 
       const isDischarge=(t)=>/出院小结|出院记录|出院病历/.test((t.short||'')+' '+(t.name||''))||(t.group==='股骨转子间骨折'&&t.type==='出院医嘱');
@@ -797,10 +868,10 @@
             <p>${utility?'通用检查理由、会诊及沟通记录单独整理，按实际临床场景选用。':'一套模板包含入院、术前、手术、术后和出院章节，可连续阅读、整套复制，也可单独复制某一章节。特殊病例另行归档。'}</p>
             <div class="record-book-hero-actions"><button id="copyWholeRecord" class="btn primary" type="button">${utility?'复制全部通用记录':'复制完整病历'}</button><button id="printWholeRecord" class="btn ghost" type="button">${utility?'打印通用记录':'打印整套病历'}</button><button id="favoriteDisease" class="btn ghost" type="button" aria-pressed="false">☆ 收藏病种</button>${pathwayHref?'<a class="btn ghost" href="'+pathwayHref+'">查看临床路径</a>':''}</div>
           </div>
-          <strong>1<small>${utility?'组通用记录 · '+list.length+' 条记录':'套标准模板 · '+list.length+' 个章节'}${specialBundle.groups.length?' · 另有 '+specialBundle.groups.length+' 套特殊病例':''}</small></strong>
+          <strong>1<small>${utility?'组通用记录 · '+list.length+' 条记录':'套标准模板 · '+units.length+' 个章节 · '+list.length+' 份文书'}${specialBundle.groups.length?' · 另有 '+specialBundle.groups.length+' 套特殊病例':''}</small></strong>
         </section>`;
 
-      const allChapters=list.map(function(t,i){return recordChapter(t,i);}).join('');
+      const allChapters=units.map(function(u,i){return caseUnitChapter(u,i,list);}).join('');
       const comorbidityPanel=currentDept==='骨科'&&state.group!=='通用场景' ? (window.HAJIMI_COMORBIDITIES?.html()||'') : '';
       const grouping=caseFileSections(list);
       const signedCount=grouping.find(function(x){return x.key==='consent';}).members.length;
@@ -808,9 +879,9 @@
         '<div class="source-template-note">'+(utility?'<strong>通用记录：</strong>按真实临床问题选用和修改，不作为完整住院病例。':'<strong>示例患者 · 整套病历：</strong>使用前核对患者身份、日期、检查结果、真实诊疗经过及签字信息；特殊病例另行归档，不与标准病例混用。')+'</div>'+
         '<section id="caseWorkspace" class="case-workspace case-continuous-reader case-show-all record-book-layout">'+
           '<aside class="record-book-toc case-file-sidebar" id="recordBookToc" aria-label="完整病历目录">'+
-            '<details id="caseDirectoryPanel" class="case-directory-panel" open><summary id="caseDirectorySummary" class="case-directory-summary"><strong>病历目录</strong><span id="caseDirectoryCurrent"></span><span class="case-directory-chevron" aria-hidden="true">⌄</span></summary>'+caseFileNav(list)+'</details></aside>'+
+            '<details id="caseDirectoryPanel" class="case-directory-panel" open><summary id="caseDirectorySummary" class="case-directory-summary"><strong>病历目录</strong><span id="caseDirectoryCurrent"></span><span class="case-directory-chevron" aria-hidden="true">⌄</span></summary>'+caseFileNav(units)+'</details></aside>'+
           '<div class="record-book-content case-file-reader-wrap">'+
-            '<div class="case-file-tools"><div><span class="case-file-eyebrow">CASE READER</span><strong id="caseCurrentSection">'+list.length+' 篇文书</strong><small>临床病历 '+(list.length-signedCount)+' 篇 · 签字沟通 '+signedCount+' 篇</small></div><div class="case-file-reader-actions">'+
+            '<div class="case-file-tools"><div><span class="case-file-eyebrow">CASE READER</span><strong id="caseCurrentSection">'+units.length+' 章 · '+list.length+' 份文书</strong><small>临床病历 '+(list.length-signedCount)+' 篇 · 签字沟通 '+signedCount+' 篇</small></div><div class="case-file-reader-actions">'+
               '<button id="casePrevious" data-case-step="-1" class="btn ghost" type="button">← 上一章</button>'+
               '<button id="caseNext" data-case-step="1" class="btn ghost" type="button">下一章 →</button>'+
             '</div></div>'+
@@ -830,7 +901,8 @@
       bindTemplateActions();
       window.HAJIMI_PERSONAL?.remember(currentDept,state.group);
       window.HAJIMI_PERSONAL?.bindFavorite(document.getElementById('favoriteDisease'),currentDept,state.group);
-      const copyWhole=document.getElementById('copyWholeRecord');if(copyWhole)copyWhole.onclick=()=>copyText(recordBookText(list));
+      const copyWhole=document.getElementById('copyWholeRecord');if(copyWhole)copyWhole.onclick=()=>copyText(caseUnitsText(units));
+      document.querySelectorAll('.copy-unit').forEach(btn=>{btn.onclick=()=>{const u=units[Number(btn.dataset.unit)];if(u)copyText(caseUnitBody(u));};});
       const printWhole=document.getElementById('printWholeRecord');if(printWhole)printWhole.onclick=()=>window.print();
 
       bindCaseFileReader();
