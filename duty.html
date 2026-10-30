@@ -64,7 +64,7 @@
   <pre id="dutyPrintSummary" class="duty-print-summary"></pre>
 </main>
 <dialog id="dutySummaryDialog" class="duty-summary-dialog" aria-labelledby="dutySummaryTitle"><div class="duty-card-head"><h2 id="dutySummaryTitle">交班摘要</h2><button id="dutySummaryClose" class="icon-btn" type="button" aria-label="关闭交班摘要">×</button></div><label for="dutySummaryText">核对后复制或下载</label><textarea id="dutySummaryText" rows="16" readonly></textarea><p id="dutyCopyStatus" role="status" aria-live="polite"></p><div class="duty-note-actions"><button id="dutyCopy" class="btn primary" type="button">复制摘要</button><button id="dutyDownload" class="btn ghost" type="button">下载文本</button></div></dialog>
-<div id="dutyToast" class="portal-toast"></div>
+<div id="dutyToast" class="portal-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 <script defer src="/duty.js?v=20261009-duty1"></script>
 <script defer src="/workspace.js?v=20261009-layout1"></script>
 </body>
