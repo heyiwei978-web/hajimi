@@ -6,13 +6,13 @@
 <meta name="theme-color" content="#f6f8fb">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231d67d8%22/%3E%3Cpath d=%22M10 8v16m12-16v16M10 16h12%22 stroke=%22white%22 stroke-width=%223.5%22/%3E%3C/svg%3E">
 <title>网站管理 · 哈基米工作站</title>
-<link rel="stylesheet" href="/styles.css?v=20261007-library4">
-<link rel="stylesheet" href="/cms.css?v=20261009-layout1">
+<link rel="stylesheet" href="/styles.css?v=20261030-ui1">
+<link rel="stylesheet" href="/cms.css?v=20261030-ui1">
 <link rel="stylesheet" href="/admin.css?v=20261009-manager1">
 <link rel="stylesheet" href="/private-gallery.css?v=20261027-private1">
 <link rel="stylesheet" href="/ui-polish.css?v=20261011-jump1">
 <link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
-<link rel="stylesheet" href="/workspace-design.css?v=20261011-layout2">
+<link rel="stylesheet" href="/workspace-design.css?v=20261030-ui1">
 </head>
 <body class="admin-page">
 <a class="skip-link" href="#adminContent">跳到主要内容</a>
@@ -25,10 +25,12 @@
     <nav class="global-links official-links" aria-label="主导航">
       <a href="/">首页</a>
       <a href="/bl">病历模板</a>
+      <a href="/classification">疾病分型</a>
+      <a href="/ecg">心电图</a>
       <a href="/pathway">临床路径</a>
       <a href="/duty">值班资料</a>
       <a href="/tools">临床工具</a>
-      <a class="active" href="/admin">管理入口</a>
+      <a class="active" href="/admin" aria-current="page">管理入口</a>
     </nav>
   </div>
 </header>
@@ -52,7 +54,7 @@
       <div><span>管理员验证</span><h2>进入开发者模式</h2></div>
     </div>
     <form id="adminLoginForm" class="admin-login-form">
-      <label>用户名<input name="username" autocomplete="username" value="admin"></label>
+      <label>用户名<input name="username" autocomplete="username"></label>
       <label>密码<input name="password" type="password" autocomplete="current-password" required></label>
       <p id="adminLoginError" class="admin-error" role="alert" hidden></p>
       <button class="admin-primary" type="submit">登录管理后台</button>
@@ -80,7 +82,7 @@
         </fieldset>
       </form>
       <p id="privateProgress" role="status" aria-live="polite"></p><p id="privateError" class="admin-error" role="alert" hidden></p>
-      <div class="private-form-row"><label>搜索私人图片<input id="privateSearch" type="search" placeholder="标题或说明"></label><label>分类筛选<select id="privateCategory"><option value="">全部分类</option><option>DR</option><option>外伤</option><option>术中</option><option>其他</option></select></label></div>
+      <div class="private-form-row"><label>搜索私人图片<input id="privateSearch" enterkeyhint="search" autocomplete="off" spellcheck="false" type="search" placeholder="标题或说明"></label><label>分类筛选<select id="privateCategory"><option value="">全部分类</option><option>DR</option><option>外伤</option><option>术中</option><option>其他</option></select></label></div>
       <p id="privateSummary" role="status" aria-live="polite"></p><div id="privateList" class="private-gallery-grid"></div>
       <button id="privateMore" class="admin-secondary" type="button" hidden>显示更多</button>
     </section>
@@ -89,7 +91,7 @@
       <p class="manager-note">这里列出已保存的模板修改、全部案例及图片引用。选择病历库中的模板后，可添加新的案例或正文修改。</p>
       <fieldset id="managerControls" disabled><legend>筛选资料</legend><div class="manager-filters">
         <label>资料类型<select id="managerKind"><option value="templates">模板修改</option><option value="cases">案例资料</option><option value="images">图片引用</option></select></label>
-        <label>搜索资料<input id="managerSearch" type="search" placeholder="名称、所属模板或案例说明"></label>
+        <label>搜索资料<input id="managerSearch" enterkeyhint="search" autocomplete="off" spellcheck="false" type="search" placeholder="名称、所属模板或案例说明"></label>
         <label id="managerPublishLabel" hidden>展示状态<select id="managerPublish"><option value="all">全部案例</option><option value="published">浏览者可见</option><option value="draft">未发布</option></select></label>
       </div></fieldset>
       <p id="managerSummary" role="status" aria-live="polite">正在加载资料…</p><p id="managerError" class="admin-error" role="alert" hidden></p>
@@ -141,7 +143,7 @@
   </section>
 </main>
 
-<div id="adminToast" class="portal-toast"></div>
+<div id="adminToast" class="portal-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 <dialog id="managedTemplateDialog" class="manager-dialog" aria-labelledby="managedTemplateTitle"><form id="managedTemplateForm">
   <div class="admin-card-head"><h2 id="managedTemplateTitle">编辑模板正文</h2><button type="button" class="icon-btn" data-manager-close aria-label="关闭模板编辑">×</button></div><p id="managedTemplateName" class="manager-template-name"></p>
   <label for="managedTemplateBody">自定义正文</label><textarea id="managedTemplateBody" rows="22" required></textarea><p id="managedTemplateError" class="admin-error" role="alert" hidden></p>

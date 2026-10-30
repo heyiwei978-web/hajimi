@@ -6,8 +6,7 @@ import {NAV_SURFACES, navModules} from '../config/site-modules.mjs';
 const patterns = {
   official: /(<nav\b[^>]*aria-label="主导航"[^>]*>)([\s\S]*?)(<\/nav>)/g,
   tools: /(<nav\b[^>]*aria-label="主导航"[^>]*>)([\s\S]*?)(<\/nav>)/g,
-  library: /(<div class="top-actions library-top-actions">)([\s\S]*?)(<\/div>)/g,
-  legacy: /(<nav class="global-links">)([\s\S]*?)(<\/nav>)/g
+  library: /(<div class="top-actions library-top-actions">)([\s\S]*?)(<\/div>)/g
 };
 const regions = [...new Set(NAV_SURFACES.map(surface => surface.region).filter(Boolean))];
 const escape = value => String(value).replace(/[&<>"']/g, character => ({
@@ -34,7 +33,7 @@ function links(surface, inner) {
     const classes = surface.variant === 'library'
       ? 'text-action' + (active ? ' library-active-link' : '')
       : active ? 'active' : '';
-    return `<a${classes ? ` class="${classes}"` : ''} href="${escape(module.href)}"${active && surface.ariaCurrent ? ' aria-current="page"' : ''}>${escape(module.label)}</a>`;
+    return `<a${classes ? ` class="${classes}"` : ''} href="${escape(module.href)}"${active ? ' aria-current="page"' : ''}>${escape(module.label)}</a>`;
   }).join(gaps[0] || '') + suffix;
 }
 

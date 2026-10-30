@@ -95,8 +95,7 @@ test('normal build consumes registry changes from a clean copy without exposing 
     occurrences += html.split(label).length - 1;
     assert.deepEqual(Buffer.from(html.replaceAll(label, '心电图')), before.get(name), name + ' only changes the navigation label');
   }
-  assert.deepEqual(changed.sort(), ['classification.html', 'duty.html', 'ecg.html', 'home.html',
+  assert.deepEqual(changed.sort(), ['admin.html', 'classification.html', 'duty.html', 'ecg.html', 'home.html',
     'index.html', 'library.html', 'pathway.html', 'tools.html'].sort());
   assert.equal(occurrences, 10, 'nine registered ECG links plus the lightweight homepage alias');
-  assert.deepEqual(after.get('admin.html'), before.get('admin.html'), 'admin exclusions stay intact');
 });

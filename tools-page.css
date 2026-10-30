@@ -13,3 +13,5 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   .formula-toolbar{align-items:stretch;flex-direction:column;margin-top:-8px;margin-bottom:34px}
   #formulaCount{padding-left:3px}
 }
+
+.nav{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}

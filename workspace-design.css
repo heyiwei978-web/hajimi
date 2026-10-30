@@ -450,3 +450,23 @@
 @media screen and (max-width:600px){
   body.duty-page .duty-hero>.btn{display:inline-flex;margin-top:16px}
 }
+
+/* Preserve the library header spacing while respecting display cutouts. */
+#libraryShell .library-topbar{padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+@media(max-width:650px){
+  #libraryShell .library-topbar,.cms-admin-mode #libraryShell .library-topbar{padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+}
+
+/* Mid widths (phone landscape, small tablets): keep the library title on one line
+   and let the navigation links scroll inside their own area instead of squeezing the brand. */
+@media screen and (min-width:651px) and (max-width:1100px){
+  #libraryShell .library-topbar .brandline,#libraryShell .library-topbar .brand{flex-shrink:0;white-space:nowrap}
+  #libraryShell .library-topbar .brand small{display:none}
+  #libraryShell .library-top-actions{flex:1 1 auto;min-width:0;flex-shrink:1;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none}
+  #libraryShell .library-top-actions::-webkit-scrollbar{display:none}
+  #libraryShell .library-top-actions>:first-child{margin-left:auto}
+  #libraryShell .library-top-actions>*{flex-shrink:0;white-space:nowrap}
+  /* Patient info and login stay pinned on the right while the links scroll. */
+  #libraryShell .library-top-actions>[data-auth-slot]{position:sticky;right:0;z-index:1;min-width:56px;padding-left:8px;display:flex;justify-content:flex-end;background:#fff}
+  #libraryShell .library-top-actions>.patient-action{position:sticky;right:56px;z-index:1;box-shadow:-10px 0 10px #fff}
+}

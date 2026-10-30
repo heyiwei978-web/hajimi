@@ -6,13 +6,13 @@
 <meta name="theme-color" content="#f6f8fb">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231d67d8%22/%3E%3Cpath d=%22M10 8v16m12-16v16M10 16h12%22 stroke=%22white%22 stroke-width=%223.5%22/%3E%3C/svg%3E">
 <title>哈基米工作站</title>
-<link rel="stylesheet" href="/styles.css?v=20261027-cls1">
-<link rel="stylesheet" href="/cms.css?v=20261009-layout1">
+<link rel="stylesheet" href="/styles.css?v=20261030-ui1">
+<link rel="stylesheet" href="/cms.css?v=20261030-ui1">
 <link rel="stylesheet" href="/ui-polish.css?v=20261011-jump1">
 <link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
 <link rel="stylesheet" href="/library-personal.css?v=20261009-personal1">
 <link rel="stylesheet" href="/case-workspace-preview.css?v=20261017-continuous1">
-<link rel="stylesheet" href="/workspace-design.css?v=20261027-cls1">
+<link rel="stylesheet" href="/workspace-design.css?v=20261030-ui1">
 <link rel="stylesheet" href="/classification-home.css?v=20261011-ecg1">
 </head>
 <body>
@@ -25,7 +25,7 @@
       <span class="official-brand-text"><strong>哈基米工作站</strong><small>hajimi Clinical Workspace</small></span>
     </a>
     <nav class="global-links official-links" aria-label="主导航">
-      <a class="active" href="/">首页</a>
+      <a class="active" href="/" aria-current="page">首页</a>
       <a href="/bl">病历模板</a>
       <a href="/classification">疾病分型</a>
       <a href="/ecg">心电图</a>
@@ -55,7 +55,7 @@
         <label for="homeSearch">搜索病历模板</label>
         <div class="home-search-field">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg>
-          <input id="homeSearch" name="q" type="search" placeholder="疾病、术式或文书名称" required>
+          <input id="homeSearch" enterkeyhint="search" autocomplete="off" spellcheck="false" name="q" type="search" placeholder="疾病、术式或文书名称" required>
           <button type="submit">搜索 <span aria-hidden="true">→</span></button>
         </div>
       </form>
@@ -167,15 +167,10 @@
 </main>
 </div>
 
-<div id="dutyPage" class="portal-home" hidden>
-<header class="global-nav"><div class="global-nav-inner"><a class="global-brand" href="/">hajimi</a><nav class="global-links"><a href="/">首页</a><a href="/bl">病历模板</a><a href="/classification">疾病分型</a><a href="/ecg">心电图</a><a href="/pathway">临床路径</a><a href="/tools">临床工具</a><a href="/admin">管理入口</a><span data-auth-slot></span></nav></div></header>
-<main class="portal-main"><section class="portal-hero"><p class="portal-kicker">ON CALL</p><h1>值班工作台</h1><p class="portal-subtitle">交班核对清单、待办复评安排与常用资料。</p><a class="btn primary" href="/duty">打开值班工作台</a></section></main>
-</div>
-
 <div id="libraryShell" aria-busy="true">
 <header class="topbar library-topbar">
 <div class="brandline"><button id="menuBtn" class="menu-btn" type="button" aria-label="打开菜单" aria-controls="sidebar" aria-expanded="false">☰</button><a class="site-home-mark" href="/" aria-label="返回网站首页" title="网站首页"><span class="brand-mark library-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M3.8 10.8 12 4l8.2 6.8v8.1a1.6 1.6 0 0 1-1.6 1.6h-4.4v-6h-4.4v6H5.4a1.6 1.6 0 0 1-1.6-1.6z"/></svg></span></a><a class="brand library-brand" href="/bl"><span class="library-brand-copy"><em>哈基米工作站</em><strong>病历模板</strong><small>Clinical Template Library</small></span></a></div>
-<div class="top-actions library-top-actions"><a class="text-action" href="/">首页</a><a class="text-action library-active-link" href="/bl">病历模板</a><a class="text-action" href="/classification">疾病分型</a><a class="text-action" href="/ecg">心电图</a><a class="text-action" href="/pathway">临床路径</a><a class="text-action" href="/duty">值班资料</a><a class="text-action" href="/tools">临床工具</a><a class="text-action" href="/admin">管理入口</a><button id="patientBtn" class="text-action patient-action" type="button">患者信息</button><span data-auth-slot></span></div>
+<div class="top-actions library-top-actions"><a class="text-action" href="/">首页</a><a class="text-action library-active-link" href="/bl" aria-current="page">病历模板</a><a class="text-action" href="/classification">疾病分型</a><a class="text-action" href="/ecg">心电图</a><a class="text-action" href="/pathway">临床路径</a><a class="text-action" href="/duty">值班资料</a><a class="text-action" href="/tools">临床工具</a><a class="text-action" href="/admin">管理入口</a><button id="patientBtn" class="text-action patient-action" type="button">患者信息</button><span data-auth-slot></span></div>
 </header>
 <div id="drawerMask" class="drawer-mask" aria-hidden="true"></div>
 <div class="page">
@@ -218,7 +213,7 @@
 <div id="previewContent" class="record-paper"></div>
 </dialog>
 
-<div id="toast" class="toast"></div><div id="portalToast" class="portal-toast"></div>
+<div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div><div id="portalToast" class="portal-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 <script defer src="/library-ui.js?v=20261011-mvp1"></script>
 <script defer src="/search-core.js?v=20261011-mvp1"></script>
 <script defer src="/library-personal.js?v=20261024-lumbar1"></script>
@@ -257,7 +252,7 @@
 <script defer src="/departments.js?v=20261009-quality1"></script>
 <script defer src="/ideal-other-cases.js?v=20261007-complete3"></script>
 <script defer src="/tka-special-cases.js?v=20261007-special5"></script>
-<script defer src="/cms-core.js?v=20261009-allortho4"></script>
+<script defer src="/cms-core.js?v=20261030-ui1"></script>
 <script defer src="/workspace.js?v=20261009-layout1"></script>
 <script defer src="/ortho-protocols-a.js?v=20261009-allortho2"></script>
 <script defer src="/ortho-protocols-b.js?v=20261009-allortho2"></script>
