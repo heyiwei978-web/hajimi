@@ -7,6 +7,7 @@
     "test": "node --test test/*.test.js",
     "audit:clinical": "node scripts/audit-clinical-library.mjs",
     "build": "node scripts/build-home.mjs",
+    "sync:nav": "node scripts/navigation-build.mjs",
     "test:browser": "npm run build && node --test e2e/*.test.cjs",
     "audit:quality": "node scripts/clinical-quality-audit.mjs",
     "audit:quality:check": "node scripts/clinical-quality-audit.mjs --check",

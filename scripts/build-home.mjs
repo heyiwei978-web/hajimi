@@ -6,6 +6,7 @@ import {PUBLIC_FILES} from './public-assets.mjs';
 import {assertPublicResources} from './public-resources.mjs';
 import {writeBuiltNavigation} from './navigation-build.mjs';
 import {writeBuiltDepartmentPages} from './department-build.mjs';
+import {writeAssetVersions} from './asset-versions.mjs';
 
 // Keep homepage markup in index.html as the single source for both entry points.
 export function buildHome(source) {
@@ -42,6 +43,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const ecg=compileEcg(directory);
     writeBuiltNavigation(directory);
     writeBuiltDepartmentPages(directory);
+    writeAssetVersions(directory);
     assertPublicResources(directory,JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8')),manifest);
     console.log('Built lightweight homepage and clinical library in dist/');
     console.log('Built ECG bundle assets/'+ecg.name+' ('+ecg.entries+' entries, '+Math.round(ecg.bytes/1024)+' KB)');

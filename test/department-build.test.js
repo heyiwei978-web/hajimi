@@ -126,11 +126,18 @@ test('normal build projects registry metadata into home, router and classificati
   const added=[...after.keys()].filter(name=>!before.has(name)).sort();
   const removed=[...before.keys()].filter(name=>!after.has(name)).sort();
   assert.deepEqual(added,[newRouter,newManifest.name].sort());assert.deepEqual(removed,[oldRouter,oldManifest.name].sort());
+  // Asset URLs carry content digests (scripts/asset-versions.mjs): only the
+  // changed classification data gets a new version; everything else keeps its URL.
+  const versions=html=>new Map([...html.matchAll(/\/([A-Za-z0-9_-]+\.(?:css|js))\?v=([0-9a-f]{12})/g)].map(match=>[match[1],match[2]]));
+  const oldVersions=versions(before.get('classification.html').toString('utf8')),newVersions=versions(after.get('classification.html').toString('utf8'));
+  assert.notEqual(newVersions.get('classification-data.js'),oldVersions.get('classification-data.js'));
+  for (const [file,version] of newVersions) if (file!=='classification-data.js') assert.equal(version,oldVersions.get(file),file+' keeps its version');
+  const sameDataVersion=html=>html.replace('/classification-data.js?v='+newVersions.get('classification-data.js'),'/classification-data.js?v='+oldVersions.get('classification-data.js'));
   for (const [name,bytes] of after) {
     if (!before.has(name)) continue;
-    let normalized=bytes;
+    let normalized=name.endsWith('.html')?Buffer.from(sameDataVersion(bytes.toString('utf8'))):bytes;
     if (['index.html','home.html','library.html'].includes(name)) {
-      const html=bytes.toString('utf8');assert.ok(html.includes(values.homeDescription));
+      const html=normalized.toString('utf8');assert.ok(html.includes(values.homeDescription));
       normalized=Buffer.from(html.replace(values.homeDescription,old.homeDescription).replace(newManifest.name,oldManifest.name));
     } else if (name==='classification-data.js') {
       const source=bytes.toString('utf8');assert.ok(source.includes(values.classificationDescription));

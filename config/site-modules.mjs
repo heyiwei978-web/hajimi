@@ -11,7 +11,10 @@
 // `.global-links` item below 640px and ui-polish.css restores it for official
 // navigation bars; reordering MODULES changes which entry is affected on phones.
 
+// The build renders every official/tools header brand from these values
+// (scripts/navigation-build.mjs); edit here instead of in each page.
 export const SITE_BRAND = Object.freeze({
+  mark: 'H',
   name: '哈基米工作站',
   tagline: 'hajimi Clinical Workspace'
 });
