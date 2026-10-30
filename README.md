@@ -32,7 +32,7 @@
 
 敏感配置只保存在 Vercel Environment Variables，不提交到仓库。
 
-GitHub 已连接 Vercel；当前 `vercel.json` 禁用 `main`、`security/blob-static-token`、`chore/clinical-library-slimming`、`refactor/site-registry-phase1` 四个分支的自动部署。发布按[发布与核验流程](docs/deployment-workflow.md)执行，不能把 Git 连接状态当作自动发布许可。
+GitHub 已连接 Vercel，采用**合并即上线**：PR 合并到 `main` 后，Vercel 自动构建并发布到生产。合并前须确认 CI 全部通过、预览部署检查无误；`vercel.json` 仍禁用若干历史分支的自动部署。详见[发布与核验流程](docs/deployment-workflow.md)。
 
 
 ## 开发与检查
