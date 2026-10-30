@@ -68,7 +68,8 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 - **发布白名单**：`scripts/public-assets.mjs` 是公开文件的显式白名单。新增要公开的页面、样式或脚本，必须加入对应列表，否则不会进入 `dist/`。病历源脚本、`config/`、`scripts/`、`docs/`、`content/` 和所有 `.md` 都不得公开。
 - **心电图**：`ecg.html` 的脚本顺序必须与 `scripts/ecg-compiler.mjs` 中的 `ECG_SOURCES` 一致，否则构建失败；编译期会校验词条 id、分类、示意图、相关链接、参考文献（必须 https）和日期格式。
 - **首页**：首页样式和入口内容维护在 `index.html`；`home.html` 由构建生成。
-- **缓存版本号**：页面用 `?v=日期-说明` 做缓存刷新。修改某个 CSS/JS 后，同步更新**所有**引用它的页面上的版本号，保持一致。
+- **缓存版本号**：构建时 `scripts/asset-versions.mjs` 把 `dist/` 页面里所有 `/文件.css|js?v=…` 替换为该文件内容的哈希。**不需要也不要手动改版本号**；源 HTML 里的 `?v=` 只在不构建直接预览源文件时起作用。新增引用时照样写 `?v=` 即可被接管。
+- **顶栏**：官方页面（`official`）和工具页（`tools`）的整个 `<header>` 由 `scripts/navigation-build.mjs` 按模板生成：品牌区来自 `SITE_BRAND`，导航来自 `MODULES`；页面只能保留额外的 header 样式类和 `.official-nav-right` 里的专属按钮。往顶栏里加别的内容会让构建失败——需要的话先改模板。源文件里的顶栏与构建结果保持逐字节一致：改完注册表后运行 `npm run sync:nav` 同步源文件，再 `npm run build`（测试 `navigation-build` 会检查两者一致）。
 
 ## 6. 医学内容（最高风险，必须遵守）
 
@@ -143,4 +144,4 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 ## 11. 已知待办（供参考，不代表已授权）
 
 - 导航收尾：管理后台导航补齐、所有页面当前项加 `aria-current`、副标题统一、清理 `index.html` 中旧的 `#dutyPage` 区块（见 `config/site-modules.mjs` 中记录的已知不一致）。
-- 模块化第二阶段：顶栏外层结构共用、各页面 CSS 版本号统一并由构建集中注入。
+- 工具页顶栏仍使用独立的 `tools` 结构与样式（tools-page.css）；如要与官方顶栏完全合并，需要同时调整样式并做视觉核对。
