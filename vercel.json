@@ -17,6 +17,14 @@
       "destination": "/password-hash.html"
     },
     {
+      "source": "/kb",
+      "destination": "/kb.html"
+    },
+    {
+      "source": "/kb/",
+      "destination": "/kb.html"
+    },
+    {
       "source": "/ecg",
       "destination": "/ecg.html"
     },

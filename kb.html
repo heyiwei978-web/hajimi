@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f8fb">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231d67d8%22/%3E%3Cpath d=%22M10 8v16m12-16v16M10 16h12%22 stroke=%22white%22 stroke-width=%223.5%22/%3E%3C/svg%3E">
+<title>我的知识库 · 哈基米工作站</title>
+<link rel="stylesheet" href="/styles.css?v=20261031-kb1">
+<link rel="stylesheet" href="/ui-polish.css?v=20261031-kb1">
+<link rel="stylesheet" href="/accessibility.css?v=20261031-kb1">
+<link rel="stylesheet" href="/workspace-design.css?v=20261031-kb1">
+<link rel="stylesheet" href="/kb.css?v=20261031-kb1">
+</head>
+<body class="kb-page">
+<a class="skip-link" href="#kbContent">跳到主要内容</a>
+<header class="global-nav official-nav">
+  <div class="global-nav-inner official-nav-inner">
+    <a class="global-brand official-brand" href="/"><span class="official-brand-mark" aria-hidden="true">H</span><span class="official-brand-text"><strong>哈基米工作站</strong><small>hajimi Clinical Workspace</small></span></a>
+    <nav class="global-links official-links" aria-label="主导航">
+      <a href="/">首页</a>
+      <a href="/bl">病历模板</a>
+      <a href="/classification">疾病分型</a>
+      <a href="/ecg">心电图</a>
+      <a href="/pathway">临床路径</a>
+      <a href="/duty">值班资料</a>
+      <a href="/tools">临床工具</a>
+      <a class="active" href="/admin" aria-current="page">管理入口</a>
+    </nav>
+  </div>
+</header>
+<main id="kbContent" class="kb-main">
+  <section class="kb-hero">
+    <div><p class="kb-kicker">PRIVATE KNOWLEDGE BASE</p><h1>我的知识库</h1><p>读书笔记、指南要点和个人总结。仅登录后本人可见，不公开、不被搜索引擎收录。</p></div>
+    <div class="kb-hero-actions"><button id="kbNew" class="btn primary" type="button" hidden>＋ 新建笔记</button></div>
+  </section>
+
+  <section id="kbSignedOut" class="kb-card kb-signed-out" hidden>
+    <h2>请先登录</h2>
+    <p>知识库只对网站管理员本人开放。请在「管理入口」登录后再回到这里。</p>
+    <a class="btn primary" href="/admin">去登录</a>
+  </section>
+  <p id="kbStatus" class="kb-status" role="status" aria-live="polite">正在检查登录状态…</p>
+  <p id="kbError" class="kb-error" role="alert" hidden></p>
+
+  <section id="kbList" class="kb-list-view" aria-labelledby="kbListTitle" hidden>
+    <h2 id="kbListTitle" class="visually-hidden">笔记列表</h2>
+    <div class="kb-filters">
+      <label class="kb-search"><span class="visually-hidden">搜索笔记</span><input id="kbSearch" type="search" enterkeyhint="search" autocomplete="off" placeholder="搜索标题、来源、标签或正文，如：转子间 抗凝"></label>
+      <label><span>类型</span><select id="kbKind"><option value="">全部类型</option></select></label>
+      <label><span>科室</span><select id="kbDept"><option value="">全部科室</option></select></label>
+    </div>
+    <p id="kbSummary" class="kb-summary" role="status" aria-live="polite"></p>
+    <ol id="kbItems" class="kb-items"></ol>
+  </section>
+
+  <article id="kbReader" class="kb-card kb-reader" hidden aria-labelledby="kbReaderTitle">
+    <div class="kb-reader-tools"><button id="kbBack" class="btn ghost" type="button">← 返回列表</button>
+      <div><button id="kbCopy" class="btn ghost" type="button">复制正文</button><button id="kbEdit" class="btn ghost" type="button">编辑</button><button id="kbDelete" class="btn ghost kb-danger" type="button">删除</button></div></div>
+    <p id="kbReaderMeta" class="kb-meta"></p>
+    <h2 id="kbReaderTitle"></h2>
+    <ul id="kbReaderTags" class="kb-tags" aria-label="标签"></ul>
+    <div id="kbReaderBody" class="kb-body"></div>
+    <p id="kbReaderDates" class="kb-dates"></p>
+  </article>
+
+  <form id="kbEditor" class="kb-card kb-editor" hidden novalidate aria-labelledby="kbEditorTitle">
+    <h2 id="kbEditorTitle">新建笔记</h2>
+    <fieldset id="kbFields">
+      <label class="kb-wide">标题<input id="kbTitle" name="title" maxlength="120" required placeholder="如：股骨转子间骨折术后抗凝要点"></label>
+      <label>类型<select id="kbFormKind" name="kind" required></select></label>
+      <label>科室<select id="kbFormDept" name="department" required></select></label>
+      <label class="kb-wide">来源<input id="kbSource" name="source" maxlength="200" placeholder="书名/指南名称、版本或年份、页码"></label>
+      <label class="kb-wide">标签<input id="kbTags" name="tags" placeholder="用逗号或空格分隔，如：抗凝 髋部骨折"></label>
+      <label class="kb-wide">正文<textarea id="kbBody" name="body" rows="14" maxlength="60000" required placeholder="可直接粘贴整理好的要点。以「# 」开头的行显示为小标题。"></textarea></label>
+      <p class="kb-hint">请勿录入患者姓名、住院号等身份信息。书籍和指南原文仅供本人学习，不要公开分享。</p>
+    </fieldset>
+    <div class="kb-editor-actions"><button id="kbCancel" class="btn ghost" type="button">取消</button><button id="kbSave" class="btn primary" type="submit">保存</button></div>
+  </form>
+</main>
+<script defer src="/kb.js?v=20261031-kb1"></script>
+</body>
+</html>
