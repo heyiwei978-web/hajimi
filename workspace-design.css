@@ -450,3 +450,9 @@
 @media screen and (max-width:600px){
   body.duty-page .duty-hero>.btn{display:inline-flex;margin-top:16px}
 }
+
+/* Preserve the library header spacing while respecting display cutouts. */
+#libraryShell .library-topbar{padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+@media(max-width:650px){
+  #libraryShell .library-topbar,.cms-admin-mode #libraryShell .library-topbar{padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+}
