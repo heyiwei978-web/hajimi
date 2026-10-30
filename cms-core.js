@@ -18,7 +18,7 @@
     document.body.insertAdjacentHTML('beforeend',`
       <dialog id="cmsLoginDialog" class="cms-dialog" aria-labelledby="cmsLoginTitle"><form id="cmsLoginForm">
         <div class="cms-dialog-head"><div><strong id="cmsLoginTitle">开发者登录</strong><span>登录后才能修改模板、添加案例和图片</span></div><button type="button" class="cms-x" data-dialog-close aria-label="关闭">×</button></div>
-        <label>用户名<input name="username" autocomplete="username" value="admin"></label>
+        <label>用户名<input name="username" autocomplete="username"></label>
         <label>密码<input name="password" type="password" autocomplete="current-password" required></label>
         <div id="cmsLoginError" class="cms-error" role="alert" hidden></div>
         <div class="cms-actions"><button type="button" class="btn ghost" data-dialog-close>取消</button><button type="submit" class="btn primary">登录</button></div>
