@@ -131,7 +131,6 @@
     function pathState(){
       const p=location.pathname.split('/').filter(Boolean);
       if(!p.length)return {page:'home'};
-      if(p[0]==='duty')return {page:'duty'};
       if(p[0]!=='bl')return {page:'home'};
       if(!p[1])return {page:'departments'};
       const dep=slugToDept[p[1]]||null;
@@ -140,10 +139,10 @@
       return {page:'library',department:dep,disease};
     }
     function setShell(page){
-      if(page==='home'||page==='duty')document.body.classList.remove('disease-book-page');
-      const home=document.getElementById('portalHome'),duty=document.getElementById('dutyPage'),lib=document.getElementById('libraryShell');
-      home.hidden=page!=='home';duty.hidden=page!=='duty';lib.hidden=!(page==='departments'||page==='library');
-      document.body.classList.toggle('portal-mode',page==='home'||page==='duty');
+      if(page==='home')document.body.classList.remove('disease-book-page');
+      const home=document.getElementById('portalHome'),lib=document.getElementById('libraryShell');
+      home.hidden=page!=='home';lib.hidden=!(page==='departments'||page==='library');
+      document.body.classList.toggle('portal-mode',page==='home');
     }
     function setBrand(){
       const strong=document.querySelector('#libraryShell .brand strong');
@@ -879,9 +878,9 @@
       const generation=++routeGeneration;
       document.getElementById('templateGrid').classList.remove('search-results','case-search-results');
       const r=pathState();setShell(r.page);
-      const title=r.page==='home'?'哈基米工作站':r.page==='duty'?'值班资料':r.page==='departments'?'病历模板库':(r.disease?labelFor(r.disease)+' · 完整病历':(r.department||'')+'病历模板库');
+      const title=r.page==='home'?'哈基米工作站':r.page==='departments'?'病历模板库':(r.disease?labelFor(r.disease)+' · 完整病历':(r.department||'')+'病历模板库');
       document.title=title==='哈基米工作站'?title:title+' · 哈基米工作站';
-      if(r.page==='home'||r.page==='duty')return;
+      if(r.page==='home')return;
       if(r.page==='departments'){renderDepartmentRoot();applyRouteSearch();return;}
       if(window.HAJIMI&&r.department){
         const grid=document.getElementById('templateGrid');grid.innerHTML='<p class="library-loading" role="status">正在加载病历资料…</p>';

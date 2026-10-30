@@ -13,7 +13,7 @@ import {renderHomeDepartments,renderRouterDepartments,renderClassificationDepart
 const root = new URL('../', import.meta.url);
 const read = file => fs.readFileSync(new URL(file, root), 'utf8');
 const readPage = file => renderPageNavigation(['index.html','home.html'].includes(file) ? renderHomeDepartments(read(file)) : read(file), file);
-const REGIONS = ['portalHome', 'dutyPage', 'libraryShell'];
+const REGIONS = ['portalHome', 'libraryShell'];
 
 function regionSource(file, region) {
   const source = readPage(file);
@@ -27,10 +27,9 @@ function regionSource(file, region) {
 const NAV_PATTERNS = {
   official: /<nav\b[^>]*aria-label="主导航"[^>]*>([\s\S]*?)<\/nav>/g,
   tools: /<nav\b[^>]*aria-label="主导航"[^>]*>([\s\S]*?)<\/nav>/g,
-  library: /<div class="top-actions library-top-actions">([\s\S]*?)<\/div>/g,
-  legacy: /<nav class="global-links">([\s\S]*?)<\/nav>/g
+  library: /<div class="top-actions library-top-actions">([\s\S]*?)<\/div>/g
 };
-const ACTIVE_CLASS = {official: 'active', tools: 'active', library: 'library-active-link', legacy: 'active'};
+const ACTIVE_CLASS = {official: 'active', tools: 'active', library: 'library-active-link'};
 
 function navLinks(surface) {
   const source = regionSource(surface.file, surface.region);
@@ -85,7 +84,7 @@ for (const surface of NAV_SURFACES) {
       .map(match => match[1] || match[2]);
     assert.deepEqual(current, surface.active ? [MODULES.find(module => module.id === surface.active).href] : [], 'one current navigation entry');
     if (surface.variant === 'official' || surface.variant === 'tools') {
-      const tagline = surface.tagline || SITE_BRAND.tagline;
+      const tagline = SITE_BRAND.tagline;
       const brand = `<strong>${SITE_BRAND.name}</strong><small>${tagline}</small>`;
       assert.ok(regionSource(surface.file, surface.region).includes(brand), `brand reads ${SITE_BRAND.name} / ${tagline}`);
     }

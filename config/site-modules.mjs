@@ -70,9 +70,8 @@ export const DEPARTMENTS = Object.freeze([
 //   official  <nav class="global-links official-links" aria-label="主导航">, active = a.active
 //   tools     <header class="nav"><div class="navin">…<nav aria-label="主导航">, active = a.active
 //   library   <div class="top-actions library-top-actions">, active = a.library-active-link
-//   legacy    the hidden #dutyPage block inside index.html (no active item)
-// `exclude` and `tagline` record today's known drift. Phase 1 keeps it as is;
-// fixing it is a visible UI change that belongs in its own reviewed PR.
+// All registered surfaces use the same navigation entries and brand tagline.
+// The builder marks each active entry with aria-current="page".
 export const NAV_SURFACES = Object.freeze([
   {file: 'index.html', region: 'portalHome', variant: 'official', active: 'home'},
   {file: 'home.html', variant: 'official', active: 'home', generatedFrom: 'index.html'},
@@ -82,8 +81,7 @@ export const NAV_SURFACES = Object.freeze([
   {file: 'duty.html', variant: 'official', active: 'duty'},
   {file: 'admin.html', variant: 'official', active: 'admin'},
   {file: 'tools.html', variant: 'tools', active: 'tools'},
-  {file: 'index.html', region: 'libraryShell', variant: 'library', active: 'records'},
-  {file: 'index.html', region: 'dutyPage', variant: 'legacy', active: null, exclude: ['duty'], legacy: true}
+  {file: 'index.html', region: 'libraryShell', variant: 'library', active: 'records'}
 ].map(Object.freeze));
 
 export function navModules(surface) {

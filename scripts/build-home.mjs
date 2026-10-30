@@ -11,7 +11,7 @@ import {writeBuiltDepartmentPages} from './department-build.mjs';
 export function buildHome(source) {
   const headEnd = source.indexOf('</head>');
   const start = source.indexOf('<div id="portalHome"');
-  const end = source.indexOf('<div id="dutyPage"');
+  const end = source.indexOf('<div id="libraryShell"');
   if (headEnd < 0 || start < headEnd || end <= start) {
     throw new Error('Homepage sections missing from index.html');
   }
