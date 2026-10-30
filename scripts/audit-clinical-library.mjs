@@ -3,13 +3,14 @@ import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
-import {loadClinicalSource} from './clinical-compiler.mjs';
+import {loadClinicalSource,loadBuildSource} from './clinical-compiler.mjs';
+import {CLINICAL_SOURCE_DIR,loadClinicalJsonSource} from './clinical-source.mjs';
 import {fail,readInventory,planClinicalPublication} from './clinical-inventory.mjs';
 import {applyClinicalUpdate,persistClinicalRevision,proposeClinicalUpdate} from './clinical-updates.mjs';
 
 const root=new URL('../',import.meta.url),directory=new URL('../content/clinical-library/',import.meta.url);
 export function auditClinicalLibrary(){
-  const source=loadClinicalSource(fs.readFileSync(new URL('index.html',root),'utf8'),{audit:true});
+  const source=loadBuildSource(fs.readFileSync(new URL('index.html',root),'utf8'));
   const inventory=readInventory(),plan=planClinicalPublication(source,inventory);
   return {source,inventory,plan};
 }
@@ -19,6 +20,17 @@ async function git(args){
 }
 async function previousSource(commit){
   if(!/^[a-f0-9]{40}$/.test(commit))fail('source-commit must be a full previous approved Git commit');
+  // Commits after the JSON migration hold the flat per-disease source.
+  const index=await git(['show',commit+':'+CLINICAL_SOURCE_DIR+'index.json']).catch(()=>null);
+  if(index!==null){
+    const names=[...JSON.parse(index).files,'legacy-rendered.json'],files=new Map([['index.json',index]]),code=new Map();
+    for(const name of names){
+      if(!/^[a-z]+\/[^/]+\.json$|^legacy-rendered\.json$/.test(name)||name.includes('..'))fail('invalid historical source path');
+      files.set(name,await git(['show',commit+':'+CLINICAL_SOURCE_DIR+name]));
+    }
+    for(const file of ['search-core.js','app.js'])code.set(file,await git(['show',commit+':'+file]));
+    return loadClinicalJsonSource({audit:true,read:name=>{if(!files.has(name))fail('missing historical source');return files.get(name);},readSource:file=>code.get(file)});
+  }
   const html=await git(['show',commit+':index.html']),cache=new Map();
   const files=[...html.matchAll(/<script\s+[^>]*?src="\/([^?"]+)(?:\?[^"]*)?"/g)].map(match=>match[1]);
   for(let start=0;start<files.length;start+=8)await Promise.all(files.slice(start,start+8).map(async file=>{
@@ -48,7 +60,7 @@ async function main(args){
     const inventory=readInventory(),commit=opts['source-commit']||(opts['apply-update']
       ?JSON.parse(fs.readFileSync(opts['apply-update'],'utf8')).sourceCommit:(await git(['rev-parse','HEAD'])).trim());
     const previous=await previousSource(commit);
-    const source=loadClinicalSource(fs.readFileSync(new URL('index.html',root),'utf8'),{audit:true});
+    const source=loadBuildSource(fs.readFileSync(new URL('index.html',root),'utf8'));
     if(opts['propose-update']){
       if(!opts.output)fail('preview requires --output to a private local JSON file outside the repository');
       const output=path.join(fs.realpathSync(path.dirname(path.resolve(opts.output))),path.basename(opts.output));

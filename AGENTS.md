@@ -11,7 +11,7 @@
 | 负责方 | 负责范围 | 不碰 |
 | --- | --- | --- |
 | **Claude**（Claude Code） | 代码：界面、样式、构建脚本、导航与注册表、接口 `api/`、测试、安全、依赖、部署配置 | 医学内容（第 6 节所列一切医学文字与资料） |
-| **ChatGPT / Codex** | 内容：病历正文与修订脚本、疾病分型与治疗方案、临床路径、心电图资料、临床工具公式及其参考来源 | 上述「代码」范围的文件，除非负责人在该任务中明确要求 |
+| **ChatGPT / Codex** | 内容：病历正文（`content/clinical-library/source/` 下各病种 JSON）、疾病分型与治疗方案、临床路径、心电图资料、临床工具公式及其参考来源 | 上述「代码」范围的文件，除非负责人在该任务中明确要求 |
 
 一个任务若同时需要改内容和代码：内容方只改内容，在 PR 描述里写明需要的代码改动，由代码方另开 PR。
 
@@ -49,22 +49,23 @@ PR 描述里写明：负责方（Claude / ChatGPT / Codex）、改动类型（�
 | 位置 | 作用 |
 | --- | --- |
 | `*.html`（根目录） | 各栏目页面源文件 |
-| `index.html` | 首页区块 + 完整病历库源页面；其中 `<script>` 顺序就是病历生成链 |
+| `index.html` | 首页区块 + 完整病历库源页面；其中病历相关 `<script>` 是**已退役**的旧生成链（见第 6.3 节） |
 | `home.html` | **由构建生成**（取自 `index.html` 首页区块），不要手改 |
-| `record-*.js`、`ortho-*.js`、`orthopedic-expansion-*.js`、`ideal-*.js`、`tka-special-cases.js` | 病历正文与逐轮质量修订脚本（医学内容，见第 6 节） |
+| `content/clinical-library/source/` | **病历正文源数据**：每个科室一个目录、每个病种一个 JSON 文件；`index.json` 记录全部记录顺序；`legacy-rendered.json` 只供身份账本核对 |
+| `record-*.js`、`ortho-*.js`、`orthopedic-expansion-*.js`、`ideal-*.js`、`tka-special-cases.js` | 已退役的旧生成链脚本，冻结不改（见第 6.3 节） |
 | `ecg-*.js` | 心电图资料与功能，构建时由 `scripts/ecg-compiler.mjs` 编译成带哈希的包 |
 | `classification-*.js` | 疾病分型资料与治疗方案 |
 | `*.css` | 样式；`workspace-design.css` 是最后加载的公共界面样式，管理设计变量 |
 | `config/site-modules.mjs` | **站点模块注册表**：栏目、科室、所有主导航位置的唯一来源 |
 | `scripts/` | 构建、编译、审核脚本（不发布） |
-| `content/clinical-library/` | 病历身份账本与修订记录（见第 6 节） |
+| `content/clinical-library/` | 病历身份账本、修订记录与正文源数据（见第 6 节） |
 | `api/` | 登录、会话、内容、图片、上传、私人图库接口；`_` 开头为共享模块 |
 | `test/`、`e2e/` | 单元/运行时测试、浏览器回归测试 |
 | `docs/` | 设计说明、内容审核记录、发布流程 |
 | `security/`、`FIREWALL.md` | 防火墙规则定义与防护说明 |
 | `dist/` | 构建产物，已在 `.gitignore`，不要提交 |
 
-**根目录约定**：病历源脚本必须留在根目录——`content/clinical-library/baseline.json` 按根目录文件名记录了生成链文件及其哈希，移动会改写身份账本。新增的页面脚本、样式也放在根目录并加入发布白名单；不要再新增"补丁式"脚本（运行时注入样式或改 DOM 修正别处问题），直接改对应模块。`record-quality-v2.js` 未被引用，但属于医学源资料，未经医学授权不删除。
+**根目录约定**：已退役的病历生成链脚本留在根目录、内容冻结——`baseline.json` 与 `source/index.json` 的 `retiredChain` 按文件名记录了它们的哈希，测试会检查不变。新增的页面脚本、样式也放在根目录并加入发布白名单；不要再新增"补丁式"脚本（运行时注入样式或改 DOM 修正别处问题），直接改对应模块。`record-quality-v2.js` 未被引用，但属于医学源资料，未经医学授权不删除。
 
 ## 4. 构建、测试与本地预览
 
@@ -109,10 +110,12 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 - 每条文书有永久稳定 ID（`clinical-v1-rNNNNNN`）和原数字 ID，不得重编号、复用或改变病例归属、排序、名称、阶段、类型。
 - 修改医学正文必须走 `docs/clinical-identity-ledger-update-plan.md` 的流程：生成仓库外的差异预览 → 医学审核人明确授权 → 用审核过的 `proposalHash` 应用。**AI 不能自行充当审核人或替用户授权。**
 
-### 6.3 生成链顺序
-- `index.html` 里病历相关 `<script>` 的顺序就是生成链，由 `scripts/clinical-compiler.mjs` 执行。现有顺序（包括 `record-quality-v24.js` 排在 `v23` 之前）是有意保留的，**不要"整理"或重排**。
-- 新的修订脚本追加在链尾，并按第 6.2 节流程审核。
-- 不要在 `index.html` 里加入与病历无关的 `<script>`——那里的每个脚本都会被编译器当作病历链执行。
+### 6.3 病历正文源数据（2026-10-30 起）
+- 病历正文的唯一来源是 `content/clinical-library/source/<科室>/<病种>.json`。构建、身份账本核对、质量门禁和修订预览都读这些文件（`scripts/clinical-source.mjs`）。
+- 修改正文：直接编辑对应病种 JSON 里那一条记录的字段（通常是 `sourceBody`），**不增删字段、不改字段顺序、不移动记录**；然后按第 6.2 节流程预览、由负责人授权、追加修订批次。未经授权的正文改动会让构建失败（「propose and authorize a content revision」）。
+- `index.json` 的 `sequence` 决定全部记录的顺序，不要手改；`legacy-rendered.json` 只为旧账本核对保留，不是显示内容，不要编辑。
+- 旧生成链（`index.html` 里的病历脚本和根目录 `record-*.js` 等）**已退役并冻结**：不要再新增修订脚本，也不要修改这些文件，测试会检查其哈希。`scripts/clinical-source-export.mjs` 只用于当初的一次性迁移，源数据存在时拒绝运行。
+- 不要在 `index.html` 里加入与病历无关的 `<script>`。
 
 ### 6.4 写作与安全原则
 - 只修正与原病例事实一致的内容；不能用"术式常规"替代病例事实，不能把可选操作写成已完成。不确定处保留【待核实】字段。
