@@ -205,7 +205,13 @@
       if(number)number.textContent=count;if(caption)caption.textContent=label;
     }
 
-    function allDisease(dep){return diseaseMap[dep]||[...new Set(listForDept(dep).map((t)=>t.group))];}
+    // Non-orthopedic departments list their seeded diseases plus every published
+    // case added later (from the build manifest), so new diseases need no code edit.
+    function allDisease(dep){
+      const published=caseEntries(dep).filter(item=>item.caseType!=='utility').map(item=>item.group);
+      if(dep==='骨科')return diseaseMap[dep];
+      return [...new Set([...(diseaseMap[dep]||[]),...published,...(diseaseMap[dep]?[]:listForDept(dep).map((t)=>t.group))])];
+    }
     function deptCard(dep){
       const d=departments.find((x)=>x.name===dep),n=departmentCount(dep);
       const meta={

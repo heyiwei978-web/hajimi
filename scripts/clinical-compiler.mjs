@@ -85,6 +85,9 @@ export function loadBuildSource(html){
 
 export function compileClinicalSite(html,directory,{inventory,cmsAudit,source=loadBuildSource(html)}={}){
   const publication=planClinicalPublication(source,inventory,{cmsAudit});
+  // New disease scaffolds mark every unwritten chapter; never publish them.
+  const unfilled=publication.published.filter(({record})=>String(record.sourceBody||'').includes('【待填写】'));
+  if(unfilled.length)throw new Error('Clinical build failed: '+unfilled.length+' published records still contain 【待填写】, e.g. '+unfilled[0].record.name);
   const slugs=clinicalDepartmentSlugs(publication.published);
   const publishedGroups=new Set(publication.published.filter(item=>item.record.department==='骨科').map(item=>item.record.group));
   const manifest={total:publication.published.length,identityNamespace:publication.baseline.identityNamespace,

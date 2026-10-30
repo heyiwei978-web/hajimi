@@ -113,8 +113,9 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 ### 6.3 病历正文源数据（2026-10-30 起）
 - 病历正文的唯一来源是 `content/clinical-library/source/<科室>/<病种>.json`。构建、身份账本核对、质量门禁和修订预览都读这些文件（`scripts/clinical-source.mjs`）。
 - 修改正文：直接编辑对应病种 JSON 里那一条记录的字段（通常是 `sourceBody`），**不增删字段、不改字段顺序、不移动记录**；然后按第 6.2 节流程预览、由负责人授权、追加修订批次。未经授权的正文改动会让构建失败（「propose and authorize a content revision」）。
+- **新增病种**：只能用 `npm run clinical:new` 建立模板（按现有完整病例的章节结构），再填写正文、走第 6.2 节授权，详见 `docs/new-disease-workflow.md`。不要手写新病种的 JSON 结构或手改 `index.json`。构建拒绝发布仍含 `【待填写】` 的记录。
 - `index.json` 的 `sequence` 决定全部记录的顺序，不要手改；`legacy-rendered.json` 只为旧账本核对保留，不是显示内容，不要编辑。
-- 旧生成链（`index.html` 里的病历脚本和根目录 `record-*.js` 等）**已退役并冻结**：不要再新增修订脚本，也不要修改这些文件，测试会检查其哈希。`scripts/clinical-source-export.mjs` 只用于当初的一次性迁移，源数据存在时拒绝运行。
+- 旧生成链（`index.html` 里的病历脚本和根目录 `record-*.js` 等）**已退役并冻结**：不要再新增修订脚本，也不要修改这些文件，测试会检查其哈希。`search-core.js`、`app.js`、`departments.js` 虽曾在链中执行，但仍是在用的页面代码（Claude 负责），不在冻结范围。`scripts/clinical-source-export.mjs` 只用于当初的一次性迁移，源数据存在时拒绝运行。
 - 不要在 `index.html` 里加入与病历无关的 `<script>`。
 
 ### 6.4 写作与安全原则
