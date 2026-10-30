@@ -79,9 +79,9 @@ export const NAV_SURFACES = Object.freeze([
   {file: 'classification.html', variant: 'official', active: 'classification'},
   {file: 'ecg.html', variant: 'official', active: 'ecg'},
   {file: 'pathway.html', variant: 'official', active: 'pathway'},
-  {file: 'duty.html', variant: 'official', active: 'duty', tagline: 'Clinical Workspace'},
+  {file: 'duty.html', variant: 'official', active: 'duty'},
   {file: 'admin.html', variant: 'official', active: 'admin'},
-  {file: 'tools.html', variant: 'tools', active: 'tools', tagline: 'Clinical Workspace'},
+  {file: 'tools.html', variant: 'tools', active: 'tools'},
   {file: 'index.html', region: 'libraryShell', variant: 'library', active: 'records'},
   {file: 'index.html', region: 'dutyPage', variant: 'legacy', active: null, exclude: ['duty'], legacy: true}
 ].map(Object.freeze));
