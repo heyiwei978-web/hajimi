@@ -49,3 +49,5 @@
   .cms-edit-dialog .cms-spacer{display:none}
   .cms-edit-dialog .cms-actions .btn{padding-left:6px;padding-right:6px}
 }
+
+.cms-actions{padding-bottom:env(safe-area-inset-bottom,0px)}

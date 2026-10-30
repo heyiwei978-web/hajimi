@@ -1614,3 +1614,11 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 }
 /* Reserve the template list while catalogs load so the guide below does not jump into view and back out. */
 #templateGrid:empty,#templateGrid>.library-loading:only-child{min-height:70vh}
+
+/* Keep fixed and sticky controls clear of device safe areas. */
+.topbar,.global-nav{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.toast,.portal-toast{bottom:calc(30px + env(safe-area-inset-bottom,0px))}
+.preview-tools{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+@media(max-width:900px){
+  body.department-no-sidebar #libraryShell .sidebar,#libraryShell .sidebar{padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))!important}
+}

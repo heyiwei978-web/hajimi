@@ -199,3 +199,5 @@ body.pathway-page{margin:0;background:var(--pw-bg);color:var(--pw-ink)}
 @media screen and (min-width:821px){
   .pathway-sidebar{top:calc(var(--site-header-height,62px) + 16px);max-height:calc(100dvh - var(--site-header-height,62px) - 32px)}
 }
+
+.path-toast{bottom:calc(28px + env(safe-area-inset-bottom,0px))}
