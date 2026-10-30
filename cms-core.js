@@ -147,7 +147,7 @@
     const cases=CMS.data.cases.filter((c)=>c.template===t.name&&(CMS.auth||c.published!==false));if(!cases.length)return;
     const cards=cases.map((c)=>{
       const images=(c.images||[]).map((p)=>'<a href="/api/image?path='+encodeURIComponent(p)+'" target="_blank" rel="noopener"><img src="/api/image?path='+encodeURIComponent(p)+'" loading="lazy" decoding="async" alt="'+esc(c.title||'案例图片')+'"></a>').join('');
-      const admin=CMS.auth?'<div class="cms-case-admin"><button data-edit-case="'+esc(c.id)+'">编辑</button><button data-delete-case="'+esc(c.id)+'">删除</button></div>':'';
+      const admin=CMS.auth?'<div class="cms-case-admin"><button aria-label="编辑：'+esc(c.title||'案例')+'" data-edit-case="'+esc(c.id)+'">编辑</button><button aria-label="删除：'+esc(c.title||'案例')+'" data-delete-case="'+esc(c.id)+'">删除</button></div>':'';
       return '<article class="cms-case-card"><div class="cms-case-head"><div><strong>'+esc(c.title||'案例')+'</strong><span>'+esc(new Date(c.updatedAt||c.createdAt||Date.now()).toLocaleDateString())+'</span></div>'+admin+'</div>'+(c.description?'<p>'+esc(c.description).replace(/\n/g,'<br>')+'</p>':'')+(images?'<div class="cms-case-images">'+images+'</div>':'')+'</article>';
     }).join('');
     const preview=document.getElementById('previewContent');
