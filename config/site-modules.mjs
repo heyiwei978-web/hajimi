@@ -30,7 +30,9 @@ export const MODULES = Object.freeze([
   {id: 'pathway', label: '临床路径', href: '/pathway', nav: true, routes: ['/pathway', '/pathway/']},
   {id: 'duty', label: '值班资料', href: '/duty', nav: true, routes: ['/duty', '/duty/']},
   {id: 'tools', label: '临床工具', href: '/tools', nav: true, routes: ['/tools', '/tools/']},
-  {id: 'admin', label: '管理入口', href: '/admin', nav: true, routes: ['/admin', '/admin/', '/admin/password']}
+  {id: 'admin', label: '管理入口', href: '/admin', nav: true, routes: ['/admin', '/admin/', '/admin/password']},
+  // Private, sign-in only; reached from the admin console, not the main navigation.
+  {id: 'kb', label: '我的知识库', href: '/kb', nav: false, routes: ['/kb', '/kb/']}
 ].map(Object.freeze));
 
 // Departments and which sections already have material for them.
@@ -83,6 +85,7 @@ export const NAV_SURFACES = Object.freeze([
   {file: 'pathway.html', variant: 'official', active: 'pathway'},
   {file: 'duty.html', variant: 'official', active: 'duty'},
   {file: 'admin.html', variant: 'official', active: 'admin'},
+  {file: 'kb.html', variant: 'official', active: 'admin'},
   {file: 'tools.html', variant: 'tools', active: 'tools'},
   {file: 'index.html', region: 'libraryShell', variant: 'library', active: 'records'}
 ].map(Object.freeze));
