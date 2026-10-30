@@ -476,3 +476,21 @@
   .site-disclaimer{max-width:1180px;margin:24px auto 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--ws-line,#dde6ef);color:var(--ws-muted,#5b6b7c);font-size:.8125rem;line-height:1.7;text-align:center}
 }
 @media print{.site-disclaimer{display:none}}
+
+/* 合并章节：章内每份记录一个小标题，可单独复制 */
+@media screen{
+  .record-merged-part+.record-merged-part{border-top:1px dashed var(--ws-line,#dde6ef)}
+  .record-merged-part-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding:16px 22px 0}
+  .record-merged-part-head h4{margin:0;font-size:1rem;font-weight:700;color:var(--ws-blue,#135f9c)}
+  .record-merged-part-actions{display:flex;gap:8px}
+  .record-merged-part-actions .btn{min-height:40px;padding:0 12px;font-size:.875rem}
+  .case-nav-count{font-style:normal;font-weight:500;font-size:.75rem;color:var(--ws-muted,#526577);margin-left:4px}
+}
+@media screen and (max-width:640px){
+  .record-merged-part-head{padding:14px 14px 0}
+}
+@media print{
+  .record-merged-part-actions{display:none}
+  .record-merged-part-head{padding:10px 0 0}
+  .record-merged-part-head h4{margin:0;font-size:12pt}
+}

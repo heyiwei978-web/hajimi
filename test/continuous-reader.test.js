@@ -80,7 +80,7 @@ test('opening a case keeps all chapters in continuous mode on desktop and phone'
     assert(f.root.classList.contains('case-show-all'));assert(f.root.classList.contains('case-continuous-reader'));
     assert.equal(f.articles.filter(article=>article.classList.contains('case-active')).length,1);
     assert(f.articles.every(article=>!article.hidden));assert.equal(f.panel.open,width>720);
-    assert.equal(f.status.textContent,'整套病历 · 3 篇连续文书');assert.equal(f.env.scrolls.length,0);
+    assert.equal(f.status.textContent,'整套病历 · 3 章');assert.equal(f.env.scrolls.length,0);
   }
 });
 
