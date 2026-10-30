@@ -80,7 +80,7 @@ export const NAV_SURFACES = Object.freeze([
   {file: 'ecg.html', variant: 'official', active: 'ecg', ariaCurrent: true},
   {file: 'pathway.html', variant: 'official', active: 'pathway'},
   {file: 'duty.html', variant: 'official', active: 'duty', tagline: 'Clinical Workspace'},
-  {file: 'admin.html', variant: 'official', active: 'admin', exclude: ['classification', 'ecg']},
+  {file: 'admin.html', variant: 'official', active: 'admin'},
   {file: 'tools.html', variant: 'tools', active: 'tools', tagline: 'Clinical Workspace'},
   {file: 'index.html', region: 'libraryShell', variant: 'library', active: 'records'},
   {file: 'index.html', region: 'dutyPage', variant: 'legacy', active: null, exclude: ['duty'], legacy: true}
