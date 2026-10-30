@@ -76,8 +76,8 @@ export const DEPARTMENTS = Object.freeze([
 export const NAV_SURFACES = Object.freeze([
   {file: 'index.html', region: 'portalHome', variant: 'official', active: 'home'},
   {file: 'home.html', variant: 'official', active: 'home', generatedFrom: 'index.html'},
-  {file: 'classification.html', variant: 'official', active: 'classification', ariaCurrent: true},
-  {file: 'ecg.html', variant: 'official', active: 'ecg', ariaCurrent: true},
+  {file: 'classification.html', variant: 'official', active: 'classification'},
+  {file: 'ecg.html', variant: 'official', active: 'ecg'},
   {file: 'pathway.html', variant: 'official', active: 'pathway'},
   {file: 'duty.html', variant: 'official', active: 'duty', tagline: 'Clinical Workspace'},
   {file: 'admin.html', variant: 'official', active: 'admin'},

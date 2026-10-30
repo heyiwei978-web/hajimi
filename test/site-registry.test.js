@@ -83,7 +83,7 @@ for (const surface of NAV_SURFACES) {
     else assert.deepEqual(active.map(link => link.href), [MODULES.find(module => module.id === surface.active).href], 'one active entry');
     const current = [...regionSource(surface.file, surface.region).matchAll(/<a\b[^>]*aria-current="page"[^>]*href="([^"]*)"|<a\b[^>]*href="([^"]*)"[^>]*aria-current="page"/g)]
       .map(match => match[1] || match[2]);
-    assert.deepEqual(current, surface.ariaCurrent ? [MODULES.find(module => module.id === surface.active).href] : [], 'existing aria-current behavior');
+    assert.deepEqual(current, surface.active ? [MODULES.find(module => module.id === surface.active).href] : [], 'one current navigation entry');
     if (surface.variant === 'official' || surface.variant === 'tools') {
       const tagline = surface.tagline || SITE_BRAND.tagline;
       const brand = `<strong>${SITE_BRAND.name}</strong><small>${tagline}</small>`;

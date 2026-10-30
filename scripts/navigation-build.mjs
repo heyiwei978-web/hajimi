@@ -34,7 +34,7 @@ function links(surface, inner) {
     const classes = surface.variant === 'library'
       ? 'text-action' + (active ? ' library-active-link' : '')
       : active ? 'active' : '';
-    return `<a${classes ? ` class="${classes}"` : ''} href="${escape(module.href)}"${active && surface.ariaCurrent ? ' aria-current="page"' : ''}>${escape(module.label)}</a>`;
+    return `<a${classes ? ` class="${classes}"` : ''} href="${escape(module.href)}"${active ? ' aria-current="page"' : ''}>${escape(module.label)}</a>`;
   }).join(gaps[0] || '') + suffix;
 }
 
