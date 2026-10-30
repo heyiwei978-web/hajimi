@@ -1620,7 +1620,6 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .global-nav{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
 @media(max-width:620px){.topbar{padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}}
 .toast,.portal-toast{bottom:calc(30px + env(safe-area-inset-bottom,0px))}
-.preview-tools{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
 @media(max-width:900px){
   body.department-no-sidebar #libraryShell .sidebar,#libraryShell .sidebar{padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))!important}
 }
