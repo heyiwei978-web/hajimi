@@ -229,7 +229,7 @@ function selectGroup(g){
  state.group=g;state.stage='all';state.type='all';state.q='';
  $('#searchInput').value='';$('#stageFilter').value='all';$('#typeFilter').value='all';
  $$('.nav-item').forEach(x=>x.classList.toggle('active',x.dataset.group===g));render();
- if(innerWidth<760)document.querySelector('.content').scrollIntoView({behavior:'smooth'});
+ if(innerWidth<760)document.querySelector('.content').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
 }
 function renderNav(){
  $('#traumaNav').innerHTML=traumaGroups.map(g=>`<button class="nav-item" data-group="${g}">${g}</button>`).join('');
