@@ -1,0 +1,25 @@
+name: TEMP regenerate lockfile (zod override)
+on:
+  push:
+    branches: ['security/zod-override-20261030']
+    paths: ['package.json', '.github/workflows/tmp-regen-lockfile.yml']
+permissions:
+  contents: write
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --package-lock-only --ignore-scripts --no-fund --no-audit
+      - run: npm ls zod --package-lock-only || true
+      - run: npm audit --package-lock-only --audit-level=high || true
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git diff --cached --quiet || git commit -m "chore(deps): regenerate lockfile with zod override"
+          git push
