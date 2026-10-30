@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import {planClinicalPublication} from './clinical-inventory.mjs';
 import {DEPARTMENTS} from '../config/site-modules.mjs';
 import {renderRouterDepartments} from './department-build.mjs';
+import {hasClinicalJsonSource,loadClinicalJsonSource} from './clinical-source.mjs';
 const root=new URL('../',import.meta.url);
 const digest=value=>createHash('sha256').update(value).digest('hex').slice(0,20);
 
@@ -76,7 +77,13 @@ export function loadClinicalSource(html,{audit=false,readSource=file=>fs.readFil
   return source;
 }
 
-export function compileClinicalSite(html,directory,{inventory,cmsAudit,source=loadClinicalSource(html,{audit:true})}={}){
+// The flat per-disease JSON files are the build source once they exist; the
+// legacy chain is only read when they are absent (and by the equality test).
+export function loadBuildSource(html){
+  return hasClinicalJsonSource()?loadClinicalJsonSource({audit:true}):loadClinicalSource(html,{audit:true});
+}
+
+export function compileClinicalSite(html,directory,{inventory,cmsAudit,source=loadBuildSource(html)}={}){
   const publication=planClinicalPublication(source,inventory,{cmsAudit});
   const slugs=clinicalDepartmentSlugs(publication.published);
   const publishedGroups=new Set(publication.published.filter(item=>item.record.department==='骨科').map(item=>item.record.group));

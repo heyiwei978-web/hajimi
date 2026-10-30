@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {loadClinicalSource} from './clinical-compiler.mjs';
+import {hasClinicalJsonSource,loadClinicalJsonSource} from './clinical-source.mjs';
 import {auditClinicalRecords} from './clinical-audit-rules.mjs';
 
 const args = process.argv.slice(2);
@@ -11,7 +12,7 @@ if (jsonIndex >= 0 && (!args[jsonIndex + 1] || args[jsonIndex + 1].startsWith('-
 }
 
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-const {records} = loadClinicalSource(html);
+const {records} = hasClinicalJsonSource() ? loadClinicalJsonSource() : loadClinicalSource(html);
 const report = auditClinicalRecords(records);
 console.log('Clinical record quality audit (read-only)');
 console.log('Records: ' + report.total + ' total, ' + report.orthopedics + ' orthopedic, ' +
