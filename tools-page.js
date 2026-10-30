@@ -57,7 +57,7 @@ eag:['ADA','A1C → eAG','https://doi.org/10.2337/dc26-s006'],
 ldl:['NCBI','Friedewald LDL-C','https://www.ncbi.nlm.nih.gov/books/NBK355892/'],
 nonhdl:['NCBI','non-HDL-C','https://www.ncbi.nlm.nih.gov/books/NBK355892/']
 };
-function f(id,label,extra=''){return '<label class="field">'+label+'<input id="'+id+'" type="number" '+extra+'></label>'}
+function f(id,label,extra=''){return '<label class="field">'+label+'<input id="'+id+'" type="number" inputmode="decimal" '+extra+'></label>'}
 function sel(id,label,opts){return '<label class="field">'+label+'<select id="'+id+'">'+opts.map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('')+'</select></label>'}
 function ck(g,t,v){return '<label class="check"><input type="checkbox" data-g="'+g+'" data-v="'+v+'"><span>'+t+' <b>'+(v>0?'+':'')+v+'</b></span></label>'}
 function wrap(inner,note=''){return '<div class="body">'+inner+(note?'<div class="warn">'+note+'</div>':'')+'<div id="res" class="result" role="status" aria-live="polite" aria-atomic="true" hidden></div><div class="actions"><button class="calc" id="go">计算</button><button class="reset" id="clear">清空</button></div></div>'}
