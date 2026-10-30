@@ -310,12 +310,12 @@
   .official-brand-mark{width:32px;height:32px;border-radius:10px}
   .official-nav .official-links,.tools-page .nav nav{gap:22px}
   .official-main{padding:22px 16px 0}
-  .official-hero{padding:8px 0 24px;gap:24px}
-  .official-hero h1{font-size:2.375rem;line-height:1.25;letter-spacing:-.025em}
-  .official-hero h1 span{display:block}
-  .official-kicker{font-size:.6875rem;margin-bottom:12px}
-  .official-lead{font-size:1rem;line-height:1.8;margin-top:14px}
-  .home-search{margin-top:20px}
+  .official-hero{padding:4px 0 24px;gap:24px}
+  /* 手机首屏优先给搜索：标题收成一行，隐藏英文眉题与介绍段 */
+  .official-hero h1{font-size:1.625rem;line-height:1.3;letter-spacing:-.015em}
+  .official-hero h1 span{display:inline}
+  .official-kicker,.official-lead{display:none}
+  .home-search{margin-top:14px}
   .home-search-field{gap:8px;padding-left:12px}
   .home-search-field button{padding:0 13px}
   .home-search-field button span{display:none}
@@ -391,7 +391,7 @@
   .pathway-section-head h3{font-size:1.25rem}
 }
 @media screen and (max-width:380px){
-  .official-hero h1{font-size:2.125rem}
+  .official-hero h1{font-size:1.5rem}
   .home-search-field svg{display:none}
   .home-quick-heading{gap:6px}
   .home-quick-heading>a{font-size:.8125rem}
@@ -470,3 +470,9 @@
   #libraryShell .library-top-actions>[data-auth-slot]{position:sticky;right:0;z-index:1;min-width:56px;padding-left:8px;display:flex;justify-content:flex-end;background:#fff}
   #libraryShell .library-top-actions>.patient-action{position:sticky;right:56px;z-index:1;box-shadow:-10px 0 10px #fff}
 }
+
+/* 全站统一免责声明（心电图页沿用自有页脚） */
+@media screen{
+  .site-disclaimer{max-width:1180px;margin:24px auto 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--ws-line,#dde6ef);color:var(--ws-muted,#5b6b7c);font-size:.8125rem;line-height:1.7;text-align:center}
+}
+@media print{.site-disclaimer{display:none}}
