@@ -12,7 +12,8 @@
     "audit:quality": "node scripts/clinical-quality-audit.mjs",
     "audit:quality:check": "node scripts/clinical-quality-audit.mjs --check",
     "audit:operative": "node scripts/operative-conditional-audit.mjs",
-    "audit:conditional": "node scripts/clinical-conditional-language-audit.mjs"
+    "audit:conditional": "node scripts/clinical-conditional-language-audit.mjs",
+    "clinical:new": "node scripts/clinical-new-disease.mjs"
   },
   "devDependencies": {
     "playwright": "1.61.1"
