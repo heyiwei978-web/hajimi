@@ -17,7 +17,8 @@ const stat=label=>{
 test('homepage statistics match the published library, departments and tool catalogue',()=>{
   const catalog=compileCaseTemplates(auditClinicalLibrary().plan.published);
   const orthoStandard=catalog.items.filter(item=>item.department==='骨科'&&item.caseType==='standard').length;
-  assert.equal(stat('骨科病种 / 术式'),orthoStandard);
+  // 首页显示全部科室的完整病历模板数（与病历模板页「完整病历模板」一致，不含通用记录组）。
+  assert.equal(stat('套病历模板'),catalog.items.filter(item=>item.caseType!=='utility').length);
   assert.equal(Number(/<small>骨科标准模板<\/small>\s*<strong>(\d+)<\/strong>/.exec(html)?.[1]),orthoStandard);
   assert.equal(stat('科室分类'),DEPARTMENTS.length);
   const tools=new Set([...fs.readFileSync(new URL('../tools.html',import.meta.url),'utf8').matchAll(/data-tool="([^"]+)"/g)].map(m=>m[1]));

@@ -118,7 +118,8 @@
         items:['通用场景'],
         reserve:[]
       }
-    ];
+    // 还没有模板的分类先不显示，等有内容后自动出现。
+    ].filter((section)=>section.items.length||section.reserve.length);
     const slugToDept=Object.fromEntries(departments.map((d)=>[d.slug,d.name]));
     const deptToSlug=Object.fromEntries(departments.map((d)=>[d.name,d.slug]));
     const coreFiltered=typeof filtered==='function'?filtered:null;
@@ -145,17 +146,15 @@
       document.body.classList.toggle('portal-mode',page==='home');
     }
     function setBrand(){
-      const strong=document.querySelector('#libraryShell .brand strong');
+      // 左上角始终显示站点名「哈基米工作站」，副标题标明当前栏目和科室。
       const small=document.querySelector('#libraryShell .brand small');
       const h=document.getElementById('libraryTitle'),lead=document.getElementById('libraryLead');
       if(!currentDept){
-        if(strong)strong.textContent='病历模板';
-        if(small)small.textContent='Clinical Template Library';
+        if(small)small.textContent='病历模板';
         if(h)h.textContent='病历模板库';
         if(lead)lead.textContent='先选择科室，再进入疾病或术式查看具体模板。';
       }else{
-        if(strong)strong.textContent=currentDept+'病历模板';
-        if(small)small.textContent=currentDept+' · Clinical Template Library';
+        if(small)small.textContent='病历模板 · '+currentDept;
         if(h)h.textContent=currentDept+'病历模板库';
         if(lead)lead.textContent='按疾病/术式、阶段和记录类型浏览'+currentDept+'模板。';
       }
@@ -870,7 +869,7 @@
             <p>${utility?'通用检查理由、会诊及沟通记录单独整理，按实际临床场景选用。':'一套模板包含入院、术前、手术、术后和出院章节，可连续阅读、整套复制，也可单独复制某一章节。特殊病例另行归档。'}</p>
             <div class="record-book-hero-actions"><button id="copyWholeRecord" class="btn primary" type="button">${utility?'复制全部通用记录':'复制完整病历'}</button><button id="printWholeRecord" class="btn ghost" type="button">${utility?'打印通用记录':'打印整套病历'}</button><button id="favoriteDisease" class="btn ghost" type="button" aria-pressed="false">☆ 收藏病种</button>${pathwayHref?'<a class="btn ghost" href="'+pathwayHref+'">查看临床路径</a>':''}</div>
           </div>
-          <strong>1<small>${utility?'组通用记录 · '+list.length+' 条记录':'套标准模板 · '+units.length+' 个章节 · '+list.length+' 份文书'}${specialBundle.groups.length?' · 另有 '+specialBundle.groups.length+' 套特殊病例':''}</small></strong>
+          <strong><small>${utility?'1 组通用记录 · '+list.length+' 条记录':'1 套标准模板 · '+units.length+' 个章节 · '+list.length+' 份文书'}${specialBundle.groups.length?' · 另有 '+specialBundle.groups.length+' 套特殊病例':''}</small></strong>
         </section>`;
 
       const allChapters=units.map(function(u,i){return caseUnitChapter(u,i,list);}).join('');
