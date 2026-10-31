@@ -186,7 +186,7 @@ test('homepage is usable without JavaScript and avoids loading clinical data', a
     assert.equal(await page.locator('.official-feature').count(),6);
     assert.equal(await page.locator('a.card-classification[href="/classification"]').count(),1);
     assert.equal(await page.locator('a.card-ecg[href="/ecg"]').count(),1);
-    assert.match(await page.locator('a.card-ecg p').innerText(),/从基础到围手术期/);
+    assert.match(await page.locator('a.card-ecg p').innerText(),/心电图基础.*围手术期/);
   } finally {await context.close();}
 });
 
@@ -620,7 +620,12 @@ test('orthopedic category links land on the selected heading without rebuilding 
       await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
       await page.evaluate(()=>window.categoryOverview=document.querySelector('.ortho-sections'));
       // Jump to the last category first, before earlier cards have been scrolled into view.
-      for(const key of ['soft','joint','trauma','pediatric','sports','hand','foot','spine','bone','soft']){
+      // Categories without templates are hidden, so walk whichever ones are listed.
+      const listed=await page.locator('.ortho-jump a').evaluateAll(links=>links.map(link=>link.getAttribute('href').slice('#ortho-'.length)));
+      assert(listed.includes('joint')&&listed.includes('trauma')&&listed.includes('soft'));
+      assert.equal(await page.locator('.ortho-category').count(),listed.length);
+      assert.equal(await page.locator('#sidebar .nav-label').count(),listed.length,'the drawer lists the same categories');
+      for(const key of ['soft',...listed]){
         await page.locator('.ortho-jump a[href="#ortho-'+key+'"]').click();
         await waitForOrthoCategory(page,key);
         assert.equal(new URL(page.url()).hash,'#ortho-'+key);
