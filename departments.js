@@ -363,10 +363,6 @@
       if(empty)empty.hidden=true;
       if(grid)grid.innerHTML=`
         <div class="library-root-home-row"><a class="btn ghost site-home-btn" href="/">⌂ 返回网站首页</a></div>
-        <div class="library-section-heading">
-          <div><span>01</span><h3>科室入口</h3><p>选择科室后，再进入具体疾病或术式。</p></div>
-          <strong>${departments.length} 个科室</strong>
-        </div>
         <div class="department-grid library-department-grid">${departments.map((d)=>deptCard(d.name)).join('')}</div>
         <section class="library-overview">
           <div class="library-overview-copy">

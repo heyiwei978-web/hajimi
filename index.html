@@ -31,7 +31,7 @@
       <a href="/tools">临床工具</a>
       <a href="/admin">管理入口</a>
     </nav>
-    <div class="official-nav-right"><a class="official-search" href="/bl" aria-label="搜索模板">⌕ <span>搜索资料</span></a>
+    <div class="official-nav-right"><a class="official-search" href="/bl" aria-label="搜索模板"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span>搜索资料</span></a>
       <span class="official-auth" data-auth-slot></span></div>
   </div>
 </header>
@@ -57,9 +57,6 @@
       <div class="official-hero-actions">
         <a class="official-cta primary" href="/bl"><span class="cta-icon">▣</span>进入病历模板 <b>→</b></a>
         <a class="official-cta secondary" href="/tools"><span class="cta-icon">⌘</span>打开临床工具 <b>→</b></a>
-      </div>
-      <div class="official-meta">
-        <span>模板集中管理</span><i></i><span>多科室扩展</span><i></i><span>浏览 / 开发者模式分离</span>
       </div>
     </div>
 
@@ -187,7 +184,7 @@
 <details class="intro-note library-guidance"><summary><strong>使用说明</strong></summary><span>模板用于辅助书写。真实病历必须结合患者实际病史、查体、检查结果及诊疗经过修改。</span></details>
 <div id="patientStrip" class="patient-strip" hidden><div>患者 <strong id="patientNameView"></strong><span id="patientMetaView"></span></div><button id="editPatientBtn" class="inline-link" type="button">编辑</button></div>
 </section>
-<section class="doc-section controls-section"><h2><span class="section-no">01</span>查找模板</h2><div class="toolbar"><label class="searchbox">⌕ <input aria-label="搜索病历模板" id="searchInput" disabled placeholder="搜索疾病、术式、记录类型或关键词"><kbd>Ctrl K</kbd></label><div class="filter-row"><label>阶段<select id="stageFilter" disabled><option value="all">全部阶段</option><option>入院</option><option>术前</option><option>术中</option><option>术后</option></select></label><label>记录类型<select id="typeFilter" disabled><option value="all">全部记录类型</option></select></label></div></div></section>
+<section class="doc-section controls-section"><h2><span class="section-no">01</span>查找模板</h2><div class="toolbar"><label class="searchbox"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><input aria-label="搜索病历模板" id="searchInput" disabled placeholder="搜索疾病、术式、记录类型或关键词"><kbd>Ctrl K</kbd></label><div class="filter-row"><label>阶段<select id="stageFilter" disabled><option value="all">全部阶段</option><option>入院</option><option>术前</option><option>术中</option><option>术后</option></select></label><label>记录类型<select id="typeFilter" disabled><option value="all">全部记录类型</option></select></label></div></div></section>
 <section class="doc-section"><div class="result-head"><h2><span class="section-no">02</span><span id="resultTitle">完整病历模板</span></h2><div><span id="resultCount" role="status" aria-live="polite"></span><button id="resetFilters" class="inline-link" type="button">重置</button></div></div><div class="stat-line"><span id="templateCountLabel">完整病历模板</span><strong id="templateCount">0</strong></div><div id="templateGrid" class="template-grid"><p class="library-loading" role="status">正在加载病历资料…</p></div><div id="emptyState" role="status" class="empty" hidden>没有找到匹配模板。</div></section>
 <section class="doc-section guide-section"><h2><span class="section-no">03</span>推荐使用流程</h2><ol class="steps"><li><div><b>先建立患者信息</b><span>录入姓名、年龄、住院号、侧别、主要诊断和重要既往史。</span></div></li><li><div><b>选择科室与疾病/术式</b><span>进入对应科室后，再进入疾病或术式项目。</span></div></li><li><div><b>预览、核对、复制</b><span>所有默认内容都必须按真实病情修改后再进入正式病历。</span></div></li></ol></section>
 <p class="site-disclaimer" role="note">本站为教学示例与临床参考资料，仅供参考，不替代医生的临床判断。</p>

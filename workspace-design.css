@@ -494,3 +494,42 @@
   .record-merged-part-head{padding:10px 0 0}
   .record-merged-part-head h4{margin:0;font-size:12pt}
 }
+
+/* 界面细节统一，2026-10-31：只改屏幕显示，打印与病历正文不受影响 */
+@media screen{
+  /* 疾病分型、心电图的横幅改为与其他栏目一致的蓝白卡片 */
+  .class-page .class-shell .class-hero{background:#fff;color:var(--ws-text);border:1px solid var(--ws-line);border-radius:20px;box-shadow:var(--ws-shadow)}
+  .class-page .class-shell .class-hero:after{display:none}
+  .class-page .class-shell .class-hero h1{color:var(--ws-ink)}
+  .class-page .class-shell .class-hero h1 em{color:var(--ws-blue)}
+  .class-page .class-shell .class-hero p{color:var(--ws-muted)}
+  .class-page .class-shell .class-eyebrow{color:var(--ws-blue)}
+  .class-page .class-shell .class-hero-stats div{background:var(--ws-soft);border-color:transparent}
+  .class-page .class-shell .class-hero-stats strong{color:var(--ws-blue)}
+  .class-page .class-shell .class-hero-stats span{color:var(--ws-muted)}
+
+  /* 搜索框统一用线条放大镜图标 */
+  .search-icon{display:block;width:18px;height:18px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;color:var(--ws-muted)}
+  .official-search{display:inline-flex;align-items:center;gap:6px}
+  .official-search .search-icon{width:16px;height:16px}
+  #libraryShell .searchbox,.tools-page .formula-search{display:flex;align-items:center;gap:8px}
+}
+@media screen and (max-width:640px){
+  /* 手机顶栏更矮：去掉英文副标题，首屏多露出内容 */
+  .official-nav,.tools-page .nav{height:auto;min-height:0}
+  .official-nav-inner,.tools-page .navin{padding-top:8px}
+  .official-brand-text small{display:none}
+  .official-brand-text strong{font-size:.9375rem}
+  .official-brand-mark{width:28px;height:28px;border-radius:8px;font-size:.875rem}
+  .official-nav .official-links a,.tools-page .nav nav a{min-height:44px;font-size:.875rem}
+
+  /* 手机上隐藏装饰性的英文小标题 */
+  .class-page .class-shell .class-eyebrow,.duty-kicker,.pathway-kicker,.tools-page .hero .eyebrow,
+  #libraryShell .breadcrumb,.ortho-eyebrow,.case-file-eyebrow,.class-dossier-kicker{display:none}
+  .class-page .class-shell .class-hero h1{margin-top:0}
+  .class-page .class-shell .class-hero{padding:22px 20px}
+  .class-page .class-shell .class-hero-stats div{min-height:64px;padding:12px}
+
+  /* 键盘快捷键提示在手机上用不到，让出搜索框宽度 */
+  #libraryShell .searchbox kbd,.ecg-global-field kbd{display:none}
+}
