@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import test from 'node:test';
+import {laterReviewed} from './_later-reviewed-groups.js';
 import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
 import {loadClinicalSource} from '../scripts/clinical-compiler.mjs';
 import {identityKey,metadataHash} from '../scripts/clinical-inventory.mjs';
@@ -22,7 +23,7 @@ test('the reviewed case updates all 27 established documents and appends three i
     if(!previous){assert.equal(record.group,'股骨转子间骨折');additions++;continue;}
     assert.equal(metadataHash(record),metadataHash(previous.record));
     if(record.group==='股骨转子间骨折'){assert.notEqual(record.sourceBody,previous.record.sourceBody);updates++;}
-    else {assert.deepEqual(record,previous.record);assert.equal(current.source.renderedBodies[index],previous.body);unchanged++;}
+    else {if(!laterReviewed(record)){assert.deepEqual(record,previous.record);assert.equal(current.source.renderedBodies[index],previous.body);}unchanged++;}
     before.delete(identityKey(record));
   }
   assert.equal(before.size,0);assert.equal(unchanged,5351);assert.equal(updates,27);assert.equal(additions,3);
