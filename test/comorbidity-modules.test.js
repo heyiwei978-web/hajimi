@@ -139,3 +139,17 @@ test('medical supplement text is escaped when rendered',()=>{
   const f=fixture();f.choose('ckd');
   assert.doesNotMatch(f.m.renderSelected('all'),/<script/i);
 });
+
+test('a newly opened record follows its chapters again and boxes are not rebuilt within one stage',()=>{
+  const f=fixture();f.choose('dm');
+  f.tab('all');
+  assert.equal(f.m.stage(),'all');
+  f.m.setChapter({stage:'术后',title:'术后病程'});
+  f.m.bind();
+  assert.equal(f.m.stage(),'postop');
+  f.notes.innerHTML='SENTINEL';
+  f.m.setChapter({stage:'术后',title:'术后主刀查房记录'});
+  assert.equal(f.notes.innerHTML,'SENTINEL','same stage and selection keep existing boxes');
+  f.m.setChapter({stage:'入院',title:'入院记录'});
+  assert.match(f.notes.innerHTML,/入院记录与既往史/);
+});

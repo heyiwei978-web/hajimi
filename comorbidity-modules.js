@@ -75,7 +75,7 @@
     {id:'all',label:'全部',fields:fields.map(([field])=>field)}
   ];
   const stageById=Object.fromEntries(stages.map(stage=>[stage.id,stage]));
-  let stage='admission',follow=true,chapter=null,sheetOpen=false,view=null;
+  let stage='admission',follow=true,chapter=null,sheetOpen=false,view=null,drawn='';
   function escape(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
   // Maps the chapter being read to the matching supplement stage.
   function stageFor(info){
@@ -167,7 +167,10 @@
       ?(chapter?.title?'正在阅读「'+chapter.title+'」→ 显示'+label+'内容':'显示'+label+'内容，随阅读章节自动切换')
       :'已手动切换为'+label+'内容';
     followButton.hidden=follow;
-    notes.innerHTML=renderSelected();
+    // Rebuild the boxes only when their content changes, so scrolling within the
+    // same stage keeps keyboard focus on a copy button.
+    const key=stage+'|'+[...chosen].join(',');
+    if(key!==drawn){drawn=key;notes.innerHTML=renderSelected();}
   }
   function setOpen(open){
     sheetOpen=!!open;
@@ -224,7 +227,8 @@
       const ok=await copyValue(value);
       current.status.textContent=ok?'已复制 '+chosen.size+' 项补充资料':'复制失败，请核对浏览器权限';
     });
-    sheetOpen=false;
+    // Each newly opened record starts by following its own chapters.
+    sheetOpen=false;follow=true;stage=stageFor(chapter);drawn='';
     redraw();
   }
   root.HAJIMI_COMORBIDITIES=Object.freeze({
