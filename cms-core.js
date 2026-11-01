@@ -57,6 +57,7 @@
     document.querySelectorAll('[data-cms-login]').forEach((e)=>e.hidden=CMS.auth);
     document.querySelectorAll('[data-cms-badge]').forEach((e)=>{e.hidden=!CMS.auth;e.textContent=CMS.auth?'开发者模式':'';});
     document.querySelectorAll('[data-cms-logout]').forEach((e)=>e.hidden=!CMS.auth);
+    window.dispatchEvent(new CustomEvent('hajimi:supplements-changed'));
   }
   async function login(e){
     e.preventDefault();const f=e.currentTarget,err=document.getElementById('cmsLoginError');err.hidden=true;
@@ -133,6 +134,17 @@
     const out=await req('/api/content',{method:'PUT',body:JSON.stringify({...next,revision:CMS.data.revision})});
     CMS.data=out;
   }
+  // Minimal interface for the supplement boxes (chronic conditions / order reasons).
+  window.HAJIMI_CMS=Object.freeze({
+    get admin(){return CMS.auth&&CMS.dataReady;},
+    supplements(){return {...(CMS.data.supplementOverrides||{})};},
+    async saveSupplement(key,body){
+      const next={...(CMS.data.supplementOverrides||{})};
+      if(body===null)delete next[key];else next[key]={body,updatedAt:new Date().toISOString()};
+      await saveContent({...CMS.data,supplementOverrides:next});
+      window.dispatchEvent(new CustomEvent('hajimi:supplements-changed'));
+    }
+  });
   function renderExtras(t){
     const dlg=document.getElementById('previewDialog');if(!dlg)return;
     dlg.querySelectorAll('.cms-preview-admin,#cmsCases').forEach((e)=>e.remove());

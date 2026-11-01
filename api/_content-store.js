@@ -10,13 +10,28 @@ const isObject=value=>!!value&&typeof value==='object'&&!Array.isArray(value);
 export class ContentError extends Error {
   constructor(status,message){super(message);this.status=status;}
 }
+// Developer-mode edits of the optional supplement boxes (chronic conditions and
+// order reasons). Key: c:<condition id>:<field> or x:<order id>:<field>.
+const SUPPLEMENT_KEY=/^[cx]:[a-z0-9-]{1,40}:[A-Za-z0-9]{1,40}$/;
+const MAX_SUPPLEMENTS=500,MAX_SUPPLEMENT_CHARS=8000;
+function validSupplements(value){
+  if(value===undefined)return true;
+  if(!isObject(value))return false;
+  const entries=Object.entries(value);
+  return entries.length<=MAX_SUPPLEMENTS&&entries.every(([key,item])=>SUPPLEMENT_KEY.test(key)&&isObject(item)
+    &&typeof item.body==='string'&&item.body.trim().length>0&&item.body.length<=MAX_SUPPLEMENT_CHARS
+    &&(item.updatedAt===undefined||typeof item.updatedAt==='string'&&item.updatedAt.length<=40));
+}
 function validate(data,status=400){
   if(!isObject(data)||!isObject(data.templateOverrides)||!Array.isArray(data.cases)||data.cases.length>500
     ||Object.values(data.templateOverrides).some(value=>!isObject(value)||typeof value.body!=='string')
-    ||data.cases.some(value=>!isObject(value)||typeof value.id!=='string'||typeof value.template!=='string')){
+    ||data.cases.some(value=>!isObject(value)||typeof value.id!=='string'||typeof value.template!=='string')
+    ||!validSupplements(data.supplementOverrides)){
     throw new ContentError(status,status===400?'资料格式错误，未保存':'已保存资料格式异常，已停止修改');
   }
-  return {version:1,templateOverrides:data.templateOverrides,cases:data.cases};
+  const supplements=data.supplementOverrides===undefined?{}:{supplementOverrides:Object.fromEntries(
+    Object.entries(data.supplementOverrides).map(([key,item])=>[key,{body:item.body,...(item.updatedAt?{updatedAt:item.updatedAt}:{})}]))};
+  return {version:1,templateOverrides:data.templateOverrides,cases:data.cases,...supplements};
 }
 export function createContentStore(storage=blob,{currentPath=CURRENT,historyPrefix=PREFIX}={}){
   async function read(){

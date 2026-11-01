@@ -95,9 +95,21 @@
   const allFields=[fields[0],...timeline.map(([field,title])=>[field,title]),...fields.slice(1)];
   const fieldTitle=Object.fromEntries(allFields);
   function shortName(item){return String(item.name).replace(/病史$/,'');}
-  function textOf(item,field){
+  // Developer-mode edits are stored in the site CMS (supplementOverrides) and
+  // replace the built-in wording for everyone; deleting one restores the default.
+  function overrides(){return root.HAJIMI_CMS?.supplements?.()||{};}
+  function isEditor(){return !!root.HAJIMI_CMS?.admin;}
+  function defaultText(item,field){
     if(timelineText[field])return timelineText[field](shortName(item));
     return String(item[field]);
+  }
+  function textOf(item,field){
+    const edited=overrides()['c:'+item.id+':'+field];
+    return edited?String(edited.body):defaultText(item,field);
+  }
+  function examText(item,field){
+    const edited=overrides()['x:'+item.id+':'+field];
+    return edited?String(edited.body):String(item[field]);
   }
   // Reading stages of the side panel. Each stage lists the fields shown beside
   // the chapter being read; "all" shows every field.
@@ -113,7 +125,7 @@
     {id:'all',label:'全部',fields:allFields.map(([field])=>field)}
   ];
   const stageById=Object.fromEntries(stages.map(stage=>[stage.id,stage]));
-  let stage='admission',follow=true,chapter=null,sheetOpen=false,view=null,drawn='';
+  let stage='admission',follow=true,chapter=null,sheetOpen=false,view=null,drawn='',editing=null;
   function escape(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
   // Maps the chapter being read to the matching supplement stage.
   function stageFor(info){
@@ -146,13 +158,13 @@
         allFields.map(([field,title])=>title+'：'+textOf(item,field)).join('\n\n')),
       ...selectedExams().map(item=>
         '【'+item.name+'｜'+item.cat+'】\n'+
-        examFields.map(([field,title])=>title+'：'+item[field]).join('\n\n'))
+        examFields.map(([field,title])=>title+'：'+examText(item,field)).join('\n\n'))
     ].join('\n\n========================================\n\n');
   }
   function boxText(id,field){
     if(String(id).startsWith('x~')){
       const exam=getExam(String(id).slice(2));
-      return exam&&examFieldTitle[field]?String(exam[field]):'';
+      return exam&&examFieldTitle[field]?examText(exam,field):'';
     }
     const item=get(id);
     return item&&fieldTitle[field]?textOf(item,field):'';
@@ -161,14 +173,23 @@
     if(String(id).startsWith('x~')){const exam=getExam(String(id).slice(2));return exam?exam.name+' · '+examFieldTitle[field]:'';}
     const item=get(id);return item?item.name+' · '+fieldTitle[field]:'';
   }
+  function supplementKey(copyId,field){
+    return String(copyId).startsWith('x~')?'x:'+String(copyId).slice(2)+':'+field:'c:'+copyId+':'+field;
+  }
+  function boxHead(copyId,field,label,ariaName){
+    const key=supplementKey(copyId,field),edited=Boolean(overrides()[key]);
+    return '<div class="comorbidity-box-head"><strong>'+escape(label)+(edited?'<em class="supplement-edited">已修改</em>':'')+'</strong>'+
+      '<span class="comorbidity-box-buttons">'+
+      (isEditor()?'<button class="btn ghost comorbidity-box-copy" type="button" data-edit-box="'+key+'" aria-label="编辑'+escape(ariaName)+'">编辑</button>':'')+
+      '<button class="btn ghost comorbidity-box-copy" type="button" data-copy-box="'+copyId+':'+field+'" aria-label="复制'+escape(ariaName)+'">复制</button></span></div>';
+  }
   function renderExams(){
     const items=selectedExams();
     if(!items.length)return '';
     return '<section class="special-exam-notes" aria-label="特殊检查与用药理由"><h4 class="special-exam-notes-title">特殊检查 · 用药 · 会诊理由<small>不随章节切换</small></h4>'+
       items.map(item=>'<article class="comorbidity-detail special-exam-detail" data-exam-item="'+item.id+'"><h4>'+escape(item.name)+'<small>'+escape(item.cat)+'</small></h4>'+
-        examFields.map(([field,title])=>'<div class="comorbidity-box"><div class="comorbidity-box-head"><strong>'+escape(title)+'</strong>'+
-          '<button class="btn ghost comorbidity-box-copy" type="button" data-copy-box="x~'+item.id+':'+field+'" aria-label="复制'+escape(item.name+'：'+title)+'">复制</button></div>'+
-          '<p>'+escape(item[field])+'</p></div>').join('')+
+        examFields.map(([field,title])=>'<div class="comorbidity-box">'+boxHead('x~'+item.id,field,title,item.name+'：'+title)+
+          '<p>'+escape(examText(item,field))+'</p></div>').join('')+
         '</article>').join('')+'</section>';
   }
   function renderSelected(stageId=stage){
@@ -177,8 +198,7 @@
     const extra=renderExams();
     if(!items.length)return extra||'<p class="comorbidity-empty">尚未选择慢性病或特殊检查。勾选后，这里会出现对应的补充内容框。</p>';
     return items.map(item=>'<article class="comorbidity-detail" data-comorbidity-item="'+item.id+'"><h4>'+escape(item.name)+'</h4>'+
-      current.fields.map(field=>'<div class="comorbidity-box"><div class="comorbidity-box-head"><strong>'+escape(fieldTitle[field])+'</strong>'+
-        '<button class="btn ghost comorbidity-box-copy" type="button" data-copy-box="'+item.id+':'+field+'" aria-label="复制'+escape(item.name+'：'+fieldTitle[field])+'">复制</button></div>'+
+      current.fields.map(field=>'<div class="comorbidity-box">'+boxHead(item.id,field,fieldTitle[field],item.name+'：'+fieldTitle[field])+
         '<p>'+escape(textOf(item,field))+'</p></div>').join('')+
       '</article>').join('')+extra;
   }
@@ -269,7 +289,7 @@
     // Rebuild the boxes only when their content changes, so scrolling within the
     // same stage keeps keyboard focus on a copy button.
     const key=stage+'|'+[...chosen].join(',')+'|'+[...exams].join(',');
-    if(key!==drawn){drawn=key;notes.innerHTML=renderSelected();}
+    if(key!==drawn&&!editing){drawn=key;notes.innerHTML=renderSelected();}
   }
   function setOpen(open){
     sheetOpen=!!open;
@@ -283,6 +303,48 @@
     chapter=info?{stage:String(info.stage||''),title:String(info.title||''),record:String(info.record||'')}:null;
     if(follow)stage=stageFor(chapter);
     redraw();
+  }
+  // In-place editing of one supplement box (developer mode only).
+  async function handleEdit(button,current){
+    const box=button.closest('.comorbidity-box');if(!box)return;
+    if(button.dataset.editBox){
+      if(!isEditor()||editing)return;
+      const key=button.dataset.editBox,[kind,id,field]=key.split(':');
+      const text=kind==='x'?(getExam(id)?examText(getExam(id),field):''):(get(id)?textOf(get(id),field):'');
+      editing=key;
+      const para=box.querySelector('p');
+      const editor=document.createElement('div');editor.className='supplement-editor';
+      editor.innerHTML='<label class="supplement-editor-label">编辑内容（保存后所有访问者都会看到）<textarea rows="7" data-edit-text></textarea></label>'+
+        '<div class="supplement-editor-actions"><button class="btn primary" type="button" data-edit-save="'+key+'">保存</button>'+
+        (overrides()[key]?'<button class="btn ghost" type="button" data-edit-reset="'+key+'">恢复默认</button>':'')+
+        '<button class="btn ghost" type="button" data-edit-cancel="'+key+'">取消</button></div>'+
+        '<p class="supplement-editor-status" role="status" aria-live="polite"></p>';
+      editor.querySelector('textarea').value=text;
+      para.replaceWith(editor);
+      editor.querySelector('textarea').focus();
+      return;
+    }
+    const editor=box.querySelector('.supplement-editor');
+    const status=editor?.querySelector('.supplement-editor-status');
+    const finish=()=>{editing=null;drawn='';redraw();};
+    if(button.dataset.editCancel){finish();return;}
+    try{
+      if(button.dataset.editSave){
+        const value=editor.querySelector('textarea').value;
+        if(!value.trim()){status.textContent='内容不能为空；如需还原请点“恢复默认”。';return;}
+        button.disabled=true;status.textContent='正在保存…';
+        await root.HAJIMI_CMS.saveSupplement(button.dataset.editSave,value);
+        finish();current.status.textContent='已保存修改，修改前资料已自动备份';
+      }else if(button.dataset.editReset){
+        if(typeof confirm==='function'&&!confirm('恢复系统默认内容？修改前资料会自动备份。'))return;
+        button.disabled=true;status.textContent='正在恢复…';
+        await root.HAJIMI_CMS.saveSupplement(button.dataset.editReset,null);
+        finish();current.status.textContent='已恢复默认内容';
+      }
+    }catch(error){
+      button.disabled=false;
+      if(status)status.textContent='保存失败：'+(error?.message||'请稍后重试')+'。内容未丢失，可复制后刷新页面再试。';
+    }
   }
   function bind(){
     const panel=document.getElementById('comorbidityPanel');
@@ -328,6 +390,8 @@
     q('#closeComorbiditySide').addEventListener('click',()=>setOpen(false));
     side.addEventListener('keydown',event=>{if(event.key==='Escape'&&sheetOpen)setOpen(false);});
     current.notes.addEventListener('click',async event=>{
+      const edit=event.target?.closest?.('[data-edit-box],[data-edit-save],[data-edit-reset],[data-edit-cancel]');
+      if(edit){await handleEdit(edit,current);return;}
       const button=event.target?.closest?.('[data-copy-box]');
       if(!button)return;
       const [id,field]=button.dataset.copyBox.split(':');
@@ -340,9 +404,11 @@
       current.status.textContent=ok?'已复制 '+(chosen.size+exams.size)+' 项补充资料':'复制失败，请核对浏览器权限';
     });
     // Each newly opened record starts by following its own chapters.
-    sheetOpen=false;follow=true;stage=stageFor(chapter);drawn='';
+    sheetOpen=false;follow=true;stage=stageFor(chapter);drawn='';editing=null;
     redraw();
   }
+  // Login, logout or a saved edit re-renders the boxes (edit buttons and wording).
+  if(typeof root.addEventListener==='function')root.addEventListener('hajimi:supplements-changed',()=>{if(!editing){drawn='';redraw();}});
   root.HAJIMI_COMORBIDITIES=Object.freeze({
     modules,stages,compose,html,sideHtml,bind,setChapter,stageFor,renderSelected,separateText,boxText,
     selected:()=>[...chosen],selectedExams:()=>[...exams],stage:()=>stage
