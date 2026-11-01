@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import test from 'node:test';
@@ -152,4 +153,54 @@ test('a newly opened record follows its chapters again and boxes are not rebuilt
   assert.equal(f.notes.innerHTML,'SENTINEL','same stage and selection keep existing boxes');
   f.m.setChapter({stage:'入院',title:'入院记录'});
   assert.match(f.notes.innerHTML,/入院记录与既往史/);
+});
+
+test('three-day workup sections follow the admission and pre-operative chapters in reading order',()=>{
+  const f=fixture();f.choose('cad');
+  const order=[
+    ['入院','入院记录','admission'],['入院','主治医师首次查房记录','day1'],['入院','主任医师首次查房记录','day2'],
+    ['术前','选择治疗方案沟通记录','day2'],['术前','术前主刀查房','day2'],['术前','多学科术前讨论','consultRecord'],
+    ['术前','手术知情同意记录','day3'],['术前','麻醉术前访视记录','day3'],['术前','术前小结','preop']
+  ];
+  for(const [stage,title,expected] of order){
+    f.m.setChapter({stage,title});
+    assert.equal(f.m.stage(),expected,title);
+  }
+  f.m.setChapter({stage:'入院',title:'主治医师首次查房记录'});
+  assert.match(f.notes.innerHTML,/入院第1天 · 主治医师查房（完善检查）/);
+  assert.match(f.notes.innerHTML,/患者既往冠心病病史/);
+  f.m.setChapter({stage:'入院',title:'主任医师首次查房记录'});
+  assert.match(f.notes.innerHTML,/第2天 · 检查结果回报及会诊申请/);
+  assert.match(f.notes.innerHTML,/请【内科\/麻醉科】会诊/);
+  f.m.setChapter({stage:'术前',title:'多学科术前讨论'});
+  assert.match(f.notes.innerHTML,/会诊记录（内科\/麻醉科）/);
+  assert.match(f.notes.innerHTML,/会诊意见/);
+  f.m.setChapter({stage:'术前',title:'麻醉术前访视记录'});
+  assert.match(f.notes.innerHTML,/第3天 · 根据会诊意见调整（查房记录）/);
+});
+
+test('workup templates insert only the condition name and leave blanks; full copy keeps timeline order',()=>{
+  const f=fixture();f.choose('stroke');
+  const day1=f.m.boxText('stroke','day1Round');
+  assert.match(day1,/患者既往脑梗死病史/);
+  assert.doesNotMatch(day1,/病史病史/);
+  assert.match(day1,/【检查项目】/);
+  const text=f.m.separateText();
+  const positions=['入院记录与既往史','入院第1天','第2天','会诊记录（内科/麻醉科）','第3天','术前查房','专科会诊申请','术后病程与监测','出院当天查房'].map(title=>text.indexOf(title));
+  assert.ok(positions.every(index=>index>=0),'every section is copied');
+  assert.deepEqual([...positions].sort((a,b)=>a-b),positions,'sections follow the inpatient timeline');
+  assert.match(text,/【脑梗死病史｜独立补充模块】/);
+});
+
+test('original eight-condition text is unchanged',()=>{
+  const source=fs.readFileSync(new URL('../comorbidity-modules.js',import.meta.url),'utf8');
+  const data=source.split('\n').slice(0,53).join('\n')+'\n';
+  assert.equal(crypto.createHash('sha256').update(data).digest('hex'),'1a4dc7dda37da09fe013ead422c72cd0004504a4f8c09d6ef6489259eaa4d073');
+});
+
+test('a merged admission round chapter maps by its first record name',()=>{
+  const f=fixture();f.choose('dm');
+  f.m.setChapter({stage:'入院',title:'入院查房记录',record:'主治医师首次查房记录'});
+  assert.equal(f.m.stage(),'day1');
+  assert.match(f.followText.textContent,/入院查房记录/);
 });

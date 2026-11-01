@@ -712,7 +712,7 @@
         links.forEach(function(link){const yes=link.dataset.caseRecord===id;link.classList.toggle('is-current',yes);if(yes){link.setAttribute('aria-current','location');link.closest('details').open=true;}else link.removeAttribute('aria-current');});
         syncNavigation();
         const record=templates[Number(articles[i].dataset.recordIndex)];
-        window.HAJIMI_COMORBIDITIES?.setChapter?.({stage:record?.stage||'',title:articles[i].querySelector('h3')?.textContent||''});
+        window.HAJIMI_COMORBIDITIES?.setChapter?.({stage:record?.stage||'',title:articles[i].querySelector('h3')?.textContent||'',record:record?.short||record?.name||''});
         if(!isCompact())revealDirectorySelection();
         if(scroll){
           if(isCompact()&&directoryPanel)directoryPanel.open=false;
