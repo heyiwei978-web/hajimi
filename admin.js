@@ -69,7 +69,7 @@
     if(auth){loadDashboard();window.HAJIMI_PRIVATE_GALLERY.load();}
   }
   document.getElementById('refreshHistory').onclick=loadDashboard;
-  downloadCurrent.onclick=()=>{if(content)download({version:1,templateOverrides:content.templateOverrides,cases:content.cases},'hajimi-content-'+new Date().toISOString().slice(0,10)+'.json');};
+  downloadCurrent.onclick=()=>{if(content)download({version:1,templateOverrides:content.templateOverrides,cases:content.cases,...(content.supplementOverrides?{supplementOverrides:content.supplementOverrides}:{})},'hajimi-content-'+new Date().toISOString().slice(0,10)+'.json');};
   form.addEventListener('submit',async event=>{
     event.preventDefault();error.hidden=true;const button=form.querySelector('button[type=submit]');button.disabled=true;button.textContent='登录中…';
     try{const session=await json('/api/login',{method:'POST',body:JSON.stringify(Object.fromEntries(new FormData(form).entries()))});form.reset();showAuth(true,session.user);notify('已进入网站管理模式');}

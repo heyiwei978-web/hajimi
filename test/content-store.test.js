@@ -75,3 +75,26 @@ test('public content hides unpublished cases and backup metadata; history requir
   assert.equal(res.code,200);assert.equal(res.body.cases.length,1);assert.equal(res.body._history,undefined);
   const denied=response();await createHistoryHandler(store)(req,denied);assert.equal(denied.code,401);
 });
+test('developer-mode supplement edits are optional, validated, preserved and backed up',async()=>{
+  const backend=storage(),store=createContentStore(backend);
+  assert.equal((await store.read()).data.supplementOverrides,undefined,'existing data without supplement edits still reads unchanged');
+  const edited={...original,supplementOverrides:{'c:cad:history':{body:'自定义既往史',updatedAt:'2026-11-01T00:00:00.000Z'},'x:mri-head:reason':{body:'自定义理由'}}};
+  const saved=await store.save(edited,'"initial"','admin');
+  assert.deepEqual(saved.supplementOverrides,edited.supplementOverrides);
+  const current=await store.read();
+  assert.deepEqual(current.data.supplementOverrides,edited.supplementOverrides);
+  assert.deepEqual(await store.historyContent(current.history[0].id,current),original,'the version before the edit is backed up');
+  for(const bad of [
+    {'bad key':{body:'x'}},
+    {'c:cad:history':{body:''}},
+    {'c:cad:history':{body:'x'.repeat(8001)}},
+    {'c:cad:history':'plain text'},
+    {'z:cad:history':{body:'x'}},
+    ['c:cad:history']
+  ]){
+    await assert.rejects(store.save({...original,supplementOverrides:bad},current.revision,'admin'),error=>error.status===400,JSON.stringify(bad).slice(0,40));
+  }
+  assert.deepEqual((await store.read()).data.supplementOverrides,edited.supplementOverrides,'rejected edits never touch storage');
+  const extra=await store.save({...original,supplementOverrides:{'c:cad:history':{body:'b',injected:'<script>'}}},current.revision,'admin');
+  assert.deepEqual(extra.supplementOverrides,{'c:cad:history':{body:'b'}},'unknown fields are dropped');
+});

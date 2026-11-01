@@ -1578,3 +1578,63 @@ test('特殊检查 column offers grouped order reasons beside chronic conditions
     }finally{await context.close();}
   }
 });
+
+test('developer mode edits a supplement box in place, saves it to the CMS and can restore the default',async()=>{
+  for(const width of [390,1440]){
+    const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'});
+    let content={version:1,revision:'r1',templateOverrides:{},cases:[]};const puts=[];
+    await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'admin'}}));
+    await context.route('**/api/content',async route=>{
+      if(route.request().method()==='PUT'){
+        const body=JSON.parse(route.request().postData());puts.push(body);
+        content={version:1,templateOverrides:body.templateOverrides,cases:body.cases,...(body.supplementOverrides?{supplementOverrides:body.supplementOverrides}:{}),revision:'r'+(puts.length+1)};
+      }
+      await route.fulfill({json:content});
+    });
+    const page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
+    page.on('dialog',dialog=>dialog.accept());
+    try{
+      await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+      const record=page.locator('.case-file-reader > .record-book-section').first().locator('.record-book-body');
+      const baseline=await record.textContent();
+      const exams=page.locator('#specialExamPanel');
+      await exams.locator('.special-exam-group summary').first().click();
+      await exams.locator('input[data-exam="mri-head"]').check();
+      const side=page.locator('#comorbiditySide');
+      if(width<1280)await page.locator('#openComorbiditySide').click();
+      await side.waitFor({state:'visible'});
+      await side.locator('[data-edit-box="x:mri-head:reason"]').click();
+      const editor=side.locator('.supplement-editor textarea');
+      assert.match(await editor.inputValue(),/头颅MRI/);
+      await editor.fill('本院自定义的头颅MRI申请理由');
+      await side.locator('[data-edit-save="x:mri-head:reason"]').click();
+      await page.waitForFunction(()=>document.querySelector('#comorbidityNotes')?.textContent.includes('本院自定义的头颅MRI申请理由'));
+      assert.equal(puts.length,1);
+      assert.equal(puts[0].revision,'r1','saves send the loaded revision');
+      assert.equal(puts[0].supplementOverrides['x:mri-head:reason'].body,'本院自定义的头颅MRI申请理由');
+      assert.match(await side.locator('#comorbidityNotes').innerText(),/已修改/);
+      await side.locator('[data-edit-box="x:mri-head:reason"]').click();
+      await side.locator('[data-edit-reset="x:mri-head:reason"]').click();
+      await page.waitForFunction(()=>!document.querySelector('#comorbidityNotes')?.textContent.includes('本院自定义'));
+      assert.equal(puts.length,2);
+      assert.deepEqual(puts[1].supplementOverrides,{});
+      assert.equal(await record.textContent(),baseline,'the sample record itself is never edited');
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('visitors see saved supplement edits but get no edit buttons',async()=>{
+  const context=await browser.newContext({viewport:{width:1440,height:900},reducedMotion:'reduce'});
+  await context.route('**/api/session',route=>route.fulfill({json:{authenticated:false,user:null}}));
+  await context.route('**/api/content',route=>route.fulfill({json:{version:1,revision:'r9',templateOverrides:{},cases:[],supplementOverrides:{'c:cad:history':{body:'本院冠心病既往史写法'}}}}));
+  const page=await context.newPage();
+  try{
+    await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+    await page.locator('#comorbidityPanel input[data-comorbidity="cad"]').check();
+    const notes=page.locator('#comorbiditySide #comorbidityNotes');
+    await page.waitForFunction(()=>document.querySelector('#comorbidityNotes')?.textContent.includes('本院冠心病既往史写法'));
+    assert.equal(await notes.locator('[data-edit-box]').count(),0);
+  }finally{await context.close();}
+});

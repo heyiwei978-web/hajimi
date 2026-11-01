@@ -73,3 +73,22 @@ test('choosing exams shows their boxes without stage buttons; copy includes them
   f.clearExams.handlers.click();
   assert.equal(f.side.hidden,true);
 });
+
+test('developer-mode edits replace the default wording for display and copy; edit buttons only for admins',async()=>{
+  const visitor=fixture();
+  const overrides={'x:mri-head:reason':{body:'自定义头颅MRI理由'},'c:cad:history':{body:'自定义冠心病既往史'}};
+  visitor.context.window.HAJIMI_CMS={admin:false,supplements:()=>overrides};
+  visitor.pick('mri-head');
+  assert.equal(visitor.m.boxText('x~mri-head','reason'),'自定义头颅MRI理由');
+  assert.equal(visitor.m.boxText('cad','history'),'自定义冠心病既往史');
+  assert.match(visitor.m.separateText(),/自定义头颅MRI理由/);
+  const notes=visitor.parts['#comorbidityNotes'].innerHTML;
+  assert.match(notes,/自定义头颅MRI理由/);
+  assert.match(notes,/已修改/);
+  assert.doesNotMatch(notes,/data-edit-box/,'visitors cannot edit');
+  const admin=fixture();
+  admin.context.window.HAJIMI_CMS={admin:true,supplements:()=>({})};
+  admin.pick('ct-head');
+  assert.match(admin.parts['#comorbidityNotes'].innerHTML,/data-edit-box="x:ct-head:reason"/);
+  assert.doesNotMatch(admin.parts['#comorbidityNotes'].innerHTML,/已修改/);
+});
