@@ -95,7 +95,9 @@ export function compileClinicalSite(html,directory,{inventory,cmsAudit,source=lo
     seeds:Object.fromEntries(Object.entries(source.seeds).filter(([key])=>publishedGroups.has(key)).map(([key,value])=>[key,{category:value.category}])),bodies:{},scripts:{}};
   manifest.caseTemplates=compileCaseTemplates(publication.published);
   const publicKeys=new Set(publication.published.map(({record:r})=>r.department+'\0'+r.group));
-  manifest.withdrawnGroups=[...new Map(publication.withdrawn.map(({record:r})=>
+  // Cases removed from the source still name their former groups, so old links
+  // and saved favorites keep showing "removed" rather than silently failing.
+  manifest.withdrawnGroups=[...new Map([...publication.withdrawn.map(({record})=>record),...(publication.removed||[])].map(r=>
     [r.department+'\0'+r.group,{department:r.department,group:r.group}]))]
     .filter(([key])=>!publicKeys.has(key)).map(([,value])=>value);
   manifest.scripts.cms=[...html.matchAll(/<script[^>]*src="([^"]+)"/g)].map(match=>match[1]).find(value=>value.startsWith('/cms-core.js?'));

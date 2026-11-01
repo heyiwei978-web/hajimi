@@ -14,21 +14,25 @@ const expectedGroups=['胸腰椎爆裂骨折','骨质疏松性椎体压缩骨折
   '腰椎滑脱症','腰椎峡部裂伴滑脱','腰椎感染','退变性腰椎侧弯','巨大腰椎间盘突出伴马尾综合征',
   '椎管内神经鞘瘤','脊柱硬膜外脓肿','神经肌肉性脊柱侧弯'];
 
+// Since 2026-11-01 every withdrawn case (lumbar 2026-10-24, slimming 2026-10-27) is
+// also deleted from the source: plan.removed lists their reserved identities.
 test('lumbar withdrawal removes exactly 12 complete cases and preserves unrelated cases and permanent IDs',()=>{
   const {plan,source,inventory}=current;
-  assert(expectedGroups.every(group=>plan.withdrawn.some(e=>e.record.group===group)));
+  assert(expectedGroups.every(group=>plan.removed.some(row=>row.group===group)));
   assert.deepEqual([...new Set(plan.published.filter(e=>e.record.department==='骨科' && !e.record.specialCase && e.record.group!=='通用场景').map(e=>e.record.group))].sort(), ['TKA','THA','人工股骨头置换','股骨转子间骨折','胫骨干骨折','桡骨远端骨折','锁骨骨折','肩锁关节脱位'].sort());
-  assert.equal(plan.withdrawn.length,5073);
+  assert.equal(plan.withdrawn.length,0);assert.equal(plan.removed.length,5073);
   assert.equal(plan.published.length,308);
   assert.equal(plan.published.filter(e=>e.record.department==='骨科').length,281);
   assert.equal(plan.archived.length,0);
   for(const decision of inventory.policy.withdrawals){
-    const actual=plan.withdrawn.filter(e=>e.identity.caseId===decision.caseId);
-    assert.deepEqual(actual.map(e=>e.identity.recordId).sort(),[...plan.state.cases.get(decision.caseId).recordIds].sort());
-    assert(actual.some(e=>e.record.short==='入院记录'));
-    assert(actual.some(e=>e.record.short==='手术记录'));
-    assert(actual.some(e=>e.record.short==='出院当天查房记录'));
-    assert(actual.some(e=>e.record.type==='出院小结'));
+    assert(decision.removedFromSource?.authorizedBy);
+    const actual=plan.removed.filter(row=>row.caseId===decision.caseId);
+    assert.deepEqual(actual.map(row=>row.recordId).sort(),[...plan.state.cases.get(decision.caseId).recordIds].sort());
+    assert(actual.some(row=>row.short==='入院记录'));
+    assert(actual.some(row=>row.short==='手术记录'));
+    assert(actual.some(row=>row.short==='出院当天查房记录'));
+    assert(actual.some(row=>row.recordType==='出院小结'));
+    assert(!source.records.some(record=>record.group===decision.group&&!record.completeCaseKey),decision.group+' must be deleted from the source');
   }
   for(const group of ['TKA','THA','股骨转子间骨折','人工股骨头置换','胫骨干骨折','桡骨远端骨折','锁骨骨折','肩锁关节脱位']){
     assert(plan.published.some(e=>e.record.group===group),group+' must remain published');
@@ -39,8 +43,9 @@ test('lumbar withdrawal removes exactly 12 complete cases and preserves unrelate
     assert.equal(entry.identity.recordId,'clinical-v1-r'+String(entry.identity.legacyId).padStart(6,'0'));
   }
   assert.equal(plan.published.filter(e=>e.record.specialCase).length,44);
+  // Without the removal authorization the deleted records count as missing.
   const restored=structuredClone(inventory);restored.policy.withdrawals=[];
-  assert.equal(planClinicalPublication(source,restored).published.length,source.records.length);
+  assert.throws(()=>planClinicalPublication(source,restored),/record count changed/);
 });
 
 test('partial, unapproved, stale or duplicate withdrawals fail instead of dropping arbitrary records',()=>{
@@ -71,7 +76,10 @@ test('published catalogs, seeds and downloadable bodies contain no withdrawn doc
   }
   const bodies=new Map(Object.values(manifest.bodies).flatMap(file=>JSON.parse(fs.readFileSync(new URL(file.slice(1),directory),'utf8'))));
   assert.equal(publicIds.length,publication.published.length);
-  for(const {record,identity}of publication.withdrawn){
+  const gone=[...publication.withdrawn.map(({record,identity})=>({record,identity})),
+    ...publication.removed.map(row=>({record:{group:row.group,department:row.department},identity:row}))];
+  assert.equal(gone.length,5073);
+  for(const {record,identity}of gone){
     assert(!publicIds.includes(identity.legacyId));
     assert(!bodies.has(identity.legacyId));
     assert(!manifest.groups.includes(record.group));
@@ -82,7 +90,7 @@ test('published catalogs, seeds and downloadable bodies contain no withdrawn doc
     assert(publicIds.includes(identity.legacyId));
     if(record.sourceBody)assert.equal(bodies.get(identity.legacyId),record.sourceBody);
   }
-  assert.deepEqual(manifest.withdrawnGroups.map(item=>item.group).sort(),[...new Set(publication.withdrawn.map(item=>item.record.group))].sort());
+  assert.deepEqual(manifest.withdrawnGroups.map(item=>item.group).sort(),[...new Set(gone.map(item=>item.record.group))].filter(group=>!publication.published.some(e=>e.record.group===group)).sort());
 });
 
 test('favorites and recent visits no longer offer withdrawn disease links',()=>{

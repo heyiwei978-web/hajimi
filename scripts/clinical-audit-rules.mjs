@@ -1,8 +1,10 @@
 // Read-only quality checks. Never mutate a template or export patient-level prose.
-// The baseline thresholds protect the October 2026 library from accidental loss.
+// The baseline thresholds protect the library from accidental loss.
+// 2026-11-01: the owner removed all withdrawn (unpublished) cases from the
+// source data; thresholds now protect the 308 retained documents (281 骨科).
 export const BASELINE = Object.freeze({
-  total: 5361,
-  orthopedics: 5334,
+  total: 308,
+  orthopedics: 281,
   tkaStandard: 28,
   tkaSpecialCases: 2
 });

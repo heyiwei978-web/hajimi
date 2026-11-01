@@ -6,7 +6,7 @@ import vm from 'node:vm';
 import {pathToFileURL} from 'node:url';
 import test from 'node:test';
 import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
-import {createInventory,planClinicalPublication,sha256} from '../scripts/clinical-inventory.mjs';
+import {createInventory,planClinicalPublication,recordFromIdentity,sha256} from '../scripts/clinical-inventory.mjs';
 import {compileClinicalSite} from '../scripts/clinical-compiler.mjs';
 import {PUBLIC_FILES} from '../scripts/public-assets.mjs';
 
@@ -31,7 +31,7 @@ function archiveDuplicate(inventory){
 test('the committed baseline preserves complete cases and every special-case document',()=>{
   assert.deepEqual(current.inventory.baseline.summary,{records:5361,projectGroups:204,diseaseOrProcedureGroups:203,
     standardCases:203,standardRecords:5313,specialCases:2,specialRecords:44,utilityRecords:4,archivedRecords:0});
-  assert.equal(current.plan.published.length+current.plan.withdrawn.length,current.inventory.baseline.summary.records+current.inventory.revisions.batches.reduce((count,batch)=>count+batch.additions.length,0));
+  assert.equal(current.plan.published.length+current.plan.withdrawn.length+current.plan.removed.length,current.inventory.baseline.summary.records+current.inventory.revisions.batches.reduce((count,batch)=>count+batch.additions.length,0));
   assert.equal(current.plan.archived.length,0);
   assert.deepEqual(current.inventory.baseline.cases.filter(c=>c.caseType==='special').map(c=>c.recordIds.length),[29,15]);
   assert.equal(current.inventory.baseline.ambiguousNames[0].recordIds.length,3);
@@ -93,4 +93,22 @@ test('public compilation retains exact payloads while excluding authoring source
   for(const name of PUBLIC_FILES)assert(fs.existsSync(new URL('../'+name,import.meta.url)),name);
   for(const name of ['app.js','departments.js','ideal-cases.js','record-quality-v3.js','record-course-v27.js','tka-special-cases.js'])assert(!PUBLIC_FILES.includes(name),name);
   assert(!PUBLIC_FILES.some(name=>name.startsWith('content/')));
+});
+
+test('removed withdrawn cases are absent from the source but keep reserved IDs; partial or unauthorized removal fails',()=>{
+  const {plan,source,inventory}=current;
+  assert.equal(plan.removed.length,5073);
+  const removed=new Set(plan.removed.map(row=>row.recordId));
+  assert(plan.published.every(entry=>!removed.has(entry.identity.recordId)));
+  assert(plan.removed.every(row=>plan.state.identities.get(row.recordId)===row));
+  assert.equal(plan.published.length+plan.withdrawn.length,source.records.length);
+  // A removed case that reappears must be complete; a single stray document fails.
+  const row=plan.removed[0],stray=structuredClone(source);
+  stray.records.push({...recordFromIdentity(row),sourceBody:'x'});stray.renderedBodies.push('x');
+  assert.throws(()=>planClinicalPublication(stray,inventory),/removed case must be deleted from the source as a whole/);
+  // Without the authorization the deleted records count as missing.
+  const policy=structuredClone(inventory.policy);delete policy.withdrawals[0].removedFromSource;
+  assert.throws(()=>planClinicalPublication(source,{...inventory,policy}),/record count changed/);
+  const blank=structuredClone(inventory.policy);blank.withdrawals[0].removedFromSource={reason:'x',authorizedBy:'',authorizationReference:'x'};
+  assert.throws(()=>planClinicalPublication(source,{...inventory,policy:blank}),/explicit authorization/);
 });

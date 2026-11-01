@@ -40,7 +40,12 @@
       ],
       "reason": "用户要求从病历库移除全部腰椎相关病历；整套退出公开发布，保留原始正文及永久身份。",
       "authorizedBy": "user",
-      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉"
+      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cd978197830c7754e3247",
@@ -75,7 +80,12 @@
       ],
       "reason": "用户要求从病历库移除全部腰椎相关病历；整套退出公开发布，保留原始正文及永久身份。",
       "authorizedBy": "user",
-      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉"
+      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c7ffc80061b253cb673e3",
@@ -111,7 +121,12 @@
       ],
       "reason": "用户要求从病历库移除全部腰椎相关病历；整套退出公开发布，保留原始正文及永久身份。",
       "authorizedBy": "user",
-      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉"
+      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c029e9c3298c8a89900ac",
@@ -149,7 +164,12 @@
       ],
       "reason": "用户要求从病历库移除全部腰椎相关病历；整套退出公开发布，保留原始正文及永久身份。",
       "authorizedBy": "user",
-      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉"
+      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c631a828353f717ada23b",
@@ -188,7 +208,12 @@
       ],
       "reason": "用户要求从病历库移除全部腰椎相关病历；整套退出公开发布，保留原始正文及永久身份。",
       "authorizedBy": "user",
-      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉"
+      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c0122742f4bb6debda5c4",
@@ -226,7 +251,12 @@
       ],
       "reason": "用户要求从病历库移除全部腰椎相关病历；整套退出公开发布，保留原始正文及永久身份。",
       "authorizedBy": "user",
-      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉"
+      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c6358ee70aaec07a22372",
@@ -265,7 +295,12 @@
       ],
       "reason": "用户要求从病历库移除全部腰椎相关病历；整套退出公开发布，保留原始正文及永久身份。",
       "authorizedBy": "user",
-      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉"
+      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c1ae7cd96d154dfe0a49a",
@@ -304,7 +339,12 @@
       ],
       "reason": "用户要求从病历库移除全部腰椎相关病历；整套退出公开发布，保留原始正文及永久身份。",
       "authorizedBy": "user",
-      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉"
+      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c888c8e0a118e82030185",
@@ -342,7 +382,12 @@
       ],
       "reason": "用户要求从病历库移除全部腰椎相关病历；整套退出公开发布，保留原始正文及永久身份。",
       "authorizedBy": "user",
-      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉"
+      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cf8b6f4105c5a29be4f2d",
@@ -380,7 +425,12 @@
       ],
       "reason": "用户要求从病历库移除全部腰椎相关病历；整套退出公开发布，保留原始正文及永久身份。",
       "authorizedBy": "user",
-      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉"
+      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca5e5ec8b46efa4944b0f",
@@ -419,7 +469,12 @@
       ],
       "reason": "用户要求从病历库移除全部腰椎相关病历；整套退出公开发布，保留原始正文及永久身份。",
       "authorizedBy": "user",
-      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉"
+      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c70cc2157337644749cf6",
@@ -458,7 +513,12 @@
       ],
       "reason": "用户要求从病历库移除全部腰椎相关病历；整套退出公开发布，保留原始正文及永久身份。",
       "authorizedBy": "user",
-      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉"
+      "authorizationReference": "用户本对话2026-10-24：等下，先去除一部分，把腰椎相关的都去掉",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ceacb9da5c5f6dcc97131",
@@ -495,7 +555,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c3cd6bfb8aa80afe12f94",
@@ -533,7 +598,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c192363ffcc156266dc37",
@@ -571,7 +641,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c6d01024e5f6bd51553fa",
@@ -609,7 +684,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c9b02d05bd87fa2ae94c9",
@@ -647,7 +727,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cbe530c4bf2141d7d8c4f",
@@ -684,7 +769,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c580918f1b27abaf2a9e7",
@@ -721,7 +811,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cb8d8b5463918f8b54cd1",
@@ -758,7 +853,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cf3c23f9a0a9dc8f04dfe",
@@ -795,7 +895,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c006db533c2cb2474dcca",
@@ -832,7 +937,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cd5efb824c6d960f519c3",
@@ -868,7 +978,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c7d332ed5bc81b2432479",
@@ -904,7 +1019,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c49fb7b5f60fd6f19c31b",
@@ -940,7 +1060,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c43e64ab88d8bf67ce6eb",
@@ -975,7 +1100,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c27a8ca84e3bd81057b91",
@@ -1013,7 +1143,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cd07249184183b357e166",
@@ -1051,7 +1186,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c914452ceba440e7708d4",
@@ -1090,7 +1230,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cb5a224c3e76df6b4456a",
@@ -1129,7 +1274,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c658f08e3bd4cc20c6721",
@@ -1166,7 +1316,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c15223ed75badb02280aa",
@@ -1205,7 +1360,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c52cdfcb60f8d71a901c4",
@@ -1244,7 +1404,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c03985670a2a93ec5e6e0",
@@ -1283,7 +1448,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cb37355460b0fdd8e9392",
@@ -1322,7 +1492,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c04908bdbc95ebf96dca5",
@@ -1359,7 +1534,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cd1cec1dab022347116cc",
@@ -1397,7 +1577,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca926125c79776e0ea9df",
@@ -1435,7 +1620,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c3f9fa832e33660338c7b",
@@ -1474,7 +1664,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c09ba6f4bbac7c8fc7c5c",
@@ -1510,7 +1705,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c7a46650f64de8f58c595",
@@ -1548,7 +1748,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c9bf08301e857f482ba7d",
@@ -1585,7 +1790,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c2e19cf37da1e384c4f40",
@@ -1622,7 +1832,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cc1d469b7b741ddbd0579",
@@ -1660,7 +1875,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca121fd6155c08db6bcaf",
@@ -1698,7 +1918,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ce53d6c3dd8e78ef27299",
@@ -1735,7 +1960,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca951fb8e77286fb822fc",
@@ -1772,7 +2002,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c25d5f0e7e5612181e63b",
@@ -1810,7 +2045,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c7bc6ef9a40675d9a59cd",
@@ -1847,7 +2087,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c6170839bd278d2bc347c",
@@ -1883,7 +2128,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cb5a6466f6265d66b6c6e",
@@ -1919,7 +2169,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c545db260f148bac2b56f",
@@ -1956,7 +2211,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cba7870cd698e9a0abc58",
@@ -1992,7 +2252,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca2c0baac06382855cfcc",
@@ -2029,7 +2294,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c77971471b00d25aec020",
@@ -2066,7 +2336,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca03556f7570c2490a59f",
@@ -2102,7 +2377,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c06e390757c3ac8b146e0",
@@ -2139,7 +2419,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cb71b19ca8d85bb738fae",
@@ -2176,7 +2461,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cca68e04145591bb408e9",
@@ -2213,7 +2503,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c289216cae3760c6fd70c",
@@ -2250,7 +2545,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c894779917656a7f2b390",
@@ -2287,7 +2587,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c612b118ad2a20649e7b6",
@@ -2325,7 +2630,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cf0dec57dd7c87d60341f",
@@ -2362,7 +2672,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cbd7ab543c2ed11221d02",
@@ -2399,7 +2714,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cbd1cded64d257491cbbe",
@@ -2436,7 +2756,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c81a713c5348488382913",
@@ -2473,7 +2798,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c01435c340f33fdb6c252",
@@ -2510,7 +2840,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cd293688d97a0acb52ab7",
@@ -2547,7 +2882,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c282dbdf94db901298155",
@@ -2584,7 +2924,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c993a1bc20e792c2c6719",
@@ -2622,7 +2967,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cdd6c5010cc74b0c8d5c5",
@@ -2659,7 +3009,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ccf8796bd9be730383fcf",
@@ -2695,7 +3050,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c18dbcf4b04a8d114ee08",
@@ -2731,7 +3091,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c55d05e8e953adc2f2443",
@@ -2768,7 +3133,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cd7ffcebc1b4cf4e0da23",
@@ -2803,7 +3173,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c10af0400bbc294be16dc",
@@ -2838,7 +3213,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c994d163eae279d856f76",
@@ -2874,7 +3254,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca97f1fac4442c7771e86",
@@ -2911,7 +3296,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c8ed8f04fdb6da8db6d90",
@@ -2949,7 +3339,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c1c401d1f6fe837e40edd",
@@ -2988,7 +3383,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c72cbdd5b68fdd17e4f8d",
@@ -3027,7 +3427,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c00d51d72d6a7c1c2b129",
@@ -3065,7 +3470,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca41fa25f9e9842ae8c12",
@@ -3104,7 +3514,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c8f17e37d14bc5ac2fd9f",
@@ -3143,7 +3558,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca0ab0fd85396f77c3ad7",
@@ -3180,7 +3600,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cf0f41c819c5c2d359ad1",
@@ -3219,7 +3644,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c3eb82e90c969cbc5742e",
@@ -3256,7 +3686,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c660d0a277f91734907ee",
@@ -3293,7 +3728,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c8c8b97daf9366551b5dd",
@@ -3331,7 +3771,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c8de8dc5e63d4450eb3db",
@@ -3370,7 +3815,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c21d2dc42d2bc6ace4b22",
@@ -3409,7 +3859,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c30688760a455ecf5c94c",
@@ -3446,7 +3901,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cea11fd802f3d61d6211b",
@@ -3483,7 +3943,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca3f76e314d0d0175433b",
@@ -3521,7 +3986,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c51a5742502d1900182eb",
@@ -3559,7 +4029,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c2e2f332b7a8037b4e903",
@@ -3596,7 +4071,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cabf380c492229389126a",
@@ -3633,7 +4113,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c57c6d32f5c54a672fd63",
@@ -3670,7 +4155,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c51f5b4f0c34998a6fb45",
@@ -3709,7 +4199,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c50f28fb73e800a59ec8c",
@@ -3747,7 +4242,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c65dede1ebd2123dfe6b4",
@@ -3785,7 +4285,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c90ab2add16471d561ba8",
@@ -3823,7 +4328,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cf02b50c735e9b224254c",
@@ -3861,7 +4371,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c3872e6dd0540d56e85b0",
@@ -3898,7 +4413,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c3821f0cf8e416745c044",
@@ -3934,7 +4454,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cec013b10c7350f9bc472",
@@ -3971,7 +4496,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cfd9e034e5627a1c03d3c",
@@ -4008,7 +4538,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ce48bcd1fedd2ae0b4d24",
@@ -4045,7 +4580,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cbba8d142c20d92a90c4d",
@@ -4082,7 +4622,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c30f47d6b17377c668b1a",
@@ -4118,7 +4663,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cfa88d854d9a7beebe350",
@@ -4155,7 +4705,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cf3c1c9754c3f7455c013",
@@ -4192,7 +4747,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c946c8a7281915841e6e8",
@@ -4228,7 +4788,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c5ce03326daecfa2e2a56",
@@ -4265,7 +4830,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c7c25cf5d0b9aa556232b",
@@ -4303,7 +4873,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c552bf8f7967a0f8e2e6a",
@@ -4341,7 +4916,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c1b676c1992751dbe5933",
@@ -4379,7 +4959,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cc6368de35a0b194dcdeb",
@@ -4416,7 +5001,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cfda84b19bd32b63fb29d",
@@ -4452,7 +5042,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c9f5ed51c5d3b8e6d1ca4",
@@ -4489,7 +5084,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c59b5d88e0412596b799a",
@@ -4526,7 +5126,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c04547e108dd4e0dc6e27",
@@ -4563,7 +5168,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c95485cc90374e6a61b45",
@@ -4599,7 +5209,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cfb78d5795206ca42432d",
@@ -4638,7 +5253,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c88ef6f2e2e23fc65af2a",
@@ -4677,7 +5297,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c22a0a712031be4e1f447",
@@ -4716,7 +5341,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cc553a9e3cf5db44dba8b",
@@ -4753,7 +5383,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c47799d9a125d41998de2",
@@ -4791,7 +5426,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ce25a29f642de22b85f0d",
@@ -4828,7 +5468,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c08d04373d905057f18cf",
@@ -4866,7 +5511,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c3eddbcea5c57c4d1a680",
@@ -4904,7 +5554,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c59b191a75e6324b1916b",
@@ -4942,7 +5597,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c1e14a4e778fce45e4512",
@@ -4978,7 +5638,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c4976b1dd7e85fb8d5a00",
@@ -5014,7 +5679,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c584439d4e3a340daad7b",
@@ -5051,7 +5721,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cdd5789c67c958385ec69",
@@ -5088,7 +5763,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c0c2de8eded2ef9f29870",
@@ -5126,7 +5806,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cf75211648f5e5e2236ab",
@@ -5163,7 +5848,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ccea04755a9bcb13d7ae3",
@@ -5200,7 +5890,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c5f46281801bfcf15409f",
@@ -5237,7 +5932,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c27e9caccdf39c9075348",
@@ -5273,7 +5973,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c831043e66cb71ee8371f",
@@ -5310,7 +6015,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cf0cfdf1441371f9a465b",
@@ -5349,7 +6059,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c3adf241f219501781f0a",
@@ -5385,7 +6100,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cc2b23bac97d665e82350",
@@ -5424,7 +6144,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c69c4aba926696130af49",
@@ -5460,7 +6185,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c36abf37d7d91ff843468",
@@ -5498,7 +6228,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cee7af84270867d3b2780",
@@ -5535,7 +6270,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c2f71f6eddb6368ff89ae",
@@ -5571,7 +6311,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c46343fea4f48758ce4e9",
@@ -5609,7 +6354,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cdf46549b90738df5532d",
@@ -5645,7 +6395,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c6c9d697044b191975499",
@@ -5681,7 +6436,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cd572f2658a52f61fa059",
@@ -5718,7 +6478,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ce3b74392b9a5e0ce97f3",
@@ -5755,7 +6520,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c680e5db64e70b2da20df",
@@ -5793,7 +6563,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca9c8c8ad11c35e313252",
@@ -5830,7 +6605,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cdb10a4faccf513cb888e",
@@ -5868,7 +6648,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cb50c102eb099a3f2e82b",
@@ -5905,7 +6690,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c4299781306c9a39a43f1",
@@ -5942,7 +6732,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c5412e3e7c7b2d56c1608",
@@ -5979,7 +6774,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c586df5c79c75278b202f",
@@ -6016,7 +6816,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c88ed80c494a453595411",
@@ -6053,7 +6858,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c1788b74c5b25613e8326",
@@ -6092,7 +6902,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c861de3e335a9b57c7b2d",
@@ -6131,7 +6946,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c97ff2a30f0409211d144",
@@ -6170,7 +6990,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cb8e839d0ff31303b5d03",
@@ -6208,7 +7033,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c7b9047936661ffefbab0",
@@ -6246,7 +7076,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c227db2df7e0bbb497d37",
@@ -6285,7 +7120,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c7696b88848dc78ae7afa",
@@ -6323,7 +7163,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c90eabf7b8b7041e38ea1",
@@ -6362,7 +7207,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cabaa9646045c9fe35a03",
@@ -6400,7 +7250,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c32a44972d5c091f058f6",
@@ -6439,7 +7294,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c7ce2e0c2cff3214e88ac",
@@ -6478,7 +7338,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ce242b20934e9f1cc94dd",
@@ -6515,7 +7380,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cfb14e156cda8d85c77a8",
@@ -6551,7 +7421,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cde9647c749e41163142e",
@@ -6586,7 +7461,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca0a5ee7bebc1fb0fd0ed",
@@ -6624,7 +7504,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c42dbd9da79026fc11732",
@@ -6663,7 +7548,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cca1922518005b1494929",
@@ -6700,7 +7590,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c6c2590ce339108d5a93b",
@@ -6737,7 +7632,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cf08dded65ebb9b681e3f",
@@ -6774,7 +7674,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c7f41af4aa0ce160542f9",
@@ -6811,7 +7716,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c55150ba51e06b57ec379",
@@ -6849,7 +7759,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cb49d3ad05643b0f2f4ff",
@@ -6888,7 +7803,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c24b8b5a5a9be8ffd4639",
@@ -6926,7 +7846,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c7f3a05d4bec1bce9e6f4",
@@ -6963,7 +7888,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c0ee64d0f889a7242d4d0",
@@ -7000,7 +7930,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cb89befe6a36a70488ae0",
@@ -7037,7 +7972,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cbbf46c0d8ba3696dcaf0",
@@ -7073,7 +8013,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-ca9ef277ce5a8ecdb1408",
@@ -7110,7 +8055,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-cae98179578dbd194659e",
@@ -7148,7 +8098,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     },
     {
       "caseId": "clinical-v1-c7c89c9bad9cde99e5921",
@@ -7187,7 +8142,12 @@
       ],
       "reason": "按用户要求精简骨科病历，保留指定病种及全部特殊病例",
       "authorizedBy": "用户",
-      "authorizationReference": "2026-10-27 骨科病历瘦身指令"
+      "authorizationReference": "2026-10-27 骨科病历瘦身指令",
+      "removedFromSource": {
+        "reason": "负责人要求把所有不显示的病历从网站文件中彻底删除，以后需要时按新增病种流程重新添加；永久编号保留不复用，旧正文可从 Git 历史找回。",
+        "authorizedBy": "用户",
+        "authorizationReference": "2026-11-01 09:17「把那些不显示的病历都去掉，以后重新添加」；选择「从网站文件里彻底删掉」"
+      }
     }
   ]
 }

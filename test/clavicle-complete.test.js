@@ -2,13 +2,14 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 import {laterReviewed} from './_later-reviewed-groups.js';
+import {withoutRemoved} from './_removed-cases.js';
 import {loadClinicalSource} from '../scripts/clinical-compiler.mjs';
 import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
 import {identityKey,metadataHash} from '../scripts/clinical-inventory.mjs';
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const tag='<script defer src="/record-clavicle-complete-v33.js?v=20261025-clavicle1"></script>';
-const before=loadClinicalSource(html.replace(tag,''),{audit:true});
 const current=auditClinicalLibrary(),after=current.source;
+const before=withoutRemoved(loadClinicalSource(html.replace(tag,''),{audit:true}),current.plan);
 const rows=after.records.filter(r=>r.group==='锁骨骨折'&&!r.specialCase),get=n=>rows.find(r=>r.short===n);
 const time=n=>get(n).sourceBody.match(/记录时间：(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/)[1];
 test('clavicle revision replaces exactly 26 bodies while preserving all identities, special cases and other rendered records',()=>{

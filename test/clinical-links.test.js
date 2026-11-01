@@ -15,8 +15,10 @@ test('retained numeric and stable IDs resolve originals; withdrawn IDs remain un
   vm.createContext(context);vm.runInContext(fs.readFileSync(new URL('../library-loader.js',import.meta.url),'utf8'),context);
   for(const item of Object.values(manifest.departments))vm.runInContext(fs.readFileSync(new URL(item.catalog.slice(1),directory),'utf8'),context);
   const H=context.window.HAJIMI;
-  const withdrawn=new Set(publication.withdrawn.map(entry=>entry.identity.legacyId));
+  // Removed cases are no longer in the source: their reserved IDs must resolve to nothing.
+  const withdrawn=new Set([...publication.withdrawn.map(entry=>entry.identity.legacyId),...publication.removed.map(row=>row.legacyId)]);
   const byId=new Map([...publication.published,...publication.withdrawn].map(entry=>[entry.identity.legacyId,entry.record]));
+  for(const row of publication.removed)byId.set(row.legacyId,null);
   for(const [id,expected] of byId){
     const row=H.findRecord(id),stable=H.findRecord('clinical-v1-r'+String(id).padStart(6,'0'));
     assert.equal(row,stable);
@@ -29,6 +31,7 @@ test('retained numeric and stable IDs resolve originals; withdrawn IDs remain un
   const fetchBody=JSON.parse(fs.readFileSync(new URL(manifest.bodies['骨科\0TKA'].slice(1),directory),'utf8'));
   for(const [id,body]of fetchBody)H.findRecord(id).sourceBody=body;
   assert.equal(new Set(rows).size,3);
-  for(let i=0;i<3;i++)assert.equal(rows[i].sourceBody,source.records[[5159,5359,5360][i]].sourceBody);
+  const original=id=>publication.published.find(entry=>entry.identity.legacyId===id).record;
+  for(let i=0;i<3;i++)assert.equal(rows[i].sourceBody,original([5159,5359,5360][i]).sourceBody);
   assert.equal(H.findRecord(-1),null);assert.equal(H.findRecord('clinical-v1-r999999'),null);
 });

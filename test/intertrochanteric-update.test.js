@@ -3,19 +3,20 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import test from 'node:test';
 import {laterReviewed} from './_later-reviewed-groups.js';
+import {withoutRemoved} from './_removed-cases.js';
 import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
 import {loadClinicalSource} from '../scripts/clinical-compiler.mjs';
 import {identityKey,metadataHash} from '../scripts/clinical-inventory.mjs';
 import {PUBLIC_FILES} from '../scripts/public-assets.mjs';
 
 const current=auditClinicalLibrary();
-const old=loadClinicalSource(fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),{
+const old=withoutRemoved(loadClinicalSource(fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),{
   audit:true,readSource:file=>file==='record-intertrochanteric-v28.js'?'':fs.readFileSync(new URL('../'+file,import.meta.url),'utf8')
-});
+}),current.plan);
 const selected=current.plan.published.filter(entry=>entry.record.department==='骨科'&&entry.record.group==='股骨转子间骨折');
 
-test('the reviewed case updates all 27 established documents and appends three identities without touching other 5351 records',()=>{
-  assert.equal(current.source.records.length,5381);assert.equal(current.plan.published.length+current.plan.withdrawn.length,5381);assert.equal(selected.length,30);
+test('the reviewed case updates all 27 established documents and appends three identities without touching the other 278 retained records',()=>{
+  assert.equal(current.source.records.length,308);assert.equal(current.plan.published.length+current.plan.withdrawn.length+current.plan.removed.length,5381);assert.equal(selected.length,30);
   const before=new Map(old.records.map((record,index)=>[identityKey(record),{record,body:old.renderedBodies[index]}]));
   let unchanged=0,updates=0,additions=0;
   for(let index=0;index<current.source.records.length;index++){
@@ -26,7 +27,7 @@ test('the reviewed case updates all 27 established documents and appends three i
     else {if(!laterReviewed(record)){assert.deepEqual(record,previous.record);assert.equal(current.source.renderedBodies[index],previous.body);}unchanged++;}
     before.delete(identityKey(record));
   }
-  assert.equal(before.size,0);assert.equal(unchanged,5351);assert.equal(updates,27);assert.equal(additions,3);
+  assert.equal(before.size,0);assert.equal(unchanged,278);assert.equal(updates,27);assert.equal(additions,3);
   assert.equal(new Set(selected.map(entry=>entry.identity.recordId)).size,30);
   assert.equal(new Set(selected.map(entry=>entry.identity.caseId)).size,1);
   assert(!PUBLIC_FILES.includes('record-intertrochanteric-v28.js'));
