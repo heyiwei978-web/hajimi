@@ -98,3 +98,18 @@ test('developer-mode supplement edits are optional, validated, preserved and bac
   const extra=await store.save({...original,supplementOverrides:{'c:cad:history':{body:'b',injected:'<script>'}}},current.revision,'admin');
   assert.deepEqual(extra.supplementOverrides,{'c:cad:history':{body:'b'}},'unknown fields are dropped');
 });
+test('a weak ETag from a compressed read still allows the conditional save',async()=>{
+  // Vercel Blob returns W/"…" when the read is compressed, but conditional writes
+  // compare against the stored strong tag: saving with the weak form was refused.
+  const backend=storage();
+  const get=backend.get.bind(backend);
+  backend.get=async key=>{const result=await get(key);if(result?.blob?.etag)result.blob.etag='W/'+result.blob.etag;return result;};
+  const put=backend.put.bind(backend);
+  backend.put=async(key,text,options)=>{if(options.ifMatch&&options.ifMatch.startsWith('W/'))throw new BlobPreconditionFailedError();return put(key,text,options);};
+  const store=createContentStore(backend);
+  const current=await store.read();
+  assert.equal(current.revision,'"initial"','the revision is the strong tag');
+  const saved=await store.save(replacement,current.revision,'admin');
+  assert.notEqual(saved.revision,current.revision);
+  assert.deepEqual((await store.read()).data,replacement);
+});
