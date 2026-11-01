@@ -67,9 +67,95 @@ function score(g){return $$('input[data-g="'+g+'"]:checked').reduce((a,x)=>a+Num
 function num(id){return Number($(id).value)}
 function allPositive(...ids){return ids.every(id=>Number($(id).value)>0)}
 function finish(k,html){return html.replace('</div>','</div>'+source(k))}
+// ===== 骨科与围手术期（2026-11 新增）=====
+// Each entry: src [机构/文献, 标题, 链接], form(), note, calc(). Uses the shared helpers above.
+const PUB=id=>'https://pubmed.ncbi.nlm.nih.gov/'+id+'/',DOI=d=>'https://doi.org/'+d;
+// Score items start empty so an untouched item can never add points silently.
+const pick=(id,label,opts)=>sel(id,label,[['','请选择'],...opts.map(o=>[o[0],o[1]+'（'+o[0]+'分）'])]);
+const val=id=>Number($(id).value);
+const box=(id,text,pts)=>'<label class="check"><input type="checkbox" id="'+id+'"><span>'+text+(pts===undefined?'':' <b>+'+pts+'</b>')+'</span></label>';
+const on=id=>$(id).checked;
+const checks=x=>'<div class="checks span-all">'+x+'</div>';
+const EXTRA={
+caprini:{src:['Dis Mon 2005','Caprini VTE 风险评分',DOI('10.1016/j.disamonth.2005.02.003')],
+ form:()=>'<div class="formgrid">'+pick('age','年龄',[['0','≤40岁'],['1','41–60岁'],['2','61–74岁'],['3','≥75岁']])+'</div>'+checks(
+  '<strong>1分</strong>'+['计划小手术','1个月内大手术史','BMI >25 kg/m²','下肢肿胀（当前）','静脉曲张','妊娠或产后','不明原因死胎、反复自然流产（≥3次）、因毒血症或胎儿生长受限早产','口服避孕药或激素替代治疗','脓毒症（<1个月）','严重肺病含肺炎（<1个月）','肺功能异常（如COPD）','急性心肌梗死','充血性心衰（<1个月）','炎症性肠病史','内科卧床患者'].map(t=>ck('cap',t,1)).join('')+
+  '<strong>2分</strong>'+['关节镜手术','恶性肿瘤（现患或既往）','大手术（>45分钟）','腹腔镜手术（>45分钟）','卧床 >72小时','石膏固定（<1个月）','中心静脉置管'].map(t=>ck('cap',t,2)).join('')+
+  '<strong>3分</strong>'+['VTE 病史','VTE 家族史','凝血因子 V Leiden 突变','凝血酶原 20210A 突变','狼疮抗凝物阳性','抗心磷脂抗体阳性','血清同型半胱氨酸升高','肝素诱导的血小板减少症（HIT）','其他先天或获得性易栓症'].map(t=>ck('cap',t,3)).join('')+
+  '<strong>5分</strong>'+['择期下肢大关节置换','髋部、骨盆或下肢骨折（<1个月）','脑卒中（<1个月）','多发伤（<1个月）','急性脊髓损伤（瘫痪，<1个月）'].map(t=>ck('cap',t,5)).join('')),
+ note:'采用 2005 版 Caprini 量表条目（不同年份版本条目与分值略有差异）。风险分层按 ACCP 2012（Gould 等）：0 分极低危、1–2 分低危、3–4 分中危、≥5 分高危。预防措施需结合出血风险与医院方案。',
+ calc(){const s=val('#age')+score('cap'),c=s===0?'极低危':s<=2?'低危':s<=4?'中危':'高危';result('<strong>Caprini '+s+' 分 · '+c+'</strong><span>分层（ACCP 2012）：0 极低危；1–2 低危；3–4 中危；≥5 高危。</span>')}},
+padua:{src:['J Thromb Haemost 2010','Padua 内科住院 VTE 风险',PUB(20738765)],
+ form:()=>checks([['活动性肿瘤（局部或远处转移，和/或6个月内放化疗）',3],['既往 VTE（不含浅静脉血栓）',3],['活动减少（因自身限制或医嘱卧床≥3天）',3],['已知易栓症',3],['近期（≤1个月）创伤和/或手术',2],['年龄 ≥70岁',1],['心力衰竭和/或呼吸衰竭',1],['急性心肌梗死或缺血性卒中',1],['急性感染和/或风湿性疾病',1],['肥胖（BMI ≥30）',1],['正在接受激素治疗',1]].map(x=>ck('pad',x[0],x[1])).join('')),
+ note:'适用于内科住院患者；骨科手术患者通常使用 Caprini 或按术式评估。',
+ calc(){const s=score('pad');result('<strong>Padua '+s+' 分 · '+(s>=4?'VTE 高风险':'VTE 低风险')+'</strong><span>原文：≥4 分为高风险，<4 分为低风险。</span>')}},
+hasbled:{src:['Chest 2010','HAS-BLED 出血风险',PUB(20299623)],
+ form:()=>checks([['H 高血压（未控制，收缩压 >160 mmHg）'],['A 肾功能异常（透析、肾移植或肌酐 ≥200 μmol/L）'],['A 肝功能异常（肝硬化，或胆红素 >2×正常上限且 AST/ALT/ALP >3×正常上限）'],['S 卒中史'],['B 出血史或出血倾向（如贫血）'],['L INR 不稳定（治疗窗内时间 <60%）'],['E 年龄 >65岁'],['D 药物：抗血小板药或 NSAID'],['D 饮酒（≥8 单位/周）']].map(x=>ck('hb',x[0],1)).join('')),
+ note:'用于房颤抗凝患者的1年大出血风险评估。高分提示需纠正可改变的出血因素并加强随访，不应单独作为停用抗凝的理由。',
+ calc(){const s=score('hb');result('<strong>HAS-BLED '+s+' 分 · '+(s>=3?'出血高风险':'出血风险非高危')+'</strong><span>原文：≥3 分为高风险。</span>')}},
+nhfs:{src:['Br J Anaesth 2008','Nottingham 髋部骨折评分 NHFS',DOI('10.1093/bja/aen236')],
+ form:()=>'<div class="formgrid">'+pick('age','年龄',[['0','<66岁'],['3','66–85岁'],['4','≥86岁']])+'</div>'+checks([['男性'],['入院血红蛋白 ≤10 g/dL'],['简易智力测试（AMTS）≤6/10'],['居住于养老/护理机构'],['合并症 ≥2 种'],['恶性肿瘤']].map(x=>ck('nh',x[0],1)).join('')),
+ note:'按 2008 年原始版本（Maxwell 等）：男性、合并症 ≥2、AMTS ≤6、Hb ≤10 g/dL 各计 1 分。总分 0–10 分，分数越高 30 天死亡风险越高；分数与死亡率的对照见原文及后续更新研究。',
+ calc(){const s=val('#age')+score('nh');result('<strong>NHFS '+s+' 分</strong><span>范围 0–10 分；用于髋部骨折术后 30 天死亡风险分层与围术期沟通。</span>')}},
+mess:{src:['J Trauma 1990','MESS 毁损肢体严重度评分',PUB(2342140)],
+ form:()=>'<div class="formgrid">'+pick('inj','骨与软组织损伤',[['1','低能量（刺伤、单纯骨折、低速枪伤）'],['2','中能量（开放或多段骨折、脱位）'],['3','高能量（近距离枪伤、挤压伤）'],['4','极高能量（上述伴严重污染、软组织撕脱）']])+pick('isc','肢体缺血',[['0','无缺血'],['1','脉搏减弱或消失，灌注正常'],['2','无脉、感觉异常、毛细血管充盈减慢'],['3','肢体发凉、麻痹、感觉丧失']])+pick('shk','休克',[['0','收缩压持续 >90 mmHg'],['1','一过性低血压'],['2','持续低血压']])+pick('age','年龄',[['0','<30岁'],['1','30–50岁'],['2','>50岁']])+'</div>'+checks(box('long','缺血时间 >6 小时（缺血分加倍）')),
+ note:'原研究中 MESS ≥7 与截肢高度相关；后续研究（如 LEAP）显示其不能可靠预测功能结局，不应单独据此决定截肢。',
+ calc(){const isc=val('#isc')*(on('#long')?2:1),s=val('#inj')+isc+val('#shk')+val('#age');result('<strong>MESS '+s+' 分</strong><span>缺血分 '+isc+(on('#long')?'（已按 >6 小时加倍）':'')+'。原文：≥7 分与截肢相关。</span>')}},
+mirels:{src:['Clin Orthop 1989','Mirels 病理性骨折风险评分',PUB(2684463)],
+ form:()=>'<div class="formgrid">'+pick('site','部位',[['1','上肢'],['2','下肢'],['3','转子周围']])+pick('pain','疼痛',[['1','轻度'],['2','中度'],['3','功能性（负重/活动诱发）']])+pick('les','病灶类型',[['1','成骨性'],['2','混合性'],['3','溶骨性']])+pick('size','病灶大小（占骨皮质直径）',[['1','<1/3'],['2','1/3–2/3'],['3','>2/3']])+'</div>',
+ note:'用于长骨转移瘤。原文：≤7 分可安全放疗，≥8 分建议放疗前预防性内固定；临床常用：8 分需结合临床判断，≥9 分建议预防性固定。',
+ calc(){const s=val('#site')+val('#pain')+val('#les')+val('#size');result('<strong>Mirels '+s+' 分</strong><span>'+(s<=7?'≤7 分：骨折风险较低，可考虑放疗与观察。':s===8?'8 分：临界，需结合临床判断。':'≥9 分：骨折风险高，建议评估预防性内固定。')+'</span>')}},
+sins:{src:['Spine 2010','SINS 脊柱肿瘤不稳定评分',DOI('10.1097/BRS.0b013e3181e16ae2')],
+ form:()=>'<div class="formgrid">'+pick('loc','部位',[['3','交界区（枕骨–C2、C7–T2、T11–L1、L5–S1）'],['2','活动节段（C3–C6、L2–L4）'],['1','半固定节段（T3–T10）'],['0','固定节段（S2–S5）']])+pick('pain','疼痛',[['3','机械性疼痛（活动/负重加重，卧床缓解）'],['1','偶发非机械性疼痛'],['0','无疼痛']])+pick('les','骨病灶',[['2','溶骨性'],['1','混合性'],['0','成骨性']])+pick('ali','影像学序列',[['4','半脱位/平移'],['2','新发畸形（后凸/侧凸）'],['0','正常']])+pick('col','椎体塌陷',[['3','>50% 塌陷'],['2','<50% 塌陷'],['1','无塌陷但椎体受累 >50%'],['0','以上均无']])+pick('pl','后外侧结构受累（关节突、椎弓根、肋椎关节）',[['3','双侧'],['1','单侧'],['0','无']])+'</div>',
+ note:'0–6 分稳定；7–12 分潜在不稳定；13–18 分不稳定。≥7 分建议脊柱外科会诊。',
+ calc(){const s=['#loc','#pain','#les','#ali','#col','#pl'].reduce((a,id)=>a+val(id),0);result('<strong>SINS '+s+' 分 · '+(s<=6?'稳定':s<=12?'潜在不稳定':'不稳定')+'</strong><span>'+(s>=7?'≥7 分：建议脊柱外科会诊。':'0–6 分：稳定。')+'</span>')}},
+stopbang:{src:['Chest 2016','STOP-Bang 阻塞性睡眠呼吸暂停筛查',PUB(26378880)],
+ form:()=>checks(box('s1','S 打鼾（响亮，隔门可闻）',1)+box('s2','T 白天常感疲倦、嗜睡',1)+box('s3','O 被观察到睡眠中呼吸暂停或憋醒',1)+box('s4','P 高血压（或正在治疗）',1)+box('b1','B BMI >35 kg/m²',1)+box('b2','A 年龄 >50岁',1)+box('b3','N 颈围 >40 cm',1)+box('b4','G 男性',1)),
+ note:'0–2 分低风险；3–4 分中风险；5–8 分高风险。STOP 4 项中 ≥2 项且合并男性、BMI >35 或颈围 >40 cm 之一者也归为高风险。',
+ calc(){const stop=['#s1','#s2','#s3','#s4'].filter(on).length,s=stop+['#b1','#b2','#b3','#b4'].filter(on).length,high=s>=5||(stop>=2&&(on('#b4')||on('#b1')||on('#b3')));result('<strong>STOP-Bang '+s+' 分 · '+(high?'OSA 高风险':s>=3?'OSA 中风险':'OSA 低风险')+'</strong><span>STOP 项 '+stop+' 个。高风险者围术期需关注气道、镇静与阿片类药物使用。</span>')}},
+apfel:{src:['Anesthesiology 1999','Apfel 简化 PONV 风险评分',PUB(10485781)],
+ form:()=>checks(ck('ap','女性',1)+ck('ap','非吸烟者',1)+ck('ap','既往术后恶心呕吐（PONV）或晕动病史',1)+ck('ap','预计术后使用阿片类药物',1)),
+ note:'原文 0–4 个危险因素对应 PONV 发生率约 10%、21%、39%、61%、79%（成人吸入麻醉、未预防用药人群）。',
+ calc(){const s=score('ap'),r=[10,21,39,61,79][s];result('<strong>Apfel '+s+' 分 · PONV 风险约 '+r+'%</strong><span>按原文发生率对照。</span>')}},
+charlson:{src:['J Chronic Dis 1987','Charlson 合并症指数 CCI',PUB(3558716)],
+ form:()=>'<div class="formgrid">'+pick('dm','糖尿病',[['0','无'],['1','无并发症'],['2','伴终末器官损害']])+pick('liver','肝病',[['0','无'],['1','轻度（慢性肝炎或无门脉高压的肝硬化）'],['3','中重度（肝硬化伴门脉高压）']])+pick('tumor','实体瘤',[['0','无'],['2','有（无转移，5年内）'],['6','转移性实体瘤']])+pick('age','年龄（仅用于年龄校正 CCI）',[['0','<50岁'],['1','50–59岁'],['2','60–69岁'],['3','70–79岁'],['4','≥80岁']])+'</div>'+checks(
+  ['心肌梗死','充血性心力衰竭','周围血管疾病','脑血管疾病','痴呆','慢性肺部疾病','结缔组织病','消化性溃疡'].map(t=>ck('cc',t,1)).join('')+['偏瘫','中重度肾病','白血病','淋巴瘤'].map(t=>ck('cc',t,2)).join('')+ck('cc','艾滋病（AIDS）',6)),
+ note:'按 1987 年原始权重。年龄校正（每 10 岁加 1 分，50 岁起）为后续常用扩展，单独显示。',
+ calc(){const s=score('cc')+val('#dm')+val('#liver')+val('#tumor');result('<strong>CCI '+s+' 分</strong><span>年龄校正 CCI：'+(s+val('#age'))+' 分。原文1年死亡率：0 分 12%，1–2 分 26%，3–4 分 52%，≥5 分 85%（1987 年内科住院队列）。</span>')}},
+gcs:{src:['Lancet 1974','格拉斯哥昏迷评分 GCS',PUB(4136544)],
+ form:()=>'<div class="formgrid">'+pick('e','睁眼 E',[['4','自发睁眼'],['3','呼唤睁眼'],['2','疼痛刺激睁眼'],['1','无反应']])+pick('v','语言 V',[['5','定向正确'],['4','言语错乱'],['3','用词不当'],['2','只能发音'],['1','无反应']])+pick('m','运动 M',[['6','遵嘱动作'],['5','疼痛定位'],['4','疼痛躲避（正常屈曲）'],['3','异常屈曲'],['2','伸直反应'],['1','无反应']])+'</div>',
+ note:'插管、眼睑肿胀等无法评估的项目应记为“NT/不可测”并分项记录（如 E2VTM5），不要以 1 分代替。',
+ calc(){const e=val('#e'),v=val('#v'),m=val('#m'),s=e+v+m;result('<strong>GCS '+s+' 分（E'+e+'V'+v+'M'+m+'）</strong><span>颅脑损伤常用分级：13–15 轻度，9–12 中度，≤8 重度。</span>')}},
+ottawaankle:{src:['JAMA 1993','Ottawa 踝/足部 X 线规则',PUB(8433468)],
+ form:()=>checks('<strong>疼痛部位</strong>'+box('ma','踝部（踝关节区域）疼痛')+box('mf','中足区域疼痛')+'<strong>体征</strong>'+box('lm','外踝后缘或尖端（远端 6 cm）骨压痛')+box('mm','内踝后缘或尖端（远端 6 cm）骨压痛')+box('m5','第5跖骨基底部骨压痛')+box('nv','足舟骨骨压痛')+box('wb','伤后即刻及急诊时均不能负重行走 4 步')),
+ note:'原研究对象为 ≥18 岁急性踝扭伤患者；醉酒、多发伤、感觉障碍等情况不适用。',
+ calc(){const ankle=on('#ma')&&(on('#lm')||on('#mm')||on('#wb')),foot=on('#mf')&&(on('#m5')||on('#nv')||on('#wb'));result('<strong>'+(ankle||foot?'建议拍片：'+[ankle?'踝关节系列':'',foot?'足部系列':''].filter(Boolean).join('、'):'规则阴性：可不拍 X 线')+'</strong><span>踝：踝部疼痛 + 内/外踝压痛或不能负重；足：中足疼痛 + 第5跖骨基底/舟骨压痛或不能负重。</span>')}},
+ottawaknee:{src:['JAMA 1997','Ottawa 膝关节 X 线规则',PUB(9403421)],
+ form:()=>checks(box('k1','年龄 ≥55岁')+box('k2','孤立性髌骨压痛（无其他膝部骨压痛）')+box('k3','腓骨头压痛')+box('k4','不能屈膝至 90°')+box('k5','伤后即刻及急诊时均不能负重行走 4 步')),
+ note:'适用于成人急性膝关节损伤；满足任一项即建议拍片。',
+ calc(){const n=['#k1','#k2','#k3','#k4','#k5'].filter(on).length;result('<strong>'+(n?'建议膝关节 X 线（满足 '+n+' 项）':'规则阴性：可不拍 X 线')+'</strong><span>任一项阳性即需拍片。</span>')}},
+parkland:{src:['StatPearls','Parkland 烧伤补液公式',PUB(30725875)],
+ form:()=>'<div class="formgrid">'+f('w','体重（kg）','step=".1"')+f('tbsa','烧伤面积 %TBSA（Ⅱ度及以上）','step=".5" min="0" max="100"')+'</div>',
+ note:'成人：乳酸林格液 4 mL × 体重(kg) × %TBSA，伤后（不是入院后）前 8 小时输入一半，后 16 小时输入另一半。Ⅰ度烧伤不计入面积。只是起始估算，应按尿量（成人约 0.5–1 mL/kg/h）等滴定调整。',
+ calc(){const w=num('#w'),t=num('#tbsa');if(!(w>0&&t>0&&t<=100))return result('<strong>请检查输入</strong>');const v=4*w*t;result('<strong>24 小时 '+Math.round(v)+' mL</strong><span>前 8 小时 '+Math.round(v/2)+' mL（约 '+Math.round(v/16)+' mL/h）；后 16 小时 '+Math.round(v/2)+' mL（约 '+Math.round(v/32)+' mL/h）。</span>')}},
+abl:{src:['Anesthesiology 1983','最大允许失血量 ABL · Gross',DOI('10.1097/00000542-198303000-00016')],
+ form:()=>'<div class="formgrid">'+f('w','体重（kg）','step=".1"')+f('ebvk','估计血容量系数（mL/kg）','value="70" step="1"')+f('hi','初始 Hct（%）','step=".1"')+f('hf','可接受的最低 Hct（%）','step=".1"')+'</div>',
+ note:'Gross 公式：ABL = EBV × (Hct初 − Hct末) / Hct平均，Hct平均 = (Hct初 + Hct末)/2。血容量系数常用：成年男性约 70–75、成年女性约 60–65 mL/kg。输血决策应结合血流动力学、症状和实际 Hb，而非只看计算值。',
+ calc(){const w=num('#w'),k=num('#ebvk'),hi=num('#hi'),hf=num('#hf');if(!(w>0&&k>0&&hi>0&&hf>0&&hi>hf))return result('<strong>请检查输入</strong><span>初始 Hct 需高于可接受最低 Hct。</span>');const ebv=w*k,v=ebv*(hi-hf)/((hi+hf)/2);result('<strong>ABL 约 '+Math.round(v)+' mL</strong><span>估计血容量 EBV = '+Math.round(ebv)+' mL。</span>')}},
+braden:{src:['Nurs Res 1987','Braden 压力性损伤风险',PUB(3299278)],
+ form:()=>'<div class="formgrid">'+pick('b1','感知',[['1','完全受限'],['2','非常受限'],['3','轻度受限'],['4','无损害']])+pick('b2','潮湿',[['1','持续潮湿'],['2','经常潮湿'],['3','偶尔潮湿'],['4','很少潮湿']])+pick('b3','活动',[['1','卧床'],['2','坐椅'],['3','偶尔步行'],['4','经常步行']])+pick('b4','移动',[['1','完全不能'],['2','非常受限'],['3','轻度受限'],['4','不受限']])+pick('b5','营养',[['1','非常差'],['2','可能不足'],['3','充足'],['4','良好']])+pick('b6','摩擦力和剪切力',[['1','有问题'],['2','潜在问题'],['3','无明显问题']])+'</div>',
+ note:'总分 6–23 分，分数越低风险越高。常用分层：≥19 无明显风险，15–18 轻度，13–14 中度，10–12 高度，≤9 极高度；原文以 ≤16 分为风险界值。各医院可能采用不同界值。',
+ calc(){const s=['#b1','#b2','#b3','#b4','#b5','#b6'].reduce((a,id)=>a+val(id),0);result('<strong>Braden '+s+' 分 · '+(s>=19?'无明显风险':s>=15?'轻度风险':s>=13?'中度风险':s>=10?'高度风险':'极高度风险')+'</strong><span>分数越低，压力性损伤风险越高。</span>')}},
+morse:{src:['Can J Aging 1989','Morse 跌倒风险评估',DOI('10.1017/S0714980800008576')],
+ form:()=>'<div class="formgrid">'+pick('m1','跌倒史（近3个月）',[['0','无'],['25','有']])+pick('m2','超过一个医学诊断',[['0','否'],['15','是']])+pick('m3','行走辅助',[['0','不需要/卧床/护士协助'],['15','拐杖、手杖或助行器'],['30','扶家具行走']])+pick('m4','静脉输液/留置针',[['0','否'],['20','是']])+pick('m5','步态',[['0','正常/卧床/轮椅'],['10','虚弱'],['20','受损']])+pick('m6','认知状态',[['0','能正确评估自身能力'],['15','高估自身能力或忘记限制']])+'</div>',
+ note:'总分 0–125 分。各机构分层界值不同，常用：0–24 低风险，25–44 中风险，≥45 高风险；请以本院护理制度为准。',
+ calc(){const s=['#m1','#m2','#m3','#m4','#m5','#m6'].reduce((a,id)=>a+val(id),0);result('<strong>Morse '+s+' 分 · '+(s>=45?'高风险':s>=25?'中风险':'低风险')+'</strong><span>按常用界值：0–24 低、25–44 中、≥45 高。</span>')}}
+};
+Object.keys(EXTRA).forEach(k=>{SRC[k]=EXTRA[k].src;});
 function openTool(k){const t=SRC[k];if(!t)return;$('#deyebrow').textContent=t[0];$('#dtitle').textContent=t[1];$('#dbody').innerHTML=body(k);$('#dlg').showModal();bind(k);$('#dbody input,#dbody select')?.focus({preventScroll:true})}
 function body(k){
  const grid=x=>'<div class="formgrid">'+x+'</div>';
+ if(EXTRA[k])return finish(k,wrap(EXTRA[k].form(),EXTRA[k].note));
  if(k==='bmi')return finish(k,wrap(grid(f('h','身高（cm）','step=".1"')+f('w','体重（kg）','step=".1"'))));
  if(k==='bsa')return finish(k,wrap(grid(f('h','身高（cm）','step=".1"')+f('w','体重（kg）','step=".1"'))));
  if(k==='ibw')return finish(k,wrap(grid(f('h','身高（cm）','step=".1"')+sel('sex','性别',[['m','男'],['f','女']])),'Devine 公式最初用于药物剂量相关体重估算；并非所有临床场景都应使用理想体重。'));
@@ -145,6 +231,7 @@ function newsScore(){
 function bind(k){
  const clear=$('#clear');if(clear)clear.onclick=()=>{$$('#dlg input').forEach(x=>{if(x.type==='checkbox')x.checked=false;else if(!x.hasAttribute('value'))x.value=''});const r=$('#res');if(r){r.hidden=true;r.innerHTML=''}};
  const go=$('#go');if(!go)return;
+ if(EXTRA[k]){if(clear)clear.addEventListener('click',()=>$$('#dbody select').forEach(x=>{x.value='';}));go.onclick=()=>{const missing=$$('#dbody select').filter(x=>x.value==='');if(missing.length)return result('<strong>请完成所有选择项</strong><span>还有 '+missing.length+' 项未选择：'+missing.map(x=>x.closest('label').firstChild.textContent).join('、')+'。</span>');EXTRA[k].calc();};return;}
  if(k==='bmi')go.onclick=()=>{if(!allPositive('#h','#w'))return result('<strong>请完整输入</strong>');const v=num('#w')/Math.pow(num('#h')/100,2),c=v<18.5?'偏低':v<25?'健康体重':v<30?'超重':v<35?'肥胖 I 级':v<40?'肥胖 II 级':'肥胖 III 级';result('<strong>'+v.toFixed(1)+' kg/m²</strong><span>CDC成人分类：'+c+'。BMI是筛查指标。</span>')};
  else if(k==='bsa')go.onclick=()=>{if(!allPositive('#h','#w'))return result('<strong>请完整输入</strong>');const v=Math.sqrt(num('#h')*num('#w')/3600);result('<strong>'+v.toFixed(3)+' m²</strong><span>Mosteller：BSA = √(身高cm × 体重kg / 3600)。</span>')};
  else if(k==='ibw')go.onclick=()=>{if(!allPositive('#h'))return result('<strong>请输入身高</strong>');const inch=num('#h')/2.54,base=$('#sex').value==='f'?45.5:50,v=base+2.3*(inch-60);result('<strong>'+v.toFixed(1)+' kg</strong><span>Devine理想体重估算。</span>')};
