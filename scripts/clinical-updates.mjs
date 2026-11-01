@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import {randomUUID} from 'node:crypto';
 import {canonical,caseKey,contentVersion,deriveClinicalState,emptyRevisions,fail,identityKey,metadataHash,
-  planClinicalPublication,proposalDigest,readInventory,recordFromIdentity,recordId,sha256,special,stableCaseId,utility} from './clinical-inventory.mjs';
+  planClinicalPublication,proposalDigest,readInventory,recordFromIdentity,recordId,removedCaseRecords,sha256,special,stableCaseId,utility} from './clinical-inventory.mjs';
 
 // Review text is local to the proposal, never copied into the version journal.
 function diff(before,after){
@@ -42,7 +42,15 @@ export function proposeClinicalUpdate(source,previousSource,inventory,{sourceCom
       review.push({recordId:row.recordId,sourceBodyDiff:diff(old.record.sourceBody??'',record.sourceBody??''),renderedDiff:diff(old.rendered,rendered)});
     }
   }
-  for(const key of state.keys.keys())if(!seen.has(key))fail('an existing identity was removed, renamed or reassigned; no automatic remapping');
+  // Cases the owner removed from the source keep their reserved IDs; their
+  // absence is not a change to review. Anything else missing is a remapping.
+  const seenIds=new Set([...seen].map(key=>state.keys.get(key)?.recordId).filter(Boolean)),removedNow=new Set();
+  for(const ids of removedCaseRecords(inventory.policy,state).values()){
+    const kept=ids.filter(id=>seenIds.has(id)).length;
+    if(kept&&kept!==ids.length)fail('a removed case must be deleted from the source as a whole');
+    if(!kept)for(const id of ids)removedNow.add(id);
+  }
+  for(const [key,row]of state.keys)if(!seen.has(key)&&!removedNow.has(row.recordId))fail('an existing identity was removed, renamed or reassigned; no automatic remapping');
   const names=new Set([...state.identities.values()].map(row=>row.name));
   let nextId=state.maxId+1;
   for(const {record,key,rendered,index}of newRecords.sort((a,b)=>a.key.localeCompare(b.key,'en'))){

@@ -37,7 +37,9 @@ test('a new disease copies the chapter structure of an existing complete case in
 }));
 
 test('a disease withdrawn earlier gets a separate new case; the old case and names stay untouched',()=>withCopy((directory,dir)=>{
-  const before=read(dir,'guke/胫骨平台骨折.json');
+  // Since 2026-11-01 the old withdrawn case is deleted from the source; its IDs and names stay reserved.
+  assert(!fs.existsSync(path.join(dir,'guke/胫骨平台骨折.json')));
+  const before=[];
   const result=scaffoldDisease({department:'骨科',group:'胫骨平台骨折',category:'创伤骨科',like:'股骨转子间骨折'},{directory});
   assert.equal(result.reusedWithdrawnGroup,true);assert.match(result.caseKey,/^complete-\d{8}$/);
   const after=read(dir,'guke/胫骨平台骨折.json');
@@ -45,7 +47,7 @@ test('a disease withdrawn earlier gets a separate new case; the old case and nam
   const added=after.slice(before.length);
   assert.equal(added.length,30);
   assert(added.every(r=>r.completeCaseKey===result.caseKey&&r.name.startsWith('胫骨平台骨折（完整病例） · ')));
-  assert(!added.some(r=>before.some(old=>old.name===r.name)));
+  assert(!added.some(r=>r.name==='胫骨平台骨折 · 入院记录'),'reserved names of the removed case are not reused');
   assert(read(dir,'index.json').traumaGroups.includes('胫骨平台骨折'));
   assert.equal(loadClinicalJsonSource({directory}).records.filter(r=>r.group==='胫骨平台骨折').length,after.length);
 }));

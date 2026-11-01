@@ -154,12 +154,43 @@ export function deriveClinicalState(inventory){
   return {identities,versions,keys,cases,maxId,revision:revisionFor(anchor,journal)};
 }
 
+// caseId -> recordIds of withdrawn cases that the owner authorized deleting from
+// the source data. Only an explicit, fully named withdrawal can be removed.
+export function removedCaseRecords(policy,state){
+  const out=new Map();
+  if(!Array.isArray(policy.withdrawals??[]))fail('withdrawals must be an array');
+  for(const decision of policy.withdrawals??[]){
+    const removal=decision.removedFromSource;
+    if(removal===undefined)continue;
+    if(!removal||typeof removal!=='object'||decision.status!=='withdrawn'
+      ||['reason','authorizedBy','authorizationReference'].some(key=>typeof removal[key]!=='string'||!removal[key].trim()))
+      fail('removing a case from the source needs an explicit authorization on its withdrawal');
+    const item=state.cases.get(decision.caseId);
+    if(!item||item.caseType!=='standard'||!Array.isArray(decision.recordIds)||decision.recordIds.length!==item.recordIds.length
+      ||decision.recordIds.some(id=>!item.recordIds.includes(id)))fail('removal must name every document of a withdrawn standard case');
+    out.set(decision.caseId,[...decision.recordIds]);
+  }
+  return out;
+}
+
 // The original numeric ID is a value in a committed ledger, never today's array
 // position. Reordering generated objects cannot rebind bodies, links or CMS names.
 export function planClinicalPublication(source,inventory=readInventory(),{cmsAudit=null}={}){
   const {baseline,policy}=inventory;
   const state=deriveClinicalState(inventory);
-  if(state.identities.size!==source.records.length)fail('record count changed; review the identity ledger before publishing');
+  // A withdrawn case whose decision also carries an authorized `removedFromSource`
+  // may be deleted from the source data. Its permanent IDs stay reserved in the
+  // ledger (never reused); re-adding the disease later creates a new case.
+  // Historical sources that still hold it remain plannable (it stays withdrawn).
+  const removable=removedCaseRecords(policy,state);
+  const present=new Set(source.records.map(record=>state.keys.get(identityKey(record))?.recordId).filter(Boolean));
+  const removed=new Set();
+  for(const ids of removable.values()){
+    const kept=ids.filter(id=>present.has(id)).length;
+    if(kept&&kept!==ids.length)fail('a removed case must be deleted from the source as a whole');
+    if(!kept)for(const id of ids)removed.add(id);
+  }
+  if(state.identities.size-removed.size!==source.records.length)fail('record count changed; review the identity ledger before publishing');
   if(!source.renderedBodies||source.renderedBodies.length!==source.records.length)fail('capture rendered medical text before publishing');
   const entries=source.records.map((record,index)=>{
     const row=state.keys.get(identityKey(record)),version=row&&state.versions.get(row.recordId),actual=contentVersion(record,source.renderedBodies[index]);
@@ -169,7 +200,7 @@ export function planClinicalPublication(source,inventory=readInventory(),{cmsAud
     return {record,identity:row,content:version};
   });
   const seen=new Set(entries.map(entry=>entry.identity.recordId));
-  if(seen.size!==state.identities.size)fail('the generated source omits or repeats an identity');
+  if(seen.size!==source.records.length||[...state.identities.keys()].some(id=>!seen.has(id)&&!removed.has(id)))fail('the generated source omits or repeats an identity');
   const {cases}=state;
   const decisions=policy.decisions;
   if(!Array.isArray(decisions))fail('publication decisions must be an array');
@@ -214,5 +245,6 @@ export function planClinicalPublication(source,inventory=readInventory(),{cmsAud
   const published=entries.filter(entry=>!archived.has(entry.identity.recordId)&&!withdrawn.has(entry.identity.recordId))
     .sort((a,b)=>a.identity.legacyId-b.identity.legacyId);
   return {baseline,state,published,archived:entries.filter(entry=>archived.has(entry.identity.recordId)),
-    withdrawn:entries.filter(entry=>withdrawn.has(entry.identity.recordId)),replacements};
+    withdrawn:entries.filter(entry=>withdrawn.has(entry.identity.recordId)),replacements,
+    removed:[...removed].map(id=>state.identities.get(id)).sort((a,b)=>a.legacyId-b.legacyId)};
 }

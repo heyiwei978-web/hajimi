@@ -26,7 +26,8 @@ test('compiled catalogs and per-disease bodies preserve every retained clinical 
     for(const [id,body]of JSON.parse(fs.readFileSync(path.join(directory,file.slice(1)),'utf8')))records[id].sourceBody=body;
   }
   const newDischargeRounds=source.records.filter(r=>r.department==='骨科'&&r.short==='出院当天查房记录');
-  assert.ok(newDischargeRounds.length>=200,'Every orthopedic model patient needs a discharge-day round');
+  // 8 retained standard orthopedic cases + 2 TKA special cases (withdrawn cases were removed 2026-11-01).
+  assert.ok(newDischargeRounds.length>=10,'Every orthopedic model patient needs a discharge-day round');
   assert.equal(records.filter(Boolean).length,publication.published.length);
   // Convert cross-context objects before comparison; all public fields, flags,
   // special-case ordering and every body must survive the data split unchanged.

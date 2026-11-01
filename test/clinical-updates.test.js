@@ -99,7 +99,9 @@ test('renames, case reassignment, non-body metadata edits, removals and new ambi
 });
 
 test('both special cases and the three same-name TKA records keep their exact ownership and CMS keys',()=>{
-  const ids=[5159,5359,5360],{source,next}=changed(5359),updated=next(),plan=planClinicalPublication(source,updated);
+  // Source positions are no longer legacy IDs once withdrawn cases were removed.
+  const at=id=>current.plan.published.findIndex(entry=>entry.identity.legacyId===id);
+  const ids=[5159,5359,5360],{source,next}=changed(current.source.records.indexOf(current.plan.published[at(5359)].record)),updated=next(),plan=planClinicalPublication(source,updated);
   for(const id of ids){
     const actual=plan.published.find(entry=>entry.identity.legacyId===id);
     const previous=current.plan.published.find(entry=>entry.identity.legacyId===id);
