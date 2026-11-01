@@ -1459,3 +1459,47 @@ test('clavicle complete case shows corrected chronology and exact chapter copyin
   }finally{await context.close();}
  }
 });
+
+test('orthopaedic and perioperative calculators return hand-checked results',async()=>{
+  const {page,context,errors}=await pageFor(1440);
+  try{
+    await page.goto(base+'/tools',{waitUntil:'networkidle'});
+    const run=async(tool,steps,expect)=>{
+      await page.locator('.card[data-tool="'+tool+'"]').click();
+      const dlg=page.locator('#dlg');await dlg.waitFor({state:'visible'});
+      assert.match(await dlg.locator('.cite a').getAttribute('href'),/^https:\/\//,tool+' cites an https source');
+      for(const [kind,target,value] of steps){
+        if(kind==='sel')await dlg.locator('#'+target).selectOption(value);
+        else if(kind==='fill')await dlg.locator('#'+target).fill(String(value));
+        else if(kind==='id')await dlg.locator('#'+target).check();
+        else await dlg.locator('label.check').filter({hasText:target}).first().locator('input').check();
+      }
+      await dlg.locator('#go').click();
+      const text=await dlg.locator('#res').innerText();
+      for(const pattern of expect)assert.match(text,pattern,tool+': '+text);
+      await dlg.locator('#close').click();
+    };
+    await run('caprini',[['sel','age','2'],['chk','择期下肢大关节置换'],['chk','恶性肿瘤（现患或既往）']],[/Caprini 9 分/,/高危/]);
+    await run('padua',[['chk','活动性肿瘤'],['chk','年龄 ≥70岁']],[/Padua 4 分/,/高风险/]);
+    await run('hasbled',[['chk','卒中史'],['chk','年龄 >65岁'],['chk','抗血小板药或 NSAID']],[/HAS-BLED 3 分/,/出血高风险/]);
+    await run('nhfs',[['sel','age','3'],['chk','男性'],['chk','入院血红蛋白']],[/NHFS 5 分/]);
+    await run('mess',[['sel','inj','3'],['sel','isc','2'],['id','long'],['sel','shk','1'],['sel','age','2']],[/MESS 10 分/,/缺血分 4/]);
+    await run('mirels',[['sel','site','3'],['sel','pain','3'],['sel','les','3'],['sel','size','2']],[/Mirels 11 分/,/预防性内固定/]);
+    await run('sins',[['sel','loc','3'],['sel','pain','3'],['sel','les','2'],['sel','ali','0'],['sel','col','2'],['sel','pl','1']],[/SINS 11 分/,/潜在不稳定/]);
+    await run('stopbang',[['id','s1'],['id','s2'],['id','b4']],[/STOP-Bang 3 分/,/OSA 高风险/]);
+    await run('apfel',[['chk','女性'],['chk','非吸烟者']],[/Apfel 2 分/,/39%/]);
+    await run('charlson',[['sel','dm','2'],['sel','liver','0'],['sel','tumor','0'],['chk','心肌梗死'],['sel','age','3']],[/CCI 3 分/,/年龄校正 CCI：6 分/]);
+    await run('gcs',[['sel','e','3'],['sel','v','4'],['sel','m','5']],[/GCS 12 分（E3V4M5）/]);
+    await run('ottawaankle',[['id','ma'],['id','lm']],[/建议拍片：踝关节系列/]);
+    await run('ottawaankle',[['id','ma']],[/规则阴性/]);
+    await run('ottawaknee',[['id','k1']],[/建议膝关节 X 线/]);
+    await run('parkland',[['fill','w',70],['fill','tbsa',30]],[/24 小时 8400 mL/,/前 8 小时 4200 mL（约 525 mL\/h）/]);
+    await run('abl',[['fill','w',70],['fill','hi',40],['fill','hf',30]],[/ABL 约 1400 mL/,/EBV = 4900 mL/]);
+    await run('braden',[['sel','b1','1'],['sel','b2','1'],['sel','b3','1'],['sel','b4','1'],['sel','b5','1'],['sel','b6','1']],[/Braden 6 分/,/极高度风险/]);
+    await run('morse',[['sel','m1','25'],['sel','m2','15'],['sel','m3','15'],['sel','m4','0'],['sel','m5','10'],['sel','m6','0']],[/Morse 65 分/,/高风险/]);
+    // Untouched score items are never counted: the calculator asks for them instead.
+    await run('sins',[['sel','loc','3']],[/请完成所有选择项/,/还有 5 项未选择/]);
+    assert.equal(await page.locator('.card[data-tool]').count(),71);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
