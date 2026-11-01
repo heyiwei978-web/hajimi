@@ -1547,3 +1547,34 @@ test('emergency and critical-care calculators return hand-checked results',async
     assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
+
+test('特殊检查 column offers grouped order reasons beside chronic conditions on phone and desktop',async()=>{
+  for(const width of [375,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+      const exams=page.locator('#specialExamPanel');await exams.waitFor();
+      assert.equal(await exams.locator('input[data-exam]').count(),18);
+      if(width>=1100){
+        const [a,b]=await Promise.all([page.locator('#comorbidityPanel').boundingBox(),exams.boundingBox()]);
+        assert(b.x>=a.x+a.width-1,'特殊检查 sits beside the chronic-condition options');
+      }
+      const first=page.locator('.case-file-reader > .record-book-section').first().locator('.record-book-body');
+      const baseline=await first.textContent();
+      await exams.locator('.special-exam-group summary').first().click();
+      await exams.locator('input[data-exam="mri-head"]').check();
+      const side=page.locator('#comorbiditySide');
+      if(width<1280)await page.locator('#openComorbiditySide').click();
+      await side.waitFor({state:'visible'});
+      assert.equal(await side.locator('.comorbidity-stage-tabs').isVisible(),false,'no stage buttons without chronic conditions');
+      assert.match(await side.locator('#comorbidityNotes').innerText(),/头颅 MRI[\s\S]*申请理由/);
+      await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.__examCopy=value;}}}));
+      await side.locator('[data-copy-box="x~mri-head:reason"]').click();
+      await page.waitForFunction(()=>typeof window.__examCopy==='string');
+      assert.match(await page.evaluate(()=>window.__examCopy),/头颅MRI/);
+      assert.equal(await first.textContent(),baseline,'original record text is untouched');
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});

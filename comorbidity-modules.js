@@ -52,6 +52,14 @@
       discharge:'核对吸入药使用方法与用药方案，交代呼吸症状恶化警示、戒烟建议及呼吸科随访。'}
   ];
   const chosen=new Set();
+  // 特殊检查 / 用药 / 会诊理由：数据在 special-exams.js，选择与慢性病分开保存。
+  const exams=new Set();
+  const examFields=[['reason','申请理由（可改用）'],['record','需写明'],['caution','注意']];
+  const examFieldTitle=Object.fromEntries(examFields);
+  function examItems(){return (root.HAJIMI_SPECIAL_ITEMS||[]);}
+  function getExam(id){return examItems().find(item=>item.id===id);}
+  function selectedExams(){return examItems().filter(item=>exams.has(item.id));}
+  function examCategories(){return [...new Set(examItems().map(item=>item.cat))];}
   const get=id=>modules.find(item=>item.id===id);
   // This is a separate, opt-in writing resource, NOT a patch of the sample case.
   // Existing cases often explicitly deny chronic conditions: mixing the text
@@ -132,33 +140,76 @@
     return 'admission';
   }
   function separateText(){
-    return selectedItems().map(item=>
-      '【'+item.name+'｜独立补充模块】\n'+
-      allFields.map(([field,title])=>title+'：'+textOf(item,field)).join('\n\n')
-    ).join('\n\n========================================\n\n');
+    return [
+      ...selectedItems().map(item=>
+        '【'+item.name+'｜独立补充模块】\n'+
+        allFields.map(([field,title])=>title+'：'+textOf(item,field)).join('\n\n')),
+      ...selectedExams().map(item=>
+        '【'+item.name+'｜'+item.cat+'】\n'+
+        examFields.map(([field,title])=>title+'：'+item[field]).join('\n\n'))
+    ].join('\n\n========================================\n\n');
   }
   function boxText(id,field){
+    if(String(id).startsWith('x~')){
+      const exam=getExam(String(id).slice(2));
+      return exam&&examFieldTitle[field]?String(exam[field]):'';
+    }
     const item=get(id);
     return item&&fieldTitle[field]?textOf(item,field):'';
+  }
+  function boxLabel(id,field){
+    if(String(id).startsWith('x~')){const exam=getExam(String(id).slice(2));return exam?exam.name+' · '+examFieldTitle[field]:'';}
+    const item=get(id);return item?item.name+' · '+fieldTitle[field]:'';
+  }
+  function renderExams(){
+    const items=selectedExams();
+    if(!items.length)return '';
+    return '<section class="special-exam-notes" aria-label="特殊检查与用药理由"><h4 class="special-exam-notes-title">特殊检查 · 用药 · 会诊理由<small>不随章节切换</small></h4>'+
+      items.map(item=>'<article class="comorbidity-detail special-exam-detail" data-exam-item="'+item.id+'"><h4>'+escape(item.name)+'<small>'+escape(item.cat)+'</small></h4>'+
+        examFields.map(([field,title])=>'<div class="comorbidity-box"><div class="comorbidity-box-head"><strong>'+escape(title)+'</strong>'+
+          '<button class="btn ghost comorbidity-box-copy" type="button" data-copy-box="x~'+item.id+':'+field+'" aria-label="复制'+escape(item.name+'：'+title)+'">复制</button></div>'+
+          '<p>'+escape(item[field])+'</p></div>').join('')+
+        '</article>').join('')+'</section>';
   }
   function renderSelected(stageId=stage){
     const items=selectedItems();
     const current=stageById[stageId]||stageById.admission;
-    if(!items.length)return '<p class="comorbidity-empty">尚未选择慢性病。勾选后，这里会出现对应的补充内容框。</p>';
+    const extra=renderExams();
+    if(!items.length)return extra||'<p class="comorbidity-empty">尚未选择慢性病或特殊检查。勾选后，这里会出现对应的补充内容框。</p>';
     return items.map(item=>'<article class="comorbidity-detail" data-comorbidity-item="'+item.id+'"><h4>'+escape(item.name)+'</h4>'+
       current.fields.map(field=>'<div class="comorbidity-box"><div class="comorbidity-box-head"><strong>'+escape(fieldTitle[field])+'</strong>'+
         '<button class="btn ghost comorbidity-box-copy" type="button" data-copy-box="'+item.id+':'+field+'" aria-label="复制'+escape(item.name+'：'+fieldTitle[field])+'">复制</button></div>'+
         '<p>'+escape(textOf(item,field))+'</p></div>').join('')+
-      '</article>').join('');
+      '</article>').join('')+extra;
   }
   // Intentionally identity-only; prevent source text and full-record copy from
   // gaining contradictory claims when a sample patient denies a condition.
   function compose(record,original){return original;}
   // The option bar shown above the record.
+  // The 特殊检查 column beside the chronic-condition options.
+  function examHtml(){
+    if(!examItems().length)return '';
+    return '<section id="specialExamPanel" class="comorbidity-panel special-exam-picker" aria-labelledby="specialExamTitle">'+
+      '<div class="comorbidity-head"><div><span class="case-file-eyebrow">ORDER REASONS</span><h3 id="specialExamTitle">特殊检查（可多选）</h3>'+
+      '<p>影像、其他检查、用药及会诊的申请理由。勾选后出现在病历旁的补充内容框中，可单独复制。</p></div>'+
+      '<button id="clearExams" class="btn ghost" type="button">清空选择</button></div>'+
+      examCategories().map(cat=>{
+        const list=examItems().filter(item=>item.cat===cat);
+        return '<details class="special-exam-group"><summary><span>'+escape(cat)+'</span><small data-exam-count="'+escape(cat)+'">'+list.length+' 项</small></summary>'+
+          '<div class="comorbidity-grid special-exam-grid">'+list.map(item=>
+            '<label class="comorbidity-choice"><input type="checkbox" data-exam="'+item.id+'"'+(exams.has(item.id)?' checked':'')+'><span>'+escape(item.name)+'</span></label>'
+          ).join('')+'</div></details>';
+      }).join('')+
+      '<p class="comorbidity-caution">申请理由为教学参考写法，【】处须按患者实际症状、检查结果和本院规定填写；是否申请由主管医师判断。</p>'+
+      '</section>';
+  }
   function html(){
+    return '<div class="supplement-pickers">'+comorbidityHtml()+examHtml()+'</div>';
+  }
+  function comorbidityHtml(){
     return '<section id="comorbidityPanel" class="comorbidity-panel comorbidity-picker" aria-labelledby="comorbidityTitle">'+
       '<div class="comorbidity-head"><div><span class="case-file-eyebrow">OPTIONAL COMORBIDITIES</span><h3 id="comorbidityTitle">合并慢性病（可多选）</h3>'+
-      '<p>勾选后，病历旁出现对应的补充内容框（手机上点右下角“慢性病补充”打开），随阅读章节自动切换入院、第1天查房、第2天会诊申请、会诊记录、第3天调整、术前、术后、出院内容，可单独复制。</p></div>'+
+      '<p>勾选后，病历旁出现对应的补充内容框（手机上点右下角“补充内容”打开），随阅读章节自动切换入院、第1天查房、第2天会诊申请、会诊记录、第3天调整、术前、术后、出院内容，可单独复制。</p></div>'+
       '<button id="clearComorbidities" class="btn ghost" type="button">清空选择</button></div>'+
       '<div class="comorbidity-grid">'+modules.map(item=>
         '<label class="comorbidity-choice"><input type="checkbox" data-comorbidity="'+item.id+'"'+(chosen.has(item.id)?' checked':'')+'><span>'+escape(item.name)+'</span></label>'
@@ -169,18 +220,18 @@
   // The supplement panel beside the record (bottom sheet on narrow screens).
   function sideHtml(){
     return '<aside id="comorbiditySide" class="comorbidity-side" aria-labelledby="comorbiditySideTitle" hidden>'+
-      '<div class="comorbidity-side-head"><div><span class="case-file-eyebrow">CHRONIC CONDITIONS</span><h3 id="comorbiditySideTitle" tabindex="-1">慢性病补充内容</h3>'+
-      '<span id="comorbiditySelectionStatus" role="status">'+chosen.size+' 项已选择</span></div>'+
+      '<div class="comorbidity-side-head"><div><span class="case-file-eyebrow">SUPPLEMENTS</span><h3 id="comorbiditySideTitle" tabindex="-1">补充内容</h3>'+
+      '<span id="comorbiditySelectionStatus" role="status">'+(chosen.size+exams.size)+' 项已选择</span></div>'+
       '<button id="closeComorbiditySide" class="btn ghost comorbidity-side-close" type="button">收起</button></div>'+
       '<div class="comorbidity-stage-tabs" role="group" aria-label="补充内容对应阶段">'+stages.map(item=>
         '<button type="button" data-comorbidity-stage="'+item.id+'" aria-pressed="'+(item.id===stage)+'">'+item.label+'</button>'
       ).join('')+'</div>'+
       '<p class="comorbidity-follow"><span id="comorbidityFollowText"></span><button id="comorbidityFollow" class="comorbidity-follow-btn" type="button" hidden>跟随阅读章节</button></p>'+
       '<div id="comorbidityNotes" class="comorbidity-notes">'+renderSelected()+'</div>'+
-      '<div class="comorbidity-actions"><button id="copyComorbidities" class="btn primary" type="button"'+(chosen.size?'':' disabled')+'>复制已选全部补充</button></div>'+
+      '<div class="comorbidity-actions"><button id="copyComorbidities" class="btn primary" type="button"'+(chosen.size+exams.size?'':' disabled')+'>复制已选全部补充</button></div>'+
       '<p class="comorbidity-footer">检查结果、用药、处理结论须核对；不会修改原始病历或“复制完整病历”的内容。</p>'+
       '</aside>'+
-      '<button id="openComorbiditySide" class="comorbidity-fab" type="button" aria-controls="comorbiditySide" aria-expanded="false" hidden>慢性病补充 <b id="comorbidityFabCount">0</b></button>';
+      '<button id="openComorbiditySide" class="comorbidity-fab" type="button" aria-controls="comorbiditySide" aria-expanded="false" hidden>补充内容 <b id="comorbidityFabCount">0</b></button>';
   }
   async function copyValue(value){
     if(!value)return false;
@@ -195,7 +246,7 @@
   function redraw(){
     if(!view||!view.side.isConnected)return;
     const {side,workspace,notes,status,copy,fab,fabCount,tabs,followText,followButton}=view;
-    const count=chosen.size;
+    const count=chosen.size+exams.size;
     side.hidden=count===0;
     workspace?.classList.toggle('has-comorbidity-side',count>0);
     if(count===0)sheetOpen=false;
@@ -206,6 +257,10 @@
     status.textContent=count+' 项已选择';
     copy.disabled=count===0;
     tabs.forEach(tab=>tab.setAttribute('aria-pressed',String(tab.dataset.comorbidityStage===stage)));
+    // Stage buttons only apply to chronic-condition supplements.
+    const stageBar=side.querySelector?.('.comorbidity-stage-tabs'),followBar=side.querySelector?.('.comorbidity-follow');
+    if(stageBar)stageBar.hidden=chosen.size===0;
+    if(followBar)followBar.hidden=chosen.size===0;
     const label=stageById[stage].label;
     followText.textContent=follow
       ?(chapter?.title?'正在阅读「'+chapter.title+'」→ 显示'+label+'内容':'显示'+label+'内容，随阅读章节自动切换')
@@ -213,7 +268,7 @@
     followButton.hidden=follow;
     // Rebuild the boxes only when their content changes, so scrolling within the
     // same stage keeps keyboard focus on a copy button.
-    const key=stage+'|'+[...chosen].join(',');
+    const key=stage+'|'+[...chosen].join(',')+'|'+[...exams].join(',');
     if(key!==drawn){drawn=key;notes.innerHTML=renderSelected();}
   }
   function setOpen(open){
@@ -252,6 +307,19 @@
       panel.querySelectorAll('[data-comorbidity]').forEach(input=>{input.checked=false;});
       redraw();
     });
+    const examPanel=document.getElementById('specialExamPanel');
+    if(examPanel){
+      examPanel.querySelectorAll('[data-exam]').forEach(input=>input.addEventListener('change',()=>{
+        if(input.checked)exams.add(input.dataset.exam);
+        else exams.delete(input.dataset.exam);
+        redraw();
+      }));
+      examPanel.querySelector('#clearExams')?.addEventListener('click',()=>{
+        exams.clear();
+        examPanel.querySelectorAll('[data-exam]').forEach(input=>{input.checked=false;});
+        redraw();
+      });
+    }
     current.tabs.forEach(tab=>tab.addEventListener('click',()=>{
       stage=tab.dataset.comorbidityStage;follow=false;redraw();
     }));
@@ -264,12 +332,12 @@
       if(!button)return;
       const [id,field]=button.dataset.copyBox.split(':');
       const ok=await copyValue(boxText(id,field));
-      current.status.textContent=ok?'已复制：'+get(id).name+' · '+fieldTitle[field]:'复制失败，请核对浏览器权限';
+      current.status.textContent=ok?'已复制：'+boxLabel(id,field):'复制失败，请核对浏览器权限';
     });
     current.copy.addEventListener('click',async()=>{
       const value=separateText();if(!value)return;
       const ok=await copyValue(value);
-      current.status.textContent=ok?'已复制 '+chosen.size+' 项补充资料':'复制失败，请核对浏览器权限';
+      current.status.textContent=ok?'已复制 '+(chosen.size+exams.size)+' 项补充资料':'复制失败，请核对浏览器权限';
     });
     // Each newly opened record starts by following its own chapters.
     sheetOpen=false;follow=true;stage=stageFor(chapter);drawn='';
@@ -277,6 +345,6 @@
   }
   root.HAJIMI_COMORBIDITIES=Object.freeze({
     modules,stages,compose,html,sideHtml,bind,setChapter,stageFor,renderSelected,separateText,boxText,
-    selected:()=>[...chosen],stage:()=>stage
+    selected:()=>[...chosen],selectedExams:()=>[...exams],stage:()=>stage
   });
 })(typeof window!=='undefined'?window:globalThis);
