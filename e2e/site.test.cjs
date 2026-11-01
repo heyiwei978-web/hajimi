@@ -1554,7 +1554,7 @@ test('特殊检查 column offers grouped order reasons beside chronic conditions
     try{
       await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
       const exams=page.locator('#specialExamPanel');await exams.waitFor();
-      assert.equal(await exams.locator('input[data-exam]').count(),25);
+      assert.equal(await exams.locator('input[data-exam]').count(),18);
       if(width>=1100){
         const [a,b]=await Promise.all([page.locator('#comorbidityPanel').boundingBox(),exams.boundingBox()]);
         assert(b.x>=a.x+a.width-1,'特殊检查 sits beside the chronic-condition options');
