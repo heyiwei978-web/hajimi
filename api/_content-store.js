@@ -7,6 +7,7 @@ const PREFIX='cms/history/';
 const EMPTY_REVISION='missing';
 const MAX_BYTES=1500000;
 const isObject=value=>!!value&&typeof value==='object'&&!Array.isArray(value);
+const strongEtag=etag=>String(etag).replace(/^W\//,'');
 export class ContentError extends Error {
   constructor(status,message){super(message);this.status=status;}
 }
@@ -48,7 +49,9 @@ export function createContentStore(storage=blob,{currentPath=CURRENT,historyPref
     if(!Array.isArray(history)||history.some(item=>!isObject(item)||!/^\d{13}-[a-f0-9-]{36}$/.test(item.id))){
       throw new ContentError(503,'修改历史格式异常，已停止修改');
     }
-    return {data,revision:result.blob.etag,history,updatedAt:document._updatedAt||null};
+    // A compressed read can return a weak tag (W/"…"); conditional writes only
+    // accept the stored strong tag, so keep the strong form as the revision.
+    return {data,revision:strongEtag(result.blob.etag),history,updatedAt:document._updatedAt||null};
   }
   async function snapshot(current,user,action){
     const now=new Date().toISOString();
