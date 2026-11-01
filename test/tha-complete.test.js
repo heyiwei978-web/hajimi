@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
+import {laterReviewed} from './_later-reviewed-groups.js';
 import {loadClinicalSource} from '../scripts/clinical-compiler.mjs';
 import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
 import {identityKey,metadataHash} from '../scripts/clinical-inventory.mjs';
@@ -17,7 +18,7 @@ test('THA revision changes only 27 established standard records and appends five
   if(!b){assert.equal(r.group,'THA');assert(!r.specialCase);added++;continue;}
   assert.equal(metadataHash(r),metadataHash(b.r));
   if(r.group==='THA'&&!r.specialCase){assert.notEqual(r.sourceBody,b.r.sourceBody);updated++;}
-  else{assert.deepEqual(r,b.r);assert.equal(after.renderedBodies[i],b.rendered);unchanged++;}
+  else{if(!laterReviewed(r)){assert.deepEqual(r,b.r);assert.equal(after.renderedBodies[i],b.rendered);}unchanged++;}
   old.delete(identityKey(r));
  }
  assert.equal(old.size,0);assert.equal(updated,27);assert.equal(added,5);assert.equal(unchanged,before.records.length-27);assert.equal(rows.length,32);

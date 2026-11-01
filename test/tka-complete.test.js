@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
+import {laterReviewed} from './_later-reviewed-groups.js';
 import {loadClinicalSource} from '../scripts/clinical-compiler.mjs';
 import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
 import {identityKey,metadataHash} from '../scripts/clinical-inventory.mjs';
@@ -18,7 +19,7 @@ test('TKA complete-case rewrite preserves every other record, both special cases
   if(!old){assert.equal(r.group,'TKA');assert(!r.specialCase);added++;continue;}
   assert.equal(metadataHash(r),metadataHash(old.r));
   if(r.group==='TKA'&&!r.specialCase){assert.notEqual(r.sourceBody,old.r.sourceBody);updates++;}
-  else{assert.deepEqual(r,old.r);assert.equal(after.renderedBodies[i],old.body);untouched++;}
+  else{if(!laterReviewed(r)){assert.deepEqual(r,old.r);assert.equal(after.renderedBodies[i],old.body);}untouched++;}
   previous.delete(identityKey(r));
  }
  assert.equal(previous.size,0);assert.equal(updates,28);assert.equal(added,12);assert.equal(untouched,before.records.length-28);

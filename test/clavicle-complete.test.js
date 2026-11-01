@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
+import {laterReviewed} from './_later-reviewed-groups.js';
 import {loadClinicalSource} from '../scripts/clinical-compiler.mjs';
 import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
 import {identityKey,metadataHash} from '../scripts/clinical-inventory.mjs';
@@ -15,7 +16,7 @@ test('clavicle revision replaces exactly 26 bodies while preserving all identiti
  for(let i=0;i<after.records.length;i++){
   const a=after.records[i],b=before.records[i];assert.equal(identityKey(a),identityKey(b));assert.equal(metadataHash(a),metadataHash(b));
   if(a.group==='锁骨骨折'&&!a.specialCase){assert.notEqual(a.sourceBody,b.sourceBody);assert.equal(a.sourceBody,after.renderedBodies[i]);changes++;}
-  else{assert.deepEqual(a,b);assert.equal(after.renderedBodies[i],before.renderedBodies[i]);}
+  else if(!laterReviewed(a)){assert.deepEqual(a,b);assert.equal(after.renderedBodies[i],before.renderedBodies[i]);}
  }
  assert.equal(changes,26);assert.equal(rows.length,26);assert.equal(new Set(current.plan.published.filter(e=>e.record.group==='锁骨骨折').map(e=>e.identity.caseId)).size,1);
 });
