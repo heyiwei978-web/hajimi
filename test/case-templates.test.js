@@ -33,8 +33,8 @@ test('whole-case counts are available before lazy catalogs load and never use th
   const context={window:{HAJIMI:{manifest:{total:348,caseTemplates:catalog}}},templates:[],labelFor:g=>g};
   vm.runInNewContext(source.slice(start,end)+'\nglobalThis.countCases=caseTotals;',context);
   assert.equal(context.countCases().total,14);
-  assert.equal(context.countCases('骨科').total,10);
-  assert.equal(context.countCases('骨科').standard,8);
+  assert.equal(context.countCases('骨科').total,11);
+  assert.equal(context.countCases('骨科').standard,9);
   assert.equal(context.countCases('骨科').special,2);
   for(const name of ['普外科','肾内科','妇科'])assert.equal(context.countCases(name).total,1);
   assert.equal(context.countCases('骨科',['通用场景']).total,0);

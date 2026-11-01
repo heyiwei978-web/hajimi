@@ -84,9 +84,12 @@ test('published catalogs, seeds and downloadable bodies contain no withdrawn doc
     assert(!publicIds.includes(identity.legacyId));
     assert(!bodies.has(identity.legacyId));
     // A withdrawn disease may return only as a separately reviewed new case.
-    if(!LATER_ADDED_GROUPS.has(record.group))assert(!manifest.groups.includes(record.group));
-    assert(!Object.hasOwn(manifest.seeds,record.group));
-    assert(!Object.hasOwn(manifest.bodies,record.department+'\0'+record.group));
+    // Its group-level files then belong to the new case; the withdrawn IDs above stay unpublished.
+    if(!LATER_ADDED_GROUPS.has(record.group)){
+      assert(!manifest.groups.includes(record.group));
+      assert(!Object.hasOwn(manifest.seeds,record.group));
+      assert(!Object.hasOwn(manifest.bodies,record.department+'\0'+record.group));
+    }
   }
   for(const {record,identity}of publication.published){
     assert(publicIds.includes(identity.legacyId));
