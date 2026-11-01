@@ -66,13 +66,13 @@ test('template totals count complete cases before and after catalogs load; utili
     const {page,context,errors}=await pageFor(width);
     try{
       await page.goto(base+'/bl',{waitUntil:'networkidle'});
-      assert.equal(await page.locator('#templateCount').innerText(),'13');
+      assert.equal(await page.locator('#templateCount').innerText(),'14');
       assert.equal(await page.evaluate(()=>templates.length),0,'complete-case totals do not require chapter loading');
-      assert.match(await page.locator('#resultCount').innerText(),/13 套完整病历模板/);
-      assert.match(await page.locator('[data-department="骨科"]').innerText(),/10 套/);
+      assert.match(await page.locator('#resultCount').innerText(),/14 套完整病历模板/);
+      assert.match(await page.locator('[data-department="骨科"]').innerText(),/11 套/);
       await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
-      assert.equal(await page.locator('#templateCount').innerText(),'10');
-      assert.deepEqual(await page.locator('.ortho-stats strong').allTextContents(),['10','8','2','1']);
+      assert.equal(await page.locator('#templateCount').innerText(),'11');
+      assert.deepEqual(await page.locator('.ortho-stats strong').allTextContents(),['11','9','2','1']);
       assert.doesNotMatch(await page.locator('#resultCount').innerText(),/5030|份模板/);
       assert.doesNotMatch(await page.locator('.ortho-category-head').allTextContents().then(xs=>xs.join(' ')),/份模板/);
       await page.goto(base+'/bl/puwai',{waitUntil:'networkidle'});
@@ -632,7 +632,7 @@ test('every orthopedic card keeps both borders inside its category on phones and
   for(const width of [320,375,393,768,1280,1440,1920]) {
     const {page,context,errors}=await pageFor(width);
     try {await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
-      assert.equal(await page.locator('.ortho-disease-card').count(),9);
+      assert.equal(await page.locator('.ortho-disease-card').count(),10);
       const categories=page.locator('.ortho-category');
       for(let i=0;i<await categories.count();i++) {
         await categories.nth(i).scrollIntoViewIfNeeded();await settle(page);
@@ -720,7 +720,7 @@ test('cross-department search groups templates into complete case files; filters
     const search=page.getByRole('textbox',{name:'搜索病历模板'});
     await search.fill('肝脓肿');
     await page.waitForFunction(()=>document.querySelector('#resultTitle').textContent.includes('搜索结果'));
-    assert.equal(await page.evaluate(()=>templates.length),308);
+    assert.equal(await page.evaluate(()=>templates.length),348);
     assert.equal(await page.locator('.case-search-card').count(),1,'one case entry per disease, not fragmented records');
     assert.match(await page.locator('.case-search-card').first().innerText(),/肝脓肿/);
     assert(await page.locator('.case-search-card').evaluateAll(cards=>cards.every(card=>{

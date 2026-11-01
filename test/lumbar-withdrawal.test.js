@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import vm from 'node:vm';
 import test from 'node:test';
+import {LATER_ADDED_GROUPS} from './_later-reviewed-groups.js';
 import {pathToFileURL} from 'node:url';
 import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
 import {identityKey,planClinicalPublication} from '../scripts/clinical-inventory.mjs';
@@ -19,10 +20,10 @@ const expectedGroups=['胸腰椎爆裂骨折','骨质疏松性椎体压缩骨折
 test('lumbar withdrawal removes exactly 12 complete cases and preserves unrelated cases and permanent IDs',()=>{
   const {plan,source,inventory}=current;
   assert(expectedGroups.every(group=>plan.removed.some(row=>row.group===group)));
-  assert.deepEqual([...new Set(plan.published.filter(e=>e.record.department==='骨科' && !e.record.specialCase && e.record.group!=='通用场景').map(e=>e.record.group))].sort(), ['TKA','THA','人工股骨头置换','股骨转子间骨折','胫骨干骨折','桡骨远端骨折','锁骨骨折','肩锁关节脱位'].sort());
+  assert.deepEqual([...new Set(plan.published.filter(e=>e.record.department==='骨科' && !e.record.specialCase && e.record.group!=='通用场景').map(e=>e.record.group))].sort(), ['TKA','THA','人工股骨头置换','股骨转子间骨折','胫骨干骨折','桡骨远端骨折','锁骨骨折','肩锁关节脱位','胫骨平台骨折'].sort());
   assert.equal(plan.withdrawn.length,0);assert.equal(plan.removed.length,5073);
-  assert.equal(plan.published.length,308);
-  assert.equal(plan.published.filter(e=>e.record.department==='骨科').length,281);
+  assert.equal(plan.published.length,348);
+  assert.equal(plan.published.filter(e=>e.record.department==='骨科').length,321);
   assert.equal(plan.archived.length,0);
   for(const decision of inventory.policy.withdrawals){
     assert(decision.removedFromSource?.authorizedBy);
@@ -82,9 +83,13 @@ test('published catalogs, seeds and downloadable bodies contain no withdrawn doc
   for(const {record,identity}of gone){
     assert(!publicIds.includes(identity.legacyId));
     assert(!bodies.has(identity.legacyId));
-    assert(!manifest.groups.includes(record.group));
-    assert(!Object.hasOwn(manifest.seeds,record.group));
-    assert(!Object.hasOwn(manifest.bodies,record.department+'\0'+record.group));
+    // A withdrawn disease may return only as a separately reviewed new case.
+    // Its group-level files then belong to the new case; the withdrawn IDs above stay unpublished.
+    if(!LATER_ADDED_GROUPS.has(record.group)){
+      assert(!manifest.groups.includes(record.group));
+      assert(!Object.hasOwn(manifest.seeds,record.group));
+      assert(!Object.hasOwn(manifest.bodies,record.department+'\0'+record.group));
+    }
   }
   for(const {record,identity}of publication.published){
     assert(publicIds.includes(identity.legacyId));

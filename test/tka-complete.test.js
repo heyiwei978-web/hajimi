@@ -1,14 +1,14 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
-import {laterReviewed} from './_later-reviewed-groups.js';
+import {laterReviewed,withoutLaterAdded} from './_later-reviewed-groups.js';
 import {withoutRemoved} from './_removed-cases.js';
 import {loadClinicalSource} from '../scripts/clinical-compiler.mjs';
 import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
 import {identityKey,metadataHash} from '../scripts/clinical-inventory.mjs';
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const tag='<script defer src="/record-tka-complete-v31.js?v=20261025-tka14"></script>';
-const current=auditClinicalLibrary(),after=current.source;
+const current=auditClinicalLibrary(),after=withoutLaterAdded(current.source);
 const before=withoutRemoved(loadClinicalSource(html.replace(tag,''),{audit:true}),current.plan);
 const selected=after.records.filter(r=>r.group==='TKA'&&r.department==='骨科'&&!r.specialCase);
 const find=name=>selected.find(r=>r.short===name);

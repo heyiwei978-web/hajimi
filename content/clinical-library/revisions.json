@@ -3464,6 +3464,1842 @@
         "reason": "肩锁关节脱位虚构教学病例统一改为锁骨钩钢板内固定；按负责人审核意见补全入院规范段落、恢复签名、修正措辞并调整为站点标准格式",
         "reviewReference": "PR #62；负责人 2026-11-01 08:11 回复「同意上线」（对应 proposalHash 8d8f4ab6）"
       }
+    },
+    {
+      "schemaVersion": 1,
+      "baselineCommit": "b32800dfe67e3a5712768977cbc6b7aeb2061086",
+      "expectedRevision": "98ec44297a898c8b9dd582e27b799f608c802514ab85f09ce3648f959b69b410",
+      "sourceCommit": "120969f67f57dcaacfb5672c44eb5d1a2e536390",
+      "sourceSnapshotHash": "8d34169217f38cd23df10efc7714335022c74412877b89ab143a120aabcbe965",
+      "updates": [],
+      "additions": [
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005381",
+            "legacyId": 5381,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "入院",
+            "recordType": "主任查房",
+            "name": "胫骨平台骨折（完整病例） · 主任医师首次查房记录",
+            "short": "主任医师首次查房记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "4b9e53d17d264fc84a65fc21dd77a5e05f205b5be47c048d7dc0f6ce9229124c",
+            "renderedHash": "4b9e53d17d264fc84a65fc21dd77a5e05f205b5be47c048d7dc0f6ce9229124c",
+            "recordHash": "b9277b32920ef3a3b3b34aa2c650a880465aebea5af2f24ad8110e35e371a231"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005382",
+            "legacyId": 5382,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "入院",
+            "recordType": "主治查房",
+            "name": "胫骨平台骨折（完整病例） · 主治医师首次查房记录",
+            "short": "主治医师首次查房记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "05ba39eeac551ab222fd22113228614719d4d23c1a3f728a3ac3b1b4f890482c",
+            "renderedHash": "05ba39eeac551ab222fd22113228614719d4d23c1a3f728a3ac3b1b4f890482c",
+            "recordHash": "ba877e959f1e17259d250a7693a13d12685b6f48bf658de9ee388bde1f3d9858"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005383",
+            "legacyId": 5383,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "入院",
+            "recordType": "查房",
+            "name": "胫骨平台骨折（完整病例） · 入院当日查房记录",
+            "short": "入院当日查房记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "897733a93f164bdb571cf9af0a051eac1d02510685ff5a14a8eb56592637a1d5",
+            "renderedHash": "897733a93f164bdb571cf9af0a051eac1d02510685ff5a14a8eb56592637a1d5",
+            "recordHash": "235ed14fca96aa75d5932f40bd79d36a0a1c26492a53c59a57066f4dfb632aed"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005384",
+            "legacyId": 5384,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "入院",
+            "recordType": "入院记录",
+            "name": "胫骨平台骨折（完整病例） · 入院记录",
+            "short": "入院记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "eea47d017d95facb77ffafcf3f4ba0824ec9439cbab1b3c54b15c58c0035bbb5",
+            "renderedHash": "eea47d017d95facb77ffafcf3f4ba0824ec9439cbab1b3c54b15c58c0035bbb5",
+            "recordHash": "5ef7219df4c2a027a018f420fc8367d84f26f8ee2e9e38f9e557454a3feaf8d7"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005385",
+            "legacyId": 5385,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "主治查房",
+            "name": "胫骨平台骨折（完整病例） · 出院前主治医师查房记录",
+            "short": "出院前主治医师查房记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "c0a800f03301553b26f4d0d837b0ba37eadc5d2447e8e258e324f7552d0edb4d",
+            "renderedHash": "c0a800f03301553b26f4d0d837b0ba37eadc5d2447e8e258e324f7552d0edb4d",
+            "recordHash": "7becb4138ee82820a954344394ddc26de7df736b0f9706b934a33eec9d9183af"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005386",
+            "legacyId": 5386,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "出院小结",
+            "name": "胫骨平台骨折（完整病例） · 出院小结",
+            "short": "出院小结",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "975b9f6765fc5fe781a324a5be73a4ff0227117fe834f9d934eb5a34812a6074",
+            "renderedHash": "975b9f6765fc5fe781a324a5be73a4ff0227117fe834f9d934eb5a34812a6074",
+            "recordHash": "de2c550135438cec3977e42d0636c350ede662a0603fc0df337435e62efdeb2a"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005387",
+            "legacyId": 5387,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "查房",
+            "name": "胫骨平台骨折（完整病例） · 出院当天查房记录",
+            "short": "出院当天查房记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "1a1ab6f69da0c4e04da424b99c50799d79a748ae981733302930a1d4700aefaf",
+            "renderedHash": "1a1ab6f69da0c4e04da424b99c50799d79a748ae981733302930a1d4700aefaf",
+            "recordHash": "9c7eb38b76325cb6fcf4d42ded818110cbdb5fe448df43b52fdffcdb7a8da81e"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005388",
+            "legacyId": 5388,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术前",
+            "recordType": "术前讨论",
+            "name": "胫骨平台骨折（完整病例） · 多学科术前讨论",
+            "short": "多学科术前讨论",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "3a687c5ce3fb245c1f4dc384b19ae759ab6f47d157b63e3e81f9602f23113cb6",
+            "renderedHash": "3a687c5ce3fb245c1f4dc384b19ae759ab6f47d157b63e3e81f9602f23113cb6",
+            "recordHash": "28a1853637306f8d90597d9481d05b0a24d5db6a01bf0ca925e01cc888ed0e21"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005389",
+            "legacyId": 5389,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "康复记录",
+            "name": "胫骨平台骨折（完整病例） · 康复评估与训练记录",
+            "short": "康复评估与训练记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "0d8588ac8da07d39d724babd98428d42e82a90222fa3e81f3fa999ca1bc94434",
+            "renderedHash": "0d8588ac8da07d39d724babd98428d42e82a90222fa3e81f3fa999ca1bc94434",
+            "recordHash": "22c4861a6b888a160df5fc86dddc4d918dbe1cdf116526bcb3212d08b836434e"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005390",
+            "legacyId": 5390,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "检查结果分析",
+            "name": "胫骨平台骨折（完整病例） · 影像复查及结果分析",
+            "short": "影像复查及结果分析",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "3589c9b749785e5e0a83044fdabce7383f0abe087b83a38c71b8bcaa1543a613",
+            "renderedHash": "3589c9b749785e5e0a83044fdabce7383f0abe087b83a38c71b8bcaa1543a613",
+            "recordHash": "4b88aa91ab224523fb432fcf62de8ee427590269544d3ee6b5dfb099d2ba2916"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005391",
+            "legacyId": 5391,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术中",
+            "recordType": "安全核查",
+            "name": "胫骨平台骨折（完整病例） · 手术安全核查记录",
+            "short": "手术安全核查记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "21b333dcd0337aa0399c4ba78f938cf6624edbb15faa3c4dc4986460bba60d8f",
+            "renderedHash": "21b333dcd0337aa0399c4ba78f938cf6624edbb15faa3c4dc4986460bba60d8f",
+            "recordHash": "6712086cf056bd7cd52198d55a2f9cb52ddeee326ab3b815fbd700d3ef6ec382"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005392",
+            "legacyId": 5392,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术前",
+            "recordType": "查房",
+            "name": "胫骨平台骨折（完整病例） · 手术日术前查房记录",
+            "short": "手术日术前查房记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "e3c13df3e7d93326c00f6cd515416ef224e6a114acf48c8e0b1cff4d7fbb863d",
+            "renderedHash": "e3c13df3e7d93326c00f6cd515416ef224e6a114acf48c8e0b1cff4d7fbb863d",
+            "recordHash": "2d66ebef97bcdee7f6d6d033766cb530c60f7b5b0d70815d67424c24adac6ea7"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005393",
+            "legacyId": 5393,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术中",
+            "recordType": "手术护理记录",
+            "name": "胫骨平台骨折（完整病例） · 手术清点记录",
+            "short": "手术清点记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "191bed7d0b6ac3ffc5638df24f903e58b112bf0099c4d2e851fb585670fc9860",
+            "renderedHash": "191bed7d0b6ac3ffc5638df24f903e58b112bf0099c4d2e851fb585670fc9860",
+            "recordHash": "2b42a42443b094a4d6ee32f320b09b5cd2198c505f480b9f1792cbed7bb4af46"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005394",
+            "legacyId": 5394,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术前",
+            "recordType": "知情同意",
+            "name": "胫骨平台骨折（完整病例） · 手术知情同意记录",
+            "short": "手术知情同意记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "730cdd43b272320c45aabfafd40ef07bce9d592d03b09af768523eb0c220839e",
+            "renderedHash": "730cdd43b272320c45aabfafd40ef07bce9d592d03b09af768523eb0c220839e",
+            "recordHash": "2638de19699e75145c172384a21bdba03a1286ccef54d6cdc4b44cbc3ed6d26f"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005395",
+            "legacyId": 5395,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术中",
+            "recordType": "手术记录",
+            "name": "胫骨平台骨折（完整病例） · 手术记录",
+            "short": "手术记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "c63bc98433404d0a403f1c0d9bbe3a0742121a6b1bfc218c3a1ba462f14098c8",
+            "renderedHash": "c63bc98433404d0a403f1c0d9bbe3a0742121a6b1bfc218c3a1ba462f14098c8",
+            "recordHash": "3d237114efb80da5de6e5b139c3058db334133926a76ebd6f67608926a1f4b20"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005396",
+            "legacyId": 5396,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术前",
+            "recordType": "查房",
+            "name": "胫骨平台骨折（完整病例） · 术前主刀查房",
+            "short": "术前主刀查房",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "efa47e34d0c0001a23ed6419df3c9e99605a7c341c4ea8777f1b8097a9720005",
+            "renderedHash": "efa47e34d0c0001a23ed6419df3c9e99605a7c341c4ea8777f1b8097a9720005",
+            "recordHash": "0467db5e62ed666e5d2b6129d5d5f2a73f939747c41b33279c7a3e0b7e2332ea"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005397",
+            "legacyId": 5397,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术前",
+            "recordType": "术前小结",
+            "name": "胫骨平台骨折（完整病例） · 术前小结",
+            "short": "术前小结",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "b2631679310d828392fa67fb79543998b899a4720e984c618500a785bb3f1910",
+            "renderedHash": "b2631679310d828392fa67fb79543998b899a4720e984c618500a785bb3f1910",
+            "recordHash": "7a124da1d5f4e3666058e26e5b3f78a660ad9bb9c73f71dcd8280c9a36bb70e6"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005398",
+            "legacyId": 5398,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "查房",
+            "name": "胫骨平台骨折（完整病例） · 术后主刀查房记录",
+            "short": "术后主刀查房记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "fb16c24f26febaa9e4e0aa0f017b782fd9f2cb04afc40918ec7e4f257f627731",
+            "renderedHash": "fb16c24f26febaa9e4e0aa0f017b782fd9f2cb04afc40918ec7e4f257f627731",
+            "recordHash": "10b057aa5a4550995e9b1070dcf7caa89aabe4d2a6f039a0aadcb7795541a9bd"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005399",
+            "legacyId": 5399,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第10天病程",
+            "short": "术后第10天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "0ada07c39a9fc54d1f4c926bf2e28fe0b6a5c8e94492457fc3a765c90a43e748",
+            "renderedHash": "0ada07c39a9fc54d1f4c926bf2e28fe0b6a5c8e94492457fc3a765c90a43e748",
+            "recordHash": "086c20e7cf110bd998251af409b256ba21b71a73fb4f781d2d1ae3cbf104d45d"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005400",
+            "legacyId": 5400,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第11天病程",
+            "short": "术后第11天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "ee5ade0ce6621349ff779ed59867b83d4a5760b5aec86681110639e755b9cc25",
+            "renderedHash": "ee5ade0ce6621349ff779ed59867b83d4a5760b5aec86681110639e755b9cc25",
+            "recordHash": "ba7597bba26395f1c983a44d3b255268d956d57ec6aee04bedda96d6b809e7ca"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005401",
+            "legacyId": 5401,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第12天病程",
+            "short": "术后第12天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "2cca1688aec29f269ff0533e7d5c0eccf48a8c072d6b4418a20940647f4b1708",
+            "renderedHash": "2cca1688aec29f269ff0533e7d5c0eccf48a8c072d6b4418a20940647f4b1708",
+            "recordHash": "050d12cb16ea6722955edd2c58a2e00003fc2858e4e23a5dcfd377e72ab383c2"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005402",
+            "legacyId": 5402,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第13天病程",
+            "short": "术后第13天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "66d7b308d087a8dcb010e2e8b3265bd53ac8dd1fa46397d20074f80ee3bb003e",
+            "renderedHash": "66d7b308d087a8dcb010e2e8b3265bd53ac8dd1fa46397d20074f80ee3bb003e",
+            "recordHash": "7a51b8e3c2820335feddd2a598b02e8d7e41714c5b0b74d53f1310f11b4f1b29"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005403",
+            "legacyId": 5403,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第14天病程",
+            "short": "术后第14天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "14a14d1f56389131df0a0f3d88d4b3cc4f8a6d6305d03a0cf79711c983493d2d",
+            "renderedHash": "14a14d1f56389131df0a0f3d88d4b3cc4f8a6d6305d03a0cf79711c983493d2d",
+            "recordHash": "6823bda2d29b44880ab74006f3c9b18cc0cae2710fc99d0cfcaaa0cd5a6e70bc"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005404",
+            "legacyId": 5404,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第1天病程",
+            "short": "术后第1天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "7df32d568eb8794c7a50633ece50a0028a03af7d72ff1b02671d5f16f451df3a",
+            "renderedHash": "7df32d568eb8794c7a50633ece50a0028a03af7d72ff1b02671d5f16f451df3a",
+            "recordHash": "f7321a11754717a4cb6a1a1e8837f382d8406e8ea64cf40c3f2b4560861f4b60"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005405",
+            "legacyId": 5405,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "检查结果分析",
+            "name": "胫骨平台骨折（完整病例） · 术后第2天晚间右下肢静脉超声结果分析记录",
+            "short": "术后第2天晚间右下肢静脉超声结果分析记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "4707675453d8545c92dd88307fa19eaadc0d67ef7b38a8c54b6b1aa15bf8ead1",
+            "renderedHash": "4707675453d8545c92dd88307fa19eaadc0d67ef7b38a8c54b6b1aa15bf8ead1",
+            "recordHash": "3419af1435b0d1f7cd97fa0c9283b0640c7819ec4f315e03fc2b427735a0dacf"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005406",
+            "legacyId": 5406,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第2天病程",
+            "short": "术后第2天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "f42d0de6aa10c3d36cc69aea1de76a92ed2173ab21cd5a7f2375f54acfe95856",
+            "renderedHash": "f42d0de6aa10c3d36cc69aea1de76a92ed2173ab21cd5a7f2375f54acfe95856",
+            "recordHash": "27219bba2edb1e4ad97e1e60a4a0e2711672ef328bba2b4aea158e98a983305a"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005407",
+            "legacyId": 5407,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第3天病程",
+            "short": "术后第3天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "af2c0ceb6556b79b119e540b9dc8e41036a4c72411203b13a3e44c5b7d9e93cf",
+            "renderedHash": "af2c0ceb6556b79b119e540b9dc8e41036a4c72411203b13a3e44c5b7d9e93cf",
+            "recordHash": "995e5cbd67a695e1c5be369aaca5ba166d3b6247e25fdeae83cb1860280299f4"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005408",
+            "legacyId": 5408,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第4天病程",
+            "short": "术后第4天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "92250a9ee0c36402b24a1929111798f7991b61bce9376192a0001fabba00b3a8",
+            "renderedHash": "92250a9ee0c36402b24a1929111798f7991b61bce9376192a0001fabba00b3a8",
+            "recordHash": "4401c6a17d0cf6d524d9a5b5728129eaaa21d062c6c54731b12560eb43cdb957"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005409",
+            "legacyId": 5409,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第5天病程",
+            "short": "术后第5天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "e21687edf03484426411943c55ab30f93193d9f3555396d7004c8ca77ff05f23",
+            "renderedHash": "e21687edf03484426411943c55ab30f93193d9f3555396d7004c8ca77ff05f23",
+            "recordHash": "33c69c2849a378167af755c871fdaeb1fef885f30b4edcc0390bfde4609a57de"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005410",
+            "legacyId": 5410,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第6天病程",
+            "short": "术后第6天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "724610c625fda82d4b0959862dae7b4d70beb5fc02553f52406aefc85b9e1e93",
+            "renderedHash": "724610c625fda82d4b0959862dae7b4d70beb5fc02553f52406aefc85b9e1e93",
+            "recordHash": "806eedf97d2215f6af87cd94dff0f865e6735c8edd09d7f0ebc6873d162e9407"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005411",
+            "legacyId": 5411,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第7天病程",
+            "short": "术后第7天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "1342143395047eedf4114ed0f8f07f0bf98bcfa8d04ae51e336874bb7ef67263",
+            "renderedHash": "1342143395047eedf4114ed0f8f07f0bf98bcfa8d04ae51e336874bb7ef67263",
+            "recordHash": "532a830f545c7e2fc4b33595cb7a1eb359c3238374e9d123aa8655a038e3cb0c"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005412",
+            "legacyId": 5412,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第8天病程",
+            "short": "术后第8天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "6285c57b09fee8f6af8df630bc1cf9fccf60b4b02844ad355b305a813b48b644",
+            "renderedHash": "6285c57b09fee8f6af8df630bc1cf9fccf60b4b02844ad355b305a813b48b644",
+            "recordHash": "45beb808f6af96598ccac26c6bc8fd6ab503456e3421488b3e08c97e9563864b"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005413",
+            "legacyId": 5413,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后第9天病程",
+            "short": "术后第9天病程",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "4732393932fde7e387a4ac248605449a23b7f1b6ded354610fda5a2104b75813",
+            "renderedHash": "4732393932fde7e387a4ac248605449a23b7f1b6ded354610fda5a2104b75813",
+            "recordHash": "5b0dabbf3d691e562b96eaf5333c81927ce69e415dee177844303d03bf5910ae"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005414",
+            "legacyId": 5414,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "术后病程",
+            "name": "胫骨平台骨折（完整病例） · 术后首次病程记录",
+            "short": "术后首次病程记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "74feeae575fcfdc0e61bd09dc340421be8d513c3b12f25588f0b0b697082158c",
+            "renderedHash": "74feeae575fcfdc0e61bd09dc340421be8d513c3b12f25588f0b0b697082158c",
+            "recordHash": "bb5038caa3ffa2140c7055ff4ad3c23f98860bb0468708973f6b858ad3c28ce1"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005415",
+            "legacyId": 5415,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术前",
+            "recordType": "沟通记录",
+            "name": "胫骨平台骨折（完整病例） · 选择治疗方案沟通记录",
+            "short": "选择治疗方案沟通记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "62e719f4248019ea2ce9d693bb690f6c7c0f4d0736aa075113c5228db9ec3e87",
+            "renderedHash": "62e719f4248019ea2ce9d693bb690f6c7c0f4d0736aa075113c5228db9ec3e87",
+            "recordHash": "d430a4f02cb399c9fc6cf2aeef07383ce0a08bffd4bac0ed1591211f2c44570f"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005416",
+            "legacyId": 5416,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "入院",
+            "recordType": "首次病程",
+            "name": "胫骨平台骨折（完整病例） · 首次病程记录",
+            "short": "首次病程记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "6d957be7e6065f5871ddbc3ac3ab128b80bdd3005407dc4ba52f4ffee42f1951",
+            "renderedHash": "6d957be7e6065f5871ddbc3ac3ab128b80bdd3005407dc4ba52f4ffee42f1951",
+            "recordHash": "b06757a78f587983981b05c82facb13a0f374d3e9baeffc69b4bd3f4486e68d8"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005417",
+            "legacyId": 5417,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术前",
+            "recordType": "麻醉评估",
+            "name": "胫骨平台骨折（完整病例） · 麻醉术前访视记录",
+            "short": "麻醉术前访视记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "e626125034ec91d90db19ff79d9612b62ad5d717c6e8f5a3748b5f32d163bfcd",
+            "renderedHash": "e626125034ec91d90db19ff79d9612b62ad5d717c6e8f5a3748b5f32d163bfcd",
+            "recordHash": "57dcfb6cada18c80a7793ae4860964c891e168fbf631ed7b9a5db7cff777e436"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005418",
+            "legacyId": 5418,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术后",
+            "recordType": "麻醉访视",
+            "name": "胫骨平台骨折（完整病例） · 麻醉术后访视记录",
+            "short": "麻醉术后访视记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "077a8fc9e7565306bda53f56b8875cf0b10ae91b271bb3da80e1a9873a3f95d1",
+            "renderedHash": "077a8fc9e7565306bda53f56b8875cf0b10ae91b271bb3da80e1a9873a3f95d1",
+            "recordHash": "8d6732e39fe33e03c4ba2121447c48c267f95105dbde0811cad770942872a132"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005419",
+            "legacyId": 5419,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术前",
+            "recordType": "知情同意",
+            "name": "胫骨平台骨折（完整病例） · 麻醉知情同意书",
+            "short": "麻醉知情同意书",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "ea1c2bc08eacec038646e226f441de792087494d8633c805cc418122ecd43292",
+            "renderedHash": "ea1c2bc08eacec038646e226f441de792087494d8633c805cc418122ecd43292",
+            "recordHash": "275ace122dd960bd10d6c46891e37063d55075a27cb962b1822c685b958d2818"
+          }
+        },
+        {
+          "identity": {
+            "recordId": "clinical-v1-r005420",
+            "legacyId": 5420,
+            "department": "骨科",
+            "group": "胫骨平台骨折",
+            "caseType": "standard",
+            "caseId": "clinical-v1-c491ed0ee2f5af4fa1531",
+            "sourceCaseKey": "complete-20261101",
+            "stage": "术中",
+            "recordType": "麻醉记录",
+            "name": "胫骨平台骨折（完整病例） · 麻醉记录",
+            "short": "麻醉记录",
+            "specialCase": false,
+            "introducedBy": "scaffold:TKA",
+            "cmsOverrideExists": null,
+            "cmsCaseExists": null,
+            "cmsRisk": "production-not-audited",
+            "recommendation": "retain",
+            "status": "published",
+            "reason": "reviewed-new-record"
+          },
+          "content": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "6eb46434aa34106581da444e067e2ac0e15a59c94e172756f6bb7e736ab9416c",
+            "renderedHash": "6eb46434aa34106581da444e067e2ac0e15a59c94e172756f6bb7e736ab9416c",
+            "recordHash": "70d04dadfe548e5404bf0da7237a954693559915ed95eb1ea1373edc4f852468"
+          }
+        }
+      ],
+      "reviewHash": "3db3ac746a085e671da2af0fac6300c62100a4e185241969afc4bf68f79f0ed5",
+      "proposalHash": "2ed5ce4d6da39be686edf488ffaf220593e4bbc4fd7d285d253f23aa0e49508c",
+      "approval": {
+        "authorizedProposalHash": "2ed5ce4d6da39be686edf488ffaf220593e4bbc4fd7d285d253f23aa0e49508c",
+        "reviewedBy": "zhao",
+        "reason": "新增病种：胫骨平台骨折",
+        "reviewReference": "PR #70 审核稿；2026-11-01 负责人在 Claude 会话中授权"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "baselineCommit": "b32800dfe67e3a5712768977cbc6b7aeb2061086",
+      "expectedRevision": "2eb2bf3e74e856706be345533888f40d75890f99480d0d4148912db21b92e805",
+      "sourceCommit": "a38abd0bd494400cc8b2a61ee0a84d1094825f17",
+      "sourceSnapshotHash": "c681f17cd5f0c51fce976dfd2985a7c473d4bb11837a833003ee199124771789",
+      "updates": [
+        {
+          "recordId": "clinical-v1-r005381",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "4b9e53d17d264fc84a65fc21dd77a5e05f205b5be47c048d7dc0f6ce9229124c",
+            "renderedHash": "4b9e53d17d264fc84a65fc21dd77a5e05f205b5be47c048d7dc0f6ce9229124c",
+            "recordHash": "b9277b32920ef3a3b3b34aa2c650a880465aebea5af2f24ad8110e35e371a231"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "3c4d9ae077f31a02ae5ea8cb7c2b96c4fa45f3cfe3dc057e16149a63ce8bf17b",
+            "renderedHash": "3c4d9ae077f31a02ae5ea8cb7c2b96c4fa45f3cfe3dc057e16149a63ce8bf17b",
+            "recordHash": "f01eee4bbb56cfca658e541299f7802aad61979d4fb6a3e9299d5748904d1e25"
+          },
+          "metadataHash": "0cf1fabc019af816f6e42abafae8bad69fd6c1cb0ff849c2cae6c4867cad4dc7"
+        },
+        {
+          "recordId": "clinical-v1-r005382",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "05ba39eeac551ab222fd22113228614719d4d23c1a3f728a3ac3b1b4f890482c",
+            "renderedHash": "05ba39eeac551ab222fd22113228614719d4d23c1a3f728a3ac3b1b4f890482c",
+            "recordHash": "ba877e959f1e17259d250a7693a13d12685b6f48bf658de9ee388bde1f3d9858"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "33b0cc3b29cb3b9c12f4a3df4c8b425314a34030d4546df1d755f734a57d08ef",
+            "renderedHash": "33b0cc3b29cb3b9c12f4a3df4c8b425314a34030d4546df1d755f734a57d08ef",
+            "recordHash": "c2fb0254370a995bf8e592ea6768adf591eb071205375a430bfec6a40cb43237"
+          },
+          "metadataHash": "ab88bb510e394bba86ecb9598ee1364cb4ad4b5cedd547bee0b0de6c2e38a42a"
+        },
+        {
+          "recordId": "clinical-v1-r005383",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "897733a93f164bdb571cf9af0a051eac1d02510685ff5a14a8eb56592637a1d5",
+            "renderedHash": "897733a93f164bdb571cf9af0a051eac1d02510685ff5a14a8eb56592637a1d5",
+            "recordHash": "235ed14fca96aa75d5932f40bd79d36a0a1c26492a53c59a57066f4dfb632aed"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "c3cd4cefda1a8ebb915525a7cd86f8b3e9350914123719db2f3d7d71df07403e",
+            "renderedHash": "c3cd4cefda1a8ebb915525a7cd86f8b3e9350914123719db2f3d7d71df07403e",
+            "recordHash": "ca5aebd6fc0c72c8a3dacc1bbe67c38a56f113fe6057866fb07f46e62363e9b6"
+          },
+          "metadataHash": "cd8c185c8ee8dc6a8c6a7d38667e9801ce2c8877b2744469557d607a5fdbc647"
+        },
+        {
+          "recordId": "clinical-v1-r005384",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "eea47d017d95facb77ffafcf3f4ba0824ec9439cbab1b3c54b15c58c0035bbb5",
+            "renderedHash": "eea47d017d95facb77ffafcf3f4ba0824ec9439cbab1b3c54b15c58c0035bbb5",
+            "recordHash": "5ef7219df4c2a027a018f420fc8367d84f26f8ee2e9e38f9e557454a3feaf8d7"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "5bfc0b404c51d5d5388193fbdd9b9321c0e15f16b380342e5ac0313168c84b54",
+            "renderedHash": "5bfc0b404c51d5d5388193fbdd9b9321c0e15f16b380342e5ac0313168c84b54",
+            "recordHash": "e89695488a2b51a72a8349a0fcb2451ce2123b0a31b010f033943737f0984828"
+          },
+          "metadataHash": "2c17da89d2202d7353b0133b08bf7dd128f862b78ef2c3ab4bc6ab236ecb15ed"
+        },
+        {
+          "recordId": "clinical-v1-r005385",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "c0a800f03301553b26f4d0d837b0ba37eadc5d2447e8e258e324f7552d0edb4d",
+            "renderedHash": "c0a800f03301553b26f4d0d837b0ba37eadc5d2447e8e258e324f7552d0edb4d",
+            "recordHash": "7becb4138ee82820a954344394ddc26de7df736b0f9706b934a33eec9d9183af"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "4360087dff6dd0c6fdf8b7272f3079961157f3acc3a6605c95f2004476998bcd",
+            "renderedHash": "4360087dff6dd0c6fdf8b7272f3079961157f3acc3a6605c95f2004476998bcd",
+            "recordHash": "02a77adc294cbd781ea1c8ab0a15b2837ef19d85cc3f912d58ba2e26357f5ed2"
+          },
+          "metadataHash": "872ffa0f27dc45307a44d7a9fbd8847bd92ff1ef944b742d9dc2d6b9141326ac"
+        },
+        {
+          "recordId": "clinical-v1-r005386",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "975b9f6765fc5fe781a324a5be73a4ff0227117fe834f9d934eb5a34812a6074",
+            "renderedHash": "975b9f6765fc5fe781a324a5be73a4ff0227117fe834f9d934eb5a34812a6074",
+            "recordHash": "de2c550135438cec3977e42d0636c350ede662a0603fc0df337435e62efdeb2a"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "2647f0c7d477a992a995f3a3f177ec7923be4037a0dc8edcaafb25aae2d656a9",
+            "renderedHash": "2647f0c7d477a992a995f3a3f177ec7923be4037a0dc8edcaafb25aae2d656a9",
+            "recordHash": "1bdb781f3494865db2f89af36914c711e8d9213a6b9ecd712f2a8b81a780216d"
+          },
+          "metadataHash": "674a7902b3b226c31aa28d89d0c5ef2f353a41347fae174e232eaeaa282fb12d"
+        },
+        {
+          "recordId": "clinical-v1-r005387",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "1a1ab6f69da0c4e04da424b99c50799d79a748ae981733302930a1d4700aefaf",
+            "renderedHash": "1a1ab6f69da0c4e04da424b99c50799d79a748ae981733302930a1d4700aefaf",
+            "recordHash": "9c7eb38b76325cb6fcf4d42ded818110cbdb5fe448df43b52fdffcdb7a8da81e"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "db6f4d76d5370f02978b1aa153b1546d0ff2204a7dc22f481b23a8e16ccb1d3a",
+            "renderedHash": "db6f4d76d5370f02978b1aa153b1546d0ff2204a7dc22f481b23a8e16ccb1d3a",
+            "recordHash": "af0da88b4aef28dfe24a06f60af2c94f2f76d2b6a68d24bca13d1651bd032364"
+          },
+          "metadataHash": "3d66c228392b16e3aa3a8a0b6fd62feb2f054d4f395adfdff0223de758224fd7"
+        },
+        {
+          "recordId": "clinical-v1-r005388",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "3a687c5ce3fb245c1f4dc384b19ae759ab6f47d157b63e3e81f9602f23113cb6",
+            "renderedHash": "3a687c5ce3fb245c1f4dc384b19ae759ab6f47d157b63e3e81f9602f23113cb6",
+            "recordHash": "28a1853637306f8d90597d9481d05b0a24d5db6a01bf0ca925e01cc888ed0e21"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "b98d1fd596179ddd755288ce426ba5bb1190b9a0b92927fe19f8259a601e7be6",
+            "renderedHash": "b98d1fd596179ddd755288ce426ba5bb1190b9a0b92927fe19f8259a601e7be6",
+            "recordHash": "69910ba2346821b038577367e2ff66282db19534fed82576532d6abd6375fe23"
+          },
+          "metadataHash": "e67827f44103f2bdf375a2787218891d45385fc9d0d9997b660c7e7ef2cbec92"
+        },
+        {
+          "recordId": "clinical-v1-r005389",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "0d8588ac8da07d39d724babd98428d42e82a90222fa3e81f3fa999ca1bc94434",
+            "renderedHash": "0d8588ac8da07d39d724babd98428d42e82a90222fa3e81f3fa999ca1bc94434",
+            "recordHash": "22c4861a6b888a160df5fc86dddc4d918dbe1cdf116526bcb3212d08b836434e"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "7ace3f67f77dc8e613c828d15fe23213ec2d586f53e470e9f05168167bd76f61",
+            "renderedHash": "7ace3f67f77dc8e613c828d15fe23213ec2d586f53e470e9f05168167bd76f61",
+            "recordHash": "31e907071b8dabb315e892bfc3ecde3f8460ec365ac5081cd00ceaf415d130e4"
+          },
+          "metadataHash": "d0f807787f4bdc059bf559457847b88130e4d9c8fa74e8af2d573eb741bf4de0"
+        },
+        {
+          "recordId": "clinical-v1-r005390",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "3589c9b749785e5e0a83044fdabce7383f0abe087b83a38c71b8bcaa1543a613",
+            "renderedHash": "3589c9b749785e5e0a83044fdabce7383f0abe087b83a38c71b8bcaa1543a613",
+            "recordHash": "4b88aa91ab224523fb432fcf62de8ee427590269544d3ee6b5dfb099d2ba2916"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "e86040d9f311dbe57dd195d5a5534088b07d0569dc13babc3b513da414258d54",
+            "renderedHash": "e86040d9f311dbe57dd195d5a5534088b07d0569dc13babc3b513da414258d54",
+            "recordHash": "51211591c1951d4918940cb503b449fc3dfc6d75b9eb21dc84ee685bb621f1a1"
+          },
+          "metadataHash": "32148ffbacad43c9e34508e04789835bc40a2ea418afe8abf58be8adfe49889c"
+        },
+        {
+          "recordId": "clinical-v1-r005391",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "21b333dcd0337aa0399c4ba78f938cf6624edbb15faa3c4dc4986460bba60d8f",
+            "renderedHash": "21b333dcd0337aa0399c4ba78f938cf6624edbb15faa3c4dc4986460bba60d8f",
+            "recordHash": "6712086cf056bd7cd52198d55a2f9cb52ddeee326ab3b815fbd700d3ef6ec382"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "cfa6d0a23fcbc2ecc9aa8dd25702ca2dc8c730cd0ae038fac42f092be04f1ae1",
+            "renderedHash": "cfa6d0a23fcbc2ecc9aa8dd25702ca2dc8c730cd0ae038fac42f092be04f1ae1",
+            "recordHash": "d33ed0c1236477051b1bc79188d192c9cd5d5e22334da4ddb6659493ab9551b5"
+          },
+          "metadataHash": "ea5e1822a55624d1ca28745886f6251d43181fc4dde702ce9ee98b5401d9d8fb"
+        },
+        {
+          "recordId": "clinical-v1-r005392",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "e3c13df3e7d93326c00f6cd515416ef224e6a114acf48c8e0b1cff4d7fbb863d",
+            "renderedHash": "e3c13df3e7d93326c00f6cd515416ef224e6a114acf48c8e0b1cff4d7fbb863d",
+            "recordHash": "2d66ebef97bcdee7f6d6d033766cb530c60f7b5b0d70815d67424c24adac6ea7"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "8c7b9040755bc326f7292745aead499f5cbcc4d7d0c7b8bae06f8e47196a8c0e",
+            "renderedHash": "8c7b9040755bc326f7292745aead499f5cbcc4d7d0c7b8bae06f8e47196a8c0e",
+            "recordHash": "2a08729843d95b0d48aaeb85ff744f89783d672dd76e3d55a3a90519da6acf53"
+          },
+          "metadataHash": "35666e380a1b004ad42601d749ef76f2595b528c0855e7c7dafb93b370af67a2"
+        },
+        {
+          "recordId": "clinical-v1-r005393",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "191bed7d0b6ac3ffc5638df24f903e58b112bf0099c4d2e851fb585670fc9860",
+            "renderedHash": "191bed7d0b6ac3ffc5638df24f903e58b112bf0099c4d2e851fb585670fc9860",
+            "recordHash": "2b42a42443b094a4d6ee32f320b09b5cd2198c505f480b9f1792cbed7bb4af46"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "495a8aea25a71545a855e3597bc94854568dfa187e201862e35fd833b47d28a9",
+            "renderedHash": "495a8aea25a71545a855e3597bc94854568dfa187e201862e35fd833b47d28a9",
+            "recordHash": "72658b970f2a1c076d74627a4cbe180a41e6a12bb9113806a21d4964304f17dc"
+          },
+          "metadataHash": "8af20f7095e3290af8ecf1ee62200997ce9a2ef075cb094cef760f1cb8e4a74f"
+        },
+        {
+          "recordId": "clinical-v1-r005394",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "730cdd43b272320c45aabfafd40ef07bce9d592d03b09af768523eb0c220839e",
+            "renderedHash": "730cdd43b272320c45aabfafd40ef07bce9d592d03b09af768523eb0c220839e",
+            "recordHash": "2638de19699e75145c172384a21bdba03a1286ccef54d6cdc4b44cbc3ed6d26f"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "859b3d8254bfddae5543c493bc5c8f2899b46418dbb010d612cda9080749ac43",
+            "renderedHash": "859b3d8254bfddae5543c493bc5c8f2899b46418dbb010d612cda9080749ac43",
+            "recordHash": "1f6c1f7028d6638fd930630eca104e80a1d050e1e3cddaed785711ad317fb096"
+          },
+          "metadataHash": "3f4af6ffedf0fdd2ac88a72c31c968e6de78d3095362fb25a71582ab4aac7323"
+        },
+        {
+          "recordId": "clinical-v1-r005395",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "c63bc98433404d0a403f1c0d9bbe3a0742121a6b1bfc218c3a1ba462f14098c8",
+            "renderedHash": "c63bc98433404d0a403f1c0d9bbe3a0742121a6b1bfc218c3a1ba462f14098c8",
+            "recordHash": "3d237114efb80da5de6e5b139c3058db334133926a76ebd6f67608926a1f4b20"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "ae9aa70248a2cbba6c8b70c545613b72321070e19191ff8712b494499e78f117",
+            "renderedHash": "ae9aa70248a2cbba6c8b70c545613b72321070e19191ff8712b494499e78f117",
+            "recordHash": "1346b1d3fcd768a1ead4b528b5d938b6f07ecc8cbaa0c3eae1323138311f1128"
+          },
+          "metadataHash": "674ec85a374b7c31aa3cc65a52c16e6053b9316af834509f5813afdff6ea5a3d"
+        },
+        {
+          "recordId": "clinical-v1-r005396",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "efa47e34d0c0001a23ed6419df3c9e99605a7c341c4ea8777f1b8097a9720005",
+            "renderedHash": "efa47e34d0c0001a23ed6419df3c9e99605a7c341c4ea8777f1b8097a9720005",
+            "recordHash": "0467db5e62ed666e5d2b6129d5d5f2a73f939747c41b33279c7a3e0b7e2332ea"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "c702ec2a4b97cd660e6f41875eeea917d910f4206ae540943250e6eeaa276b0f",
+            "renderedHash": "c702ec2a4b97cd660e6f41875eeea917d910f4206ae540943250e6eeaa276b0f",
+            "recordHash": "0df46f701fa4fc7ddb6130d8c52f82a060378eec778d89790dff61726b4b1b8a"
+          },
+          "metadataHash": "6966ab1f0b63270851046ed19769a25547a85ef0e3426f0e6c860e33862f3e4e"
+        },
+        {
+          "recordId": "clinical-v1-r005397",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "b2631679310d828392fa67fb79543998b899a4720e984c618500a785bb3f1910",
+            "renderedHash": "b2631679310d828392fa67fb79543998b899a4720e984c618500a785bb3f1910",
+            "recordHash": "7a124da1d5f4e3666058e26e5b3f78a660ad9bb9c73f71dcd8280c9a36bb70e6"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "5f3d304ebaee43261f19a88568d88b0ad02d5c7237ee719831313fb052243a3e",
+            "renderedHash": "5f3d304ebaee43261f19a88568d88b0ad02d5c7237ee719831313fb052243a3e",
+            "recordHash": "e36dd7bf2965500bc459f28100ff5d58076cb4840b4c5eaa42c745c83db56d72"
+          },
+          "metadataHash": "2d1705ea41028193cc548bdc48cfaf70a1baf4566f349d885b08da3ce0db7f9d"
+        },
+        {
+          "recordId": "clinical-v1-r005398",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "fb16c24f26febaa9e4e0aa0f017b782fd9f2cb04afc40918ec7e4f257f627731",
+            "renderedHash": "fb16c24f26febaa9e4e0aa0f017b782fd9f2cb04afc40918ec7e4f257f627731",
+            "recordHash": "10b057aa5a4550995e9b1070dcf7caa89aabe4d2a6f039a0aadcb7795541a9bd"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "e803b77e98454d134fec60f89f8140efb285318bcbd52ff97497069a5185c931",
+            "renderedHash": "e803b77e98454d134fec60f89f8140efb285318bcbd52ff97497069a5185c931",
+            "recordHash": "46deb4abaf49271c378bbc5bb0a3543dfb1436db42c834148329d4ff7c961d80"
+          },
+          "metadataHash": "d5010e6f4bd016992835738af89811b864581578b0e04b562c611908eedff48d"
+        },
+        {
+          "recordId": "clinical-v1-r005399",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "0ada07c39a9fc54d1f4c926bf2e28fe0b6a5c8e94492457fc3a765c90a43e748",
+            "renderedHash": "0ada07c39a9fc54d1f4c926bf2e28fe0b6a5c8e94492457fc3a765c90a43e748",
+            "recordHash": "086c20e7cf110bd998251af409b256ba21b71a73fb4f781d2d1ae3cbf104d45d"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "e4c4a3db2be92e52d74f3fd97d975cf29d93e8368aab4742977d6cf287671c9f",
+            "renderedHash": "e4c4a3db2be92e52d74f3fd97d975cf29d93e8368aab4742977d6cf287671c9f",
+            "recordHash": "4adadbfa55f7ce81294a5c11a344a8f3ac397f28fb4fec6d049a177333c5d5fc"
+          },
+          "metadataHash": "724ec84780a900e310a94a89512293f0f0a93f6c83f98622ca6b99f2790fa6e9"
+        },
+        {
+          "recordId": "clinical-v1-r005400",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "ee5ade0ce6621349ff779ed59867b83d4a5760b5aec86681110639e755b9cc25",
+            "renderedHash": "ee5ade0ce6621349ff779ed59867b83d4a5760b5aec86681110639e755b9cc25",
+            "recordHash": "ba7597bba26395f1c983a44d3b255268d956d57ec6aee04bedda96d6b809e7ca"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "8bd50a05b2062c123493f2e3d03032d4d570bacdf3041b294f2542ab2aa667e6",
+            "renderedHash": "8bd50a05b2062c123493f2e3d03032d4d570bacdf3041b294f2542ab2aa667e6",
+            "recordHash": "4e9b2f28838acca6beebee891d0451d1efc738b12cefd1f0ecf1530d474c28f1"
+          },
+          "metadataHash": "fbcb67f476806e298133a51466bf7164e69dbdb730cf22390cb391451ff86af0"
+        },
+        {
+          "recordId": "clinical-v1-r005401",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "2cca1688aec29f269ff0533e7d5c0eccf48a8c072d6b4418a20940647f4b1708",
+            "renderedHash": "2cca1688aec29f269ff0533e7d5c0eccf48a8c072d6b4418a20940647f4b1708",
+            "recordHash": "050d12cb16ea6722955edd2c58a2e00003fc2858e4e23a5dcfd377e72ab383c2"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "852028282333a1cbd2f20a2ac3be7a60accf08fa1d4beae3f38e84e6661e1d56",
+            "renderedHash": "852028282333a1cbd2f20a2ac3be7a60accf08fa1d4beae3f38e84e6661e1d56",
+            "recordHash": "b6c08f6d71ee71b5a4f387ec416c4dac8e7ecaa3978ae5e72b4b1923aa8e3d8a"
+          },
+          "metadataHash": "c16d7aca2eff864757d734269f01722c9b6847873cf79579a4061caf2a7d4fda"
+        },
+        {
+          "recordId": "clinical-v1-r005402",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "66d7b308d087a8dcb010e2e8b3265bd53ac8dd1fa46397d20074f80ee3bb003e",
+            "renderedHash": "66d7b308d087a8dcb010e2e8b3265bd53ac8dd1fa46397d20074f80ee3bb003e",
+            "recordHash": "7a51b8e3c2820335feddd2a598b02e8d7e41714c5b0b74d53f1310f11b4f1b29"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "39b3500148e4f29cbebab8e5da77d2aa404926a2a27d02290a2ae40c748375b8",
+            "renderedHash": "39b3500148e4f29cbebab8e5da77d2aa404926a2a27d02290a2ae40c748375b8",
+            "recordHash": "6797bc1ebfa5261f47313b6b7db5cb0a62eb5c76a1b6977aef9bf9857cb21409"
+          },
+          "metadataHash": "7c696fc43591f8050a2463625b301fbb826af545dabf6b8e0395c78416632321"
+        },
+        {
+          "recordId": "clinical-v1-r005403",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "14a14d1f56389131df0a0f3d88d4b3cc4f8a6d6305d03a0cf79711c983493d2d",
+            "renderedHash": "14a14d1f56389131df0a0f3d88d4b3cc4f8a6d6305d03a0cf79711c983493d2d",
+            "recordHash": "6823bda2d29b44880ab74006f3c9b18cc0cae2710fc99d0cfcaaa0cd5a6e70bc"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "ac2564db0be0d3442363f14c5f9091c8080080391e2e39ebda155045b42d03eb",
+            "renderedHash": "ac2564db0be0d3442363f14c5f9091c8080080391e2e39ebda155045b42d03eb",
+            "recordHash": "6eadfdce788b7cf65e2f73cfea64d78c83445394e1453e1479bd60a4c7dfdc91"
+          },
+          "metadataHash": "7644d10de09fe96201ca5aea0c9e7252989965d49d56462d821e2b4459364f01"
+        },
+        {
+          "recordId": "clinical-v1-r005404",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "7df32d568eb8794c7a50633ece50a0028a03af7d72ff1b02671d5f16f451df3a",
+            "renderedHash": "7df32d568eb8794c7a50633ece50a0028a03af7d72ff1b02671d5f16f451df3a",
+            "recordHash": "f7321a11754717a4cb6a1a1e8837f382d8406e8ea64cf40c3f2b4560861f4b60"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "f06d0595f59c0922fc8868443ab3b06b33dcf7840f252333056a084c7277cfe3",
+            "renderedHash": "f06d0595f59c0922fc8868443ab3b06b33dcf7840f252333056a084c7277cfe3",
+            "recordHash": "305169af8626e26de12b2aa3485d38a1d53e403844d501f1b622dc08d29afc9f"
+          },
+          "metadataHash": "0411f34a8ca29d26ed35b680834eda7978f590ad5f387dc0467da15d355c30cd"
+        },
+        {
+          "recordId": "clinical-v1-r005405",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "4707675453d8545c92dd88307fa19eaadc0d67ef7b38a8c54b6b1aa15bf8ead1",
+            "renderedHash": "4707675453d8545c92dd88307fa19eaadc0d67ef7b38a8c54b6b1aa15bf8ead1",
+            "recordHash": "3419af1435b0d1f7cd97fa0c9283b0640c7819ec4f315e03fc2b427735a0dacf"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "0c20b86f467076f682e10818ca699d375f355ffbb7fd2a63e3c07e004eed3c1e",
+            "renderedHash": "0c20b86f467076f682e10818ca699d375f355ffbb7fd2a63e3c07e004eed3c1e",
+            "recordHash": "863fb9dfdb4a4230924ce4f0ecd3266fb31fe35ffb8e297c09526bfee2c7b02b"
+          },
+          "metadataHash": "de5109c16b418007983631441a847eacf8603700f89908a8cd43c1b96103061f"
+        },
+        {
+          "recordId": "clinical-v1-r005406",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "f42d0de6aa10c3d36cc69aea1de76a92ed2173ab21cd5a7f2375f54acfe95856",
+            "renderedHash": "f42d0de6aa10c3d36cc69aea1de76a92ed2173ab21cd5a7f2375f54acfe95856",
+            "recordHash": "27219bba2edb1e4ad97e1e60a4a0e2711672ef328bba2b4aea158e98a983305a"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "4978386bc32740e65ccadabc39ff6ae02c9aa9f4ee6a86f99e43c85699a8e368",
+            "renderedHash": "4978386bc32740e65ccadabc39ff6ae02c9aa9f4ee6a86f99e43c85699a8e368",
+            "recordHash": "4daa3ef8c500fa562d66a13cceffcbc098faeddabc04fea73b4963813e074cee"
+          },
+          "metadataHash": "a17b74f00eb5ded6c48748e31fd5635ec40fd094b8e3dc6363d577a221ada015"
+        },
+        {
+          "recordId": "clinical-v1-r005407",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "af2c0ceb6556b79b119e540b9dc8e41036a4c72411203b13a3e44c5b7d9e93cf",
+            "renderedHash": "af2c0ceb6556b79b119e540b9dc8e41036a4c72411203b13a3e44c5b7d9e93cf",
+            "recordHash": "995e5cbd67a695e1c5be369aaca5ba166d3b6247e25fdeae83cb1860280299f4"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "5326911426ea09c249eba98a3c43a6c7829909c66ea19aab937d2a0cada67034",
+            "renderedHash": "5326911426ea09c249eba98a3c43a6c7829909c66ea19aab937d2a0cada67034",
+            "recordHash": "a738a627c6c1885473957a190fcebf3a2afcf752a65d8f26e4a5584f73d2cd26"
+          },
+          "metadataHash": "cdaa4e6dc4b2fff60f6ac00caa95a393fd03cfa3abfa1a51c04ad6e2d333b534"
+        },
+        {
+          "recordId": "clinical-v1-r005408",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "92250a9ee0c36402b24a1929111798f7991b61bce9376192a0001fabba00b3a8",
+            "renderedHash": "92250a9ee0c36402b24a1929111798f7991b61bce9376192a0001fabba00b3a8",
+            "recordHash": "4401c6a17d0cf6d524d9a5b5728129eaaa21d062c6c54731b12560eb43cdb957"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "d868c7ca3f8a2a52c2eb8609791e40d5ab1bf717c98e6e1771addb65ab6ca154",
+            "renderedHash": "d868c7ca3f8a2a52c2eb8609791e40d5ab1bf717c98e6e1771addb65ab6ca154",
+            "recordHash": "c3cfdc259ce722f172df81e48088a0e2470e0a8f650899788788626ed82deb3f"
+          },
+          "metadataHash": "ade4a2db17217c290e7c4364fb6f89a4190289c26bef2999ed4886a637acad46"
+        },
+        {
+          "recordId": "clinical-v1-r005409",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "e21687edf03484426411943c55ab30f93193d9f3555396d7004c8ca77ff05f23",
+            "renderedHash": "e21687edf03484426411943c55ab30f93193d9f3555396d7004c8ca77ff05f23",
+            "recordHash": "33c69c2849a378167af755c871fdaeb1fef885f30b4edcc0390bfde4609a57de"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "68909c758b0c8e55610c32fe0e43e9328071d03419cfb99ed7e1d0ff0c9bb603",
+            "renderedHash": "68909c758b0c8e55610c32fe0e43e9328071d03419cfb99ed7e1d0ff0c9bb603",
+            "recordHash": "82ad0bcd86fa5381aa7fdbf2bcb534a589385e03db68594f8a871331e49cb3af"
+          },
+          "metadataHash": "5f37f6899fe7d0fecf6c566c55cdc23e674fd42658b05330d727692ca0469318"
+        },
+        {
+          "recordId": "clinical-v1-r005410",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "724610c625fda82d4b0959862dae7b4d70beb5fc02553f52406aefc85b9e1e93",
+            "renderedHash": "724610c625fda82d4b0959862dae7b4d70beb5fc02553f52406aefc85b9e1e93",
+            "recordHash": "806eedf97d2215f6af87cd94dff0f865e6735c8edd09d7f0ebc6873d162e9407"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "fc5146e2bc130f566a09481f55c2b4db7aabb5ddf187a672a6516bf6387bac07",
+            "renderedHash": "fc5146e2bc130f566a09481f55c2b4db7aabb5ddf187a672a6516bf6387bac07",
+            "recordHash": "c5692409c8a87f83d7c68d0f8b11a0bd45a476e420ce3fa23ae47aa5928dd4da"
+          },
+          "metadataHash": "6bb3914920f6745d457056af7949aa43d8dc88f8f6ffe5acafd2b160e43aad8f"
+        },
+        {
+          "recordId": "clinical-v1-r005411",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "1342143395047eedf4114ed0f8f07f0bf98bcfa8d04ae51e336874bb7ef67263",
+            "renderedHash": "1342143395047eedf4114ed0f8f07f0bf98bcfa8d04ae51e336874bb7ef67263",
+            "recordHash": "532a830f545c7e2fc4b33595cb7a1eb359c3238374e9d123aa8655a038e3cb0c"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "39f8920e432335b9cf547e41d725861454c2b895c25860ea6d1f004d0df10c1c",
+            "renderedHash": "39f8920e432335b9cf547e41d725861454c2b895c25860ea6d1f004d0df10c1c",
+            "recordHash": "0eabcb87b55500a7065a5bdbc7c09c081cc9b7a9f2dcca13924177845489ea57"
+          },
+          "metadataHash": "0f41656deb71d08dcfabe270299aa6c43101ebd8d021f09769bcefc197308985"
+        },
+        {
+          "recordId": "clinical-v1-r005412",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "6285c57b09fee8f6af8df630bc1cf9fccf60b4b02844ad355b305a813b48b644",
+            "renderedHash": "6285c57b09fee8f6af8df630bc1cf9fccf60b4b02844ad355b305a813b48b644",
+            "recordHash": "45beb808f6af96598ccac26c6bc8fd6ab503456e3421488b3e08c97e9563864b"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "18c0ec4460fd732c6c317894f0dde6120ebf34e601e75d86126afaeff28f6298",
+            "renderedHash": "18c0ec4460fd732c6c317894f0dde6120ebf34e601e75d86126afaeff28f6298",
+            "recordHash": "73c4c0a3aa65ec1a286c4b1bca07a71e478155955c1d82f20857a6a05d15df3f"
+          },
+          "metadataHash": "87a6700166bc313b84804ccdf7e3c4c2faa114940b0a4cf8a671e6ba8304e410"
+        },
+        {
+          "recordId": "clinical-v1-r005413",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "4732393932fde7e387a4ac248605449a23b7f1b6ded354610fda5a2104b75813",
+            "renderedHash": "4732393932fde7e387a4ac248605449a23b7f1b6ded354610fda5a2104b75813",
+            "recordHash": "5b0dabbf3d691e562b96eaf5333c81927ce69e415dee177844303d03bf5910ae"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "5b0e224c136614f8ae3168e4a3fe09c7ee4675318f6acea11f6be20f3166df1b",
+            "renderedHash": "5b0e224c136614f8ae3168e4a3fe09c7ee4675318f6acea11f6be20f3166df1b",
+            "recordHash": "98e3bba7ce49bff5f9d74a906de3826ea03b404973b9e40ff98abd1064d894c7"
+          },
+          "metadataHash": "34611fb0626234f463b6dbb95f84171f25bc0165f1078a3a6e2e2cf63b571829"
+        },
+        {
+          "recordId": "clinical-v1-r005414",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "74feeae575fcfdc0e61bd09dc340421be8d513c3b12f25588f0b0b697082158c",
+            "renderedHash": "74feeae575fcfdc0e61bd09dc340421be8d513c3b12f25588f0b0b697082158c",
+            "recordHash": "bb5038caa3ffa2140c7055ff4ad3c23f98860bb0468708973f6b858ad3c28ce1"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "57c6fd19504105fac9edeee192f55d437766a0870b14f0a98f94db3496680c13",
+            "renderedHash": "57c6fd19504105fac9edeee192f55d437766a0870b14f0a98f94db3496680c13",
+            "recordHash": "6f2a0d543538414f6f72be1f58e9403202f0dc76904f7751268d51b92d4775d9"
+          },
+          "metadataHash": "c7247a0d16925e209141fb72336db8018c69bc240bf74d87060b23b7db969d9d"
+        },
+        {
+          "recordId": "clinical-v1-r005415",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "62e719f4248019ea2ce9d693bb690f6c7c0f4d0736aa075113c5228db9ec3e87",
+            "renderedHash": "62e719f4248019ea2ce9d693bb690f6c7c0f4d0736aa075113c5228db9ec3e87",
+            "recordHash": "d430a4f02cb399c9fc6cf2aeef07383ce0a08bffd4bac0ed1591211f2c44570f"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "edefe6701138e25ddd38104994bcb8a37f57e1cefe4ae0242e9d883397c373ec",
+            "renderedHash": "edefe6701138e25ddd38104994bcb8a37f57e1cefe4ae0242e9d883397c373ec",
+            "recordHash": "1149db6ee03885c86d4bbe0b03998437e34311cb7c6feedefaa7f962847a5c0e"
+          },
+          "metadataHash": "77dc5bebf2db12e40933408022bba606ae1018eb92bae6fac6275937bad0f2e6"
+        },
+        {
+          "recordId": "clinical-v1-r005416",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "6d957be7e6065f5871ddbc3ac3ab128b80bdd3005407dc4ba52f4ffee42f1951",
+            "renderedHash": "6d957be7e6065f5871ddbc3ac3ab128b80bdd3005407dc4ba52f4ffee42f1951",
+            "recordHash": "b06757a78f587983981b05c82facb13a0f374d3e9baeffc69b4bd3f4486e68d8"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "f11e5bb01394e20a70ccc65dfb16ae8d16c8fab6f3b39b0e0e950e2730292994",
+            "renderedHash": "f11e5bb01394e20a70ccc65dfb16ae8d16c8fab6f3b39b0e0e950e2730292994",
+            "recordHash": "239fc10ba57f4f1119a0e9c974fc3c1ae5bee6f7113da53e705b4609a47c389d"
+          },
+          "metadataHash": "f4e5e475d13e01e2a38efa737c156d12adafbee7ff87a810d7653c04e2ef02c7"
+        },
+        {
+          "recordId": "clinical-v1-r005417",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "e626125034ec91d90db19ff79d9612b62ad5d717c6e8f5a3748b5f32d163bfcd",
+            "renderedHash": "e626125034ec91d90db19ff79d9612b62ad5d717c6e8f5a3748b5f32d163bfcd",
+            "recordHash": "57dcfb6cada18c80a7793ae4860964c891e168fbf631ed7b9a5db7cff777e436"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "90ea1c031e49da5190b630312074c239ecc21434e58fd325ea9c4030110325f4",
+            "renderedHash": "90ea1c031e49da5190b630312074c239ecc21434e58fd325ea9c4030110325f4",
+            "recordHash": "38b5df23c71323a0b62636ac83ddc662b130b65f6c388761dbd040205a541e93"
+          },
+          "metadataHash": "9f21bcbcf99999da2c3218375cf627af54557554fcb3409e36b6de33d0a6cbe7"
+        },
+        {
+          "recordId": "clinical-v1-r005418",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "077a8fc9e7565306bda53f56b8875cf0b10ae91b271bb3da80e1a9873a3f95d1",
+            "renderedHash": "077a8fc9e7565306bda53f56b8875cf0b10ae91b271bb3da80e1a9873a3f95d1",
+            "recordHash": "8d6732e39fe33e03c4ba2121447c48c267f95105dbde0811cad770942872a132"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "16855005df228f91f444c341e32e9be7da02803fb53706146abd6f2f31bcac43",
+            "renderedHash": "16855005df228f91f444c341e32e9be7da02803fb53706146abd6f2f31bcac43",
+            "recordHash": "95fe6c773d5c52ab78797f69535fa3fa78db59e67c34ecc6b4baf9b5d39ba304"
+          },
+          "metadataHash": "2361b3222e4201134fc8300bcd46221d9abce3ee12f8a630ec917c8edd59d735"
+        },
+        {
+          "recordId": "clinical-v1-r005419",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "ea1c2bc08eacec038646e226f441de792087494d8633c805cc418122ecd43292",
+            "renderedHash": "ea1c2bc08eacec038646e226f441de792087494d8633c805cc418122ecd43292",
+            "recordHash": "275ace122dd960bd10d6c46891e37063d55075a27cb962b1822c685b958d2818"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "a109e34f2d42722b02b8381f5e2f2df97491f6ce654cda83ad863a46f8aa1bcf",
+            "renderedHash": "a109e34f2d42722b02b8381f5e2f2df97491f6ce654cda83ad863a46f8aa1bcf",
+            "recordHash": "95d9409ce25dc9266cdc732e3a4dbd04a973df424a0df14901e24f4fc9599213"
+          },
+          "metadataHash": "797cfc0502862d8066a4bd52642c6b3370e6d97798cda934666055e28f97c241"
+        },
+        {
+          "recordId": "clinical-v1-r005420",
+          "before": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "6eb46434aa34106581da444e067e2ac0e15a59c94e172756f6bb7e736ab9416c",
+            "renderedHash": "6eb46434aa34106581da444e067e2ac0e15a59c94e172756f6bb7e736ab9416c",
+            "recordHash": "70d04dadfe548e5404bf0da7237a954693559915ed95eb1ea1373edc4f852468"
+          },
+          "after": {
+            "bodyKind": "sourceBody",
+            "bodyHash": "560cfb62411190bff038a487c6e74efce098ad39336329b94fcd2fc0642a242b",
+            "renderedHash": "560cfb62411190bff038a487c6e74efce098ad39336329b94fcd2fc0642a242b",
+            "recordHash": "a122eae99a9e958aa7fbb78b58f2bc4d49e59e5069d5cb36104c1cde85fb724c"
+          },
+          "metadataHash": "176d726e4037774b29fcb265d88d60a279ee120003c5fa2751c10c1ff0d786dc"
+        }
+      ],
+      "additions": [],
+      "reviewHash": "68607b3169a8653264382458cae182c02adb80034a79c9b0a902c81435596ce7",
+      "proposalHash": "72bc841f1f14cbf7cc747eba2a4a8369fe53297379db22f92dcf752936c7cf90",
+      "approval": {
+        "authorizedProposalHash": "72bc841f1f14cbf7cc747eba2a4a8369fe53297379db22f92dcf752936c7cf90",
+        "reviewedBy": "zhao",
+        "reason": "胫骨平台骨折：手术记录改写为四段、病程记录分段格式对齐",
+        "reviewReference": "负责人在 Claude 会话中回复“授权”，2026-11-01"
+      }
     }
   ]
 }

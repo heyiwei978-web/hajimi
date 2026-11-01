@@ -15,3 +15,17 @@ export const LATER_REVIEWED_GROUPS=new Set([
 ]);
 
 export const laterReviewed=record=>!record.specialCase&&LATER_REVIEWED_GROUPS.has(record.group);
+
+// Whole new cases added later through `npm run clinical:new` and their own
+// reviewed revision batch. The retired legacy chain never contained them, so
+// the old snapshot tests leave them out before comparing "nothing else changed".
+// Only add a case here together with its reviewed revision batch.
+export const LATER_ADDED_CASES=new Set([
+  '胫骨平台骨折|complete-20261101',
+]);
+export const LATER_ADDED_GROUPS=new Set([...LATER_ADDED_CASES].map(key=>key.split('|')[0]));
+export const laterAdded=record=>Boolean(record?.completeCaseKey)&&LATER_ADDED_CASES.has(record.group+'|'+record.completeCaseKey);
+export function withoutLaterAdded(source){
+  const keep=source.records.map((record,index)=>laterAdded(record)?-1:index).filter(index=>index>=0);
+  return {...source,records:keep.map(index=>source.records[index]),renderedBodies:keep.map(index=>source.renderedBodies[index])};
+}
