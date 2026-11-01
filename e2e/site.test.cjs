@@ -1499,7 +1499,51 @@ test('orthopaedic and perioperative calculators return hand-checked results',asy
     await run('morse',[['sel','m1','25'],['sel','m2','15'],['sel','m3','15'],['sel','m4','0'],['sel','m5','10'],['sel','m6','0']],[/Morse 65 分/,/高风险/]);
     // Untouched score items are never counted: the calculator asks for them instead.
     await run('sins',[['sel','loc','3']],[/请完成所有选择项/,/还有 5 项未选择/]);
-    assert.equal(await page.locator('.card[data-tool]').count(),71);
+    assert.equal(await page.locator('.card[data-tool]').count(),83);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('emergency and critical-care calculators return hand-checked results',async()=>{
+  const {page,context,errors}=await pageFor(1440);
+  try{
+    await page.goto(base+'/tools',{waitUntil:'networkidle'});
+    const run=async(tool,steps,expect)=>{
+      await page.locator('.card[data-tool="'+tool+'"]').click();
+      const dlg=page.locator('#dlg');await dlg.waitFor({state:'visible'});
+      assert.match(await dlg.locator('.cite a').getAttribute('href'),/^https:\/\//,tool+' cites an https source');
+      for(const [kind,target,value] of steps){
+        if(kind==='sel')await dlg.locator('#'+target).selectOption(value);
+        else if(kind==='fill')await dlg.locator('#'+target).fill(String(value));
+        else if(kind==='id')await dlg.locator('#'+target).check();
+        else await dlg.locator('label.check').filter({hasText:target}).first().locator('input').check();
+      }
+      await dlg.locator('#go').click();
+      const text=await dlg.locator('#res').innerText();
+      for(const pattern of expect)assert.match(text,pattern,tool+': '+text);
+      await dlg.locator('#close').click();
+    };
+    await run('sofa',[['sel','resp','2'],['sel','coag','1'],['sel','liver','0'],['sel','cv','3'],['sel','cns','1'],['sel','renal','2']],[/SOFA 9 分/]);
+    // GCS 14 → 4, SBP 80 → 3, RR 32 → 3: 0.9368×4 + 0.7326×3 + 0.2908×3 = 6.82
+    await run('rts',[['fill','gcs',14],['fill','sbp',80],['fill','rr',32]],[/RTS 6\.82/,/T-RTS（编码相加）= 10/]);
+    await run('abcd2',[['sel','a','1'],['sel','b','1'],['sel','c','2'],['sel','d1','2'],['sel','d2','0']],[/ABCD² 6 分/,/高风险/]);
+    await run('heart',[['sel','h','1'],['sel','e','0'],['sel','a','1'],['sel','r','1'],['sel','t','0']],[/HEART 3 分/,/低危/]);
+    await run('perc',[],[/PERC 阴性/]);
+    await run('perc',[['id','p1']],[/PERC 阳性（1 项）/]);
+    // Urea 9 → 3, male Hb 115 → 3, SBP 95 → 2, melaena 1 = 9
+    await run('gbs',[['sel','sex','m'],['fill','urea',9],['fill','hb',115],['fill','sbp',95],['id','g2']],[/GBS 9 分/]);
+    await run('gbs',[['sel','sex','f'],['fill','urea',5],['fill','hb',130],['fill','sbp',125]],[/GBS 0 分/,/极低危/]);
+    await run('bisap',[['chk','意识障碍'],['chk','SIRS'],['chk','年龄 >60岁']],[/BISAP 3 分/,/≥3 分/]);
+    await run('ciwa',[['sel','c1','4'],['sel','c2','4'],['sel','c3','2'],['sel','c4','3'],['sel','c5','1'],['sel','c6','0'],['sel','c7','0'],['sel','c8','0'],['sel','c9','1'],['sel','c10','0']],[/CIWA-Ar 15 分/,/中度/]);
+    await run('ccsr',[['id','h1']],[/有高危因素/]);
+    await run('ccsr',[['id','l2']],[/不能左右转颈 45°/]);
+    await run('ccsr',[['id','l2'],['id','r1']],[/规则阴性/]);
+    await run('ccsr',[['id','r1']],[/无低危因素/]);
+    await run('nexus',[],[/5 项均阴性/]);
+    await run('nexus',[['id','n0']],[/建议颈椎影像检查（1 项阳性）/]);
+    await run('ccthead',[['id','t6']],[/中危：建议头颅 CT/]);
+    await run('ccthead',[],[/规则阴性/]);
+    await run('alvarado',[['chk','转移性右下腹痛'],['chk','右下腹压痛'],['chk','白细胞增多'],['chk','反跳痛'],['chk','厌食']],[/Alvarado 7 分/,/很可能/]);
     assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
