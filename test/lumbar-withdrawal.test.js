@@ -17,10 +17,10 @@ const expectedGroups=['胸腰椎爆裂骨折','骨质疏松性椎体压缩骨折
 test('lumbar withdrawal removes exactly 12 complete cases and preserves unrelated cases and permanent IDs',()=>{
   const {plan,source,inventory}=current;
   assert(expectedGroups.every(group=>plan.withdrawn.some(e=>e.record.group===group)));
-  assert.deepEqual([...new Set(plan.published.filter(e=>e.record.department==='骨科' && !e.record.specialCase && e.record.group!=='通用场景').map(e=>e.record.group))].sort(), ['TKA','THA','人工股骨头置换','股骨转子间骨折','胫骨干骨折','桡骨远端骨折','锁骨骨折'].sort());
-  assert.equal(plan.withdrawn.length,5099);
-  assert.equal(plan.published.length,282);
-  assert.equal(plan.published.filter(e=>e.record.department==='骨科').length,255);
+  assert.deepEqual([...new Set(plan.published.filter(e=>e.record.department==='骨科' && !e.record.specialCase && e.record.group!=='通用场景').map(e=>e.record.group))].sort(), ['TKA','THA','人工股骨头置换','股骨转子间骨折','胫骨干骨折','桡骨远端骨折','锁骨骨折','肩锁关节脱位'].sort());
+  assert.equal(plan.withdrawn.length,5073);
+  assert.equal(plan.published.length,308);
+  assert.equal(plan.published.filter(e=>e.record.department==='骨科').length,281);
   assert.equal(plan.archived.length,0);
   for(const decision of inventory.policy.withdrawals){
     const actual=plan.withdrawn.filter(e=>e.identity.caseId===decision.caseId);
@@ -30,7 +30,7 @@ test('lumbar withdrawal removes exactly 12 complete cases and preserves unrelate
     assert(actual.some(e=>e.record.short==='出院当天查房记录'));
     assert(actual.some(e=>e.record.type==='出院小结'));
   }
-  for(const group of ['TKA','THA','股骨转子间骨折','人工股骨头置换','胫骨干骨折','桡骨远端骨折','锁骨骨折']){
+  for(const group of ['TKA','THA','股骨转子间骨折','人工股骨头置换','胫骨干骨折','桡骨远端骨折','锁骨骨折','肩锁关节脱位']){
     assert(plan.published.some(e=>e.record.group===group),group+' must remain published');
   }
   const byIdentity=new Map(source.records.map(record=>[identityKey(record),record]));
