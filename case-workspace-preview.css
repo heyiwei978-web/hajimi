@@ -144,6 +144,29 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 @media(max-width:1279px){.comorbidity-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:600px){.comorbidity-panel{padding:16px 14px}.comorbidity-head{flex-direction:column;gap:10px}.comorbidity-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.comorbidity-choice{padding:10px;min-height:48px}}
 
+/* 特殊检查 column beside the chronic-condition options. */
+.supplement-pickers{display:grid;gap:14px;margin:18px 0 4px;align-items:start}
+.supplement-pickers>.comorbidity-panel{margin:0}
+.special-exam-group{margin-top:12px;border:1px solid #dfe7f1;border-radius:12px;background:#fbfdff}
+.special-exam-group>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;padding:10px 14px;cursor:pointer;font-weight:700;color:#1c3b58;list-style:none}
+.special-exam-group>summary::-webkit-details-marker{display:none}
+.special-exam-group>summary::after{content:"⌄";font-size:18px;color:#5b6f86}
+.special-exam-group[open]>summary::after{transform:rotate(180deg)}
+.special-exam-group>summary small{margin-left:auto;color:#5b6f86;font-weight:600}
+.special-exam-group:has(input:checked)>summary small{color:#1f5f9e}
+.special-exam-group .special-exam-grid{margin:0;padding:0 12px 12px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.special-exam-notes{margin-top:4px;padding-top:12px;border-top:1px dashed #cfdcec}
+.special-exam-notes-title{margin:0 0 10px;color:#163e68;font-size:1rem}
+.special-exam-notes-title small,.special-exam-detail h4 small{margin-left:8px;color:#5b6f86;font-size:.82rem;font-weight:600}
+.special-exam-detail{border-left-color:#2f8a6b}
+@media screen and (min-width:1100px){
+ .supplement-pickers{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .supplement-pickers .comorbidity-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .supplement-pickers .special-exam-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:600px){.special-exam-group .special-exam-grid{grid-template-columns:repeat(2,minmax(0,1fr));padding:0 10px 10px}}
+@media print{.special-exam-picker,.supplement-pickers{display:none!important}}
+
 .comorbidity-side{min-width:0;background:#fff;border:1px solid #cfdcec;border-radius:18px;box-shadow:0 10px 28px rgba(26,56,88,.08);padding:16px}
 .comorbidity-side[hidden],.comorbidity-fab[hidden]{display:none!important}
 .comorbidity-side-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid #e3eaf3}
@@ -151,6 +174,7 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 .comorbidity-side-head h3:focus{outline:none}
 #comorbiditySelectionStatus{display:block;color:#255b8c;font-weight:700;font-size:.92rem}
 .comorbidity-stage-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 8px}
+.comorbidity-stage-tabs[hidden],.comorbidity-follow[hidden]{display:none}
 .comorbidity-stage-tabs button{min-height:40px;padding:6px 12px;border:1px solid #d3deeb;border-radius:999px;background:#f6f9fd;color:#2d4a68;font:inherit;font-size:.94rem;font-weight:650;cursor:pointer}
 .comorbidity-stage-tabs button[aria-pressed="true"]{background:#1f5f9e;border-color:#1f5f9e;color:#fff}
 .comorbidity-follow{margin:0 0 10px;color:#5a6b7e;font-size:.9rem;line-height:1.6;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
