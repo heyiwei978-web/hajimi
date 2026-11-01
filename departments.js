@@ -711,6 +711,8 @@
         const id=articles[i].id;
         links.forEach(function(link){const yes=link.dataset.caseRecord===id;link.classList.toggle('is-current',yes);if(yes){link.setAttribute('aria-current','location');link.closest('details').open=true;}else link.removeAttribute('aria-current');});
         syncNavigation();
+        const record=templates[Number(articles[i].dataset.recordIndex)];
+        window.HAJIMI_COMORBIDITIES?.setChapter?.({stage:record?.stage||'',title:articles[i].querySelector('h3')?.textContent||''});
         if(!isCompact())revealDirectorySelection();
         if(scroll){
           if(isCompact()&&directoryPanel)directoryPanel.open=false;
@@ -873,11 +875,12 @@
         </section>`;
 
       const allChapters=units.map(function(u,i){return caseUnitChapter(u,i,list);}).join('');
-      const comorbidityPanel=currentDept==='骨科'&&state.group!=='通用场景' ? (window.HAJIMI_COMORBIDITIES?.html()||'') : '';
+      const comorbidity=currentDept==='骨科'&&state.group!=='通用场景'?window.HAJIMI_COMORBIDITIES:null;
+      const comorbidityPanel=comorbidity?.html()||'',comorbiditySide=comorbidity?.sideHtml?.()||'';
       const grouping=caseFileSections(list);
       const signedCount=grouping.find(function(x){return x.key==='consent';}).members.length;
       if(grid)grid.innerHTML=toolbar(currentDept+' · '+labelFor(state.group),false)+hero+
-        '<div class="source-template-note">'+(utility?'<strong>通用记录：</strong>按真实临床问题选用和修改，不作为完整住院病例。':'<strong>示例患者 · 整套病历：</strong>使用前核对患者身份、日期、检查结果、真实诊疗经过及签字信息；特殊病例另行归档，不与标准病例混用。')+'</div>'+
+        '<div class="source-template-note">'+(utility?'<strong>通用记录：</strong>按真实临床问题选用和修改，不作为完整住院病例。':'<strong>示例患者 · 整套病历：</strong>使用前核对患者身份、日期、检查结果、真实诊疗经过及签字信息；特殊病例另行归档，不与标准病例混用。')+'</div>'+comorbidityPanel+
         '<section id="caseWorkspace" class="case-workspace case-continuous-reader case-show-all record-book-layout">'+
           '<aside class="record-book-toc case-file-sidebar" id="recordBookToc" aria-label="完整病历目录">'+
             '<details id="caseDirectoryPanel" class="case-directory-panel" open><summary id="caseDirectorySummary" class="case-directory-summary"><strong>病历目录</strong><span id="caseDirectoryCurrent"></span><span class="case-directory-chevron" aria-hidden="true">⌄</span></summary>'+caseFileNav(units)+'</details></aside>'+
@@ -895,8 +898,8 @@
                 '<button id="caseNextBottom" data-case-step="1" class="btn primary" type="button">下一章 →</button>'+
               '</div>'+
             '</nav>'+
-          '</div>'+
-        '</section>'+comorbidityPanel+specialBundle.html;
+          '</div>'+comorbiditySide+
+        '</section>'+specialBundle.html;
 
       const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateDepartment(currentDept);
       bindTemplateActions();

@@ -64,49 +64,140 @@
     ['postop','术后病程与监测'],
     ['discharge','出院当天查房及随访']
   ];
+  const fieldTitle=Object.fromEntries(fields);
+  // Reading stages of the side panel. Each stage lists the fields shown beside
+  // the chapter being read; "all" shows every field.
+  const stages=[
+    {id:'admission',label:'入院',fields:['history']},
+    {id:'preop',label:'术前',fields:['preop','consult']},
+    {id:'postop',label:'术后',fields:['postop']},
+    {id:'discharge',label:'出院',fields:['discharge']},
+    {id:'all',label:'全部',fields:fields.map(([field])=>field)}
+  ];
+  const stageById=Object.fromEntries(stages.map(stage=>[stage.id,stage]));
+  let stage='admission',follow=true,chapter=null,sheetOpen=false,view=null,drawn='';
   function escape(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+  // Maps the chapter being read to the matching supplement stage.
+  function stageFor(info){
+    const title=String(info?.title||'');
+    if(/出院/.test(title))return 'discharge';
+    const value=String(info?.stage||'');
+    if(value==='入院')return 'admission';
+    if(value==='术前'||value==='术中')return 'preop';
+    if(value==='术后')return 'postop';
+    return 'admission';
+  }
   function separateText(){
     return selectedItems().map(item=>
       '【'+item.name+'｜独立补充模块】\n'+
       fields.map(([field,title])=>title+'：'+item[field]).join('\n\n')
     ).join('\n\n========================================\n\n');
   }
-  function renderSelected(){
+  function boxText(id,field){
+    const item=get(id);
+    return item&&fieldTitle[field]?String(item[field]):'';
+  }
+  function renderSelected(stageId=stage){
     const items=selectedItems();
-    return items.length
-      ?items.map(item=>'<article class="comorbidity-detail"><h4>'+escape(item.name)+'</h4>'+
-        fields.map(([field,title])=>'<div><strong>'+escape(title)+'</strong><p>'+escape(item[field])+'</p></div>').join('')+
-        '</article>').join('')
-      :'<p class="comorbidity-empty">尚未选择慢性病。可多选后查看各阶段的独立补充资料。</p>';
+    const current=stageById[stageId]||stageById.admission;
+    if(!items.length)return '<p class="comorbidity-empty">尚未选择慢性病。勾选后，这里会出现对应的补充内容框。</p>';
+    return items.map(item=>'<article class="comorbidity-detail" data-comorbidity-item="'+item.id+'"><h4>'+escape(item.name)+'</h4>'+
+      current.fields.map(field=>'<div class="comorbidity-box"><div class="comorbidity-box-head"><strong>'+escape(fieldTitle[field])+'</strong>'+
+        '<button class="btn ghost comorbidity-box-copy" type="button" data-copy-box="'+item.id+':'+field+'" aria-label="复制'+escape(item.name+'：'+fieldTitle[field])+'">复制</button></div>'+
+        '<p>'+escape(item[field])+'</p></div>').join('')+
+      '</article>').join('');
   }
   // Intentionally identity-only; prevent source text and full-record copy from
   // gaining contradictory claims when a sample patient denies a condition.
   function compose(record,original){return original;}
+  // The option bar shown above the record.
   function html(){
-    return '<section id="comorbidityPanel" class="comorbidity-panel" aria-labelledby="comorbidityTitle">'+
-      '<div class="comorbidity-head"><div><span class="case-file-eyebrow">OPTIONAL COMORBIDITIES</span><h3 id="comorbidityTitle">合并慢性病管理</h3>'+
-      '<p>在整套标准病历后查阅独立的慢性病补充资料。勾选后分别展示入院、术前、会诊、术后及出院参考段落。</p></div>'+
+    return '<section id="comorbidityPanel" class="comorbidity-panel comorbidity-picker" aria-labelledby="comorbidityTitle">'+
+      '<div class="comorbidity-head"><div><span class="case-file-eyebrow">OPTIONAL COMORBIDITIES</span><h3 id="comorbidityTitle">合并慢性病（可多选）</h3>'+
+      '<p>勾选后，病历旁出现对应的补充内容框（手机上点右下角“慢性病补充”打开），随阅读章节自动切换入院、术前、术后、出院内容，可单独复制。</p></div>'+
       '<button id="clearComorbidities" class="btn ghost" type="button">清空选择</button></div>'+
-      '<p class="comorbidity-caution">原始教学病例可能已明确记载“否认慢性病史”及特定检查结果。本模块不与原病例自动拼接，正式使用前须先按真实病史、检查、医嘱及手术时机逐项修改，避免同一病历前后矛盾。</p>'+
       '<div class="comorbidity-grid">'+modules.map(item=>
         '<label class="comorbidity-choice"><input type="checkbox" data-comorbidity="'+item.id+'"'+(chosen.has(item.id)?' checked':'')+'><span>'+escape(item.name)+'</span></label>'
       ).join('')+'</div>'+
-      '<div class="comorbidity-actions"><span id="comorbiditySelectionStatus" role="status">'+chosen.size+' 项已选择</span>'+
-      '<button id="copyComorbidities" class="btn primary" type="button"'+(chosen.size?'':' disabled')+'>仅复制已选慢性病补充</button></div>'+
+      '<p class="comorbidity-caution">原始教学病例可能已明确记载“否认慢性病史”及特定检查结果。补充内容不与原病例自动拼接，正式使用前须先按真实病史、检查、医嘱及手术时机逐项修改，避免同一病历前后矛盾。</p>'+
+      '</section>';
+  }
+  // The supplement panel beside the record (bottom sheet on narrow screens).
+  function sideHtml(){
+    return '<aside id="comorbiditySide" class="comorbidity-side" aria-labelledby="comorbiditySideTitle" hidden>'+
+      '<div class="comorbidity-side-head"><div><span class="case-file-eyebrow">CHRONIC CONDITIONS</span><h3 id="comorbiditySideTitle" tabindex="-1">慢性病补充内容</h3>'+
+      '<span id="comorbiditySelectionStatus" role="status">'+chosen.size+' 项已选择</span></div>'+
+      '<button id="closeComorbiditySide" class="btn ghost comorbidity-side-close" type="button">收起</button></div>'+
+      '<div class="comorbidity-stage-tabs" role="group" aria-label="补充内容对应阶段">'+stages.map(item=>
+        '<button type="button" data-comorbidity-stage="'+item.id+'" aria-pressed="'+(item.id===stage)+'">'+item.label+'</button>'
+      ).join('')+'</div>'+
+      '<p class="comorbidity-follow"><span id="comorbidityFollowText"></span><button id="comorbidityFollow" class="comorbidity-follow-btn" type="button" hidden>跟随阅读章节</button></p>'+
       '<div id="comorbidityNotes" class="comorbidity-notes">'+renderSelected()+'</div>'+
-      '<div class="comorbidity-footer"><span>检查结果、用药、处理结论及实际操作均须核对。</span><span>不会修改原始病历或“复制完整病历”的内容。</span></div></section>';
+      '<div class="comorbidity-actions"><button id="copyComorbidities" class="btn primary" type="button"'+(chosen.size?'':' disabled')+'>复制已选全部补充</button></div>'+
+      '<p class="comorbidity-footer">检查结果、用药、处理结论须核对；不会修改原始病历或“复制完整病历”的内容。</p>'+
+      '</aside>'+
+      '<button id="openComorbiditySide" class="comorbidity-fab" type="button" aria-controls="comorbiditySide" aria-expanded="false" hidden>慢性病补充 <b id="comorbidityFabCount">0</b></button>';
+  }
+  async function copyValue(value){
+    if(!value)return false;
+    try{await navigator.clipboard.writeText(value);return true;}catch{
+      if(typeof document==='undefined'||!document.createElement)return false;
+      const input=document.createElement('textarea');
+      input.value=value;document.body.appendChild(input);input.select();
+      let ok=false;try{ok=document.execCommand('copy');}catch{}
+      input.remove();return ok;
+    }
+  }
+  function redraw(){
+    if(!view||!view.side.isConnected)return;
+    const {side,workspace,notes,status,copy,fab,fabCount,tabs,followText,followButton}=view;
+    const count=chosen.size;
+    side.hidden=count===0;
+    workspace?.classList.toggle('has-comorbidity-side',count>0);
+    if(count===0)sheetOpen=false;
+    side.classList.toggle('is-open',sheetOpen);
+    fab.hidden=count===0||sheetOpen;
+    fab.setAttribute('aria-expanded',String(sheetOpen));
+    fabCount.textContent=String(count);
+    status.textContent=count+' 项已选择';
+    copy.disabled=count===0;
+    tabs.forEach(tab=>tab.setAttribute('aria-pressed',String(tab.dataset.comorbidityStage===stage)));
+    const label=stageById[stage].label;
+    followText.textContent=follow
+      ?(chapter?.title?'正在阅读「'+chapter.title+'」→ 显示'+label+'内容':'显示'+label+'内容，随阅读章节自动切换')
+      :'已手动切换为'+label+'内容';
+    followButton.hidden=follow;
+    // Rebuild the boxes only when their content changes, so scrolling within the
+    // same stage keeps keyboard focus on a copy button.
+    const key=stage+'|'+[...chosen].join(',');
+    if(key!==drawn){drawn=key;notes.innerHTML=renderSelected();}
+  }
+  function setOpen(open){
+    sheetOpen=!!open;
+    redraw();
+    if(!view)return;
+    if(sheetOpen)view.side.querySelector('#comorbiditySideTitle')?.focus({preventScroll:true});
+    else view.fab.focus?.({preventScroll:true});
+  }
+  // Called by the case reader whenever the current chapter changes.
+  function setChapter(info){
+    chapter=info?{stage:String(info.stage||''),title:String(info.title||'')}:null;
+    if(follow)stage=stageFor(chapter);
+    redraw();
   }
   function bind(){
     const panel=document.getElementById('comorbidityPanel');
-    if(!panel)return;
-    const notes=panel.querySelector('#comorbidityNotes');
-    const status=panel.querySelector('#comorbiditySelectionStatus');
-    const copy=panel.querySelector('#copyComorbidities');
-    const redraw=()=>{
-      status.textContent=chosen.size+' 项已选择';
-      copy.disabled=chosen.size===0;
-      notes.innerHTML=renderSelected();
+    const side=document.getElementById('comorbiditySide');
+    if(!panel||!side){view=null;return;}
+    const q=selector=>side.querySelector(selector);
+    view={
+      side,workspace:side.closest?.('.case-workspace')||null,
+      notes:q('#comorbidityNotes'),status:q('#comorbiditySelectionStatus'),copy:q('#copyComorbidities'),
+      tabs:[...side.querySelectorAll('[data-comorbidity-stage]')],
+      followText:q('#comorbidityFollowText'),followButton:q('#comorbidityFollow'),
+      fab:document.getElementById('openComorbiditySide'),fabCount:document.getElementById('comorbidityFabCount')
     };
+    const current=view;
     panel.querySelectorAll('[data-comorbidity]').forEach(input=>input.addEventListener('change',()=>{
       if(input.checked)chosen.add(input.dataset.comorbidity);
       else chosen.delete(input.dataset.comorbidity);
@@ -117,18 +208,31 @@
       panel.querySelectorAll('[data-comorbidity]').forEach(input=>{input.checked=false;});
       redraw();
     });
-    copy.addEventListener('click',async()=>{
-      const value=separateText();if(!value)return;
-      let ok=false;
-      try{await navigator.clipboard.writeText(value);ok=true;}catch{
-        const input=document.createElement('textarea');
-        input.value=value;document.body.appendChild(input);input.select();
-        try{ok=document.execCommand('copy');}catch{}
-        input.remove();
-      }
-      status.textContent=ok?'已复制 '+chosen.size+' 项补充资料':'复制失败，请核对浏览器权限';
+    current.tabs.forEach(tab=>tab.addEventListener('click',()=>{
+      stage=tab.dataset.comorbidityStage;follow=false;redraw();
+    }));
+    current.followButton.addEventListener('click',()=>{follow=true;stage=stageFor(chapter);redraw();});
+    current.fab.addEventListener('click',()=>setOpen(true));
+    q('#closeComorbiditySide').addEventListener('click',()=>setOpen(false));
+    side.addEventListener('keydown',event=>{if(event.key==='Escape'&&sheetOpen)setOpen(false);});
+    current.notes.addEventListener('click',async event=>{
+      const button=event.target?.closest?.('[data-copy-box]');
+      if(!button)return;
+      const [id,field]=button.dataset.copyBox.split(':');
+      const ok=await copyValue(boxText(id,field));
+      current.status.textContent=ok?'已复制：'+get(id).name+' · '+fieldTitle[field]:'复制失败，请核对浏览器权限';
     });
+    current.copy.addEventListener('click',async()=>{
+      const value=separateText();if(!value)return;
+      const ok=await copyValue(value);
+      current.status.textContent=ok?'已复制 '+chosen.size+' 项补充资料':'复制失败，请核对浏览器权限';
+    });
+    // Each newly opened record starts by following its own chapters.
+    sheetOpen=false;follow=true;stage=stageFor(chapter);drawn='';
     redraw();
   }
-  root.HAJIMI_COMORBIDITIES=Object.freeze({modules,compose,html,bind,separateText,selected:()=>[...chosen]});
+  root.HAJIMI_COMORBIDITIES=Object.freeze({
+    modules,stages,compose,html,sideHtml,bind,setChapter,stageFor,renderSelected,separateText,boxText,
+    selected:()=>[...chosen],stage:()=>stage
+  });
 })(typeof window!=='undefined'?window:globalThis);
