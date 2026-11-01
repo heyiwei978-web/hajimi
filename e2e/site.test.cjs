@@ -1638,3 +1638,46 @@ test('visitors see saved supplement edits but get no edit buttons',async()=>{
     assert.equal(await notes.locator('[data-edit-box]').count(),0);
   }finally{await context.close();}
 });
+
+test('editors can be enlarged: supplement boxes open a full-size editor and CMS dialogs toggle full screen',async()=>{
+  for(const width of [390,1440]){
+    const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'});
+    let content={version:1,revision:'r1',templateOverrides:{},cases:[]};const puts=[];
+    await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'admin'}}));
+    await context.route('**/api/content',async route=>{
+      if(route.request().method()==='PUT'){const body=JSON.parse(route.request().postData());puts.push(body);content={...body,revision:'r'+(puts.length+1)};}
+      await route.fulfill({json:content});
+    });
+    const page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
+    try{
+      await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+      const exams=page.locator('#specialExamPanel');
+      await exams.locator('.special-exam-group summary').nth(2).click();
+      await exams.locator('input[data-exam="drug"]').check();
+      const side=page.locator('#comorbiditySide');
+      if(width<1280)await page.locator('#openComorbiditySide').click();
+      await side.locator('[data-edit-box="x:drug:reason"]').click();
+      await side.locator('[data-edit-expand="x:drug:reason"]').click();
+      const dialog=page.locator('#supplementExpandDialog');await dialog.waitFor({state:'visible'});
+      const box=await dialog.boundingBox();
+      assert(box.width>=Math.min(width,1100)-30,'the enlarged editor uses most of the screen width');
+      assert(box.height>=700,'and most of its height');
+      await dialog.locator('#supplementExpandText').fill('生血宝 琥珀酸亚铁片：放大编辑后保存');
+      await dialog.locator('[data-expand-save]').click();
+      await page.waitForFunction(()=>document.querySelector('#comorbidityNotes')?.textContent.includes('放大编辑后保存'));
+      assert.equal(puts.at(-1).supplementOverrides['x:drug:reason'].body,'生血宝 琥珀酸亚铁片：放大编辑后保存');
+      // The existing record-template editor gets a full-screen toggle too.
+      if(width<1280)await side.locator('#closeComorbiditySide').click();
+      await page.locator('.case-file-reader .preview').first().click();
+      await page.locator('#cmsEditTemplate').click();
+      const editDialog=page.locator('#cmsEditDialog');await editDialog.waitFor({state:'visible'});
+      await editDialog.locator('[data-dialog-expand]').click();
+      assert.equal(await editDialog.evaluate(d=>d.classList.contains('is-expanded')),true);
+      const full=await editDialog.boundingBox();
+      assert(full.width>=width-30);
+      await editDialog.locator('[data-dialog-expand]').click();
+      assert.equal(await editDialog.evaluate(d=>d.classList.contains('is-expanded')),false);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});

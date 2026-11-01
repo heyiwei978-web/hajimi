@@ -24,12 +24,12 @@
         <div class="cms-actions"><button type="button" class="btn ghost" data-dialog-close>取消</button><button type="submit" class="btn primary">登录</button></div>
       </form></dialog>
       <dialog id="cmsEditDialog" class="cms-dialog cms-edit-dialog" aria-labelledby="cmsEditDialogTitle"><form id="cmsEditForm">
-        <div class="cms-dialog-head"><div><strong id="cmsEditDialogTitle">编辑模板正文</strong><span id="cmsEditTitle"></span></div><button type="button" class="cms-x" data-dialog-close aria-label="关闭">×</button></div>
+        <div class="cms-dialog-head"><div><strong id="cmsEditDialogTitle">编辑模板正文</strong><span id="cmsEditTitle"></span></div><span class="cms-head-buttons"><button type="button" class="cms-expand" data-dialog-expand aria-pressed="false">放大</button><button type="button" class="cms-x" data-dialog-close aria-label="关闭">×</button></span></div>
         <textarea id="cmsEditBody" rows="24"></textarea><p id="cmsEditError" class="cms-error" role="alert" hidden></p>
         <div class="cms-actions"><button type="button" id="cmsRestoreDefault" class="btn ghost">恢复默认</button><span class="cms-spacer"></span><button type="button" class="btn ghost" data-dialog-close>取消</button><button type="submit" class="btn primary">保存修改</button></div>
       </form></dialog>
       <dialog id="cmsCaseDialog" class="cms-dialog" aria-labelledby="cmsCaseDialogTitle"><form id="cmsCaseForm">
-        <div class="cms-dialog-head"><div><strong id="cmsCaseDialogTitle">添加案例</strong><span>案例可在浏览模式中展示</span></div><button type="button" class="cms-x" data-dialog-close aria-label="关闭">×</button></div>
+        <div class="cms-dialog-head"><div><strong id="cmsCaseDialogTitle">添加案例</strong><span>案例可在浏览模式中展示</span></div><span class="cms-head-buttons"><button type="button" class="cms-expand" data-dialog-expand aria-pressed="false">放大</button><button type="button" class="cms-x" data-dialog-close aria-label="关闭">×</button></span></div>
         <input type="hidden" name="caseId">
         <label>案例标题<input name="title" placeholder="例如：术后第3天切口及DR复查" required></label>
         <label>说明<textarea name="description" rows="5" placeholder="填写经过脱敏的案例说明"></textarea></label>
@@ -40,6 +40,11 @@
       </form></dialog>`);
   }
   function installDialogCloseHandlers(){
+    // 放大/缩小: let the edit dialogs fill the screen for long text.
+    document.querySelectorAll('[data-dialog-expand]').forEach((btn)=>btn.addEventListener('click',()=>{
+      const d=btn.closest('dialog');if(!d)return;const on=!d.classList.contains('is-expanded');
+      d.classList.toggle('is-expanded',on);btn.setAttribute('aria-pressed',String(on));btn.textContent=on?'缩小':'放大';
+    }));
     document.querySelectorAll('[data-dialog-close],#patientDialog [data-close-dialog]').forEach((btn)=>btn.addEventListener('click',()=>{const d=btn.closest('dialog');if(d)d.close();}));
     document.querySelectorAll('.cms-dialog').forEach((dialog)=>dialog.addEventListener('click',(e)=>{if(e.target!==dialog)return;const r=dialog.getBoundingClientRect();const inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;if(!inside)dialog.close();}));
   }

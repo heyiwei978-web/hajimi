@@ -51,3 +51,10 @@
 }
 
 .cms-actions{padding-bottom:env(safe-area-inset-bottom,0px)}
+/* 放大 toggle for the template and case editors. */
+.cms-head-buttons{display:flex;align-items:center;gap:8px;flex:none}
+.cms-expand{border:1px solid #cfd8e3;background:#fff;color:#1d4f86;border-radius:999px;min-height:44px;padding:0 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.cms-dialog.is-expanded{width:calc(100vw - 16px);max-width:none;height:calc(100dvh - 16px);max-height:none}
+.cms-edit-dialog.is-expanded textarea{height:calc(100dvh - 250px);font-size:17px}
+.cms-dialog.is-expanded textarea[name="description"]{height:calc(100dvh - 520px);min-height:200px;font-size:17px}
+@media(max-width:600px){.cms-dialog.is-expanded{width:100vw;height:100dvh;border-radius:0;margin:0}}

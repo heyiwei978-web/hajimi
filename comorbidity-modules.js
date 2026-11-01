@@ -304,6 +304,42 @@
     if(follow)stage=stageFor(chapter);
     redraw();
   }
+  // A large modal editor for the narrow side panel. It edits the same text as the
+  // inline box: 保存 saves through the inline controls, 缩小 copies the text back.
+  function expandDialog(){
+    let dialog=document.getElementById('supplementExpandDialog');
+    if(dialog)return dialog;
+    dialog=document.createElement('dialog');
+    dialog.id='supplementExpandDialog';dialog.className='supplement-expand-dialog';
+    dialog.setAttribute('aria-labelledby','supplementExpandTitle');
+    dialog.innerHTML='<div class="supplement-expand-head"><div><strong id="supplementExpandTitle">放大编辑</strong><span id="supplementExpandMeta"></span></div>'+
+      '<button type="button" class="btn ghost" data-expand-close>缩小</button></div>'+
+      '<label class="supplement-editor-label" for="supplementExpandText">编辑内容（保存后所有访问者都会看到）</label>'+
+      '<textarea id="supplementExpandText"></textarea>'+
+      '<div class="supplement-editor-actions"><button type="button" class="btn primary" data-expand-save>保存</button>'+
+      '<button type="button" class="btn ghost" data-expand-close>缩小（不保存）</button></div>'+
+      '<p class="supplement-editor-status" id="supplementExpandStatus" role="status" aria-live="polite"></p>';
+    document.body.appendChild(dialog);
+    return dialog;
+  }
+  function openExpanded(box,editor){
+    const dialog=expandDialog(),inline=editor.querySelector('textarea'),big=dialog.querySelector('#supplementExpandText');
+    const label=box.querySelector('.comorbidity-box-head strong')?.textContent||'';
+    const title=box.closest('.comorbidity-detail')?.querySelector('h4')?.childNodes[0]?.textContent||'';
+    dialog.querySelector('#supplementExpandMeta').textContent=[title,label.replace('已修改','')].filter(Boolean).join(' · ');
+    dialog.querySelector('#supplementExpandStatus').textContent='';
+    big.value=inline.value;
+    const back=()=>{inline.value=big.value;};
+    dialog.querySelectorAll('[data-expand-close]').forEach(button=>{button.onclick=()=>{back();dialog.close();inline.focus();};});
+    dialog.querySelector('[data-expand-save]').onclick=()=>{
+      back();
+      if(!big.value.trim()){dialog.querySelector('#supplementExpandStatus').textContent='内容不能为空；如需还原请点小框里的“恢复默认”。';return;}
+      dialog.close();
+      editor.querySelector('[data-edit-save]')?.click();
+    };
+    dialog.oncancel=()=>{back();};
+    dialog.showModal();big.focus();
+  }
   // In-place editing of one supplement box (developer mode only).
   async function handleEdit(button,current){
     const box=button.closest('.comorbidity-box');if(!box)return;
@@ -317,7 +353,8 @@
       editor.innerHTML='<label class="supplement-editor-label">编辑内容（保存后所有访问者都会看到）<textarea rows="7" data-edit-text></textarea></label>'+
         '<div class="supplement-editor-actions"><button class="btn primary" type="button" data-edit-save="'+key+'">保存</button>'+
         (overrides()[key]?'<button class="btn ghost" type="button" data-edit-reset="'+key+'">恢复默认</button>':'')+
-        '<button class="btn ghost" type="button" data-edit-cancel="'+key+'">取消</button></div>'+
+        '<button class="btn ghost" type="button" data-edit-cancel="'+key+'">取消</button>'+
+        '<button class="btn ghost supplement-expand-btn" type="button" data-edit-expand="'+key+'">放大编辑</button></div>'+
         '<p class="supplement-editor-status" role="status" aria-live="polite"></p>';
       editor.querySelector('textarea').value=text;
       para.replaceWith(editor);
@@ -326,6 +363,7 @@
     }
     const editor=box.querySelector('.supplement-editor');
     const status=editor?.querySelector('.supplement-editor-status');
+    if(button.dataset.editExpand){openExpanded(box,editor);return;}
     const finish=()=>{editing=null;drawn='';redraw();};
     if(button.dataset.editCancel){finish();return;}
     try{
@@ -390,7 +428,7 @@
     q('#closeComorbiditySide').addEventListener('click',()=>setOpen(false));
     side.addEventListener('keydown',event=>{if(event.key==='Escape'&&sheetOpen)setOpen(false);});
     current.notes.addEventListener('click',async event=>{
-      const edit=event.target?.closest?.('[data-edit-box],[data-edit-save],[data-edit-reset],[data-edit-cancel]');
+      const edit=event.target?.closest?.('[data-edit-box],[data-edit-save],[data-edit-reset],[data-edit-cancel],[data-edit-expand]');
       if(edit){await handleEdit(edit,current);return;}
       const button=event.target?.closest?.('[data-copy-box]');
       if(!button)return;
