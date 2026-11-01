@@ -9,14 +9,16 @@
   "胫骨干骨折",
   "桡骨远端骨折",
   "锁骨骨折",
-  "肩锁关节脱位"
+  "肩锁关节脱位",
+  "胫骨平台骨折"
  ],
  "traumaGroups": [
   "股骨转子间骨折",
   "胫骨干骨折",
   "桡骨远端骨折",
   "锁骨骨折",
-  "肩锁关节脱位"
+  "肩锁关节脱位",
+  "胫骨平台骨折"
  ],
  "seeds": {
   "TKA": {
@@ -199,6 +201,10 @@
    "indication": "",
    "risk": "",
    "group": "肩锁关节脱位"
+  },
+  "胫骨平台骨折": {
+   "category": "创伤骨科",
+   "group": "胫骨平台骨折"
   }
  },
  "qualityAudit": {
@@ -260,6 +266,10 @@
   [
    "record-tha-complete-v32.js",
    5
+  ],
+  [
+   "scaffold:TKA",
+   40
   ]
  ],
  "sequence": [
@@ -358,6 +368,10 @@
   [
    "guke/THA.json",
    5
+  ],
+  [
+   "guke/胫骨平台骨折.json",
+   40
   ]
  ],
  "files": [
@@ -372,7 +386,8 @@
   "guke/肩锁关节脱位.json",
   "puwai/肝脓肿.json",
   "shennei/化疗药物性肾功能损伤.json",
-  "fuke/妊娠组织物残留.json"
+  "fuke/妊娠组织物残留.json",
+  "guke/胫骨平台骨折.json"
  ],
  "retiredChain": [
   {
