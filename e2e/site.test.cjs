@@ -173,6 +173,18 @@ test('supplement panel follows the chapter being read',async()=>{
       await page.locator('#caseWorkspace [data-case-record]').filter({hasText:name}).first().click();
       await settle(page);
     };
+    // This case merges the attending and chief rounds into one 入院查房记录 chapter.
+    await go('入院查房记录');
+    assert.equal(await pressed(),'day1');
+    assert.match(await side.locator('#comorbidityNotes').innerText(),/入院第1天 · 主治医师查房/);
+    await side.locator('[data-comorbidity-stage="day2"]').click();
+    assert.match(await side.locator('#comorbidityNotes').innerText(),/第2天 · 检查结果回报及会诊申请/);
+    await side.locator('#comorbidityFollow').click();
+    await go('多学科术前讨论');
+    assert.equal(await pressed(),'consultRecord');
+    assert.match(await side.locator('#comorbidityNotes').innerText(),/会诊记录（内科\/麻醉科）/);
+    await go('麻醉术前访视记录');
+    assert.equal(await pressed(),'day3');
     await go('手术记录');
     assert.equal(await pressed(),'preop');
     await go('术后首次病程记录');

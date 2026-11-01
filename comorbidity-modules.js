@@ -64,38 +64,82 @@
     ['postop','术后病程与监测'],
     ['discharge','出院当天查房及随访']
   ];
-  const fieldTitle=Object.fromEntries(fields);
+  // Inpatient timeline sections. These are generic fill-in templates without
+  // medical judgement: only the condition name is inserted, everything else is
+  // left as 【】 blanks for the clinician (or later reviewed content) to complete.
+  const timeline=[
+    ['day1Round','入院第1天 · 主治医师查房（完善检查）',name=>
+      '主治医师查房：患者既往'+name+'病史【病程、目前控制情况及用药】。结合本次拟行手术，为评估围手术期风险，指示完善【检查项目】，复查【指标】，待结果回报后进一步评估。'],
+    ['day2Results','第2天 · 检查结果回报及会诊申请',name=>
+      '检查结果回报：【检查项目及结果】。结合患者既往'+name+'病史，为明确围手术期风险及用药调整，请【内科/麻醉科】会诊，协助评估【会诊目的】。'],
+    ['consultRecord','会诊记录（内科/麻醉科）',name=>
+      '会诊科室：【内科/麻醉科】　会诊医师：________　会诊时间：【日期 时间】\n'+
+      '会诊目的：评估患者既往'+name+'病史对本次手术及麻醉的影响。\n'+
+      '病史及查体：【据实填写】\n'+
+      '辅助检查：【检查结果】\n'+
+      '会诊意见：1.【手术时机意见】；2.【用药调整】；3.【围手术期监测建议】。\n'+
+      '会诊医师签名：________'],
+    ['day3Plan','第3天 · 根据会诊意见调整（查房记录）',name=>
+      '查房记录：【内科/麻醉科】会诊意见已回报：【会诊意见要点】。结合患者既往'+name+'病史及会诊意见，调整为：【处理措施/用药调整】；手术时机【按期/调整及原因】；继续观察【监测指标】。']
+  ];
+  const timelineText=Object.fromEntries(timeline.map(([field,,make])=>[field,make]));
+  // Display order: admission history, the three-day workup, then perioperative stages.
+  const allFields=[fields[0],...timeline.map(([field,title])=>[field,title]),...fields.slice(1)];
+  const fieldTitle=Object.fromEntries(allFields);
+  function shortName(item){return String(item.name).replace(/病史$/,'');}
+  function textOf(item,field){
+    if(timelineText[field])return timelineText[field](shortName(item));
+    return String(item[field]);
+  }
   // Reading stages of the side panel. Each stage lists the fields shown beside
   // the chapter being read; "all" shows every field.
   const stages=[
     {id:'admission',label:'入院',fields:['history']},
+    {id:'day1',label:'第1天查房',fields:['day1Round']},
+    {id:'day2',label:'第2天会诊申请',fields:['day2Results']},
+    {id:'consultRecord',label:'会诊记录',fields:['consultRecord']},
+    {id:'day3',label:'第3天调整',fields:['day3Plan']},
     {id:'preop',label:'术前',fields:['preop','consult']},
     {id:'postop',label:'术后',fields:['postop']},
     {id:'discharge',label:'出院',fields:['discharge']},
-    {id:'all',label:'全部',fields:fields.map(([field])=>field)}
+    {id:'all',label:'全部',fields:allFields.map(([field])=>field)}
   ];
   const stageById=Object.fromEntries(stages.map(stage=>[stage.id,stage]));
   let stage='admission',follow=true,chapter=null,sheetOpen=false,view=null,drawn='';
   function escape(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
   // Maps the chapter being read to the matching supplement stage.
   function stageFor(info){
-    const title=String(info?.title||'');
+    // A merged chapter (e.g. 入院查房记录) is matched by its first record's name too.
+    const title=String(info?.title||'')+' '+String(info?.record||'');
     if(/出院/.test(title))return 'discharge';
     const value=String(info?.stage||'');
-    if(value==='入院')return 'admission';
-    if(value==='术前'||value==='术中')return 'preop';
+    if(value==='入院'){
+      if(/主治/.test(title))return 'day1';
+      if(/主任/.test(title))return 'day2';
+      return 'admission';
+    }
+    // Pre-operative chapters, in reading order: treatment talk and surgeon round
+    // (day 2) → multidisciplinary discussion / consultation (consult record) →
+    // consents and anaesthesia visit (day 3) → pre-operative summary.
+    if(value==='术前'){
+      if(/小结/.test(title))return 'preop';
+      if(/会诊|讨论/.test(title))return 'consultRecord';
+      if(/主刀查房|治疗方案/.test(title))return 'day2';
+      return 'day3';
+    }
+    if(value==='术中')return 'preop';
     if(value==='术后')return 'postop';
     return 'admission';
   }
   function separateText(){
     return selectedItems().map(item=>
       '【'+item.name+'｜独立补充模块】\n'+
-      fields.map(([field,title])=>title+'：'+item[field]).join('\n\n')
+      allFields.map(([field,title])=>title+'：'+textOf(item,field)).join('\n\n')
     ).join('\n\n========================================\n\n');
   }
   function boxText(id,field){
     const item=get(id);
-    return item&&fieldTitle[field]?String(item[field]):'';
+    return item&&fieldTitle[field]?textOf(item,field):'';
   }
   function renderSelected(stageId=stage){
     const items=selectedItems();
@@ -104,7 +148,7 @@
     return items.map(item=>'<article class="comorbidity-detail" data-comorbidity-item="'+item.id+'"><h4>'+escape(item.name)+'</h4>'+
       current.fields.map(field=>'<div class="comorbidity-box"><div class="comorbidity-box-head"><strong>'+escape(fieldTitle[field])+'</strong>'+
         '<button class="btn ghost comorbidity-box-copy" type="button" data-copy-box="'+item.id+':'+field+'" aria-label="复制'+escape(item.name+'：'+fieldTitle[field])+'">复制</button></div>'+
-        '<p>'+escape(item[field])+'</p></div>').join('')+
+        '<p>'+escape(textOf(item,field))+'</p></div>').join('')+
       '</article>').join('');
   }
   // Intentionally identity-only; prevent source text and full-record copy from
@@ -114,7 +158,7 @@
   function html(){
     return '<section id="comorbidityPanel" class="comorbidity-panel comorbidity-picker" aria-labelledby="comorbidityTitle">'+
       '<div class="comorbidity-head"><div><span class="case-file-eyebrow">OPTIONAL COMORBIDITIES</span><h3 id="comorbidityTitle">合并慢性病（可多选）</h3>'+
-      '<p>勾选后，病历旁出现对应的补充内容框（手机上点右下角“慢性病补充”打开），随阅读章节自动切换入院、术前、术后、出院内容，可单独复制。</p></div>'+
+      '<p>勾选后，病历旁出现对应的补充内容框（手机上点右下角“慢性病补充”打开），随阅读章节自动切换入院、第1天查房、第2天会诊申请、会诊记录、第3天调整、术前、术后、出院内容，可单独复制。</p></div>'+
       '<button id="clearComorbidities" class="btn ghost" type="button">清空选择</button></div>'+
       '<div class="comorbidity-grid">'+modules.map(item=>
         '<label class="comorbidity-choice"><input type="checkbox" data-comorbidity="'+item.id+'"'+(chosen.has(item.id)?' checked':'')+'><span>'+escape(item.name)+'</span></label>'
@@ -181,7 +225,7 @@
   }
   // Called by the case reader whenever the current chapter changes.
   function setChapter(info){
-    chapter=info?{stage:String(info.stage||''),title:String(info.title||'')}:null;
+    chapter=info?{stage:String(info.stage||''),title:String(info.title||''),record:String(info.record||'')}:null;
     if(follow)stage=stageFor(chapter);
     redraw();
   }
