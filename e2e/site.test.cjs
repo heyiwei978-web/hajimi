@@ -112,13 +112,15 @@ test('search returns one standard TKA template and two distinct special template
   }finally{await context.close();}
 });
 
-test('chronic-condition resources are separate, selectable and never rewrite reviewed case copies',async()=>{
+test('chronic-condition options open supplement boxes beside the record and never rewrite reviewed case copies',async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width);
     try{
       await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
       const panel=page.locator('#comorbidityPanel');await panel.waitFor();
       assert.equal(await panel.locator('input[data-comorbidity]').count(),8);
+      const side=page.locator('#comorbiditySide');
+      assert.equal(await side.isVisible(),false,'no supplement panel before a choice');
       const first=page.locator('.case-file-reader > .record-book-section').first().locator('.record-book-body');
       const baseline=await first.textContent();
       const surgery=page.locator('.case-file-reader > .record-book-section').filter({has:page.getByRole('heading',{name:'手术记录',exact:true})}).first().locator('.record-book-body');
@@ -126,24 +128,59 @@ test('chronic-condition resources are separate, selectable and never rewrite rev
       await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.__comorbidityCopy=value;}}}));
       await panel.locator('input[data-comorbidity="cad"]').check();
       await panel.locator('input[data-comorbidity="htn"]').check();
-      assert.match(await panel.locator('#comorbidityNotes').innerText(),/冠心病/);
-      assert.match(await panel.locator('#comorbidityNotes').innerText(),/心脏超声/);
-      assert.match(await panel.locator('#comorbidityNotes').innerText(),/高血压/);
+      if(width<1280){
+        const fab=page.locator('#openComorbiditySide');
+        assert.equal(await fab.isVisible(),true,'phone shows the supplement button');
+        assert.match(await fab.innerText(),/2/);
+        await fab.click();
+      }else{
+        const [reader,aside]=await Promise.all([page.locator('.case-file-reader').boundingBox(),side.boundingBox()]);
+        assert(aside.x>=reader.x+reader.width,'supplement panel sits beside the record');
+      }
+      await side.waitFor({state:'visible'});
+      const notes=side.locator('#comorbidityNotes');
+      assert.match(await notes.innerText(),/冠心病/);
+      assert.match(await notes.innerText(),/高血压/);
+      assert.match(await notes.innerText(),/入院记录与既往史/);
+      await side.locator('[data-comorbidity-stage="preop"]').click();
+      assert.match(await notes.innerText(),/心脏超声/);
       assert.equal(await first.textContent(),baseline,'original patient history must not change');
       assert.equal(await surgery.textContent(),operation,'original operation must not change');
-      await panel.locator('#copyComorbidities').click();
+      await side.locator('#copyComorbidities').click();
       await page.waitForFunction(()=>typeof window.__comorbidityCopy==='string');
       assert.match(await page.evaluate(()=>window.__comorbidityCopy),/冠心病/);
       assert.match(await page.evaluate(()=>window.__comorbidityCopy),/高血压/);
+      if(width<1280)await side.locator('#closeComorbiditySide').click();
       await page.locator('#copyWholeRecord').click();
       assert.doesNotMatch(await page.evaluate(()=>window.__comorbidityCopy),/【冠心病｜独立补充模块】/,'full record copy must remain the original example');
       await panel.locator('#clearComorbidities').click();
-      assert.equal(await panel.locator('#comorbiditySelectionStatus').textContent(),'0 项已选择');
-      assert.equal(await panel.locator('#copyComorbidities').isDisabled(),true);
+      assert.equal(await side.isVisible(),false);
+      assert.equal(await page.locator('#openComorbiditySide').isVisible(),false);
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
   }
+});
+
+test('supplement panel follows the chapter being read',async()=>{
+  const {page,context,errors}=await pageFor(1440);
+  try{
+    await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+    await page.locator('#comorbidityPanel input[data-comorbidity="dm"]').check();
+    const side=page.locator('#comorbiditySide');await side.waitFor({state:'visible'});
+    const pressed=()=>side.locator('[data-comorbidity-stage][aria-pressed="true"]').getAttribute('data-comorbidity-stage');
+    const go=async name=>{
+      await page.locator('#caseWorkspace [data-case-record]').filter({hasText:name}).first().click();
+      await settle(page);
+    };
+    await go('手术记录');
+    assert.equal(await pressed(),'preop');
+    await go('术后首次病程记录');
+    assert.equal(await pressed(),'postop');
+    assert.match(await side.locator('#comorbidityNotes').innerText(),/术后病程与监测/);
+    assert.match(await side.locator('#comorbidityFollowText').innerText(),/术后首次病程记录/);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
 });
 
 test('reviewed intertrochanteric case exposes 30 consistent teaching chapters on phone and desktop',async()=>{
