@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import test from 'node:test';
-import {laterReviewed} from './_later-reviewed-groups.js';
+import {laterReviewed,laterAdded,withoutLaterAdded} from './_later-reviewed-groups.js';
 import {withoutRemoved} from './_removed-cases.js';
 import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
 import {loadClinicalSource} from '../scripts/clinical-compiler.mjs';
@@ -16,15 +16,16 @@ const old=withoutRemoved(loadClinicalSource(fs.readFileSync(new URL('../index.ht
 const selected=current.plan.published.filter(entry=>entry.record.department==='骨科'&&entry.record.group==='股骨转子间骨折');
 
 test('the reviewed case updates all 27 established documents and appends three identities without touching the other 278 retained records',()=>{
-  assert.equal(current.source.records.length,308);assert.equal(current.plan.published.length+current.plan.withdrawn.length+current.plan.removed.length,5381);assert.equal(selected.length,30);
+  assert.equal(withoutLaterAdded(current.source).records.length,308);assert.equal(current.plan.published.filter(entry=>!laterAdded(entry.record)).length+current.plan.withdrawn.length+current.plan.removed.length,5381);assert.equal(selected.length,30);
   const before=new Map(old.records.map((record,index)=>[identityKey(record),{record,body:old.renderedBodies[index]}]));
   let unchanged=0,updates=0,additions=0;
-  for(let index=0;index<current.source.records.length;index++){
-    const record=current.source.records[index],previous=before.get(identityKey(record));
+  const source=withoutLaterAdded(current.source);
+  for(let index=0;index<source.records.length;index++){
+    const record=source.records[index],previous=before.get(identityKey(record));
     if(!previous){assert.equal(record.group,'股骨转子间骨折');additions++;continue;}
     assert.equal(metadataHash(record),metadataHash(previous.record));
     if(record.group==='股骨转子间骨折'){assert.notEqual(record.sourceBody,previous.record.sourceBody);updates++;}
-    else {if(!laterReviewed(record)){assert.deepEqual(record,previous.record);assert.equal(current.source.renderedBodies[index],previous.body);}unchanged++;}
+    else {if(!laterReviewed(record)){assert.deepEqual(record,previous.record);assert.equal(source.renderedBodies[index],previous.body);}unchanged++;}
     before.delete(identityKey(record));
   }
   assert.equal(before.size,0);assert.equal(unchanged,278);assert.equal(updates,27);assert.equal(additions,3);
