@@ -109,6 +109,11 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 - `revisions.json` 只能追加经审核的批次。
 - 每条文书有永久稳定 ID（`clinical-v1-rNNNNNN`）和原数字 ID，不得重编号、复用或改变病例归属、排序、名称、阶段、类型。
 - 修改医学正文必须走 `docs/clinical-identity-ledger-update-plan.md` 的流程：生成仓库外的差异预览 → 医学审核人明确授权 → 用审核过的 `proposalHash` 应用。**AI 不能自行充当审核人或替用户授权。**
+- **简化授权（负责人 2026-11-01 同意）**：AI 在会话中向负责人发出一个 `proposalHash` 及改动说明后，负责人只回复“授权”二字，即视为对**这条消息中的这一个** `proposalHash` 的明确授权，审核人默认记为 `zhao`（负责人另行说明的除外）。限制：
+  - 只对 AI **最近一次**发出的 `proposalHash` 有效；以前发过的编号不能用“授权”认领。
+  - 编号发出后内容有任何改动，该编号作废，必须重新生成并发出新编号，再次取得“授权”。
+  - AI 必须在发出编号的同一条消息里列明改动范围（哪些章节、改了什么），并提供全文或差异预览。
+  - `--review-reference` 写明“负责人在会话中回复‘授权’”及日期；不得在负责人未回复时自行应用。
 
 ### 6.3 病历正文源数据（2026-10-30 起）
 - 病历正文的唯一来源是 `content/clinical-library/source/<科室>/<病种>.json`。构建、身份账本核对、质量门禁和修订预览都读这些文件（`scripts/clinical-source.mjs`）。
