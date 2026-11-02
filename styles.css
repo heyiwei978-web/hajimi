@@ -836,8 +836,11 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .library-top-actions .library-active-link:after{
   content:"";position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:999px;background:#1d6fe8
 }
-.library-top-actions .patient-action{
-  padding:8px 12px;border:1px solid #e4e9ef;border-radius:999px;background:#f8fafc;color:#344052
+.library-top-actions{margin-left:auto}
+.library-header-tools{display:flex;align-items:center;gap:10px;flex:none;margin-left:18px}
+.library-header-tools .patient-action{
+  padding:8px 12px;border:1px solid #e4e9ef;border-radius:999px;background:#f8fafc;color:#344052;
+  font-size:14px;font-weight:600;white-space:nowrap
 }
 
 #libraryShell{
@@ -1238,7 +1241,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 }
 @media(max-width:640px){
   .library-top-actions .text-action:not(.patient-action){display:none}
-  .library-top-actions .patient-action{padding:7px 10px}
+  .library-header-tools .patient-action{padding:7px 10px}
   .library-root-page .article-intro{padding:28px 20px;border-radius:20px}
   .library-root-page .article-intro h1{font-size:34px}
   .library-root-page .controls-section{padding:15px;border-radius:16px}

@@ -30,7 +30,7 @@
   #libraryShell .library-topbar{background:#fff;border-color:var(--ws-line);backdrop-filter:none}
   #libraryShell .library-brand-copy strong{font-size:1rem;color:var(--ws-ink)}
   #libraryShell .library-top-actions .text-action{color:var(--ws-muted)}
-  #libraryShell .library-top-actions .patient-action{background:var(--ws-soft);border-color:var(--ws-line);color:var(--ws-blue);border-radius:10px}
+  #libraryShell .library-header-tools .patient-action{background:var(--ws-soft);border-color:var(--ws-line);color:var(--ws-blue);border-radius:10px}
 
   /* The homepage opens with a usable search and direct clinical destinations. */
   .official-main{max-width:1280px;margin:0 auto;padding:40px 24px 0}
@@ -484,9 +484,25 @@
   #libraryShell .library-top-actions::-webkit-scrollbar{display:none}
   #libraryShell .library-top-actions>:first-child{margin-left:auto}
   #libraryShell .library-top-actions>*{flex-shrink:0;white-space:nowrap}
-  /* Patient info and login stay pinned on the right while the links scroll. */
-  #libraryShell .library-top-actions>[data-auth-slot]{position:sticky;right:0;z-index:1;min-width:56px;padding-left:8px;display:flex;justify-content:flex-end;background:#fff}
-  #libraryShell .library-top-actions>.patient-action{position:sticky;right:56px;z-index:1;box-shadow:-10px 0 10px #fff}
+  /* Patient info and login sit outside the scrolling links, on the right. */
+  #libraryShell .library-header-tools{margin-left:12px}
+  #libraryShell .library-top-actions .library-active-link{display:block}
+  #libraryShell .library-topbar{column-gap:16px}
+}
+
+/* Phones: the library header matches the other sections — brand row with
+   patient info and login, then the main navigation scrolling in its own row. */
+@media screen and (max-width:650px){
+  #libraryShell .library-topbar,.cms-admin-mode #libraryShell .library-topbar{height:auto;min-height:0;flex-wrap:wrap;align-items:center;column-gap:8px;row-gap:2px;padding-top:8px}
+  #libraryShell .library-topbar .brandline{order:1;flex:1 1 0;min-width:0}
+  /* Signed in, the badge and logout need their own row so the title stays whole. */
+  .cms-admin-mode #libraryShell .library-topbar .brandline{flex:0 0 100%}
+  #libraryShell .library-header-tools{order:2;margin-left:0;gap:6px}
+  #libraryShell .library-top-actions{order:3;flex:0 0 100%;width:100%;margin-left:0;display:flex;justify-content:flex-start;gap:22px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;min-height:48px}
+  #libraryShell .library-top-actions::-webkit-scrollbar{display:none}
+  #libraryShell .library-top-actions .text-action,#libraryShell .library-top-actions .library-active-link{display:flex;align-items:center;flex-shrink:0;min-height:48px;padding:0 1px;font-size:.9375rem;font-weight:600;white-space:nowrap}
+  #libraryShell .library-top-actions .library-active-link{color:var(--ws-blue,#1d6fe8)}
+  #libraryShell .library-top-actions .library-active-link:after{height:3px;border-radius:0}
 }
 
 /* 全站统一免责声明（心电图页沿用自有页脚） */

@@ -3,8 +3,8 @@
   function fitNavigation(){
     const header=headers.find(element=>element.getBoundingClientRect().height>0);
     if(header)document.documentElement.style.setProperty('--site-header-height',header.getBoundingClientRect().height+'px');
-    for(const nav of document.querySelectorAll('.official-links,.nav nav')){
-      const active=nav.querySelector('a.active');
+    for(const nav of document.querySelectorAll('.official-links,.nav nav,#libraryShell .library-top-actions')){
+      const active=nav.querySelector('a.active,a.library-active-link');
       if(!active||nav.scrollWidth<=nav.clientWidth)continue;
       const item=active.getBoundingClientRect(),bounds=nav.getBoundingClientRect();
       if(item.left<bounds.left||item.right>bounds.right){
