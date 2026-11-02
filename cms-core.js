@@ -134,6 +134,8 @@
     }
     if(!CMS.baseOpenPreview){CMS.baseOpenPreview=openPreview;openPreview=function(t){CMS.activeTemplate=t;CMS.baseOpenPreview(t);renderExtras(t);};}
   }
+  // Lets the record pages behind the preview show the saved wording without a reload.
+  function templatesChanged(){window.dispatchEvent(new CustomEvent('hajimi:templates-changed'));}
   async function saveContent(next){
     if(!CMS.dataReady)throw new Error('内容未加载完成，请刷新页面后重试');
     const out=await req('/api/content',{method:'PUT',body:JSON.stringify({...next,revision:CMS.data.revision})});
@@ -185,11 +187,11 @@
     };
     form.onsubmit=async(e)=>{e.preventDefault();await run(async()=>{
       const overrides={...CMS.data.templateOverrides,[t.name]:{body:document.getElementById('cmsEditBody').value,updatedAt:new Date().toISOString()}};
-      await saveContent({...CMS.data,templateOverrides:overrides});dialog.close();document.getElementById('previewContent').textContent=generate(t);renderExtras(t);notify('模板已更新，修改前资料已备份');
+      await saveContent({...CMS.data,templateOverrides:overrides});dialog.close();document.getElementById('previewContent').textContent=generate(t);renderExtras(t);templatesChanged();notify('模板已更新，修改前资料已备份');
     });};
     document.getElementById('cmsRestoreDefault').onclick=async()=>{if(!confirm('恢复为系统默认模板？修改前资料会自动备份。'))return;await run(async()=>{
       const overrides={...CMS.data.templateOverrides};delete overrides[t.name];await saveContent({...CMS.data,templateOverrides:overrides});
-      document.getElementById('cmsEditBody').value=CMS.baseGenerate(t);document.getElementById('previewContent').textContent=generate(t);renderExtras(t);notify('已恢复默认模板');
+      document.getElementById('cmsEditBody').value=CMS.baseGenerate(t);document.getElementById('previewContent').textContent=generate(t);renderExtras(t);templatesChanged();notify('已恢复默认模板');
     });};
   }
   function openCaseEditor(t,c){

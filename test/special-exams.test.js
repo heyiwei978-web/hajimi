@@ -65,11 +65,13 @@ test('choosing exams shows their boxes without stage buttons; copy includes them
   assert.match(notes,/头颅 MRI/);
   assert.match(notes,/用药理由（通用）/);
   assert.match(notes,/申请理由（可改用）/);
+  assert.doesNotMatch(notes,/<strong>(需写明|注意)/,'only the order reason box is shown');
   assert.equal(f.m.boxText('x~mri-head','reason'),f.items.find(i=>i.id==='mri-head').reason);
   assert.equal(f.m.boxText('x~nope','reason'),'');
   await f.parts['#copyComorbidities'].handlers.click();
   assert.match(f.context.copied,/【头颅 MRI｜影像检查】/);
   assert.match(f.context.copied,/【用药理由（通用）｜用药理由】/);
+  assert.doesNotMatch(f.context.copied,/需写明：|注意：/);
   f.clearExams.handlers.click();
   assert.equal(f.side.hidden,true);
 });
