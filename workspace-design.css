@@ -386,6 +386,15 @@
   .ortho-hero h2{font-size:1.625rem}
   .ortho-jump{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .ortho-jump a{padding:10px;line-height:1.5}
+  /* 骨科科室页：手机上去掉与页首重复的标题和数字卡，分类改为横滑按钮，更快看到病种。 */
+  #libraryShell .content:has(.ortho-hero) .stat-line{display:none}
+  #libraryShell .ortho-hero{display:block;padding:14px 16px;margin:0 0 14px}
+  #libraryShell .ortho-hero :is(.ortho-eyebrow,h2,.ortho-stats){display:none}
+  #libraryShell .ortho-hero p{font-size:.9375rem;line-height:1.7}
+  #libraryShell .ortho-jump{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;margin:0 -16px 20px;padding:0 16px}
+  #libraryShell .ortho-jump::-webkit-scrollbar{display:none}
+  #libraryShell .ortho-jump a{flex:none;display:inline-flex;align-items:center;min-height:44px;padding:6px 14px;border-radius:999px;font-size:.9375rem;white-space:nowrap}
+  #libraryShell .ortho-jump a span{display:none}
   .ortho-category{padding:14px}
   .ortho-category-head h3{font-size:1.375rem}
   .ortho-disease-grid{grid-template-columns:minmax(0,1fr);gap:12px}
