@@ -225,8 +225,14 @@
       '<p class="comorbidity-caution">申请理由为教学参考写法，【】处须按患者实际症状、检查结果和本院规定填写；是否申请由主管医师判断。</p>'+
       '</section>';
   }
+  // Folded by default so the record itself is reached quickly, above all on phones.
   function html(){
-    return '<div class="supplement-pickers">'+comorbidityHtml()+examHtml()+'</div>';
+    const count=chosen.size+exams.size;
+    return '<details id="supplementPickersFold" class="supplement-pickers-fold">'+
+      '<summary><span class="supplement-fold-title"><strong>补充内容</strong><small>合并慢性病 · 特殊检查（可多选）</small></span>'+
+      '<span class="supplement-fold-count" id="supplementFoldCount"'+(count?'':' hidden')+'>已选 '+count+' 项</span>'+
+      '<span class="supplement-fold-action" aria-hidden="true"></span></summary>'+
+      '<div class="supplement-pickers">'+comorbidityHtml()+examHtml()+'</div></details>';
   }
   function comorbidityHtml(){
     return '<section id="comorbidityPanel" class="comorbidity-panel comorbidity-picker" aria-labelledby="comorbidityTitle">'+
@@ -276,6 +282,8 @@
     fab.hidden=count===0||sheetOpen;
     fab.setAttribute('aria-expanded',String(sheetOpen));
     fabCount.textContent=String(count);
+    const foldCount=typeof document!=='undefined'?document.getElementById?.('supplementFoldCount'):null;
+    if(foldCount){foldCount.hidden=count===0;foldCount.textContent='已选 '+count+' 项';}
     status.textContent=count+' 项已选择';
     copy.disabled=count===0;
     tabs.forEach(tab=>tab.setAttribute('aria-pressed',String(tab.dataset.comorbidityStage===stage)));
