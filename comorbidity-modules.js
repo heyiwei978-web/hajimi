@@ -54,7 +54,9 @@
   const chosen=new Set();
   // 特殊检查 / 用药 / 会诊理由：数据在 special-exams.js，选择与慢性病分开保存。
   const exams=new Set();
-  const examFields=[['reason','申请理由（可改用）'],['record','需写明'],['caution','注意']];
+  // Only the reusable order reason is shown; the source items keep their
+  // record/caution notes (special-exams.js) but they are not displayed or copied.
+  const examFields=[['reason','申请理由（可改用）']];
   const examFieldTitle=Object.fromEntries(examFields);
   function examItems(){return (root.HAJIMI_SPECIAL_ITEMS||[]);}
   function getExam(id){return examItems().find(item=>item.id===id);}

@@ -1142,6 +1142,15 @@
     // hashchange follows native history scroll restoration. Align the category
     // after that step, including when returning from another category link.
     window.addEventListener('hashchange',scrollToOrthoCategory);
+    // A developer-mode save changes generate(t); refresh the chapter bodies in
+    // place so the open record shows it without a reload or losing scroll,
+    // supplement choices or the preview dialog.
+    window.addEventListener('hajimi:templates-changed',()=>{
+      document.querySelectorAll('.record-book-body').forEach(body=>{
+        const t=templates[Number(body.closest('[data-record-index]')?.dataset.recordIndex)];
+        if(t&&typeof generate==='function')body.textContent=String(generate(t));
+      });
+    });
     window.addEventListener('hajimi:cms-ready',async()=>{const r=pathState(),path=location.pathname;if(r.page==='library'&&r.disease&&currentDept){try{if(window.HAJIMI)await window.HAJIMI.ensureGroup(r.department,r.disease);if(path===location.pathname)renderDisease();}catch(error){toast(error.message);}}});
     window.hajimiNavigateDepartment=navigateDepartment;
     window.hajimiNavigateRoot=navigateRoot;
