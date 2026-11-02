@@ -313,6 +313,18 @@
 }
 @media screen and (max-width:640px){
   .official-nav-inner,.tools-page .navin{padding:10px 16px 0;gap:8px}
+  /* 疾病分型科室卡与心电图栏目入口：手机上改为左图标、右文字的紧凑卡片。 */
+  main :is(.class-dept-grid,.ecg-entry-grid){gap:10px}
+  main :is(.class-dept-grid,.ecg-entry-grid) .class-dept-card{min-height:0;padding:16px;display:grid;grid-template-columns:48px minmax(0,1fr);column-gap:14px;align-items:start}
+  main :is(.class-dept-grid,.ecg-entry-grid) .class-dept-symbol{grid-column:1;grid-row:1/span 4;margin:0;width:48px;height:48px}
+  main :is(.class-dept-grid,.ecg-entry-grid) .class-dept-index{grid-column:2;font-size:.75rem}
+  main :is(.class-dept-grid,.ecg-entry-grid) .class-dept-card h3{grid-column:2;margin:2px 0 4px;font-size:1.125rem;line-height:1.45}
+  main :is(.class-dept-grid,.ecg-entry-grid) .class-dept-card p{grid-column:2;font-size:.9375rem;line-height:1.7}
+  main :is(.class-dept-grid,.ecg-entry-grid) .class-dept-foot{grid-column:2;margin-top:8px;padding-top:0;font-size:.875rem}
+  main .class-disease-card.ecg-card{min-height:0;padding:16px}
+  main .class-disease-card.ecg-card h3{margin:0 0 4px;font-size:1.125rem;line-height:1.45}
+  main .class-disease-card.ecg-card p{font-size:.9375rem;line-height:1.7}
+  main .class-disease-card.ecg-card :is(small,b){font-size:.875rem}
   /* 临床工具：手机上分类横向滑动，卡片改成紧凑的左图标、右文字。 */
   .tools-page .tool-jump{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;margin:-4px -16px 24px;padding:0 16px}
   .tools-page .tool-jump::-webkit-scrollbar{display:none}
