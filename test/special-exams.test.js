@@ -48,6 +48,7 @@ test('the 特殊检查 column sits beside the chronic-condition options and grou
   const {m}=fixture();
   const html=m.html();
   assert.match(html,/class="supplement-pickers"/);
+  assert.match(html,/^<details id="supplementPickersFold" class="supplement-pickers-fold">/,'pickers start folded');
   assert.ok(html.indexOf('id="comorbidityPanel"')<html.indexOf('id="specialExamPanel"'));
   assert.match(html,/特殊检查（可多选）/);
   assert.equal((html.match(/data-exam="/g)||[]).length,18);

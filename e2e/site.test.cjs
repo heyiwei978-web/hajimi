@@ -7,6 +7,12 @@ const {chromium} = require('playwright');
 const root = path.resolve(__dirname, '..');
 let server, browser, base;
 
+// The supplement pickers are folded above the record; open them before choosing.
+async function openSupplements(page){
+  const fold=page.locator('#supplementPickersFold');
+  if(!(await fold.evaluate(el=>el.open)))await fold.locator(':scope > summary').click();
+}
+
 before(async () => {
   const config = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json')));
   const publicRoot=path.join(root,config.outputDirectory);
@@ -117,6 +123,7 @@ test('chronic-condition options open supplement boxes beside the record and neve
     const {page,context,errors}=await pageFor(width);
     try{
       await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+      await openSupplements(page);
       const panel=page.locator('#comorbidityPanel');await panel.waitFor();
       assert.equal(await panel.locator('input[data-comorbidity]').count(),8);
       const side=page.locator('#comorbiditySide');
@@ -162,10 +169,32 @@ test('chronic-condition options open supplement boxes beside the record and neve
   }
 });
 
+test('record page: supplement pickers fold above the record so phones reach it within one screen',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+      const fold=page.locator('#supplementPickersFold');
+      assert.equal(await fold.evaluate(el=>el.open),false,'folded by default');
+      assert.equal(await page.locator('#comorbidityPanel').isVisible(),false);
+      const top=await page.locator('#caseWorkspace').evaluate(el=>el.getBoundingClientRect().top+scrollY);
+      assert(top<page.viewportSize().height,'the record starts within the first screen ('+Math.round(top)+'px)');
+      await openSupplements(page);
+      await page.locator('#comorbidityPanel input[data-comorbidity="cad"]').check();
+      assert.equal(await page.locator('#supplementFoldCount').innerText(),'已选 1 项');
+      await fold.locator(':scope > summary').click();
+      assert.equal(await page.locator('#supplementFoldCount').isVisible(),true,'the count stays visible when folded');
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('supplement panel follows the chapter being read',async()=>{
   const {page,context,errors}=await pageFor(1440);
   try{
     await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+    await openSupplements(page);
     await page.locator('#comorbidityPanel input[data-comorbidity="dm"]').check();
     const side=page.locator('#comorbiditySide');await side.waitFor({state:'visible'});
     const pressed=()=>side.locator('[data-comorbidity-stage][aria-pressed="true"]').getAttribute('data-comorbidity-stage');
@@ -1553,6 +1582,7 @@ test('特殊检查 column offers grouped order reasons beside chronic conditions
     const {page,context,errors}=await pageFor(width);
     try{
       await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+      await openSupplements(page);
       const exams=page.locator('#specialExamPanel');await exams.waitFor();
       assert.equal(await exams.locator('input[data-exam]').count(),18);
       if(width>=1100){
@@ -1595,6 +1625,7 @@ test('developer mode edits a supplement box in place, saves it to the CMS and ca
     page.on('dialog',dialog=>dialog.accept());
     try{
       await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+      await openSupplements(page);
       const record=page.locator('.case-file-reader > .record-book-section').first().locator('.record-book-body');
       const baseline=await record.textContent();
       const exams=page.locator('#specialExamPanel');
@@ -1632,6 +1663,7 @@ test('visitors see saved supplement edits but get no edit buttons',async()=>{
   const page=await context.newPage();
   try{
     await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+    await openSupplements(page);
     await page.locator('#comorbidityPanel input[data-comorbidity="cad"]').check();
     const notes=page.locator('#comorbiditySide #comorbidityNotes');
     await page.waitForFunction(()=>document.querySelector('#comorbidityNotes')?.textContent.includes('本院冠心病既往史写法'));
@@ -1651,6 +1683,7 @@ test('editors can be enlarged: supplement boxes open a full-size editor and CMS 
     const page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
     try{
       await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+      await openSupplements(page);
       const exams=page.locator('#specialExamPanel');
       await exams.locator('.special-exam-group summary').nth(2).click();
       await exams.locator('input[data-exam="drug"]').check();

@@ -144,6 +144,24 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 @media(max-width:1279px){.comorbidity-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:600px){.comorbidity-panel{padding:16px 14px}.comorbidity-head{flex-direction:column;gap:10px}.comorbidity-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.comorbidity-choice{padding:10px;min-height:48px}}
 
+/* The two pickers fold into one row above the record. */
+.supplement-pickers-fold{margin:14px 0 4px;border:1px solid #d7e1ed;border-radius:16px;background:#fff;box-shadow:0 6px 18px rgba(26,56,88,.05)}
+.supplement-pickers-fold>summary{display:flex;align-items:center;gap:10px;min-height:56px;padding:10px 16px;cursor:pointer;list-style:none;color:#17334f}
+.supplement-pickers-fold>summary::-webkit-details-marker{display:none}
+.supplement-fold-title{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;min-width:0}
+.supplement-fold-title strong{font-size:1.06rem}
+.supplement-fold-title small{color:#5b6f86;font-size:.9rem;font-weight:600}
+.supplement-fold-count{flex:none;padding:3px 10px;border-radius:999px;background:#edf5ff;color:#1f5f9e;font-size:.86rem;font-weight:700}
+.supplement-fold-count[hidden]{display:none}
+.supplement-fold-action{flex:none;margin-left:auto;color:#1f5f9e;font-size:.92rem;font-weight:700;white-space:nowrap}
+.supplement-fold-action::before{content:"展开选择 ⌄"}
+.supplement-pickers-fold[open]>summary .supplement-fold-action::before{content:"收起 ⌃"}
+.supplement-pickers-fold[open]>summary{border-bottom:1px solid #e3eaf3}
+.supplement-pickers-fold>.supplement-pickers{margin:0;padding:14px}
+.supplement-pickers-fold .comorbidity-panel{box-shadow:none}
+@media(max-width:600px){.supplement-pickers-fold>.supplement-pickers{padding:10px}.supplement-pickers-fold>summary{padding:10px 12px}}
+@media print{.supplement-pickers-fold{display:none!important}}
+
 /* 特殊检查 column beside the chronic-condition options. */
 .supplement-pickers{display:grid;gap:14px;margin:18px 0 4px;align-items:start}
 .supplement-pickers>.comorbidity-panel{margin:0}
