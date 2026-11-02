@@ -162,35 +162,6 @@ test('chronic-condition options open supplement boxes beside the record and neve
   }
 });
 
-test('clinical tools: category chips jump to a group, follow search, and phone cards stay compact',async()=>{
-  for(const width of [390,1440]){
-    const {page,context,errors}=await pageFor(width);
-    try{
-      await page.goto(base+'/tools',{waitUntil:'networkidle'});
-      const chips=page.locator('.tool-jump a');
-      const sections=await page.locator('.section:has(.card)').count();
-      assert.equal(await chips.count(),sections,'one chip per tool group');
-      const kidney=chips.filter({hasText:'肾功能'});
-      await kidney.click();
-      const target=page.locator(await kidney.getAttribute('href'));
-      await page.waitForFunction(id=>{const r=document.querySelector(id).getBoundingClientRect();return r.top>=0&&r.top<innerHeight/2;},await kidney.getAttribute('href'));
-      assert.match(await target.locator('h2').innerText(),/肾功能/);
-      await page.locator('#formulaSearch').fill('eGFR');
-      assert.equal(await chips.filter({hasText:'体格与基础'}).isVisible(),false,'groups without matches lose their chip');
-      assert.equal(await kidney.isVisible(),true);
-      await page.locator('#formulaSearch').fill('');
-      if(width<640){
-        const box=await page.locator('.card[data-tool="bmi"]').boundingBox();
-        assert(box.height<=170,'phone tool cards are compact ('+Math.round(box.height)+'px)');
-      }
-      await page.locator('.card[data-tool="bmi"]').click();
-      await page.locator('#dlg').waitFor({state:'visible'});
-      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
-      assert.deepEqual(errors,[]);
-    }finally{await context.close();}
-  }
-});
-
 test('supplement panel follows the chapter being read',async()=>{
   const {page,context,errors}=await pageFor(1440);
   try{
@@ -1273,6 +1244,35 @@ test('library logout reports failures, then removes unpublished cases and clears
     await page.locator('#libraryShell [data-cms-logout]').click();await page.waitForSelector('#libraryShell [data-cms-login]:not([hidden])');assert.equal(await page.locator('#cmsCaseForm input[name="title"]').inputValue(),'');assert.equal(await page.locator('#cmsCaseForm textarea[name="description"]').inputValue(),'');
     await page.locator('.record-book-section .preview').first().click();assert.equal(await privateCase.count(),0);assert.match(await page.locator('#cmsCases').innerText(),/公开案例/);assert.equal(await page.locator('#cmsEditTemplate,#cmsAddCase').count(),0);assert.deepEqual(errors,[]);
   }finally{await context.close();}
+});
+
+test('clinical tools: category chips jump to a group, follow search, and phone cards stay compact',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/tools',{waitUntil:'networkidle'});
+      const chips=page.locator('.tool-jump a');
+      const sections=await page.locator('.section:has(.card)').count();
+      assert.equal(await chips.count(),sections,'one chip per tool group');
+      const kidney=chips.filter({hasText:'肾功能'});
+      await kidney.click();
+      const target=page.locator(await kidney.getAttribute('href'));
+      await page.waitForFunction(id=>{const r=document.querySelector(id).getBoundingClientRect();return r.top>=0&&r.top<innerHeight/2;},await kidney.getAttribute('href'));
+      assert.match(await target.locator('h2').innerText(),/肾功能/);
+      await page.locator('#formulaSearch').fill('eGFR');
+      assert.equal(await chips.filter({hasText:'体格与基础'}).isVisible(),false,'groups without matches lose their chip');
+      assert.equal(await kidney.isVisible(),true);
+      await page.locator('#formulaSearch').fill('');
+      if(width<640){
+        const box=await page.locator('.card[data-tool="bmi"]').boundingBox();
+        assert(box.height<=170,'phone tool cards are compact ('+Math.round(box.height)+'px)');
+      }
+      await page.locator('.card[data-tool="bmi"]').click();
+      await page.locator('#dlg').waitFor({state:'visible'});
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
 });
 
 test('signed-in clinical headers, preview actions and editors remain usable on narrow and short screens',async()=>{
