@@ -358,7 +358,18 @@ function filterCards(){
  sections.forEach(({section,cards})=>{if(cards.length)section.hidden=cards.every(c=>c.hidden)});
  $('#formulaCount').textContent=visible+' 个工具';
 }
-search.addEventListener('input',filterCards);filterCards();
+// Category chips under the search box jump straight to a group of tools.
+const jump=document.createElement('nav');jump.className='tool-jump';jump.setAttribute('aria-label','工具分类');
+const jumpLinks=sections.filter(({cards})=>cards.length).map(({section,cards},i)=>{
+ if(!section.id)section.id='tool-group-'+String(i+1).padStart(2,'0');
+ const a=document.createElement('a');a.href='#'+section.id;
+ a.textContent=section.querySelector('.sectionhead h2')?.textContent||'分类';
+ const n=document.createElement('small');a.appendChild(n);jump.appendChild(a);
+ return {a,n,section,cards};
+});
+$('.formula-toolbar')?.after(jump);
+function syncJump(){jumpLinks.forEach(({a,n,section,cards})=>{a.hidden=section.hidden;n.textContent=String(cards.filter(c=>!c.hidden).length);});}
+search.addEventListener('input',()=>{filterCards();syncJump();});filterCards();syncJump();
 const requestedTool=new URLSearchParams(location.search).get('tool');
 if(requestedTool&&Object.hasOwn(SRC,requestedTool))openTool(requestedTool);
 })();

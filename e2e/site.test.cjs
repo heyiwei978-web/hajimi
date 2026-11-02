@@ -1275,6 +1275,35 @@ test('library logout reports failures, then removes unpublished cases and clears
   }finally{await context.close();}
 });
 
+test('clinical tools: category chips jump to a group, follow search, and phone cards stay compact',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/tools',{waitUntil:'networkidle'});
+      const chips=page.locator('.tool-jump a');
+      const sections=await page.locator('.section:has(.card)').count();
+      assert.equal(await chips.count(),sections,'one chip per tool group');
+      const kidney=chips.filter({hasText:'肾功能'});
+      await kidney.click();
+      const target=page.locator(await kidney.getAttribute('href'));
+      await page.waitForFunction(id=>{const r=document.querySelector(id).getBoundingClientRect();return r.top>=0&&r.top<innerHeight/2;},await kidney.getAttribute('href'));
+      assert.match(await target.locator('h2').innerText(),/肾功能/);
+      await page.locator('#formulaSearch').fill('eGFR');
+      assert.equal(await chips.filter({hasText:'体格与基础'}).isVisible(),false,'groups without matches lose their chip');
+      assert.equal(await kidney.isVisible(),true);
+      await page.locator('#formulaSearch').fill('');
+      if(width<640){
+        const box=await page.locator('.card[data-tool="bmi"]').boundingBox();
+        assert(box.height<=170,'phone tool cards are compact ('+Math.round(box.height)+'px)');
+      }
+      await page.locator('.card[data-tool="bmi"]').click();
+      await page.locator('#dlg').waitFor({state:'visible'});
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('signed-in clinical headers, preview actions and editors remain usable on narrow and short screens',async()=>{
   for(const [width,height]of [[320,740],[375,812],[812,375],[1024,600]]){
     const {page,context,errors}=await pageFor(width,{viewport:{width,height},isMobile:width<400,hasTouch:width<400});
