@@ -162,6 +162,28 @@ test('chronic-condition options open supplement boxes beside the record and neve
   }
 });
 
+test('record pages: phone header matches other sections with a scrolling navigation row',async()=>{
+  for(const width of [360,390,700,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
+      const active=page.locator('.library-top-actions .library-active-link');
+      const box=await active.boundingBox();
+      assert(box&&box.width>0&&box.x>=0&&box.x+box.width<=width,'the current section is shown in the navigation');
+      assert.equal(await page.locator('.library-top-actions a').count(),8);
+      assert.equal(await page.locator('#patientBtn').isVisible(),true);
+      assert.equal(await page.locator('#libraryShell [data-auth-slot] [data-cms-login]').isVisible(),true);
+      if(width<=650){
+        const [brand,nav]=await Promise.all([page.locator('.library-topbar .brandline').boundingBox(),page.locator('.library-top-actions').boundingBox()]);
+        assert(nav.y>=brand.y+brand.height-1,'navigation sits in its own row below the brand');
+        assert(nav.width>=width-40,'and spans the header width');
+      }
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('supplement panel follows the chapter being read',async()=>{
   const {page,context,errors}=await pageFor(1440);
   try{

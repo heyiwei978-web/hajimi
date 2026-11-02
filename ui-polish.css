@@ -466,7 +466,7 @@ button,a,[role="button"]{
   #libraryShell .menu-btn{flex-shrink:0}
   .cms-admin-mode #libraryShell .library-topbar{height:auto;padding:8px 14px;flex-wrap:wrap;gap:6px}
   .cms-admin-mode #libraryShell .brandline{flex-basis:100%}
-  .cms-admin-mode #libraryShell .library-top-actions{width:100%;justify-content:flex-end}
+  .cms-admin-mode #libraryShell .library-header-tools{margin-left:auto}
   .preview-tools>.btn{flex:1 1 auto}
 }
 @media screen and (max-width:900px){
