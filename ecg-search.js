@@ -17,6 +17,12 @@
   };
   const terms=query=>normalize(query).split(/\s+/).filter(Boolean).slice(0,8);
 
+  function namedInTitle(title,term){
+    for(let at=title.indexOf(term);at>=0;at=title.indexOf(term,at+1)){
+      if(!/^[a-z0-9ivx型度]/.test(title.slice(at+term.length)))return true;
+    }
+    return false;
+  }
   function scoreTerm(doc,term){
     let best=0;
     if(doc.title===term)best=100;
@@ -27,12 +33,17 @@
       else if(alias.startsWith(term)&&!isShort(term))best=Math.max(best,45);
       else if(has(alias,term))best=Math.max(best,35);
     }
+    // Several entries can share an alias (e.g. 文氏 on both 二度房室传导阻滞 and
+    // 二度 I 型（文氏）): the one whose own title names the term outright is the
+    // specific one. "Outright" means the term is not the start of a longer name in
+    // the title, so 莫氏 alone does not pick 二度 II 型（莫氏 II 型）.
+    if(best===85&&namedInTitle(doc.compactTitle,term.replace(/\s+/g,'')))best+=5;
     if(!best&&has(doc.body,term))best=8;
     return best;
   }
 
   function create(docs){
-    const index=docs.map((doc,order)=>({...doc,order,title:normalize(doc.title),aliases:(doc.aliases||[]).map(normalize),body:normalize(doc.body),raw:doc}));
+    const index=docs.map((doc,order)=>({...doc,order,title:normalize(doc.title),compactTitle:normalize(doc.title).replace(/\s+/g,''),aliases:(doc.aliases||[]).map(normalize),body:normalize(doc.body),raw:doc}));
     function search(query,{limit=Infinity,type}={}){
       const list=terms(query);
       if(!list.length)return [];

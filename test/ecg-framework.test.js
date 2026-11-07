@@ -61,6 +61,19 @@ test('search ranks exact titles and aliases above full-text hits and spans long-
   assert.equal(engine.search('房颤',{limit:3}).length,3);
 });
 
+test('a term shared by several entries opens the specific entry, not the broader one',()=>{
+  const window=withSearch(),S=window.HAJIMI_ECG_SEARCH,engine=S.create(S.documents(window.HAJIMI_ECG_DATA));
+  const first=query=>engine.search(query)[0];
+  for(const [query,id] of [['文氏','mobitz-i'],['莫氏II型','mobitz-ii'],['心包积液','low-voltage-effusion'],['室壁瘤','ventricular-aneurysm']]){
+    assert.equal(first(query).doc.id,id,query);
+    assert(first(query).score>=85,query+' still jumps straight to the entry on Enter');
+  }
+  // A term that only starts a longer name in a title stays with the broader entry.
+  assert.equal(first('莫氏').doc.id,'second-degree-av-block');
+  // The broader entry is still offered right after it.
+  assert(engine.search('莫氏II型',{limit:3}).some(result=>result.doc.id==='second-degree-av-block'));
+});
+
 test('search highlighting escapes markup before marking matches',()=>{
   const S=withSearch().HAJIMI_ECG_SEARCH;
   assert.equal(S.highlight('<b>房颤</b> 伴快速心室率','房颤'),'&lt;b&gt;<mark>房颤</mark>&lt;/b&gt; 伴快速心室率');
