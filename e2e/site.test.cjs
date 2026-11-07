@@ -475,33 +475,6 @@ test('ECG in-page navigation does not pull focus away from a search started befo
   }finally{await context.close();}
 });
 
-test('ECG related entries show both directions, own list first, compact on phones',async()=>{
-  for(const width of [390,1440]){
-    const {page,context,errors}=await pageFor(width);
-    try{
-      // 高钾血症 lists no related entries itself; entries that list it now appear.
-      await page.goto(base+'/ecg/atlas/electrolytes/hyperkalemia',{waitUntil:'networkidle'});
-      const links=page.locator('#ecg-related a');
-      assert(await links.count()>=1,'entries that point to 高钾血症 are shown');
-      // STEMI keeps its own related order first and adds back-links after, without duplicates.
-      await page.goto(base+'/ecg/atlas/ischemia/stemi',{waitUntil:'networkidle'});
-      const hrefs=await page.locator('#ecg-related a').evaluateAll(items=>items.map(item=>item.getAttribute('href')));
-      const own=await page.evaluate(()=>window.HAJIMI_ECG_DATA.entries.find(entry=>entry.id==='stemi').related);
-      assert.deepEqual(hrefs.slice(0,own.length).map(href=>href.split('/').pop()),own);
-      assert.equal(new Set(hrefs).size,hrefs.length,'no duplicates');
-      assert(!hrefs.some(href=>href.endsWith('/stemi')),'no self link');
-      if(width<700){
-        const box=await page.locator('#ecg-related a').first().boundingBox();
-        assert(box.height<=110,'related item is a compact row ('+Math.round(box.height)+'px)');
-      }
-      await page.locator('#ecg-related a').first().click();
-      await page.waitForURL(url=>url.pathname.startsWith('/ecg/atlas/')&&!url.pathname.endsWith('/stemi'));
-      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
-      assert.deepEqual(errors,[]);
-    }finally{await context.close();}
-  }
-});
-
 test('ECG draft dossiers keep the basic layer visible, synchronize keyboard folding and keep fixed review metadata readable',async()=>{
   const dossiers=[['arrhythmias','atrial-fibrillation','房颤'],['electrolytes','hyperkalemia','高钾血症'],['pulmonary','pulmonary-embolism','肺栓塞'],['conduction','second-degree-av-block','二度房室传导阻滞'],['pacing','ventricular-pacing','心室起搏心电图'],['arrhythmias','brugada','Brugada 图形'],['ischemia','inferior-stemi','下壁 ST 段抬高型心肌梗死']];
   for(const width of [320,375,768,1440]){
@@ -537,6 +510,33 @@ test('ECG draft dossiers keep the basic layer visible, synchronize keyboard fold
         assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'SVG scrolling stays inside the figure');
         assert(await page.locator('#ecg-basic p').first().evaluate(element=>parseFloat(getComputedStyle(element).fontSize)>=16));
       }
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('ECG related entries show both directions, own list first, compact on phones',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      // 高钾血症 lists no related entries itself; entries that list it now appear.
+      await page.goto(base+'/ecg/atlas/electrolytes/hyperkalemia',{waitUntil:'networkidle'});
+      const links=page.locator('#ecg-related a');
+      assert(await links.count()>=1,'entries that point to 高钾血症 are shown');
+      // STEMI keeps its own related order first and adds back-links after, without duplicates.
+      await page.goto(base+'/ecg/atlas/ischemia/stemi',{waitUntil:'networkidle'});
+      const hrefs=await page.locator('#ecg-related a').evaluateAll(items=>items.map(item=>item.getAttribute('href')));
+      const own=await page.evaluate(()=>window.HAJIMI_ECG_DATA.entries.find(entry=>entry.id==='stemi').related);
+      assert.deepEqual(hrefs.slice(0,own.length).map(href=>href.split('/').pop()),own);
+      assert.equal(new Set(hrefs).size,hrefs.length,'no duplicates');
+      assert(!hrefs.some(href=>href.endsWith('/stemi')),'no self link');
+      if(width<700){
+        const box=await page.locator('#ecg-related a').first().boundingBox();
+        assert(box.height<=110,'related item is a compact row ('+Math.round(box.height)+'px)');
+      }
+      await page.locator('#ecg-related a').first().click();
+      await page.waitForURL(url=>url.pathname.startsWith('/ecg/atlas/')&&!url.pathname.endsWith('/stemi'));
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
   }

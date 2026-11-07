@@ -87,17 +87,6 @@ body.ecg-page{
 .ecg-entry-page .class-hero h1{font-size:32px}
 .ecg-entry-page .class-shell{padding-bottom:calc(var(--ecg-footer-height,150px) + 32px)}
 html:has(.ecg-entry-page){scroll-padding-bottom:calc(var(--ecg-footer-height,150px) + 16px)}
-@media(min-width:700px){
-  .ecg-page .class-shell{width:calc(100% - 48px)}
-  .ecg-entry-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .ecg-category-grid,.ecg-panel-grid,.ecg-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .ecg-page .class-hero{padding:30px}
-  .ecg-page .class-content-section{padding:26px}
-}
-@media(min-width:1100px){
-  .ecg-category-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .ecg-footer-inner{flex-direction:row;align-items:center;justify-content:space-between;gap:16px}
-}
 /* Phones: related entries become a compact list (category and title); the
    summary is on the entry itself. */
 @media screen and (max-width:699px){
@@ -108,6 +97,17 @@ html:has(.ecg-entry-page){scroll-padding-bottom:calc(var(--ecg-footer-height,150
   #ecg-related .ecg-card p{display:none}
   #ecg-related .ecg-card b{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:0}
   #ecg-related .ecg-card b::after{content:"→";font-size:18px}
+}
+@media(min-width:700px){
+  .ecg-page .class-shell{width:calc(100% - 48px)}
+  .ecg-entry-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ecg-category-grid,.ecg-panel-grid,.ecg-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ecg-page .class-hero{padding:30px}
+  .ecg-page .class-content-section{padding:26px}
+}
+@media(min-width:1100px){
+  .ecg-category-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ecg-footer-inner{flex-direction:row;align-items:center;justify-content:space-between;gap:16px}
 }
 @media(max-width:1099px){
   .ecg-page .official-nav{height:auto;min-height:0}
