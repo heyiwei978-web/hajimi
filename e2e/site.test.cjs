@@ -559,6 +559,29 @@ test('ECG related entries show both directions, own list first, compact on phone
   }
 });
 
+test('long ECG reading pages offer a button back to their contents once it has scrolled away',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/ecg/basics',{waitUntil:'networkidle'});await settle(page);
+      const button=page.getByRole('button',{name:'回到本页目录'});
+      assert.equal(await button.isVisible(),false,'hidden while the contents are on screen');
+      await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight/2));
+      await button.waitFor({state:'visible'});
+      await button.click();
+      await page.waitForFunction(()=>{const r=document.querySelector('nav.ecg-section-links').getBoundingClientRect();return r.top>=0&&r.top<innerHeight;});
+      assert.equal(await page.evaluate(()=>document.activeElement.closest('nav')?.className),'ecg-section-links');
+      await page.waitForFunction(()=>document.querySelector('.ecg-toc-jump').hidden);
+      // In-page navigation to an entry removes it; entry pages keep only their fixed footer.
+      await page.evaluate(()=>{const a=document.createElement('a');a.href='/ecg/atlas/arrhythmias/atrial-fibrillation';document.getElementById('ecgApp').appendChild(a);a.click();});
+      await page.waitForURL(base+'/ecg/atlas/arrhythmias/atrial-fibrillation');
+      await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
+      assert.equal(await page.locator('.ecg-toc-jump').count(),0);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('ECG tools calculate both QTc formulas and RR heart rate, discard stale results and link to the existing RCRI',async()=>{
   for(const width of [320,1440]){
     const {page,context,errors}=await pageFor(width);
