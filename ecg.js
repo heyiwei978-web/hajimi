@@ -295,11 +295,15 @@
     view();
     if(window.HAJIMI_ECG_CALIPERS)window.HAJIMI_ECG_CALIPERS.enhance(app);
     globalSearch.sync();
+    // Keyboard focus moves to the new title only if the reader has not already
+    // put it somewhere (e.g. started typing a search) before the next frame.
+    const focusBefore=document.activeElement;
     // Deferred scripts create these targets before the measured public header is ready.
     requestAnimationFrame(()=>{
       if(scroll!=null)window.scrollTo({top:scroll,behavior:'instant'});
       else if(!scrollToHash()&&focus)window.scrollTo({top:0,behavior:'instant'});
-      if(focus){const heading=document.getElementById('ecgTitle');heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}
+      const untouched=document.activeElement===focusBefore||document.activeElement===document.body||!document.activeElement;
+      if(focus&&untouched){const heading=document.getElementById('ecgTitle');heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}
     });
   }
 

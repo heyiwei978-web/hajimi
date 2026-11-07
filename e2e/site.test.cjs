@@ -453,6 +453,28 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
   }
 });
 
+test('ECG in-page navigation does not pull focus away from a search started before the next frame',async()=>{
+  const {page,context,errors}=await pageFor(1440);
+  try{
+    await page.goto(base+'/ecg',{waitUntil:'networkidle'});
+    // Navigate and start a search in the same task, before the deferred title focus runs.
+    await page.evaluate(()=>{
+      document.querySelector('main a[href="/ecg/basics"]').click();
+      const input=document.getElementById('ecgGlobalSearch');
+      input.focus();input.value='LBBB';input.dispatchEvent(new Event('input',{bubbles:true}));
+    });
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.equal(await page.evaluate(()=>document.activeElement.id),'ecgGlobalSearch','focus stays in the search box');
+    await page.keyboard.press('Escape');
+    assert(await page.getByRole('listbox',{name:'搜索结果'}).isHidden());
+    // Ordinary navigation still moves focus to the new page title.
+    await page.locator('#ecgGlobalSearch').blur();
+    await page.evaluate(()=>document.querySelector('a[href="/ecg/atlas"]').click());
+    await page.waitForFunction(()=>document.activeElement?.id==='ecgTitle');
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('ECG draft dossiers keep the basic layer visible, synchronize keyboard folding and keep fixed review metadata readable',async()=>{
   const dossiers=[['arrhythmias','atrial-fibrillation','房颤'],['electrolytes','hyperkalemia','高钾血症'],['pulmonary','pulmonary-embolism','肺栓塞'],['conduction','second-degree-av-block','二度房室传导阻滞'],['pacing','ventricular-pacing','心室起搏心电图'],['arrhythmias','brugada','Brugada 图形'],['ischemia','inferior-stemi','下壁 ST 段抬高型心肌梗死']];
   for(const width of [320,375,768,1440]){
