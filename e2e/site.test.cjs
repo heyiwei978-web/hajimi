@@ -1075,6 +1075,28 @@ test('disease navigation starts at the top, preserves record content and chapter
   } finally {await context.close();}
 });
 
+test('record library department and disease cards are compact on phones',async()=>{
+  for(const width of [360,390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/bl',{waitUntil:'networkidle'});
+      const dept=page.locator('.library-department-card').first();
+      const d=await dept.boundingBox();
+      if(width<640){
+        assert(d.height<=190,'department card '+Math.round(d.height)+'px');
+        const [icon,title]=await Promise.all([dept.locator('.department-icon').boundingBox(),dept.locator('h3').boundingBox()]);
+        assert(title.x>=icon.x+icon.width,'title sits right of the icon');
+      }else assert(d.height>=250,'desktop department card keeps its size');
+      await dept.click();
+      await page.waitForURL(base+'/bl/guke');
+      const card=page.locator('.ortho-disease-card').first();await card.waitFor();
+      if(width<640)assert((await card.boundingBox()).height<=260,'disease card is compact');
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('legacy chapter URLs and same-name TKA numeric/stable identities survive refresh on desktop and phone',async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width);
