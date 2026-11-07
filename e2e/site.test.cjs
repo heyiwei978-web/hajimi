@@ -715,6 +715,21 @@ test('orthopedic category links land on the selected heading without rebuilding 
   }
 });
 
+test('orthopedic department page reaches the first category quickly on phones',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
+    const top=await page.locator('.ortho-sections').evaluate(el=>el.getBoundingClientRect().top+scrollY);
+    assert(top<1100,'first category starts at '+Math.round(top)+'px');
+    assert.equal(await page.locator('.ortho-stats').isVisible(),false,'duplicate counts are hidden on phones');
+    assert.equal(await page.locator('.ortho-hero p').isVisible(),true,'the explanation stays');
+    const jump=page.locator('.ortho-jump');
+    assert((await jump.boundingBox()).height<=60,'category buttons form one scrolling row');
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('orthopedic category deep links survive refresh and browser history, and open the matching records', {timeout:60000},async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width,{reducedMotion:width===375?'no-preference':'reduce',isMobile:width===375,hasTouch:width===375});
