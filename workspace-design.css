@@ -440,6 +440,14 @@
   .pathway-hero h1{font-size:2rem;line-height:1.4}
   .pathway-hero-metrics div{padding:14px;min-width:0}
   .pathway-hero-metrics span{font-size:.75rem}
+  /* 临床路径：手机上四个数字一行排开、两个按钮并排，更快进入路径正文。 */
+  .pathway-hero-metrics{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .pathway-hero-metrics div{min-height:0;padding:10px 4px;align-items:center;text-align:center}
+  .pathway-hero-metrics strong{font-size:1.125rem}
+  .pathway-hero-metrics span{margin-top:4px;font-size:.6875rem;line-height:1.35}
+  .pathway-hero-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(136px,1fr));gap:8px;margin-top:18px}
+  .pathway-btn{width:100%;padding:0 6px;font-size:.8125rem;white-space:nowrap;text-align:center}
+  .pathway-title-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .pathway-title-card{padding:20px}
   .pathway-title-card h2{font-size:1.375rem}
   .pathway-section-head h3{font-size:1.25rem}
