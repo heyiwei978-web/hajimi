@@ -1722,6 +1722,26 @@ test('visitors see saved supplement edits but get no edit buttons',async()=>{
   }finally{await context.close();}
 });
 
+test('classification and ECG entry cards are compact on phones and unchanged on desktop',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      for(const [route,selector] of [['/classification','.class-dept-grid .class-dept-card'],['/ecg','.ecg-entry-grid .class-dept-card']]){
+        await page.goto(base+route,{waitUntil:'networkidle'});
+        const card=page.locator(selector).first();await card.waitFor();
+        const [box,icon]=await Promise.all([card.boundingBox(),card.locator('.class-dept-symbol').boundingBox()]);
+        if(width<640){
+          assert(box.height<=210,route+' card is compact ('+Math.round(box.height)+'px)');
+          const title=await card.locator('h3').boundingBox();
+          assert(title.x>=icon.x+icon.width,route+' title sits right of the icon');
+        }else assert(box.height>=200,route+' desktop card keeps its size');
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,route);
+      }
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('editors can be enlarged: supplement boxes open a full-size editor and CMS dialogs toggle full screen',async()=>{
   for(const width of [390,1440]){
     const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'});
