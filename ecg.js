@@ -294,9 +294,28 @@
     target.scrollIntoView({behavior:'instant',block:'start'});
     return true;
   }
+  // Long reading pages (基础学习, 围手术期, 心电现象, 练习, 报告) list their sections
+  // at the top. Once that list has scrolled away, a small button brings it back.
+  function tocJump(){
+    const nav=app.querySelector('nav.ecg-section-links');
+    if(!nav||nav.querySelectorAll('a[href^="#"]').length<3)return;
+    const button=document.createElement('button');
+    button.type='button';button.className='ecg-toc-jump';button.hidden=true;
+    button.textContent='目录 ↑';button.setAttribute('aria-label','回到本页目录');
+    button.addEventListener('click',()=>{
+      nav.scrollIntoView({behavior:'instant',block:'start'});
+      nav.querySelector('a')?.focus({preventScroll:true});
+    });
+    document.body.appendChild(button);
+    const update=()=>{button.hidden=nav.getBoundingClientRect().bottom>=0;};
+    window.addEventListener('scroll',update,{passive:true});
+    update();
+    cleanup.push(()=>{window.removeEventListener('scroll',update);button.remove();});
+  }
   function render({focus=false,scroll=null}={}){
     resetShell();
     view();
+    tocJump();
     if(window.HAJIMI_ECG_CALIPERS)window.HAJIMI_ECG_CALIPERS.enhance(app);
     globalSearch.sync();
     // Keyboard focus moves to the new title only if the reader has not already
