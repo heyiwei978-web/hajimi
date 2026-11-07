@@ -559,6 +559,30 @@ test('ECG related entries show both directions, own list first, compact on phone
   }
 });
 
+test('ECG atlas lists categories and entries compactly on phones; search still filters them',async()=>{
+  for(const width of [320,390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/ecg/atlas',{waitUntil:'networkidle'});
+      const entry=page.locator('[data-ecg-entry]:not([hidden]) a').first();
+      const category=page.locator('.ecg-category-grid a').first();
+      if(width<700){
+        assert((await entry.boundingBox()).height<=110,'entry row is compact');
+        const [a,b]=await Promise.all([category.boundingBox(),page.locator('.ecg-category-grid a').nth(1).boundingBox()]);
+        assert(Math.abs(a.y-b.y)<2,'categories sit two per row');
+        assert(await entry.locator('p').evaluate(el=>el.scrollHeight<=parseFloat(getComputedStyle(el).lineHeight)*1.5),'summary is one line');
+        assert(await page.evaluate(()=>document.documentElement.scrollHeight)<14000,'atlas page is about half as long');
+      }
+      await page.getByRole('searchbox',{name:'搜索心电图图谱'}).fill('房颤');
+      assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').first().getAttribute('data-ecg-entry'),'atrial-fibrillation');
+      await page.locator('[data-ecg-entry]:not([hidden]) a').first().click();
+      await page.waitForURL(base+'/ecg/atlas/arrhythmias/atrial-fibrillation');
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('ECG tools calculate both QTc formulas and RR heart rate, discard stale results and link to the existing RCRI',async()=>{
   for(const width of [320,1440]){
     const {page,context,errors}=await pageFor(width);
