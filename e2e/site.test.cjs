@@ -737,6 +737,21 @@ test('orthopedic category links land on the selected heading without rebuilding 
   }
 });
 
+test('orthopedic department page reaches the first category quickly on phones',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
+    const top=await page.locator('.ortho-sections').evaluate(el=>el.getBoundingClientRect().top+scrollY);
+    assert(top<1100,'first category starts at '+Math.round(top)+'px');
+    assert.equal(await page.locator('.ortho-stats').isVisible(),false,'duplicate counts are hidden on phones');
+    assert.equal(await page.locator('.ortho-hero p').isVisible(),true,'the explanation stays');
+    const jump=page.locator('.ortho-jump');
+    assert((await jump.boundingBox()).height<=60,'category buttons form one scrolling row');
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('orthopedic category deep links survive refresh and browser history, and open the matching records', {timeout:60000},async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width,{reducedMotion:width===375?'no-preference':'reduce',isMobile:width===375,hasTouch:width===375});
@@ -1742,6 +1757,26 @@ test('visitors see saved supplement edits but get no edit buttons',async()=>{
     await page.waitForFunction(()=>document.querySelector('#comorbidityNotes')?.textContent.includes('本院冠心病既往史写法'));
     assert.equal(await notes.locator('[data-edit-box]').count(),0);
   }finally{await context.close();}
+});
+
+test('classification and ECG entry cards are compact on phones and unchanged on desktop',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      for(const [route,selector] of [['/classification','.class-dept-grid .class-dept-card'],['/ecg','.ecg-entry-grid .class-dept-card']]){
+        await page.goto(base+route,{waitUntil:'networkidle'});
+        const card=page.locator(selector).first();await card.waitFor();
+        const [box,icon]=await Promise.all([card.boundingBox(),card.locator('.class-dept-symbol').boundingBox()]);
+        if(width<640){
+          assert(box.height<=210,route+' card is compact ('+Math.round(box.height)+'px)');
+          const title=await card.locator('h3').boundingBox();
+          assert(title.x>=icon.x+icon.width,route+' title sits right of the icon');
+        }else assert(box.height>=200,route+' desktop card keeps its size');
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,route);
+      }
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
 });
 
 test('editors can be enlarged: supplement boxes open a full-size editor and CMS dialogs toggle full screen',async()=>{
