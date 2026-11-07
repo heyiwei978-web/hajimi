@@ -1389,6 +1389,28 @@ test('signed-in clinical headers, preview actions and editors remain usable on n
   }
 });
 
+test('pathway hero is compact on phones: metrics in one row, buttons never overflow',async()=>{
+  for(const width of [320,360,390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/pathway',{waitUntil:'networkidle'});
+      const metrics=page.locator('.pathway-hero-metrics > div');
+      const boxes=await metrics.evaluateAll(items=>items.map(item=>item.getBoundingClientRect().top));
+      if(width<640)assert.equal(new Set(boxes.map(Math.round)).size,1,'four metrics share one row');
+      for(const button of await page.locator('.pathway-hero-actions > *').all()){
+        assert(await button.evaluate(el=>el.scrollWidth<=el.clientWidth+1),'button text fits at '+width+'px');
+      }
+      if(width===390){
+        // Was about 1218px before the compact hero.
+        const top=await page.locator('.pathway-main:not([hidden])').evaluate(el=>el.getBoundingClientRect().top+scrollY);
+        assert(top<1100,'pathway content starts at '+Math.round(top)+'px');
+      }
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('pathway directory selections and direct links leave their title cards below the current header',async()=>{
   for(const [width,height]of [[320,740],[375,812],[812,375],[1024,600],[1440,900]]){
     const {page,context,errors}=await pageFor(width,{viewport:{width,height},isMobile:width<400,hasTouch:width<400});
