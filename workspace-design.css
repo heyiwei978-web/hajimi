@@ -407,6 +407,21 @@
   #libraryShell .ortho-jump::-webkit-scrollbar{display:none}
   #libraryShell .ortho-jump a{flex:none;display:inline-flex;align-items:center;min-height:44px;padding:6px 14px;border-radius:999px;font-size:.9375rem;white-space:nowrap}
   #libraryShell .ortho-jump a span{display:none}
+  /* 病历库科室卡与骨科病种卡：手机上收紧间距，科室卡改为左图标、右文字。 */
+  #libraryShell .library-department-card{display:grid;grid-template-columns:48px minmax(0,1fr);column-gap:14px;align-items:start;min-height:0;padding:16px}
+  #libraryShell .library-department-card .department-visual{grid-column:1;grid-row:1/span 4}
+  #libraryShell .library-department-card .department-eyebrow,#libraryShell .library-department-card small{display:none}
+  #libraryShell .library-department-card :is(.department-card-top,h3,p,.department-card-open){grid-column:2}
+  #libraryShell .library-department-card .department-card-top{margin-top:0}
+  #libraryShell .library-department-card h3{margin:2px 0 4px;font-size:1.25rem}
+  #libraryShell .library-department-card .department-card-open{margin-top:8px;padding-top:8px}
+  #libraryShell .ortho-disease-card{padding:14px 16px;min-height:0}
+  #libraryShell .ortho-disease-card h3{margin:8px 0 4px;font-size:1.1875rem}
+  #libraryShell .ortho-disease-card p{margin:0 0 8px;font-size:.9375rem;line-height:1.7}
+  #libraryShell .ortho-stage-chips{gap:4px;padding-top:2px}
+  #libraryShell .ortho-stage-chips span{padding:2px 6px;font-size:.8125rem;white-space:nowrap}
+  #libraryShell .ortho-stage-chips b{margin-left:2px}
+  #libraryShell .ortho-open{margin-top:10px;padding-top:10px}
   .ortho-category{padding:14px}
   .ortho-category-head h3{font-size:1.375rem}
   .ortho-disease-grid{grid-template-columns:minmax(0,1fr);gap:12px}
