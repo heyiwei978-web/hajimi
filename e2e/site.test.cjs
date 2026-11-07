@@ -1234,9 +1234,15 @@ test('complete records stay visible while directory jumps, scrolling and refresh
       })),`readable bottom actions at ${width}px`);
       await page.locator('#casePreviousBottom').click();await settle(page);
       assert.equal(await current.getAttribute('id'),ids.at(-2));await visibleAll();
+      // 病历目录 sits below the last chapter: scrolling down to reach it rightly moves the
+      // reading position. Reach it first and let the marker settle, so the check below is
+      // about opening the directory, not about whether the click beat the next frame.
+      await page.locator('#caseBackToDirectory').scrollIntoViewIfNeeded();await settle(page);
+      const beforeDirectory=await current.getAttribute('id');
+      assert([ids.at(-2),ids.at(-1)].includes(beforeDirectory));
       await page.locator('#caseBackToDirectory').click();await settle(page);
       assert(await page.locator('#caseDirectoryPanel').evaluate(element=>element.open));
-      assert.equal(await current.getAttribute('id'),ids.at(-2),'opening the directory keeps the current chapter');
+      assert.equal(await current.getAttribute('id'),beforeDirectory,'opening the directory keeps the current chapter');
       const directoryTop=(await page.locator('#recordBookToc').boundingBox()).y,topbar=await page.locator('.library-topbar').boundingBox();
       assert(directoryTop>=topbar.y+topbar.height-1,`directory heading stays on screen at ${width}px`);
       assert(await page.locator('.case-nav-item[aria-current="location"]').evaluate(element=>{
