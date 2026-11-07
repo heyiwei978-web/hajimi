@@ -475,6 +475,22 @@ test('ECG in-page navigation does not pull focus away from a search started befo
   }finally{await context.close();}
 });
 
+test('ECG entry review footer stays fixed and complete but compact on phones',async()=>{
+  for(const [width,max] of [[320,90],[390,64],[1440,80]]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/ecg/atlas/electrolytes/hyperkalemia',{waitUntil:'networkidle'});await settle(page);
+      const footer=page.locator('#ecgReviewFooter');
+      const text=await footer.innerText();
+      for(const part of ['仅供临床参考，不替代医生判断','参考文献：','更新日期：','审核状态：待审核'])assert(text.includes(part),part);
+      const box=await footer.boundingBox();
+      assert(box.height<=max,'footer is '+Math.round(box.height)+'px at '+width+'px');
+      assert(box.y+box.height<=page.viewportSize().height+1);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('ECG draft dossiers keep the basic layer visible, synchronize keyboard folding and keep fixed review metadata readable',async()=>{
   const dossiers=[['arrhythmias','atrial-fibrillation','房颤'],['electrolytes','hyperkalemia','高钾血症'],['pulmonary','pulmonary-embolism','肺栓塞'],['conduction','second-degree-av-block','二度房室传导阻滞'],['pacing','ventricular-pacing','心室起搏心电图'],['arrhythmias','brugada','Brugada 图形'],['ischemia','inferior-stemi','下壁 ST 段抬高型心肌梗死']];
   for(const width of [320,375,768,1440]){
