@@ -492,6 +492,29 @@ test('ECG entry review footer stays fixed and complete but compact on phones',as
   }
 });
 
+test('long ECG reading pages offer a button back to their contents once it has scrolled away',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/ecg/basics',{waitUntil:'networkidle'});await settle(page);
+      const button=page.getByRole('button',{name:'回到本页目录'});
+      assert.equal(await button.isVisible(),false,'hidden while the contents are on screen');
+      await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight/2));
+      await button.waitFor({state:'visible'});
+      await button.click();
+      await page.waitForFunction(()=>{const r=document.querySelector('nav.ecg-section-links').getBoundingClientRect();return r.top>=0&&r.top<innerHeight;});
+      assert.equal(await page.evaluate(()=>document.activeElement.closest('nav')?.className),'ecg-section-links');
+      await page.waitForFunction(()=>document.querySelector('.ecg-toc-jump').hidden);
+      // In-page navigation to an entry removes it; entry pages keep only their fixed footer.
+      await page.evaluate(()=>{const a=document.createElement('a');a.href='/ecg/atlas/arrhythmias/atrial-fibrillation';document.getElementById('ecgApp').appendChild(a);a.click();});
+      await page.waitForURL(base+'/ecg/atlas/arrhythmias/atrial-fibrillation');
+      await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
+      assert.equal(await page.locator('.ecg-toc-jump').count(),0);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('ECG draft dossiers keep the basic layer visible, synchronize keyboard folding and keep fixed review metadata readable',async()=>{
   const dossiers=[['arrhythmias','atrial-fibrillation','房颤'],['electrolytes','hyperkalemia','高钾血症'],['pulmonary','pulmonary-embolism','肺栓塞'],['conduction','second-degree-av-block','二度房室传导阻滞'],['pacing','ventricular-pacing','心室起搏心电图'],['arrhythmias','brugada','Brugada 图形'],['ischemia','inferior-stemi','下壁 ST 段抬高型心肌梗死']];
   for(const width of [320,375,768,1440]){
@@ -554,29 +577,6 @@ test('ECG related entries show both directions, own list first, compact on phone
       await page.locator('#ecg-related a').first().click();
       await page.waitForURL(url=>url.pathname.startsWith('/ecg/atlas/')&&!url.pathname.endsWith('/stemi'));
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
-      assert.deepEqual(errors,[]);
-    }finally{await context.close();}
-  }
-});
-
-test('long ECG reading pages offer a button back to their contents once it has scrolled away',async()=>{
-  for(const width of [390,1440]){
-    const {page,context,errors}=await pageFor(width);
-    try{
-      await page.goto(base+'/ecg/basics',{waitUntil:'networkidle'});await settle(page);
-      const button=page.getByRole('button',{name:'回到本页目录'});
-      assert.equal(await button.isVisible(),false,'hidden while the contents are on screen');
-      await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight/2));
-      await button.waitFor({state:'visible'});
-      await button.click();
-      await page.waitForFunction(()=>{const r=document.querySelector('nav.ecg-section-links').getBoundingClientRect();return r.top>=0&&r.top<innerHeight;});
-      assert.equal(await page.evaluate(()=>document.activeElement.closest('nav')?.className),'ecg-section-links');
-      await page.waitForFunction(()=>document.querySelector('.ecg-toc-jump').hidden);
-      // In-page navigation to an entry removes it; entry pages keep only their fixed footer.
-      await page.evaluate(()=>{const a=document.createElement('a');a.href='/ecg/atlas/arrhythmias/atrial-fibrillation';document.getElementById('ecgApp').appendChild(a);a.click();});
-      await page.waitForURL(base+'/ecg/atlas/arrhythmias/atrial-fibrillation');
-      await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
-      assert.equal(await page.locator('.ecg-toc-jump').count(),0);
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
   }
