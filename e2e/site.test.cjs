@@ -531,6 +531,33 @@ test('ECG draft dossiers keep the basic layer visible, synchronize keyboard fold
   }
 });
 
+test('ECG related entries show both directions, own list first, compact on phones',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      // 高钾血症 lists no related entries itself; entries that list it now appear.
+      await page.goto(base+'/ecg/atlas/electrolytes/hyperkalemia',{waitUntil:'networkidle'});
+      const links=page.locator('#ecg-related a');
+      assert(await links.count()>=1,'entries that point to 高钾血症 are shown');
+      // STEMI keeps its own related order first and adds back-links after, without duplicates.
+      await page.goto(base+'/ecg/atlas/ischemia/stemi',{waitUntil:'networkidle'});
+      const hrefs=await page.locator('#ecg-related a').evaluateAll(items=>items.map(item=>item.getAttribute('href')));
+      const own=await page.evaluate(()=>window.HAJIMI_ECG_DATA.entries.find(entry=>entry.id==='stemi').related);
+      assert.deepEqual(hrefs.slice(0,own.length).map(href=>href.split('/').pop()),own);
+      assert.equal(new Set(hrefs).size,hrefs.length,'no duplicates');
+      assert(!hrefs.some(href=>href.endsWith('/stemi')),'no self link');
+      if(width<700){
+        const box=await page.locator('#ecg-related a').first().boundingBox();
+        assert(box.height<=110,'related item is a compact row ('+Math.round(box.height)+'px)');
+      }
+      await page.locator('#ecg-related a').first().click();
+      await page.waitForURL(url=>url.pathname.startsWith('/ecg/atlas/')&&!url.pathname.endsWith('/stemi'));
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('ECG tools calculate both QTc formulas and RR heart rate, discard stale results and link to the existing RCRI',async()=>{
   for(const width of [320,1440]){
     const {page,context,errors}=await pageFor(width);

@@ -104,8 +104,12 @@
     if(!source||!data.textbook)return '';
     return '<p class="ecg-textbook"><strong>学习教材</strong>'+esc(data.textbook.title)+'，'+esc(source.chapter)+'，第 '+esc(source.pages)+' 页。<span class="ecg-hint">'+esc(data.textbook.note)+'</span></p>';
   }
+  // Related entries: the entry's own list first, then entries that list it, so a
+  // relation written on one side shows on both (the data files are unchanged).
   function related(entry){
-    const items=(entry.related||[]).map(id=>data.entries.find(other=>other.id===id)).filter(Boolean);
+    const own=(entry.related||[]).map(id=>data.entries.find(other=>other.id===id)).filter(Boolean);
+    const back=data.entries.filter(other=>other!==entry&&(other.related||[]).includes(entry.id)&&!own.includes(other));
+    const items=[...own,...back];
     return items.length?section('ecg-related','相关词条','<div class="ecg-panel-grid">'+items.map(other=>card(entryUrl(other),other.title,other.basic.summary,[categoryFor(other).title,riskLabel(other)].filter(Boolean).join(' · '))).join('')+'</div>'):'';
   }
   function details(entry){

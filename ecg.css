@@ -87,6 +87,17 @@ body.ecg-page{
 .ecg-entry-page .class-hero h1{font-size:32px}
 .ecg-entry-page .class-shell{padding-bottom:calc(var(--ecg-footer-height,150px) + 32px)}
 html:has(.ecg-entry-page){scroll-padding-bottom:calc(var(--ecg-footer-height,150px) + 16px)}
+/* Phones: related entries become a compact list (category and title); the
+   summary is on the entry itself. */
+@media screen and (max-width:699px){
+  #ecg-related .ecg-panel-grid{gap:8px}
+  #ecg-related .ecg-card{min-height:0;padding:12px 40px 12px 14px;position:relative;gap:2px}
+  #ecg-related .ecg-card h3{margin:0;font-size:17px;line-height:1.5}
+  #ecg-related .ecg-card small{font-size:13px;line-height:1.5}
+  #ecg-related .ecg-card p{display:none}
+  #ecg-related .ecg-card b{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:0}
+  #ecg-related .ecg-card b::after{content:"→";font-size:18px}
+}
 @media(min-width:700px){
   .ecg-page .class-shell{width:calc(100% - 48px)}
   .ecg-entry-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
