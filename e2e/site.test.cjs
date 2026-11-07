@@ -349,8 +349,9 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
       assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),94);
       const search=page.getByRole('searchbox',{name:'搜索心电图图谱'});
       const searchBounds=await search.boundingBox();assert(searchBounds.y>0&&searchBounds.y+searchBounds.height<900,'atlas search is visible before scrolling through categories');
-      // Exact abbreviations match one entry; common Chinese terms rank the title/alias match first.
-      for(const [query,id,only] of [['房颤','atrial-fibrillation',false],['AF','atrial-fibrillation',true],['高钾','hyperkalemia',false],['低钾','hypokalemia',false],['文氏','second-degree-av-block',false],['LBBB','left-bundle-branch-block',false],['莫氏','second-degree-av-block',false],['PE','pulmonary-embolism',true],['Ｓ１Ｑ３Ｔ３','pulmonary-embolism',true]]){
+      // Exact abbreviations match one entry; common Chinese terms rank the title/alias match first,
+      // and a shared alias (文氏) ranks the entry named after it above the broader one.
+      for(const [query,id,only] of [['房颤','atrial-fibrillation',false],['AF','atrial-fibrillation',true],['高钾','hyperkalemia',false],['低钾','hypokalemia',false],['文氏','mobitz-i',false],['LBBB','left-bundle-branch-block',false],['莫氏','second-degree-av-block',false],['PE','pulmonary-embolism',true],['Ｓ１Ｑ３Ｔ３','pulmonary-embolism',true]]){
         await search.fill(query);
         if(only)assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').count(),1);
         assert.equal(await page.locator('[data-ecg-entry]:not([hidden])').first().getAttribute('data-ecg-entry'),id);
