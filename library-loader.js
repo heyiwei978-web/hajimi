@@ -1,5 +1,9 @@
 (() => {
   const manifest=window.HAJIMI_MANIFEST,records=[],byId=new Map(),catalogs=new Map(),bodies=new Map();
+  // 慢网络优化：页面一打开就同时开始下载后面要用的脚本和正文（<link rel=preload>），
+  // 下面仍按原顺序逐个执行，执行顺序不变，只是不再一个下载完才开始下一个。
+  function preload(url){if(!url)return;const link=document.createElement('link');link.rel='preload';link.as='script';link.href=url;document.head.append(link);}
+  const early=new Map();
   function script(url){return new Promise((resolve,reject)=>{const element=document.createElement('script');element.src=url;element.onload=resolve;element.onerror=()=>{element.remove();reject(new Error('资料加载失败，请检查网络后重试'));};document.head.append(element);});}
   const H=window.HAJIMI={records,manifest,
     acceptCatalog(department,{strings,extras,rows}){
@@ -23,7 +27,8 @@
       await H.ensureDepartment(slug);
       const key=department+'\0'+group,url=manifest.bodies[key];if(!url)return;
       if(!bodies.has(key))bodies.set(key,(async()=>{
-        const response=await fetch(url);if(!response.ok)throw new Error('病历正文加载失败，请检查网络后重试');
+        const pending=early.get(url);early.delete(url);
+        const response=await(pending||fetch(url));if(!response.ok)throw new Error('病历正文加载失败，请检查网络后重试');
         const values=await response.json();
         if(!Array.isArray(values)||values.some(([id,body])=>!byId.has(id)||typeof body!=='string'))throw new Error('病历正文加载异常，请刷新后重试');
         for(const [id,body]of values)byId.get(id).sourceBody=body;
@@ -42,6 +47,13 @@
   window.HAJIMI_BOOTSTRAP=true;
   (async()=>{
     const parts=location.pathname.split('/').filter(Boolean),slug=parts[0]==='bl'?parts[1]:null;
+    const department=slug&&manifest.departments[slug];
+    if(department)preload(department.catalog);
+    preload(manifest.scripts.app);preload(manifest.scripts.router);preload(manifest.scripts.cms);
+    if(department&&parts[2]){
+      const url=manifest.bodies[department.name+'\0'+decodeURIComponent(parts.slice(2).join('/'))];
+      if(url)early.set(url,fetch(url));
+    }
     if(slug)await H.ensureDepartment(slug);
     await script(manifest.scripts.app);
     if(slug&&parts[2])await H.ensureGroup(manifest.departments[slug]?.name,decodeURIComponent(parts.slice(2).join('/')));
