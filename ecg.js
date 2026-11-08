@@ -227,14 +227,16 @@
     const sample='<h3>'+esc(R.sample.title)+'</h3><div class="ecg-report-sheet">'+R.sample.lines.map(line=>'<p>'+esc(line)+'</p>').join('')+'<p><strong>结论：</strong></p><ol>'+R.sample.conclusion.map(line=>'<li>'+esc(line)+'</li>').join('')+'</ol></div>';
     const examples=(data.cases||[]).map(item=>'<li><strong>'+esc(item.title)+'：</strong>'+esc(item.report)+'</li>').join('');
     const opt=values=>values.map(value=>'<option>'+esc(value)+'</option>').join('');
+    // 报告生成器不预设心律：必须由使用者按实际心电图选择（审核意见 docs/ecg-content-audit-20261108.md 第 8 项）。
+    const OTHER_RHYTHM='其他（请在其他描述中写明）',NO_PR_RHYTHMS=['心房颤动','心房扑动'];
     const builder='<p>按实际测量填写，未填写的项目不会出现在报告中。请勿填写姓名、住院号等身份信息。</p><form class="ecg-form" id="ecgReportForm" novalidate><div class="ecg-form-grid">'+
-      '<label for="ecgRpRhythm">心律<select id="ecgRpRhythm">'+opt(['窦性心律','窦性心动过速','窦性心动过缓','心房颤动','心房扑动','交界性心律','心室起搏心律'])+'</select></label>'+
+      '<label for="ecgRpRhythm">心律（必选）<select id="ecgRpRhythm" required aria-describedby="ecgRpRhythmHint"><option value="">请选择心律</option>'+opt(['窦性心律','窦性心动过速','窦性心动过缓','心房颤动','心房扑动','交界性心律','心室起搏心律',OTHER_RHYTHM])+'</select></label>'+
       '<label for="ecgRpRate">心率（次/分）<input id="ecgRpRate" type="number" inputmode="decimal" min="0" step="any" placeholder="例如 72"></label>'+
       '<label for="ecgRpPr">PR 间期（ms）<input id="ecgRpPr" type="number" inputmode="decimal" min="0" step="any" placeholder="例如 160"></label>'+
       '<label for="ecgRpQrs">QRS 时限（ms）<input id="ecgRpQrs" type="number" inputmode="decimal" min="0" step="any" placeholder="例如 90"></label>'+
       '<label for="ecgRpQt">QT 间期（ms）<input id="ecgRpQt" type="number" inputmode="decimal" min="0" step="any" placeholder="例如 400"></label>'+
       '<label for="ecgRpAxis">电轴（度）<input id="ecgRpAxis" type="number" inputmode="decimal" step="any" placeholder="例如 60"></label>'+
-      '</div><label for="ecgRpFindings">其他描述（ST-T、QRS 形态等，每行一条）<textarea id="ecgRpFindings" rows="3" placeholder="例如：V1–V2 导联 T 波倒置"></textarea></label>'+
+      '</div><p class="ecg-form-hint" id="ecgRpRhythmHint" aria-live="polite">心律需按实际心电图选择，不会自动填写。</p><label for="ecgRpFindings">其他描述（ST-T、QRS 形态等，每行一条）<textarea id="ecgRpFindings" rows="3" placeholder="例如：V1–V2 导联 T 波倒置"></textarea></label>'+
       '<label for="ecgRpConclusion">结论（按重要性排序，每行一条）<textarea id="ecgRpConclusion" rows="3" placeholder="例如：窦性心律&#10;一度房室传导阻滞"></textarea></label>'+
       '<button class="btn primary" type="submit">生成报告</button><div class="ecg-result" id="ecgRpResult" role="status" aria-live="polite" hidden></div></form>';
     app.innerHTML='<nav class="ecg-section-links" aria-label="报告目录"><a href="#ecg-report-structure">报告结构</a><a href="#ecg-report-rules">规范写法</a><a href="#ecg-report-sample">完整范例</a><a href="#ecg-report-examples">练习病例报告</a><a href="#ecg-report-builder">报告生成器</a></nav>'+
@@ -242,14 +244,25 @@
       section('ecg-report-examples','练习病例的规范报告','<ul class="ecg-points">'+examples+'</ul><p><a class="btn" href="/ecg/quiz">去做病例练习 →</a></p>')+section('ecg-report-builder','报告生成器',builder);
     const form=document.getElementById('ecgReportForm'),out=document.getElementById('ecgRpResult'),C=window.HAJIMI_ECG_CALCULATORS,v=id=>document.getElementById(id).value.trim();
     form.addEventListener('input',()=>{out.hidden=true;out.replaceChildren();});
+    const rhythm=document.getElementById('ecgRpRhythm'),pr=document.getElementById('ecgRpPr'),rhythmHint=document.getElementById('ecgRpRhythmHint');
+    const defaultHint=rhythmHint.textContent;
+    rhythm.addEventListener('change',()=>{
+      rhythm.removeAttribute('aria-invalid');
+      const noPr=NO_PR_RHYTHMS.includes(rhythm.value);
+      pr.disabled=noPr;if(noPr)pr.value='';
+      rhythmHint.textContent=noPr?rhythm.value+'时没有固定的 P 波，PR 间期不能常规测量，已停用 PR 间期一栏。'
+        :rhythm.value===OTHER_RHYTHM?'请在下方「其他描述」中写明心律。':defaultHint;
+    });
     form.addEventListener('submit',event=>{
       event.preventDefault();out.classList.remove('is-error');
       try{
         const num=(value,label)=>{const n=Number(value);if(!Number.isFinite(n)||n<=0)throw new RangeError(label+'请输入大于 0 的数值。');return n;};
-        const lines=[],rate=v('ecgRpRate'),qt=v('ecgRpQt'),axisValue=v('ecgRpAxis');
-        lines.push('心律：'+v('ecgRpRhythm')+'。'+(rate?'心率：'+Math.round(num(rate,'心率'))+' 次/分。':''));
+        const lines=[],rate=v('ecgRpRate'),qt=v('ecgRpQt'),axisValue=v('ecgRpAxis'),rhythmValue=v('ecgRpRhythm');
+        if(!rhythmValue){rhythm.setAttribute('aria-invalid','true');rhythm.focus();throw new RangeError('请先选择心律。报告不会默认填写窦性心律。');}
+        if(rhythmValue===OTHER_RHYTHM&&!v('ecgRpFindings')){document.getElementById('ecgRpFindings').focus();throw new RangeError('选择「其他」时，请在「其他描述」中写明心律。');}
+        lines.push('心律：'+(rhythmValue===OTHER_RHYTHM?'见下方描述':rhythmValue)+'。'+(rate?'心率：'+Math.round(num(rate,'心率'))+' 次/分。':''));
         const intervals=[];
-        if(v('ecgRpPr'))intervals.push('PR 间期 '+Math.round(num(v('ecgRpPr'),'PR 间期'))+' ms');
+        if(v('ecgRpPr')&&!NO_PR_RHYTHMS.includes(rhythmValue))intervals.push('PR 间期 '+Math.round(num(v('ecgRpPr'),'PR 间期'))+' ms');
         if(v('ecgRpQrs'))intervals.push('QRS 时限 '+Math.round(num(v('ecgRpQrs'),'QRS 时限'))+' ms');
         if(qt){if(!rate)throw new RangeError('计算 QTc 需要同时填写心率。');const q=C.qtc(num(qt,'QT 间期'),60000/num(rate,'心率'));intervals.push('QT/QTc '+Math.round(Number(qt))+'/'+Math.round(q.bazett)+' ms（Bazett）');}
         if(intervals.length)lines.push(intervals.join('；')+'。');
