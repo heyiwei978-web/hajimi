@@ -71,6 +71,14 @@
     {
       "source": "/duty/",
       "destination": "/duty.html"
+    },
+    {
+      "source": "/duty/orders",
+      "destination": "/duty-orders.html"
+    },
+    {
+      "source": "/duty/orders/",
+      "destination": "/duty-orders.html"
     }
   ],
   "headers": [

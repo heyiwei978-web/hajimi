@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f8fb">
+<title>内科医嘱参考 · 哈基米工作站</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231d67d8%22/%3E%3Cpath d=%22M10 8v16m12-16v16M10 16h12%22 stroke=%22white%22 stroke-width=%223.5%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/styles.css?v=20261030-ui1">
+<link rel="stylesheet" href="/ui-polish.css?v=20261011-jump1">
+<link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
+<link rel="stylesheet" href="/duty.css?v=20261009-layout1">
+<link rel="stylesheet" href="/workspace-design.css?v=20261030-ui1">
+<link rel="stylesheet" href="/duty-orders.css?v=20261108-orders1">
+</head>
+<body class="duty-page duty-orders-page">
+<a class="skip-link" href="#ordersMain">跳到主要内容</a>
+<header class="global-nav official-nav">
+  <div class="global-nav-inner official-nav-inner">
+    <a class="global-brand official-brand" href="/"><span class="official-brand-mark" aria-hidden="true">H</span><span class="official-brand-text"><strong>哈基米工作站</strong><small>hajimi Clinical Workspace</small></span></a>
+    <nav class="global-links official-links" aria-label="主导航"><a href="/">首页</a><a href="/bl">病历模板</a><a href="/classification">疾病分型</a><a href="/ecg">心电图</a><a href="/pathway">临床路径</a><a class="active" href="/duty" aria-current="page">值班资料</a><a href="/tools">临床工具</a><a href="/admin">管理入口</a></nav>
+  </div>
+</header>
+<main id="ordersMain" class="duty-main orders-main">
+  <nav class="orders-breadcrumb" aria-label="当前位置"><a href="/duty">值班资料</a><span aria-hidden="true">/</span><span>内科医嘱参考</span></nav>
+  <section class="duty-hero orders-hero"><div><p class="duty-kicker">ORDER REFERENCE</p><h1>内科医嘱参考</h1><p>常用口服药与对症处理、各科用药与检查、抢救药品泵法、常见滴速和过敏性休克处理，按原表格分页整理。</p></div><a class="btn ghost" href="/duty">返回值班工作台</a></section>
+  <p class="orders-warning" role="note"><strong>个人整理资料，仅供参考。</strong>剂量、配法和泵速请以药品说明书、所在医院规定和上级医师意见为准；用药前核对过敏史、肝肾功能和禁忌证。</p>
+  <div class="orders-search">
+    <label for="ordersSearch">搜索药名、检查或处理</label>
+    <div class="orders-search-field"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="ordersSearch" type="search" autocomplete="off" placeholder="例如：去甲肾上腺素、胰岛素、甘露醇" disabled></div>
+    <div class="orders-status-row"><p id="ordersStatus" class="orders-status" role="status" aria-live="polite">正在加载资料…</p><a class="orders-toc-link" href="#ordersToc">分页目录 ↑</a></div>
+  </div>
+  <nav id="ordersToc" class="orders-toc" aria-label="资料分页"></nav>
+  <div id="ordersContent" class="orders-content"></div>
+  <noscript><p class="orders-warning">本页需要启用 JavaScript 才能显示资料。</p></noscript>
+  <p class="site-disclaimer" role="note">本站为教学示例与临床参考资料，仅供参考，不替代医生的临床判断。</p>
+</main>
+<script defer src="/duty-orders-data.js?v=20261108-orders1"></script>
+<script defer src="/duty-orders.js?v=20261108-orders1"></script>
+<script defer src="/workspace.js?v=20261009-layout1"></script>
+</body>
+</html>
