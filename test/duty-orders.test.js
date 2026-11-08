@@ -6,7 +6,7 @@ import {BlobPreconditionFailedError} from '@vercel/blob';
 import {PUBLIC_FILES} from '../scripts/public-assets.mjs';
 import {MODULES, NAV_SURFACES} from '../config/site-modules.mjs';
 import {createSession} from '../api/_auth.js';
-import SEED from '../api/_duty-orders-seed.js';
+import SEED, {ADDITIONS} from '../api/_duty-orders-seed.js';
 import {createDutyOrdersStore, validateSheets} from '../api/_duty-orders-store.js';
 import {createDutyOrdersHandler} from '../api/duty-orders.js';
 
@@ -28,7 +28,7 @@ function auth(t) {
   return 'hajimi_session=' + createSession('fixture-owner');
 }
 const SAMPLE = [{title: '示例分页', columns: ['内容', '用法'], rows: [['合成测试条目', '口服'], ['第二条', '']]}];
-function fixture(seed = SAMPLE) {
+function fixture(seed = SAMPLE, additions = []) {
   const objects = new Map(), calls = [];
   let serial = 0;
   const backend = {objects, calls,
@@ -46,7 +46,7 @@ function fixture(seed = SAMPLE) {
       objects.set(path, {body, etag});
       return {etag, pathname: path};
     }};
-  const store = createDutyOrdersStore(backend, {seed});
+  const store = createDutyOrdersStore(backend, {seed, additions});
   return {backend, store, handler: createDutyOrdersHandler(store)};
 }
 async function call(f, cookie, extra) { const out = res(); await f.handler(req(cookie, extra), out); return out; }
@@ -150,4 +150,41 @@ test('malformed order data is rejected without writing', async t => {
   ];
   for (const sheets of bad) assert.equal((await call(f, cookie, {method: 'PUT', body: {sheets, revision: 'seed'}})).code, 400);
   assert.ok(f.backend.calls.every(([kind]) => kind === 'get'));
+});
+
+test('added sheets appear after their anchor once, both before and after the first save, and are not re-added', async t => {
+  const cookie = auth(t);
+  const extra = {id: 'fixture-addition', after: '示例分页', sheets: [{title: '补充分页', columns: ['内容'], rows: [['补充条目']]}]};
+  const base = [...SAMPLE, {title: '末页', columns: ['内容'], rows: []}];
+  const f = fixture(base, [extra]);
+  const first = await call(f, cookie);
+  assert.deepEqual(first.body.sheets.map(sheet => sheet.title), ['示例分页', '补充分页', '末页']);
+
+  // Data saved before the addition existed: the new sheet is inserted on read.
+  const old = fixture(base, []);
+  await call(old, cookie, {method: 'PUT', body: {sheets: base, revision: 'seed'}});
+  const upgraded = createDutyOrdersHandler(createDutyOrdersStore(old.backend, {seed: base, additions: [extra]}));
+  const read = res(); await upgraded(req(cookie), read);
+  assert.deepEqual(read.body.sheets.map(sheet => sheet.title), ['示例分页', '补充分页', '末页']);
+
+  // The owner deletes its rows and renames it; saving records the addition so it is not inserted again.
+  const edited = structuredClone(read.body.sheets);
+  edited[1] = {title: '改名后的分页', columns: ['内容'], rows: []};
+  const saved = res(); await upgraded(req(cookie, {method: 'PUT', body: {sheets: edited, revision: read.body.revision}}), saved);
+  assert.equal(saved.code, 200);
+  assert.deepEqual(JSON.parse(old.backend.objects.get(CURRENT).body)._appliedAdditions, ['fixture-addition']);
+  const again = res(); await upgraded(req(cookie), again);
+  assert.deepEqual(again.body.sheets.map(sheet => sheet.title), ['示例分页', '改名后的分页', '末页']);
+});
+
+test('hypertension and diabetes sheets are transcribed after 消化内科 without patient identifiers', () => {
+  const titles = ADDITIONS[0].sheets.map(sheet => sheet.title);
+  assert.deepEqual(titles, ['高血压用药·急症降压原则', '高血压用药·静脉降压药', '高血压用药·继发性高血压检查', '糖尿病用药·常用降糖药', '糖尿病用药·常用胰岛素']);
+  assert.equal(ADDITIONS[0].after, '消化内科');
+  assert.ok(SEED.some(sheet => sheet.title === '消化内科'));
+  assert.doesNotThrow(() => validateSheets([...SEED, ...ADDITIONS[0].sheets]));
+  const text = JSON.stringify(ADDITIONS);
+  for (const identifier of ['A01800539', '25638', '医保号', '年龄']) assert.ok(!text.includes(identifier), 'no patient identifier: ' + identifier);
+  assert.ok(text.includes('去甲肾上腺素、肾上腺素、多巴胺'));
+  assert.ok(text.includes('德谷门冬双胰岛素70/30'));
 });

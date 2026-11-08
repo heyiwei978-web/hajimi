@@ -78,6 +78,8 @@
     const filled = row.map((value, index) => value ? index : -1).filter(index => index >= 0);
     return filled.length === 1 && columns[filled[0]] === CONTENT_COLUMN && row[filled[0]].length <= 30;
   }
+  // 只有第一格有长文字的行（注释、来源等）跨整行显示。
+  const isNote = row => row[0].length > 30 && row.slice(1).every(value => !value);
   function button(label, action, data, extraLabel) {
     const element = document.createElement('button');
     element.type = 'button';
@@ -149,8 +151,9 @@
       sheet.rows.forEach((row, rowIndex) => {
         const tr = document.createElement('tr');
         const cells = [];
-        if (isSubhead(row, sheet.columns)) {
-          tr.className = 'orders-subhead';
+        const note = isNote(row);
+        if (note || isSubhead(row, sheet.columns)) {
+          tr.className = note ? 'orders-note' : 'orders-subhead';
           const td = document.createElement('td');
           td.colSpan = sheet.columns.length;
           const text = row.find(Boolean);
