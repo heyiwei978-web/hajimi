@@ -30,6 +30,7 @@
   .orders-table td{padding:10px 12px;border-bottom:1px solid #edf1f5;vertical-align:top;white-space:pre-wrap;overflow-wrap:break-word;min-width:8em}
   .orders-table td:empty{min-width:3em}
   .orders-table td.orders-main-cell{min-width:18em;color:var(--ws-ink);font-weight:550}
+  .orders-table tr.orders-note td{color:var(--ws-muted);font-size:.875rem;background:#fafbfc}
   .orders-table tr.orders-subhead td{padding-top:18px;border-bottom:1px solid #c9dce8;background:#f4f8fb;color:var(--ws-blue);font-weight:700}
   .orders-table mark{padding:0 1px;border-radius:3px;background:#ffe58a;color:inherit}
 }
@@ -52,6 +53,8 @@
   .orders-table tr.orders-subhead{padding:0;border:0}
   .orders-table tr.orders-subhead td{display:block;margin-top:8px;padding:10px 12px;border-radius:8px;border:0}
   .orders-table tr.orders-subhead td::before{content:none}
+  .orders-table tr.orders-note td{display:block}
+  .orders-table tr.orders-note td::before{content:none}
 }
 @media print{
   .orders-search,.orders-toc,.orders-breadcrumb,.skip-link,.official-nav{display:none!important}

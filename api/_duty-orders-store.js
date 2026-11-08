@@ -2,7 +2,7 @@ import {randomUUID} from 'node:crypto';
 import {BlobPreconditionFailedError} from '@vercel/blob';
 import {blob} from './_blob-auth.js';
 import {ContentError} from './_content-store.js';
-import SEED from './_duty-orders-seed.js';
+import SEED,{ADDITIONS} from './_duty-orders-seed.js';
 
 // 内科医嘱参考：仅管理员可读写。与公开 CMS 资料分开存放，有自己的备份。
 // 私有存储里还没有资料时，用随接口部署的初始资料（_duty-orders-seed.js）。
@@ -33,18 +33,31 @@ export function validateSheets(sheets,status=400){
   return clean;
 }
 
-export function createDutyOrdersStore(storage=blob,{seed=SEED,currentPath=CURRENT,historyPrefix=PREFIX}={}){
+// 把尚未补充过的分页插到指定分页之后（找不到则放在最后）。
+export function withAdditions(sheets,applied,additions){
+  const out=[...sheets];
+  for(const addition of additions){
+    if(applied.includes(addition.id))continue;
+    const at=out.findIndex(sheet=>sheet.title===addition.after);
+    out.splice(at<0?out.length:at+1,0,...addition.sheets);
+  }
+  return out;
+}
+
+export function createDutyOrdersStore(storage=blob,{seed=SEED,additions=ADDITIONS,currentPath=CURRENT,historyPrefix=PREFIX}={}){
+  const additionIds=additions.map(addition=>addition.id);
   async function read(){
     let result;
     try{result=await storage.get(currentPath,{access:'private',useCache:false});}
     catch{throw new ContentError(503,'资料读取失败，请稍后重试');}
-    if(result===null)return {sheets:validateSheets(seed,503),revision:SEED_REVISION,history:[],updatedAt:null};
+    if(result===null)return {sheets:validateSheets(withAdditions(seed,[],additions),503),revision:SEED_REVISION,history:[],updatedAt:null};
     if(result?.statusCode!==200||!result.blob?.etag)throw new ContentError(503,'资料读取失败，已停止修改');
     let document;
     try{document=JSON.parse(await new Response(result.stream).text());}
     catch{throw new ContentError(503,'已保存资料无法读取，已停止修改');}
     if(!isObject(document))throw new ContentError(503,'已保存资料格式异常，已停止修改');
-    const sheets=validateSheets(document.sheets,503);
+    const applied=Array.isArray(document._appliedAdditions)?document._appliedAdditions.filter(id=>typeof id==='string'):[];
+    const sheets=validateSheets(withAdditions(validateSheets(document.sheets,503),applied,additions),503);
     const history=document._history||[];
     if(!Array.isArray(history)||history.some(item=>!isObject(item)||!/^\d{13}-[a-f0-9-]{36}$/.test(item.id))){
       throw new ContentError(503,'修改历史格式异常，已停止修改');
@@ -69,7 +82,7 @@ export function createDutyOrdersStore(storage=blob,{seed=SEED,currentPath=CURREN
     const history=[backup,...current.history].slice(0,50);
     const updatedAt=new Date().toISOString();
     let result;
-    try{result=await storage.put(currentPath,JSON.stringify({version:1,sheets:next,_history:history,_updatedAt:updatedAt}),{
+    try{result=await storage.put(currentPath,JSON.stringify({version:1,sheets:next,_appliedAdditions:additionIds,_history:history,_updatedAt:updatedAt}),{
       access:'private',addRandomSuffix:false,allowOverwrite:current.revision!==SEED_REVISION,
       ...(current.revision!==SEED_REVISION?{ifMatch:current.revision}:{}),contentType:'application/json; charset=utf-8'
     });}catch(error){
