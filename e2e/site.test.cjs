@@ -606,6 +606,40 @@ test('ECG atlas lists categories and entries compactly on phones; search still f
   }
 });
 
+test('classic 12-lead ECGs: gallery, full tracing pages, entry links and search',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/ecg/classic',{waitUntil:'networkidle'});
+      const cards=page.locator('#ecgApp .ecg-card');
+      assert.equal(await cards.count(),await page.evaluate(()=>window.HAJIMI_ECG_CLASSIC.items.length));
+      assert(await cards.count()>=25);
+      await page.locator('#ecgApp a[href="/ecg/classic/inferior-stemi"]').click();
+      await page.waitForURL(base+'/ecg/classic/inferior-stemi');
+      assert.equal(await page.locator('h1').innerText(),'急性下壁 ST 段抬高型心肌梗死');
+      const svg=page.locator('svg.ecg-twelve');
+      assert.equal(await svg.count(),1);
+      const labels=await svg.locator('text').allTextContents();
+      for(const lead of ['I','II','III','aVR','aVL','aVF','V1','V2','V3','V4','V5','V6'])assert(labels.includes(lead),lead);
+      assert.equal(labels.filter(text=>text==='II').length,2,'II appears in the grid and as the rhythm strip');
+      assert.match(await page.locator('#ecg-classic-points').innerText(),/对应性 ST 段压低/);
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'the tracing scrolls inside its own frame');
+      // Reciprocity comes from Einthoven's law: III = II − I at every instant.
+      assert(await page.evaluate(()=>{const C=window.HAJIMI_ECG_CLASSIC;return [100,1234,5678].every(t=>Math.abs(C.value('inferior-stemi','III',t)-(C.value('inferior-stemi','II',t)-C.value('inferior-stemi','I',t)))<1e-9);}));
+      await page.locator('a[href="/ecg/atlas/ischemia/inferior-stemi"]').first().click();
+      await page.waitForURL(base+'/ecg/atlas/ischemia/inferior-stemi');
+      const layer=page.locator('#ecg-twelve');
+      assert.equal(await layer.locator('svg').count(),0,'the entry page draws the tracing only when opened');
+      await layer.locator('summary').click();
+      await layer.locator('svg.ecg-twelve').waitFor();
+      await page.goto(base+'/ecg',{waitUntil:'networkidle'});
+      await page.fill('#ecgGlobalSearch','经典心电图 房颤');
+      assert.match(await page.locator('#ecgGlobalResults').innerText(),/房颤/);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('ECG tools calculate both QTc formulas and RR heart rate, discard stale results and link to the existing RCRI',async()=>{
   for(const width of [320,1440]){
     const {page,context,errors}=await pageFor(width);

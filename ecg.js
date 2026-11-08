@@ -37,7 +37,7 @@
   }
   function home(){
     setPage('心电图','从基础到围手术期：学习、查阅和床旁计算。');
-    const entries=[['basics','基础学习','电活动、导联与电极位置、电轴与间期测量、伪差识别，再用六步法读图。','基'],['atlas','图谱库','按类别逐级查阅，搜索常见心电图词条及其围手术期要点。','图'],['periop','围手术期专区','术前异常心电图处置、骨科麻醉相关风险、术后胸闷流程与术后心肌损伤。','术']];
+    const entries=[['basics','基础学习','电活动、导联与电极位置、电轴与间期测量、伪差识别，再用六步法读图。','基'],['atlas','图谱库','按类别逐级查阅，搜索常见心电图词条及其围手术期要点。','图'],['periop','围手术期专区','术前异常心电图处置、骨科麻醉相关风险、术后胸闷流程与术后心肌损伤。','术'],['classic','经典心电图','完整 12 导联示意：正常、常见心律失常、传导阻滞、心肌梗死、电解质紊乱等，附判读要点。','典']];
     app.innerHTML='<section class="class-section-head"><span>01 / LEARN & READ</span><h2>从这里开始</h2><p>基础层帮助认识波形，围手术期层联系临床场景。</p></section><div class="ecg-entry-grid">'+entries.map(([id,title,description,symbol],index)=>'<a class="class-dept-card is-ready" href="/ecg/'+id+'"><span class="class-dept-index">0'+(index+1)+'</span><div class="class-dept-symbol" aria-hidden="true">'+symbol+'</div><h3>'+title+'</h3><p>'+description+'</p><div class="class-dept-foot"><strong>进入栏目</strong><span aria-hidden="true">→</span></div></a>').join('')+'</div>'+section('ecg-more','工具、练习与报告','<div class="ecg-panel-grid">'+card('/ecg/tools','心电图工具','QTc 四种公式、电轴计算、格数换算、心率估算，以及现有 RCRI 入口。')+card('/ecg/quiz','病例练习','骨科围手术期场景的判读练习，作答后给出解析和规范报告。','示意病例')+card('/ecg/report','报告范例','标准化心电图报告结构、规范写法、范例与报告生成器。')+card('/ecg/phenomena','常见心电现象','超常传导、隐匿性传导、蝉联、干扰脱节、心脏记忆、拖带等 11 种现象。','进阶')+'</div>');
   }
   function basics(){
@@ -122,11 +122,13 @@
     const pager='<nav class="ecg-pager" aria-label="同类词条">'+(previous?'<a rel="prev" href="'+esc(entryUrl(previous))+'"><small>上一条</small>'+esc(previous.title)+'</a>':'<span></span>')+'<span class="ecg-pager-count">'+esc(category.title)+' · '+(position+1)+' / '+siblings.length+'</span>'+(next?'<a rel="next" href="'+esc(entryUrl(next))+'"><small>下一条</small>'+esc(next.title)+'</a>':'<span></span>')+'</nav>';
     const basic='<span class="class-section-label">基础层 · 默认展开</span>'+diagram(entry.basic.diagram.kind,entry.basic.diagram.caption)+criteriaTable(entry.basic.criteria)+'<h3>诊断要点</h3>'+points(entry.basic.diagnosticPoints)+'<h3>鉴别点</h3>'+points(entry.basic.differentialPoints);
     const periop=[['对手术时机的影响',entry.periop.timing],['麻醉关注点',entry.periop.anesthesia],['术后管理',entry.periop.postoperative],['何时会诊',entry.periop.consultation]].map(([title,text])=>'<section><h3>'+title+'</h3><p>'+esc(text)+'</p></section>').join('');
-    app.innerHTML='<div class="ecg-layer-control">'+riskBadge(entry)+'<span class="ecg-status">'+esc(entry.reviewStatus)+' · 草稿</span><button class="btn" id="ecgLayerToggle" type="button" aria-controls="ecgPeriopLayer" aria-expanded="false">展开围手术期层</button></div>'+section('ecg-basic','基础判读',basic)+'<details class="class-content-section ecg-periop" id="ecgPeriopLayer"><summary><h2>围手术期要点<span class="ecg-hint">对手术、麻醉、术后管理及会诊的影响 · 默认折叠</span></h2></summary>'+periop+'</details>'+related(entry)+section('ecg-references','参考文献',references(entry))+pager+'<nav class="ecg-section-links ecg-print-hide" aria-label="词条导航"><a href="/ecg/atlas/'+category.id+'">返回'+esc(category.title)+'</a><a href="/ecg/periop">围手术期专区</a><button type="button" class="btn" id="ecgPrint">打印本词条</button></nav>';
+    app.innerHTML='<div class="ecg-layer-control">'+riskBadge(entry)+'<span class="ecg-status">'+esc(entry.reviewStatus)+' · 草稿</span><button class="btn" id="ecgLayerToggle" type="button" aria-controls="ecgPeriopLayer" aria-expanded="false">展开围手术期层</button></div>'+section('ecg-basic','基础判读',basic)+'<details class="class-content-section ecg-periop" id="ecgPeriopLayer"><summary><h2>围手术期要点<span class="ecg-hint">对手术、麻醉、术后管理及会诊的影响 · 默认折叠</span></h2></summary>'+periop+'</details>'+twelveLead(entry)+related(entry)+section('ecg-references','参考文献',references(entry))+pager+'<nav class="ecg-section-links ecg-print-hide" aria-label="词条导航"><a href="/ecg/atlas/'+category.id+'">返回'+esc(category.title)+'</a><a href="/ecg/periop">围手术期专区</a><button type="button" class="btn" id="ecgPrint">打印本词条</button></nav>';
     document.getElementById('ecgPrint').addEventListener('click',()=>{layer.open=true;sync();window.print();});
     const toggle=document.getElementById('ecgLayerToggle'),layer=document.getElementById('ecgPeriopLayer');
     function sync(){toggle.setAttribute('aria-expanded',String(layer.open));toggle.textContent=layer.open?'收起围手术期层':'展开围手术期层';}
     toggle.addEventListener('click',()=>{layer.open=!layer.open;sync();});
+    const twelve=document.getElementById('ecg-twelve');
+    if(twelve)twelve.addEventListener('toggle',()=>{const slot=twelve.querySelector('.ecg-twelve-slot');if(twelve.open&&!slot.firstChild)slot.innerHTML=twelveFigure(twelve.dataset.classic);});
     layer.addEventListener('toggle',sync);
     const footerReference=document.getElementById('ecgFooterReferences');
     footerReference.innerHTML='<a href="#ecg-references">参考文献：'+(entry.references.length?entry.references.length+' 条':'待补充')+'</a>';
@@ -261,6 +263,30 @@
       out.hidden=false;
     });
   }
+  // Classic 12-lead ECGs (ecg-classic.js): a gallery and one page per tracing.
+  const C=()=>window.HAJIMI_ECG_CLASSIC;
+  function twelveFigure(id){
+    return '<figure class="ecg-figure ecg-twelve-figure"><div class="ecg-figure-scroll" tabindex="0" role="region" aria-label="12 导联心电图教学示意，可横向滚动">'+C().render(id)+'</div><figcaption><strong>自绘教学示意 · 非真实病例</strong><span>走纸 25 mm/s、增益 10 mm/mV：每小格 40 ms、0.1 mV。前三行为同步记录的 12 导联（每列 2.5 秒），最下行为 II 导联 10 秒节律条。示意图不用于诊断测量；手机上可横向滑动查看。</span></figcaption></figure>';
+  }
+  function classicGallery(){
+    setPage('经典心电图','完整 12 导联示意，附判读要点；资料待审核。',[{title:'经典心电图'}]);
+    const items=C().items,groups=[...new Set(items.map(item=>item.category))];
+    app.innerHTML='<p class="ecg-hint">按标准 12 导联格式（3×4 + II 导联节律条）绘制的教学示意图，形态参照教材典型表现，并非真实患者记录。点开每一份可查看大图与判读要点。</p>'+
+      groups.map(group=>section('ecg-classic-'+items.findIndex(item=>item.category===group),group,'<div class="ecg-panel-grid">'+items.filter(item=>item.category===group).map(item=>card('/ecg/classic/'+item.id,item.title,item.points[0],item.rate)).join('')+'</div>')).join('');
+  }
+  function classicPage(item){
+    const items=C().items,position=items.indexOf(item),previous=items[position-1],next=items[position+1];
+    setPage(item.title,'12 导联教学示意 · '+item.rate,[{title:'经典心电图',url:'/ecg/classic'},{title:item.title}]);
+    const entry=item.entry&&data.entries.find(other=>other.id===item.entry);
+    const more=entry?'<p><a class="btn" href="'+esc(entryUrl(entry))+'">查看图谱词条：'+esc(entry.title)+' →</a></p>':item.link?'<p><a class="btn" href="'+esc(item.link)+'">查看相关基础内容 →</a></p>':'';
+    const pager='<nav class="ecg-pager" aria-label="经典心电图">'+(previous?'<a rel="prev" href="/ecg/classic/'+esc(previous.id)+'"><small>上一份</small>'+esc(previous.title)+'</a>':'<span></span>')+'<span class="ecg-pager-count">'+(position+1)+' / '+items.length+'</span>'+(next?'<a rel="next" href="/ecg/classic/'+esc(next.id)+'"><small>下一份</small>'+esc(next.title)+'</a>':'<span></span>')+'</nav>';
+    app.innerHTML=twelveFigure(item.id)+section('ecg-classic-points','判读要点',points(item.points)+'<p class="ecg-hint">资料待审核；判读需结合临床、既往心电图与动态变化。</p>'+more)+pager;
+  }
+  // On an atlas entry: the matching 12-lead tracing, drawn only when opened.
+  function twelveLead(entry){
+    const item=C()&&C().items.find(other=>other.entry===entry.id);
+    return item?'<details class="class-content-section ecg-twelve-layer" id="ecg-twelve" data-classic="'+esc(item.id)+'"><summary><h2>完整 12 导联示意<span class="ecg-hint">'+esc(item.title)+' · 点击展开</span></h2></summary><div class="ecg-twelve-slot"></div><p><a class="btn" href="/ecg/classic/'+esc(item.id)+'">查看判读要点 →</a></p></details>':'';
+  }
   function phenomena(){
     const P=data.phenomena;
     setPage('常见心电现象','超常传导、隐匿性传导、蝉联、干扰脱节、心脏记忆等：用电生理机制解释“看起来矛盾”的心电图。',[{title:'心电现象'}]);
@@ -277,6 +303,11 @@
     if(route[0]!=='ecg')return notFound();
     if(route.length===1)return home();
     if(route.length===2&&Object.hasOwn(pages,route[1]))return pages[route[1]]();
+    if(route[1]==='classic'&&C()){
+      if(route.length===2)return classicGallery();
+      const item=C().items.find(other=>other.id===route[2]);
+      if(route.length===3&&item)return classicPage(item);
+    }
     if(route[1]==='atlas'){
       const category=data.categories.find(item=>item.id===route[2]);
       const entry=data.entries.find(item=>item.id===route[3]&&item.category===route[2]);

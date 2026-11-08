@@ -114,15 +114,22 @@ html:has(.ecg-entry-page){scroll-padding-bottom:calc(var(--ecg-footer-height,150
   #ecgApp [data-ecg-entry] .ecg-card b::after{content:"→";font-size:18px}
   #ecgApp :has(>[data-ecg-entry]){gap:8px}
 }
+/* Classic 12-lead tracings: full width on wide screens, scroll sideways on phones. */
+.ecg-twelve{display:block;width:100%;height:auto;min-width:860px}
+.ecg-twelve-figure .ecg-figure-scroll{background:#fffafa}
+.ecg-twelve-layer>summary{cursor:pointer}
+@media(min-width:1100px){.ecg-twelve{min-width:0}}
+@media print{.ecg-twelve{min-width:0}}
 @media(min-width:700px){
   .ecg-page .class-shell{width:calc(100% - 48px)}
-  .ecg-entry-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ecg-entry-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .ecg-category-grid,.ecg-panel-grid,.ecg-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .ecg-page .class-hero{padding:30px}
   .ecg-page .class-content-section{padding:26px}
 }
 @media(min-width:1100px){
   .ecg-category-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ecg-entry-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
   .ecg-footer-inner{flex-direction:row;align-items:center;justify-content:space-between;gap:16px}
 }
 /* Phones: the fixed review footer keeps all its wording but packs it into two

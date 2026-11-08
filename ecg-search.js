@@ -99,6 +99,8 @@
     const B=data.basics||{};
     const page=(title,url,meta,parts)=>docs.push({type:'page',title,aliases:[],url,meta,summary:'',body:parts.flat(Infinity).filter(item=>typeof item==='string').join(' ')});
     for(const item of B.introduction||[])page(item.title,'/ecg/basics#ecg-'+item.id,'基础学习',item.points);
+    const classic=typeof window!=='undefined'&&window.HAJIMI_ECG_CLASSIC;
+    for(const item of classic?classic.items:[])page(item.title+' · 12 导联','/ecg/classic/'+item.id,'经典心电图',[item.category,item.rate,item.points]);
     if(B.steps)page('读图六步法','/ecg/basics#ecg-six-steps','基础学习',B.steps.map(step=>[step.title,step.body]));
     if(B.calibration)page('定标与走纸速度','/ecg/basics#ecg-calibration','基础学习',B.calibration.points);
     if(B.electrodes)page('电极位置与接反识别','/ecg/basics#ecg-electrodes','基础学习',[B.electrodes.chest,B.electrodes.limb,B.electrodes.reversals]);
