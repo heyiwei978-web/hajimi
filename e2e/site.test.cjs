@@ -613,7 +613,7 @@ test('classic 12-lead ECGs: gallery, full tracing pages, entry links and search'
       await page.goto(base+'/ecg/classic',{waitUntil:'networkidle'});
       const cards=page.locator('#ecgApp .ecg-card');
       assert.equal(await cards.count(),await page.evaluate(()=>window.HAJIMI_ECG_CLASSIC.items.length));
-      assert(await cards.count()>=25);
+      assert(await cards.count()>=45);
       await page.locator('#ecgApp a[href="/ecg/classic/inferior-stemi"]').click();
       await page.waitForURL(base+'/ecg/classic/inferior-stemi');
       assert.equal(await page.locator('h1').innerText(),'急性下壁 ST 段抬高型心肌梗死');
@@ -635,6 +635,36 @@ test('classic 12-lead ECGs: gallery, full tracing pages, entry links and search'
       await page.goto(base+'/ecg',{waitUntil:'networkidle'});
       await page.fill('#ecgGlobalSearch','经典心电图 房颤');
       assert.match(await page.locator('#ecgGlobalResults').innerText(),/房颤/);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('12-lead reading practice hides the answer, grades a choice and moves to the next tracing',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/ecg/classic',{waitUntil:'networkidle'});
+      await page.locator('a[href="/ecg/classic/practice"]').click();
+      await page.waitForURL(base+'/ecg/classic/practice');
+      const box=page.locator('#ecgClassicCase');
+      const options=box.locator('input[type="radio"]');
+      assert.equal(await options.count(),4);
+      const titles=await box.locator('.ecg-option span').allTextContents();
+      const svgText=await box.locator('svg.ecg-twelve title, svg.ecg-twelve desc').allTextContents();
+      for(const title of titles)assert(!svgText.join(' ').includes(title.slice(3)),'the drawing does not name a diagnosis');
+      await box.locator('button[type="submit"]').click();
+      assert.equal(await box.locator('.ecg-case-error').isVisible(),true,'asks for a choice first');
+      await options.first().check();
+      await box.locator('button[type="submit"]').click();
+      await box.locator('.ecg-case-verdict').waitFor();
+      assert.equal(await box.locator('label.is-answer').count(),1);
+      assert(await box.locator('.ecg-case-feedback li').count()>=2,'key points are shown');
+      assert.match(await page.locator('#ecgClassicScore').innerText(),/已答 1 份/);
+      await page.locator('#ecgClassicNext').click();
+      assert.equal(await box.locator('.ecg-case-no').innerText(),'2');
+      assert.equal(await box.locator('input:disabled').count(),0);
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
   }

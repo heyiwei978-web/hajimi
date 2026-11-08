@@ -265,13 +265,13 @@
   }
   // Classic 12-lead ECGs (ecg-classic.js): a gallery and one page per tracing.
   const C=()=>window.HAJIMI_ECG_CLASSIC;
-  function twelveFigure(id){
-    return '<figure class="ecg-figure ecg-twelve-figure"><div class="ecg-figure-scroll" tabindex="0" role="region" aria-label="12 导联心电图教学示意，可横向滚动">'+C().render(id)+'</div><figcaption><strong>自绘教学示意 · 非真实病例</strong><span>走纸 25 mm/s、增益 10 mm/mV：每小格 40 ms、0.1 mV。前三行为同步记录的 12 导联（每列 2.5 秒），最下行为 II 导联 10 秒节律条。示意图不用于诊断测量；手机上可横向滑动查看。</span></figcaption></figure>';
+  function twelveFigure(id,quiz=false){
+    return '<figure class="ecg-figure ecg-twelve-figure"><div class="ecg-figure-scroll" tabindex="0" role="region" aria-label="12 导联心电图教学示意，可横向滚动">'+C().render(id,{quiz})+'</div><figcaption><strong>自绘教学示意 · 非真实病例</strong><span>走纸 25 mm/s、增益 10 mm/mV：每小格 40 ms、0.1 mV。前三行为同步记录的 12 导联（每列 2.5 秒），最下行为 II 导联 10 秒节律条。示意图不用于诊断测量；手机上可横向滑动查看。</span></figcaption></figure>';
   }
   function classicGallery(){
     setPage('经典心电图','完整 12 导联示意，附判读要点；资料待审核。',[{title:'经典心电图'}]);
     const items=C().items,groups=[...new Set(items.map(item=>item.category))];
-    app.innerHTML='<p class="ecg-hint">按标准 12 导联格式（3×4 + II 导联节律条）绘制的教学示意图，形态参照教材典型表现，并非真实患者记录。点开每一份可查看大图与判读要点。</p>'+
+    app.innerHTML='<p class="ecg-hint">按标准 12 导联格式（3×4 + II 导联节律条）绘制的教学示意图，形态参照教材典型表现，并非真实患者记录。点开每一份可查看大图与判读要点。</p><p><a class="btn" href="/ecg/classic/practice">开始 12 导联读图练习 →</a></p>'+
       groups.map(group=>section('ecg-classic-'+items.findIndex(item=>item.category===group),group,'<div class="ecg-panel-grid">'+items.filter(item=>item.category===group).map(item=>card('/ecg/classic/'+item.id,item.title,item.points[0],item.rate)).join('')+'</div>')).join('');
   }
   function classicPage(item){
@@ -281,6 +281,48 @@
     const more=entry?'<p><a class="btn" href="'+esc(entryUrl(entry))+'">查看图谱词条：'+esc(entry.title)+' →</a></p>':item.link?'<p><a class="btn" href="'+esc(item.link)+'">查看相关基础内容 →</a></p>':'';
     const pager='<nav class="ecg-pager" aria-label="经典心电图">'+(previous?'<a rel="prev" href="/ecg/classic/'+esc(previous.id)+'"><small>上一份</small>'+esc(previous.title)+'</a>':'<span></span>')+'<span class="ecg-pager-count">'+(position+1)+' / '+items.length+'</span>'+(next?'<a rel="next" href="/ecg/classic/'+esc(next.id)+'"><small>下一份</small>'+esc(next.title)+'</a>':'<span></span>')+'</nav>';
     app.innerHTML=twelveFigure(item.id)+section('ecg-classic-points','判读要点',points(item.points)+'<p class="ecg-hint">资料待审核；判读需结合临床、既往心电图与动态变化。</p>'+more)+pager;
+  }
+  // Reading practice: one tracing at a time in random order; choose among four diagnoses
+  // (distractors from the same category first). The drawing does not name the answer.
+  function classicPractice(){
+    setPage('12 导联读图练习','看完整 12 导联心电图，选择最可能的诊断；作答后查看判读要点。资料待审核。',[{title:'经典心电图',url:'/ecg/classic'},{title:'读图练习'}]);
+    const items=C().items;
+    const shuffle=list=>{const copy=[...list];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]];}return copy;};
+    let order=shuffle(items),index=0,answered=0,right=0;
+    app.innerHTML='<div class="ecg-quiz-bar"><span id="ecgClassicScore" role="status" aria-live="polite"></span><button type="button" class="btn" id="ecgClassicRestart">重新开始</button></div><section class="class-content-section ecg-case" id="ecgClassicCase" aria-labelledby="ecgClassicHeading"></section>';
+    const box=document.getElementById('ecgClassicCase'),score=document.getElementById('ecgClassicScore');
+    const refresh=()=>{score.textContent='第 '+Math.min(index+1,order.length)+' / '+order.length+' 份 · 已答 '+answered+' 份 · 答对 '+right+' 份';};
+    function choices(item){
+      const others=shuffle(items.filter(other=>other!==item&&other.title!==item.title));
+      const same=others.filter(other=>other.category===item.category),rest=others.filter(other=>other.category!==item.category);
+      return shuffle([item,...[...same,...rest].slice(0,3)]);
+    }
+    function show(){
+      const item=order[index],options=choices(item);
+      box.innerHTML='<h2 id="ecgClassicHeading" tabindex="-1"><span class="ecg-case-no">'+(index+1)+'</span>这份心电图最可能的诊断是？</h2>'+twelveFigure(item.id,true)+
+        '<form class="ecg-case-form" novalidate><fieldset><legend>请选择一个诊断</legend>'+options.map((option,i)=>'<label class="ecg-option"><input type="radio" name="ecg-classic-answer" value="'+esc(option.id)+'"><span>'+String.fromCharCode(65+i)+'. '+esc(option.title)+'</span></label>').join('')+'</fieldset>'+
+        '<p class="ecg-case-error" role="alert" hidden>请先选择一个答案。</p><button class="btn" type="submit">提交答案</button></form><div class="ecg-case-feedback" hidden></div>';
+      const form=box.querySelector('form'),feedback=box.querySelector('.ecg-case-feedback'),error=box.querySelector('.ecg-case-error');
+      form.addEventListener('submit',event=>{
+        event.preventDefault();
+        const picked=form.querySelector('input:checked');
+        if(!picked){error.hidden=false;return;}
+        error.hidden=true;
+        const correct=picked.value===item.id;answered++;if(correct)right++;
+        form.querySelectorAll('input').forEach(input=>{input.disabled=true;const label=input.closest('label');label.classList.toggle('is-answer',input.value===item.id);label.classList.toggle('is-wrong',input===picked&&!correct);});
+        form.querySelector('button').disabled=true;
+        const entry=item.entry&&data.entries.find(other=>other.id===item.entry),last=index===order.length-1;
+        feedback.innerHTML='<p class="ecg-case-verdict '+(correct?'is-right':'is-wrong')+'">'+(correct?'回答正确：':'回答不正确。正确答案：')+esc(item.title)+'</p><h3>判读要点</h3>'+points(item.points)+
+          '<p class="ecg-section-links">'+(entry?'<a href="'+esc(entryUrl(entry))+'">图谱词条：'+esc(entry.title)+'</a>':'')+'<a href="/ecg/classic/'+esc(item.id)+'">查看大图</a></p>'+
+          (last?'<p><strong>全部完成：共 '+order.length+' 份，答对 '+right+' 份。</strong></p><button type="button" class="btn" id="ecgClassicAgain">再练一遍</button>':'<button type="button" class="btn" id="ecgClassicNext">下一份 →</button>');
+        feedback.hidden=false;refresh();
+        const next=document.getElementById(last?'ecgClassicAgain':'ecgClassicNext');
+        next.addEventListener('click',()=>{if(last){order=shuffle(items);index=0;answered=0;right=0;}else index++;refresh();show();document.getElementById('ecgClassicHeading').focus({preventScroll:false});});
+        next.focus({preventScroll:true});
+      });
+    }
+    document.getElementById('ecgClassicRestart').addEventListener('click',()=>{order=shuffle(items);index=0;answered=0;right=0;refresh();show();});
+    refresh();show();
   }
   // On an atlas entry: the matching 12-lead tracing, drawn only when opened.
   function twelveLead(entry){
@@ -305,6 +347,7 @@
     if(route.length===2&&Object.hasOwn(pages,route[1]))return pages[route[1]]();
     if(route[1]==='classic'&&C()){
       if(route.length===2)return classicGallery();
+      if(route.length===3&&route[2]==='practice')return classicPractice();
       const item=C().items.find(other=>other.id===route[2]);
       if(route.length===3&&item)return classicPage(item);
     }

@@ -184,13 +184,110 @@
     {id:'limb-lead-reversal',title:'左右上肢电极接反',entry:null,link:'/ecg/basics#ecg-electrodes',category:'伪差与操作',rate:'约 72 次/分',
       rhythm:()=>regular(72),qt:380,
       points:['I 导联 P 波、QRS、T 波全部倒置；aVR 反而直立（与 aVL 互换），II 与 III 互换。','胸导联 R 波递增正常——这是与右位心的关键区别（右位心时胸导联 R 波逐渐变小）。','重新放置电极复查即可；不要据此诊断心肌梗死或右位心。'],
-      leads:{I:{p:-.1,qrs:neg(NORMAL.I.qrs),t:-.25},II:{p:.05,qrs:[...NORMAL.II.qrs,...neg(NORMAL.I.qrs)],t:.1}}}
+      leads:{I:{p:-.1,qrs:neg(NORMAL.I.qrs),t:-.25},II:{p:.05,qrs:[...NORMAL.II.qrs,...neg(NORMAL.I.qrs)],t:.1}}},
+    // ---- second batch ----
+    {id:'lateral-stemi',title:'急性高侧壁 ST 段抬高型心肌梗死',entry:'lateral-stemi',category:'心肌缺血与梗死',rate:'约 85 次/分',
+      rhythm:()=>regular(85,{pr:150}),qt:370,tUp:42,tDown:45,
+      points:['I、aVL 和 V5–V6 ST 段抬高。','III、aVF 对应性 ST 段压低——高侧壁梗死时，下壁导联的镜像改变往往比抬高本身更醒目。','多为对角支或回旋支闭塞；抬高幅度可能不大，容易漏诊。'],
+      leads:{I:{qrs:[[12,5,-.08],[42,10,.7],[70,8,-.05]],st:.2,t:.4},II:{qrs:[[12,5,-.05],[42,10,.8],[70,8,-.15]],st:-.05,t:.15},V5:{st:.15,t:.5},V6:{st:.2,t:.5}}},
+    {id:'posterior-mi',title:'急性后壁心肌梗死',entry:'posterior-mi',category:'心肌缺血与梗死',rate:'约 80 次/分',
+      rhythm:()=>regular(80,{pr:150}),qt:370,
+      points:['V1–V3 水平型 ST 段压低，伴直立 T 波；V1–V2 R 波增高增宽（R/S >1）——是后壁 ST 抬高与病理性 Q 波在前壁导联的“镜像”。','常与下壁梗死并存（本例 II、III、aVF 轻度 ST 抬高）。','加做 V7–V9：ST 抬高 ≥0.5 mm 可确认后壁 STEMI，按再灌注流程处理。'],
+      leads:{II:{qrs:[[12,5,-.05],[42,10,1],[70,8,-.15]],st:.1,t:.4},V1:{pNeg:.05,qrs:[[36,12,.7],[70,11,-.4]],st:-.2,t:.35},V2:{qrs:[[38,12,1.2],[72,11,-.5]],st:-.25,t:.45},V3:{qrs:[[38,11,1.2],[70,10,-.6]],st:-.15,t:.45}}},
+    {id:'de-winter',title:'de Winter T 波',entry:'de-winter',category:'心肌缺血与梗死',rate:'约 80 次/分',
+      rhythm:()=>regular(80,{pr:150}),qt:370,tUp:36,tDown:40,
+      points:['V1–V6 J 点压低，ST 段上斜型压低，接续高大、对称的 T 波；胸导联没有 ST 段抬高。','aVR 常有轻度 ST 段抬高。','提示左前降支近段闭塞，属 STEMI 等危，应按 STEMI 流程处理。'],
+      leads:{I:{st:-.06,t:.3},II:{st:-.06,t:.35},V1:{st:-.1,t:.35},V2:{st:-.2,t:1.2},V3:{st:-.22,t:1.4},V4:{st:-.2,t:1.2},V5:{st:-.15,t:.8},V6:{st:-.1,t:.5}}},
+    {id:'wellens',title:'Wellens 综合征（B 型）',entry:'wellens',category:'心肌缺血与梗死',rate:'约 70 次/分',
+      rhythm:()=>regular(70),qt:400,tUp:48,tDown:48,
+      points:['V2–V4 深而对称的 T 波倒置；ST 段基本在基线或仅轻度抬高。','R 波递增正常，没有病理性 Q 波。','多见于胸痛缓解后，提示左前降支近段严重狭窄；负荷试验可能诱发大面积梗死，应尽早冠脉评估。'],
+      leads:{V1:{t:-.2},V2:{st:.03,t:-.6},V3:{st:.03,t:-.8},V4:{t:-.55},V5:{t:-.2}}},
+    {id:'early-repolarization',title:'早期复极',entry:'early-repolarization',category:'心肌缺血与梗死',rate:'约 56 次/分',
+      rhythm:()=>regular(56,{pr:160}),qt:410,
+      points:['V2–V5 J 点切迹或顿挫，ST 段凹面向上轻度抬高，T 波高大。','窦性心动过缓、年轻男性或运动员多见；改变稳定，没有对应性压低。','新出现、合并胸痛或动态变化时，不能轻易归为早复极。'],
+      leads:{I:{st:.04,t:.35},II:{qrs:[[12,5,-.05],[42,10,1.1],[70,8,-.1],[94,6,.1]],st:.1,t:.5},
+        V2:{qrs:[[26,9,.5],[60,13,-1.2],[92,6,.1]],st:.18,t:.8},V3:{qrs:[[32,10,.9],[64,12,-.7],[94,6,.14]],st:.2,t:.9},V4:{qrs:[[38,10,1.5],[70,10,-.3],[96,6,.16]],st:.18,t:.85},V5:{qrs:[[12,5,-.08],[42,10,1.5],[72,9,-.1],[96,6,.12]],st:.12,t:.6}}},
+    {id:'right-ventricular-hypertrophy',title:'右心室肥厚',entry:'right-ventricular-hypertrophy',category:'肺循环与右心负荷',rate:'约 80 次/分',
+      rhythm:()=>regular(80,{pr:150}),qt:380,
+      points:['电轴右偏（I 导联以 S 波为主，III 导联高 R）。','V1 以 R 波为主（R/S >1），伴 ST 段压低、T 波倒置（右室“劳损”）；V5–V6 深 S 波。','II 导联 P 波高尖（≥0.25 mV），提示右心房异常。','见于肺动脉高压、慢性肺病、先天性心脏病等，需超声评估。'],
+      leads:{I:{p:.06,qrs:[[28,8,.2],[60,11,-.6]],t:.05},II:{p:.28,qrs:[[12,5,-.05],[42,10,.9],[70,8,-.15]],t:.15},
+        V1:{p:.1,pNeg:0,qrs:[[38,11,1.1],[70,9,-.2]],st:-.06,t:-.35},V2:{qrs:[[36,11,.9],[68,11,-.6]],st:-.05,t:-.25},V3:{qrs:[[36,10,.8],[66,11,-.8]],t:-.1},
+        V4:{qrs:[[38,10,.8],[70,11,-.9]],t:.2},V5:{qrs:[[38,10,.5],[70,11,-.9]],t:.2},V6:{qrs:[[38,10,.4],[70,11,-.8]],t:.15}}},
+    {id:'dextrocardia',title:'镜像右位心',entry:'dextrocardia',category:'心肌与结构性心脏病',rate:'约 72 次/分',
+      rhythm:()=>regular(72),qt:380,
+      points:['I 导联 P 波、QRS、T 波全部倒置，aVR 直立。','胸导联 R 波从 V1 到 V6 逐渐变小，V5–V6 振幅很低——这一点与左右上肢电极接反不同。','加做右胸导联（V3R–V6R）可见正常的 R 波递增。'],
+      leads:{I:{p:-.1,qrs:neg(NORMAL.I.qrs),t:-.25},II:{p:.05,qrs:[...NORMAL.II.qrs,...neg(NORMAL.I.qrs)],t:.1},
+        V1:{p:.04,pNeg:0,qrs:[[30,10,.4],[62,12,-.6]],t:.1},V2:{p:.03,qrs:[[30,10,.3],[62,12,-.5]],t:.08},V3:{p:.03,qrs:[[30,10,.2],[62,12,-.4]],t:.06},
+        V4:{p:.02,qrs:[[30,10,.15],[62,12,-.3]],t:.05},V5:{p:.02,qrs:[[30,10,.1],[62,12,-.2]],t:.04},V6:{p:.02,qrs:[[30,10,.08],[62,12,-.15]],t:.03}}},
+    {id:'left-posterior-fascicular-block',title:'左后分支阻滞',entry:'left-posterior-fascicular-block',category:'传导阻滞',rate:'约 72 次/分',
+      rhythm:()=>regular(72),qt:390,
+      points:['电轴右偏（约 +110°）：I、aVL 呈 rS，II、III、aVF 呈 qR，III 的 R 波最高。','QRS 时限基本正常。','诊断前需排除右心室肥厚、侧壁梗死、肺气肿等引起电轴右偏的原因；单独出现少见。'],
+      leads:{I:{qrs:[[28,8,.2],[60,11,-.5]],t:.1},II:{qrs:[[12,5,-.1],[42,10,1.2],[70,8,-.05]],t:.35}}},
+    {id:'premature-atrial-contractions',title:'房性早搏',entry:'premature-atrial-contractions',category:'心律失常',rate:'窦性约 75 次/分',
+      qt:380,
+      rhythm:()=>{const beats=[];let at=360,n=0;while(at<10600){n++;if(n%3===0){const pac=at-340;beats.push({at:pac,p:pac-140,pk:-.6,morph:'n'});at=pac+800;continue;}beats.push({at,p:at-160,morph:'n'});at+=800;}return {beats};},
+      points:['提前出现的 P′ 波，形态与窦性 P 波不同（本例在 II 导联倒置），其后 QRS 形态正常。','早搏后为不完全性代偿间歇（窦房结被重整）。','P′ 很早时可落在前一 T 波上，或未下传（无 QRS）。'],
+      leads:{}},
+    {id:'junctional-rhythm',title:'交界性逸搏心律',entry:'junctional-rhythm',category:'心律失常',rate:'约 50 次/分',
+      qt:410,retroP:{I:.02,II:-.13,V1:.03,V2:.02,V3:0,V4:-.02,V5:-.03,V6:-.03},
+      rhythm:()=>{const r=regular(50,{p:false,first:400});r.beats.forEach(b=>{b.p=b.at+60;b.retro=true;});return r;},
+      points:['窄 QRS 规则出现，频率约 40–60 次/分。','QRS 前没有窦性 P 波；逆行 P 波（II、III、aVF 倒置）紧随 QRS 后出现，也可埋在 QRS 内。','见于窦房结功能障碍、药物（β 受体阻滞剂、地高辛）或迷走张力增高。'],
+      leads:{}},
+    {id:'mat',title:'多源性房性心动过速',entry:'mat',category:'心律失常',rate:'平均约 115 次/分',
+      qt:320,tDown:32,
+      rhythm:()=>{const beats=[],pks=[1,-.6,1.7,.45,1.2,-.4],prs=[150,120,190,140,170,125];const r=seeded(11);let at=300,i=0;while(at<10600){beats.push({at,p:at-prs[i%6],pk:pks[i%6],morph:'n'});at+=420+r()*200;i++;}return {beats};},
+      points:['心率 >100 次/分，可见至少 3 种形态不同的 P 波。','PR 间期、PP 和 RR 间期都不等，节律不规则——易被误认为房颤，但每个 QRS 前都有 P 波，P 波间有等电位线。','多见于慢性阻塞性肺病急性加重、低氧、电解质紊乱，治疗以处理原发病为主。'],
+      leads:{}},
+    {id:'torsades-de-pointes',title:'尖端扭转型室性心动过速',entry:'torsades-de-pointes',category:'心律失常',rate:'发作时约 240 次/分',
+      qt:560,tUp:85,tDown:55,
+      rhythm:()=>{const beats=[{at:400,p:240,morph:'n'},{at:1350,p:1190,morph:'n'}];let at=1350+520;for(let i=0;i<24;i++,at+=250)beats.push({at,p:null,morph:'tdp',k:Math.sin(Math.PI*(i+1)/8)});beats.push({at:at+900,p:at+740,morph:'n'},{at:at+1850,p:at+1690,morph:'n'});return {beats};},
+      morphs:{tdp:{qt:230,tUp:30,tDown:28,I:{qrs:wide(55,.7,20),t:-.25},II:{qrs:wide(55,1.4,20),t:-.4},V1:{qrs:wide(55,-1.1,20),t:.3},V2:{qrs:wide(55,-1.4,20),t:.35},V3:{qrs:wide(55,1,20),t:-.3},
+        V4:{qrs:wide(55,1.4,20),t:-.35},V5:{qrs:wide(55,1.3,20),t:-.35},V6:{qrs:wide(55,1.1,20),t:-.3}}},
+      points:['发作前的窦性搏动 QT 明显延长；一个落在 T 波上的室性早搏（R on T）诱发。','多形性室速：QRS 振幅与主波方向围绕基线周期性“扭转”，频率 200–250 次/分，常可自行终止，也可蜕变为室颤。','处理：静脉硫酸镁，停用延长 QT 的药物，纠正低钾、低镁；无脉者立即除颤。'],
+      leads:{}},
+    {id:'ventricular-fibrillation',title:'心室颤动',entry:'ventricular-fibrillation',category:'心律失常',rate:'无法计数',
+      atrial:'vf',qt:380,
+      rhythm:()=>({beats:[]}),
+      points:['所有导联均为杂乱、不规则、振幅与形态不断变化的颤动波，无法辨认 P 波、QRS 和 T 波。','患者无脉搏、意识丧失：立即心肺复苏并尽早除颤，不要等待完整心电图。','先确认导联连接，排除运动或电极脱落伪差，但不能因此延误抢救。'],
+      leads:{I:{p:0},II:{p:0},V1:{p:0,pNeg:0},V2:{p:0},V3:{p:0},V4:{p:0},V5:{p:0},V6:{p:0}}},
+    {id:'digoxin-effect',title:'地高辛效应',entry:'digoxin-effect',category:'电解质与药物影响',rate:'约 70 次/分',
+      rhythm:()=>regular(70,{pr:210}),qt:330,tUp:55,tDown:35,
+      points:['ST 段呈“鱼钩/勺状”下垂样压低（II、aVF、V4–V6 明显），T 波低平或倒置，QT 缩短。','PR 可轻度延长。','这是药物效应，不等于中毒；中毒的线索是新出现的心律失常（如室早二联律、房速伴阻滞、双向性室速）及高钾。'],
+      leads:{I:{st:-.08,t:.05},II:{st:-.15,t:.05},V4:{st:-.15,t:.05},V5:{st:-.18,t:.04},V6:{st:-.15,t:.04}}},
+    {id:'low-voltage-effusion',title:'低电压与电交替（大量心包积液）',entry:'low-voltage-effusion',category:'心肌与结构性心脏病',rate:'约 108 次/分',
+      qt:320,tDown:32,
+      rhythm:()=>{const r=regular(108,{pr:140});r.beats.forEach((b,i)=>{b.k=i%2?.62:1;});return r;},
+      points:['肢体导联 QRS 振幅普遍 <0.5 mV，胸导联 <1.0 mV（低电压）。','QRS 振幅逐搏高低交替（电交替），伴窦性心动过速——提示大量心包积液，需警惕心脏压塞。','床旁超声确认，血流动力学不稳定时紧急心包穿刺。'],
+      leads:{I:{p:.05,qrs:[[12,5,-.02],[42,10,.25],[70,8,-.05]],t:.08},II:{p:.07,qrs:[[12,5,-.02],[42,10,.35],[70,8,-.06]],t:.1},
+        V1:{p:.03,pNeg:.02,qrs:[[24,8,.1],[56,13,-.4]],t:-.03},V2:{p:.03,qrs:[[26,9,.15],[60,13,-.55]],t:.15},V3:{p:.03,qrs:[[32,10,.3],[64,12,-.35]],t:.15},
+        V4:{p:.03,qrs:[[38,10,.5],[70,10,-.2]],t:.15},V5:{p:.03,qrs:[[12,5,-.03],[42,10,.5],[72,9,-.07]],t:.12},V6:{p:.03,qrs:[[12,5,-.03],[42,10,.4],[72,9,-.04]],t:.1}}},
+    {id:'hypertrophic-cardiomyopathy',title:'肥厚型心肌病',entry:'hypertrophic-cardiomyopathy',category:'心肌与结构性心脏病',rate:'约 68 次/分',
+      rhythm:()=>regular(68),qt:410,
+      points:['I、aVL、V5–V6（及下壁导联）深而窄的 Q 波（“匕首样”），宽度 <40 ms，不同于梗死的宽 Q 波。','左心室肥厚电压，伴 ST-T 改变。','年轻人出现这类 Q 波或显著左室肥厚电压，应做超声心动图并询问猝死家族史。'],
+      leads:{I:{qrs:[[12,5,-.3],[42,10,1.2],[72,9,-.1]],st:-.05,t:-.1},II:{qrs:[[12,5,-.25],[42,10,1.3],[72,9,-.1]],st:-.05,t:.05},
+        V1:{qrs:[[24,8,.2],[58,14,-2]],st:.1,t:.2},V2:{qrs:[[26,9,.3],[62,14,-2.4]],st:.15,t:.3},V3:{qrs:[[32,10,.8],[66,13,-1.5]],t:.2},
+        V4:{qrs:[[12,5,-.2],[42,11,2],[74,10,-.4]],t:-.1},V5:{qrs:[[12,5,-.45],[44,11,2.4],[76,10,-.15]],st:-.1,t:-.3},V6:{qrs:[[12,5,-.4],[44,11,1.9],[76,10,-.1]],st:-.08,t:-.25}}},
+    {id:'hypercalcemia',title:'高钙血症（QT 缩短）',entry:'calcium-disorders',category:'电解质与药物影响',rate:'约 70 次/分',
+      rhythm:()=>regular(70),qt:300,tUp:36,tDown:34,
+      points:['ST 段明显缩短甚至消失，T 波紧接 QRS 出现，QT 间期缩短。','严重时可出现 J 波（Osborn 样）及心律失常。','以血钙（最好是离子钙）为准；低钙血症则相反，表现为 ST 段延长、QT 延长。'],
+      leads:{}},
+    {id:'dual-chamber-pacing',title:'双腔起搏（房室顺序起搏）',entry:'dual-chamber-pacing',category:'起搏心电图',rate:'约 70 次/分',
+      qt:420,tUp:60,
+      rhythm:()=>{const r=regular(70,{pr:180,first:400});return {beats:r.beats,spikes:r.beats.flatMap(b=>[b.p-4,b.at-6])};},
+      points:['每个心动周期有两个起搏脉冲：心房脉冲后跟 P 波，约 160–200 ms 后心室脉冲后跟宽大 QRS。','QRS 呈右室起搏图形（左束支阻滞形、电轴左上偏），ST-T 与主波相反。','自身 P 波出现时可只见心室脉冲（P 波跟踪），自身房室传导时可两个通道都被抑制。'],
+      leads:{I:{qrs:[[60,26,.65]],t:-.25},II:{qrs:[[60,28,-.8]],t:.3},
+        V1:{qrs:[[70,30,-1.2]],st:.12,t:.35},V2:{qrs:[[70,30,-1.5]],st:.18,t:.45},V3:{qrs:[[70,30,-1.4]],st:.15,t:.4},
+        V4:{qrs:[[70,30,-1]],st:.1,t:.3},V5:{qrs:[[30,12,.2],[80,26,-.8]],t:.2},V6:{qrs:[[30,12,.3],[80,26,-.6]],t:.15}}}
   ];
 
   // ---- waveform generation ----
   function template(item,lead,morph){
     const base={...NORMAL[lead],...(item.leads[lead]||{})};
-    return morph&&morph!=='n'&&item.morphs?.[morph]?.[lead]?{...base,p:0,pNeg:0,pr:0,...item.morphs[morph][lead]}:base;
+    const m=morph&&morph!=='n'&&item.morphs?.[morph];
+    if(!m?.[lead])return base;
+    // Keys that are not lead names (qt, tUp, tDown) apply to every lead of that morphology.
+    const shared=Object.fromEntries(Object.entries(m).filter(([key])=>!NORMAL[key]));
+    return {...base,p:0,pNeg:0,pr:0,...shared,...m[lead]};
   }
   function beatShape(item,tpl){
     const qt=tpl.qt||item.qt||380,tDown=tpl.tDown||item.tDown||40,tUp=tpl.tUp||item.tUp||60;
@@ -202,22 +299,30 @@
     const r=item.rhythm(),beats=r.beats,extraP=r.ps||[],spikes=r.spikes||[];
     const cache={};
     const shape=(lead,morph)=>{const key=lead+'|'+morph;return cache[key]||(cache[key]={tpl:template(item,lead,morph),s:beatShape(item,template(item,lead,morph))});};
-    const pTimes=[...beats.filter(b=>b.p!=null).map(b=>({at:b.p,qrs:b.at})),...extraP.map(at=>({at,qrs:null}))];
+    // P waves: pk scales (or inverts) the lead's P wave for ectopic atrial beats;
+    // retro uses item.retroP, the retrograde P of junctional beats.
+    const pTimes=[...beats.filter(b=>b.p!=null).map(b=>({at:b.p,qrs:b.at,pk:b.pk??1,retro:!!b.retro})),
+      ...extraP.map(p=>typeof p==='number'?{at:p,qrs:null,pk:1,retro:false}:{qrs:null,pk:1,retro:false,...p})];
     const flutterAmp={I:.04,II:-.26,V1:.15,V2:.08,V3:.04,V4:.03,V5:.03,V6:.03},fibAmp={I:.03,II:.05,V1:.09,V2:.06,V3:.04,V4:.03,V5:.03,V6:.03};
     function base(lead,t){
       let v=0;const n=shape(lead,'n').tpl;
-      for(const {at,qrs} of pTimes){
+      for(const {at,qrs,pk,retro} of pTimes){
         const d=t-at;if(d<-120||d>400)continue;
-        v+=G(d,50,20,n.p||0)+G(d,82,16,-(n.pNeg||0));
+        if(retro){v+=G(d,40,18,item.retroP?.[lead]??-(n.p||0));continue;}
+        v+=pk*(G(d,50,20,n.p||0)+G(d,82,16,-(n.pNeg||0)));
         if(n.pr&&qrs!=null)v+=n.pr*win(t,at+100,qrs,6);
       }
       for(const b of beats){
         const d=t-b.at;if(d<-60||d>900)continue;
-        const {s}=shape(lead,b.morph);
-        for(const [c,sd,a] of s.qrs)v+=G(d,c,sd,a);
-        if(s.st)v+=s.st*win(d,s.j,s.tPeak,5);
-        v+=AG(d,s.tPeak,s.tUp,s.tDown,s.t);
-        if(s.u)v+=G(d,s.qt+70,32,s.u);
+        const {s}=shape(lead,b.morph),k=b.k??1;
+        for(const [c,sd,a] of s.qrs)v+=k*G(d,c,sd,a);
+        if(s.st)v+=k*s.st*win(d,s.j,s.tPeak,5);
+        v+=k*AG(d,s.tPeak,s.tUp,s.tDown,s.t);
+        if(s.u)v+=k*G(d,s.qt+70,32,s.u);
+      }
+      if(item.atrial==='vf'){
+        const a=({I:.3,II:.45,V1:.55,V2:.65,V3:.6,V4:.5,V5:.42,V6:.36})[lead]||.4,ph=lead.charCodeAt(lead.length-1);
+        v+=a*(Math.sin(t/31+ph)*.6+Math.sin(t/23.7+ph*2)*.35+Math.sin(t/47+ph*.5)*.25)*(.55+.45*Math.sin(t/1300+ph));
       }
       if(item.atrial==='fib'){const a=fibAmp[lead]||.03;v+=a*(Math.sin(t/23)*.55+Math.sin(t/14.3+1.7)*.3+Math.sin(t/37+.4)*.25)*(0.75+0.25*Math.sin(t/900));}
       if(item.atrial==='flutter'){
@@ -243,7 +348,8 @@
     for(let t=from;t<=to;t+=4){const x=x0+(t-from)*MS,y=baseline-value(lead,t)*10;d+=(d?'L':'M')+x.toFixed(2)+' '+y.toFixed(2);}
     return d;
   }
-  function render(id){
+  // quiz: true draws the tracing without naming the diagnosis (title, description).
+  function render(id,{quiz=false}={}){
     const item=items.find(entry=>entry.id===id);if(!item)return '';
     const {value,spikes}=build(item),key='ecg12-'+(++serial),width=LEFT+250+3,height=TOP+4*ROW+6;
     let traces='',labels='',marks='';
@@ -265,7 +371,7 @@
     traces+=path(value,'II',0,9996,LEFT,rhythmBase);
     labels+='<text x="'+(LEFT+1.2)+'" y="'+(rhythmBase-9)+'">II</text>';
     return '<svg class="ecg-twelve" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+width+' '+height+'" role="img" aria-labelledby="'+key+'-t '+key+'-d">'+
-      '<title id="'+key+'-t">'+esc(item.title)+' · 12 导联教学示意</title><desc id="'+key+'-d">'+esc(item.points.join(' '))+'</desc>'+
+      '<title id="'+key+'-t">'+(quiz?'12 导联心电图读图练习':esc(item.title)+' · 12 导联教学示意')+'</title><desc id="'+key+'-d">'+(quiz?'作答后可查看诊断与判读要点。':esc(item.points.join(' ')))+'</desc>'+
       '<defs><pattern id="'+key+'-s" width="1" height="1" patternUnits="userSpaceOnUse"><path d="M1 0H0V1" fill="none" stroke="#f3c4c4" stroke-width=".06"/></pattern>'+
       '<pattern id="'+key+'-b" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="url(#'+key+'-s)"/><path d="M5 0H0V5" fill="none" stroke="#e59a9a" stroke-width=".14"/></pattern></defs>'+
       '<rect width="'+width+'" height="'+height+'" fill="#fffafa"/><rect width="'+width+'" height="'+height+'" fill="url(#'+key+'-b)"/>'+
