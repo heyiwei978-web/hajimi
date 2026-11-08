@@ -74,6 +74,19 @@ test('a term shared by several entries opens the specific entry, not the broader
   assert(engine.search('莫氏II型',{limit:3}).some(result=>result.doc.id==='second-degree-av-block'));
 });
 
+test('every atlas entry lists related entries and at least two references; shared search terms reach the specific entry',()=>{
+  const window=withSearch(),data=window.HAJIMI_ECG_DATA;
+  for(const entry of data.entries){
+    assert((entry.related||[]).length>=1,entry.id+' has related entries');
+    assert(entry.references.length>=2,entry.id+' has at least two references');
+    assert.equal(new Set(entry.references.map(ref=>ref.url)).size,entry.references.length,entry.id+' has no duplicate references');
+  }
+  const S=window.HAJIMI_ECG_SEARCH,engine=S.create(S.documents(data));
+  assert.equal(engine.search('QT延长')[0].doc.id,'drug-induced-long-qt');
+  assert.equal(engine.search('2:1房室阻滞')[0].doc.id,'av-block-2-1');
+  assert.equal(data.cases.find(item=>item.id==='c14').link.url,'/ecg/basics#ecg-electrodes');
+});
+
 test('search highlighting escapes markup before marking matches',()=>{
   const S=withSearch().HAJIMI_ECG_SEARCH;
   assert.equal(S.highlight('<b>房颤</b> 伴快速心室率','房颤'),'&lt;b&gt;<mark>房颤</mark>&lt;/b&gt; 伴快速心室率');

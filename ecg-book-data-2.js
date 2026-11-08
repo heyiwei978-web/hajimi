@@ -326,7 +326,7 @@
         postoperative:'术后心率突然加快且 P 波为窦性时，记录起止过程有助于鉴别。',
         consultation:'症状明显或反复发作时可请心内科评估。'
       },
-      references:[REF.svt],updatedAt:UPDATED,reviewStatus:'待审核'
+      references:[REF.svt,REF.periop,{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'}],updatedAt:'2026-11-08',reviewStatus:'待审核'
     }
   ];
   for(const entry of entries)if(!data.entries.some(item=>item.id===entry.id))data.entries.push(entry);

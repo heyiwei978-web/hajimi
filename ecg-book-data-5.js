@@ -273,4 +273,10 @@
       'T 波电交替（逐搏 T 波振幅、形态或极性交替而 QRS 不变）提示复极不稳定，是恶性室性心律失常的预测指标；肉眼可见者多见于急性缺血、长 QT 和电解质紊乱。'
     ]
   });
+  // 2026-11-08 revision (pending review): references for entries that had only one,
+  // related entries for those that had none, and aliases that pointed search at the
+  // broader entry. Later textbook extensions reset dates, so the date is set here, last.
+  for(const id of ['pulmonary-embolism','first-degree-av-block','second-degree-av-block','mobitz-i','mobitz-ii','av-block-2-1','sinus-node-dysfunction','digoxin-effect','atrial-tachycardia','sinus-node-reentry','calcium-disorders','hyperkalemia','hypokalemia','torsades-de-pointes','brugada']){
+    const entry=find(id);if(entry)entry.updatedAt='2026-11-08';
+  }
 })();

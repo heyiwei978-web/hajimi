@@ -92,7 +92,7 @@ window.HAJIMI_ECG_DATA = {
       references:[{title:'2023 ACC/AHA/ACCP/HRS Guideline for the Diagnosis and Management of Atrial Fibrillation · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001193'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
     },
     {
-      id:'hyperkalemia',title:'高钾血症',category:'electrolytes',risk:'high',aliases:['高血钾','hyperkalemia','potassium','血钾升高'],
+      id:'hyperkalemia',title:'高钾血症',category:'electrolytes',risk:'high',related:['hypokalemia','calcium-disorders','complete-heart-block','wide-complex-tachycardia','ventricular-fibrillation'],aliases:['高血钾','hyperkalemia','potassium','血钾升高'],
       basic:{
         summary:'高钾可影响传导和复极；心电图用于发现危险线索，不能可靠估计血钾或排除高钾。',
         diagram:{kind:'hyperkalemia',caption:'II 导联高钾相关尖高 T 波教学示意：展示一种可能的复极改变，不表示血钾数值或病情分级。'},
@@ -105,10 +105,10 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'动态复核血钾、心电监护和病因变化，关注治疗后的反跳及肾功能；具体监测与处理按本院流程。',
         consultation:'显著升高、快速变化、出现传导异常或合并症状时及时升级评估；肾功能受损、治疗困难或需要肾脏替代治疗评估时联系相关专科。'
       },
-      references:[{title:'StatPearls: Hyperkalemia（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK470284/'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part IV：ST 段、T 波、U 波与 QT 间期（2009）',url:'https://www.hrsonline.org/resource/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-iv-st-segment/'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'StatPearls: Hyperkalemia（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK470284/'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part IV：ST 段、T 波、U 波与 QT 间期（2009）',url:'https://www.hrsonline.org/resource/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-iv-st-segment/'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'}],updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
-      id:'pulmonary-embolism',title:'肺栓塞',category:'pulmonary',risk:'high',aliases:['PE','pulmonary embolism','肺动脉栓塞','S1Q3T3','右心负荷'],
+      id:'pulmonary-embolism',title:'肺栓塞',category:'pulmonary',risk:'high',related:['sinus-tachycardia','right-bundle-branch-block','right-ventricular-hypertrophy','t-wave-inversion','atrial-fibrillation'],aliases:['PE','pulmonary embolism','肺动脉栓塞','S1Q3T3','右心负荷'],
       basic:{
         summary:'心电图可提供心率及右心负荷线索，既不能单独确诊，也不能排除肺栓塞。',
         diagram:{kind:'pe',caption:'I、III 导联 SⅠQⅢTⅢ 教学示意：I 导联较深 S 波、III 导联 Q 波和 T 波倒置。该组合并不敏感，也不特异。'},
@@ -121,7 +121,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'关注氧合、循环状态、右心功能和出血风险；抗凝及随访按专科方案与本院流程，心电图仅作为综合评估的一部分。',
         consultation:'突发气促、胸痛、低氧、晕厥或疑似急性肺栓塞时及时评估并联系相关专科；循环不稳定时立即启动急救流程。'
       },
-      references:[{title:'2019 ESC Guidelines for the diagnosis and management of acute pulmonary embolism · Eur Heart J 2020',url:'https://pubmed.ncbi.nlm.nih.gov/31504429/'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'2019 ESC Guidelines for the diagnosis and management of acute pulmonary embolism · Eur Heart J 2020',url:'https://pubmed.ncbi.nlm.nih.gov/31504429/'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part IV：ST 段、T 波、U 波与 QT 间期（2009）',url:'https://www.hrsonline.org/resource/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-iv-st-segment/'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part III：室内传导障碍（2009）',url:'https://pubmed.ncbi.nlm.nih.gov/19281930/'}],updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'stemi',title:'急性 ST 段抬高型心肌梗死',category:'ischemia',risk:'high',
@@ -230,6 +230,7 @@ window.HAJIMI_ECG_DATA = {
     },
     {
       id:'torsades-de-pointes',title:'尖端扭转型室速',category:'arrhythmias',risk:'high',
+      related:['drug-induced-long-qt','congenital-long-qt','hypokalemia','ventricular-fibrillation','ventricular-tachycardia'],
       aliases:['尖端扭转','TdP','torsades','多形性室速','长QT'],
       basic:{
         summary:'QT 延长背景下出现的多形性室速，QRS 方向和振幅围绕基线“扭转”，可自行终止或恶化为室颤。',
@@ -251,7 +252,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'梳理并停用可疑药物，纠正电解质，持续监护；心动过缓相关者可能需要提高心率。用药方案按本院流程和专科意见，本草稿不给出固定剂量。',
         consultation:'发作时：无脉搏按心脏骤停流程除颤；有脉搏时立即启动急救，静脉镁剂是常用一线措施，按本院流程执行。发作后尽快请心内科会诊。'
       },
-      references:[{title:'Prevention of Torsade de Pointes in Hospital Settings（AHA/ACCF 科学声明）· Circulation 2010',url:'https://doi.org/10.1161/CIRCULATIONAHA.109.192704'},{title:'2017 AHA/ACC/HRS Guideline for Management of Patients With Ventricular Arrhythmias and the Prevention of Sudden Cardiac Death · Circulation 2018',url:'https://doi.org/10.1161/CIR.0000000000000549'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'Prevention of Torsade de Pointes in Hospital Settings（AHA/ACCF 科学声明）· Circulation 2010',url:'https://doi.org/10.1161/CIRCULATIONAHA.109.192704'},{title:'2017 AHA/ACC/HRS Guideline for Management of Patients With Ventricular Arrhythmias and the Prevention of Sudden Cardiac Death · Circulation 2018',url:'https://doi.org/10.1161/CIR.0000000000000549'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'}],updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'svt',title:'阵发性室上性心动过速',category:'arrhythmias',risk:'medium',
@@ -354,11 +355,11 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'复核术后新加用的减慢房室传导药物和电解质；若 PR 进行性延长或出现脱落，应提高警惕。',
         consultation:'进展为二度或三度房室阻滞、伴晕厥或症状性心动过缓，或合并双分支阻滞时，请心内科会诊。'
       },
-      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'}],updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'second-degree-av-block',title:'二度房室传导阻滞',category:'conduction',risk:'medium',
-      aliases:['二度房室阻滞','文氏','文氏阻滞','莫氏','莫氏II型','Mobitz','Wenckebach','II度房室传导阻滞','2:1房室阻滞'],
+      aliases:['二度房室阻滞','文氏','文氏阻滞','莫氏','莫氏II型','Mobitz','Wenckebach','II度房室传导阻滞'],
       related:['mobitz-i','mobitz-ii','av-block-2-1','high-grade-av-block','complete-heart-block'],
       basic:{
         summary:'部分 P 波不能下传。区分文氏型（PR 逐搏延长）和莫氏 II 型（PR 固定、突然脱落），后者风险更高。',
@@ -381,7 +382,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'持续心电监护，复核药物、电解质和缺血情况；文氏型在睡眠时出现可以是生理性的，但新发的莫氏 II 型需高度重视。',
         consultation:'莫氏 II 型、高度房室阻滞、伴晕厥、低血压或宽 QRS 的 2:1 阻滞，应及时请心内科会诊，评估临时或永久起搏。'
       },
-      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'}],updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'complete-heart-block',title:'三度房室传导阻滞',category:'conduction',risk:'high',
@@ -513,6 +514,7 @@ window.HAJIMI_ECG_DATA = {
     },
     {
       id:'hypokalemia',title:'低钾血症',category:'electrolytes',risk:'medium',
+      related:['hyperkalemia','drug-induced-long-qt','torsades-de-pointes','digoxin-effect'],
       aliases:['低钾','血钾低','U波','U 波','hypokalemia'],
       basic:{
         summary:'T 波低平、ST 压低和明显 U 波提示低钾可能，易诱发心律失常；心电图不能用于推算血钾数值。',
@@ -533,11 +535,12 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'术后利尿、胃肠减压、呕吐、腹泻和补液不当都可导致低钾；按本院流程监测和补钾，同时纠正低镁。',
         consultation:'伴心律失常、QT 明显延长、肌无力或难以纠正的低钾时，及时与内科或相关专科讨论；出现室性心律失常时按急救流程处理。'
       },
-      references:[{title:'StatPearls: Hypokalemia（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK482465/'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part IV：ST 段、T 波、U 波与 QT 间期（2009）',url:'https://www.hrsonline.org/resource/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-iv-st-segment/'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'StatPearls: Hypokalemia（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK482465/'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part IV：ST 段、T 波、U 波与 QT 间期（2009）',url:'https://www.hrsonline.org/resource/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-iv-st-segment/'}],updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'calcium-disorders',title:'血钙异常（低钙 / 高钙）',category:'electrolytes',risk:'medium',
-      aliases:['低钙','高钙','低钙血症','高钙血症','血钙','QT延长','QT缩短'],
+      related:['drug-induced-long-qt','short-qt','hypokalemia','hyperkalemia'],
+      aliases:['低钙','高钙','低钙血症','高钙血症','血钙','低钙QT延长','高钙QT缩短'],
       basic:{
         summary:'低钙主要使 ST 段延长、QT 延长；高钙使 ST 段缩短、QT 缩短。两者都应以血钙（最好是离子钙）为准。',
         diagram:{kind:'calcium',caption:'血钙异常教学示意：上行 ST 段延长、QT 延长（低钙）；下行 ST 段缩短、QT 缩短（高钙）。'},
@@ -557,7 +560,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'甲状腺或甲状旁腺术后、大量输血后应监测离子钙；高钙患者注意补液、肾功能和意识状态。',
         consultation:'伴心律失常、QT 明显改变、抽搐、意识改变的血钙异常，以及病因不明的高钙血症，及时请内分泌科或相关专科会诊。'
       },
-      references:[{title:'StatPearls: Hypocalcemia（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK430912/'},{title:'StatPearls: Hypercalcemia（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK430714/'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part IV：ST 段、T 波、U 波与 QT 间期（2009）',url:'https://www.hrsonline.org/resource/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-iv-st-segment/'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'StatPearls: Hypocalcemia（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK430912/'},{title:'StatPearls: Hypercalcemia（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK430714/'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part IV：ST 段、T 波、U 波与 QT 间期（2009）',url:'https://www.hrsonline.org/resource/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-iv-st-segment/'}],updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'drug-induced-long-qt',title:'药物相关 QT 间期延长',category:'electrolytes',risk:'medium',
@@ -606,7 +609,7 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'术后肾功能变化、电解质紊乱和新增相互作用药物都可能诱发中毒；必要时监测血药浓度。',
         consultation:'疑似中毒伴心律失常或血流动力学改变时，及时联系心内科及中毒救治团队，评估特异性解毒剂等治疗；不在此草稿给出固定方案。'
       },
-      references:[{title:'StatPearls: Digitalis Toxicity（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK470568/'}],updatedAt:'2026-10-11',reviewStatus:'待审核'
+      references:[{title:'StatPearls: Digitalis Toxicity（NCBI Bookshelf）',url:'https://www.ncbi.nlm.nih.gov/books/NBK470568/'},{title:'AHA/ACCF/HRS 心电图标准化与判读建议 Part IV：ST 段、T 波、U 波与 QT 间期（2009）',url:'https://www.hrsonline.org/resource/ahaaccfhrs-recommendations-standardization-and-interpretation-electrocardiogram-part-iv-st-segment/'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'}],updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'ventricular-pacing',title:'心室起搏心电图',category:'pacing',risk:'low',
@@ -712,6 +715,7 @@ window.HAJIMI_ECG_DATA = {
     },
     {
       id:'brugada',title:'Brugada 图形',category:'arrhythmias',risk:'high',
+      related:['early-repolarization','st-elevation-differential','right-bundle-branch-block','ventricular-fibrillation'],
       aliases:['Brugada','布鲁加达','Brugada综合征','穹窿形ST抬高','钠通道病'],
       basic:{
         summary:'右胸导联穹窿形 ST 段抬高伴 T 波倒置（1 型）具有诊断意义；发热和部分药物可诱发或加重，与猝死风险相关。',
@@ -734,7 +738,7 @@ window.HAJIMI_ECG_DATA = {
         consultation:'1 型图形、伴晕厥或室性心律失常、有猝死家族史时请心内科会诊；发生室颤或多形性室速时按心脏骤停流程处理。'
       },
       references:[{title:'2022 ESC Guidelines for the management of patients with ventricular arrhythmias and the prevention of sudden cardiac death · Eur Heart J 2022',url:'https://doi.org/10.1093/eurheartj/ehac262'},{title:'J-Wave syndromes expert consensus conference report: emerging concepts and gaps in knowledge · Heart Rhythm 2016',url:'https://pubmed.ncbi.nlm.nih.gov/27423412/'}],
-      updatedAt:'2026-10-11',reviewStatus:'待审核'
+      updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'acute-pericarditis',title:'急性心包炎',category:'ischemia',risk:'medium',
@@ -840,8 +844,8 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'睡眠中出现的文氏阻滞多为生理性；新发且伴下壁缺血表现时，需评估心肌缺血。',
         consultation:'进展为莫氏 II 型、高度或三度阻滞，或伴症状性心动过缓时请心内科会诊。'
       },
-      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'}],
-      updatedAt:'2026-10-12',reviewStatus:'待审核'
+      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'}],
+      updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'mobitz-ii',title:'二度 II 型房室传导阻滞（莫氏 II 型）',category:'conduction',risk:'high',
@@ -867,8 +871,8 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'持续心电监护，警惕进展为高度或三度房室阻滞；纠正高钾、缺血等可逆因素。',
         consultation:'一经发现即请心内科会诊；伴晕厥、低血压或心衰时按急救流程处理并准备起搏。'
       },
-      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'}],
-      updatedAt:'2026-10-12',reviewStatus:'待审核'
+      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'}],
+      updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'av-block-2-1',title:'2:1 房室传导阻滞',category:'conduction',risk:'high',
@@ -894,8 +898,8 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'延长心电监护，观察是否出现文氏周期（倾向良性）或进展为高度/三度阻滞（高危）。',
         consultation:'发现 2:1 阻滞即请心内科会诊；伴症状、宽 QRS 或血流动力学不稳定时紧急处理。'
       },
-      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'}],
-      updatedAt:'2026-10-12',reviewStatus:'待审核'
+      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'}],
+      updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'high-grade-av-block',title:'高度房室传导阻滞',category:'conduction',risk:'high',
@@ -948,8 +952,8 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'复核术后新用药（β 受体阻滞剂、右美托咪定、阿片类等）、电解质和体温；快慢综合征患者控制房颤心室率时需警惕停搏。',
         consultation:'症状性心动过缓、清醒时长间歇、晕厥或需要同时处理快速心律失常时请心内科会诊。'
       },
-      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'}],
-      updatedAt:'2026-10-12',reviewStatus:'待审核'
+      references:[{title:'2018 ACC/AHA/HRS Guideline on the Evaluation and Management of Patients With Bradycardia and Cardiac Conduction Delay · Circulation 2019',url:'https://doi.org/10.1161/CIR.0000000000000628'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'}],
+      updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'anterior-stemi',title:'前壁 ST 段抬高型心肌梗死',category:'ischemia',risk:'high',
@@ -1353,8 +1357,8 @@ window.HAJIMI_ECG_DATA = {
         postoperative:'复核电解质、地高辛使用和低氧情况；持续发作或心率快时持续监护。',
         consultation:'心率难以控制、伴心功能不全、疑似地高辛中毒时请心内科会诊。'
       },
-      references:[{title:'2015 ACC/AHA/HRS Guideline for the Management of Adult Patients With Supraventricular Tachycardia · Circulation 2016',url:'https://doi.org/10.1161/CIR.0000000000000311'}],
-      updatedAt:'2026-10-12',reviewStatus:'待审核'
+      references:[{title:'2015 ACC/AHA/HRS Guideline for the Management of Adult Patients With Supraventricular Tachycardia · Circulation 2016',url:'https://doi.org/10.1161/CIR.0000000000000311'},{title:'Part 3: Adult Basic and Advanced Life Support · 2020 AHA Guidelines for CPR and ECC · Circulation 2020',url:'https://doi.org/10.1161/CIR.0000000000000916'},{title:'2024 AHA/ACC 等 Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery · Circulation 2024',url:'https://doi.org/10.1161/CIR.0000000000001285'}],
+      updatedAt:'2026-11-08',reviewStatus:'待审核'
     },
     {
       id:'mat',title:'多源性房性心动过速',category:'arrhythmias',risk:'medium',
