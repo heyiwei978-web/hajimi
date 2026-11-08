@@ -28,7 +28,7 @@ export const MODULES = Object.freeze([
     routes: ['/classification', '/classification/', '/classification/:path*']},
   {id: 'ecg', label: '心电图', href: '/ecg', nav: true, routes: ['/ecg', '/ecg/', '/ecg/:path*']},
   {id: 'pathway', label: '临床路径', href: '/pathway', nav: true, routes: ['/pathway', '/pathway/']},
-  {id: 'duty', label: '值班资料', href: '/duty', nav: true, routes: ['/duty', '/duty/']},
+  {id: 'duty', label: '值班资料', href: '/duty', nav: true, routes: ['/duty', '/duty/', '/duty/orders', '/duty/orders/']},
   {id: 'tools', label: '临床工具', href: '/tools', nav: true, routes: ['/tools', '/tools/']},
   {id: 'admin', label: '管理入口', href: '/admin', nav: true, routes: ['/admin', '/admin/', '/admin/password']}
 ].map(Object.freeze));
@@ -82,6 +82,7 @@ export const NAV_SURFACES = Object.freeze([
   {file: 'ecg.html', variant: 'official', active: 'ecg'},
   {file: 'pathway.html', variant: 'official', active: 'pathway'},
   {file: 'duty.html', variant: 'official', active: 'duty'},
+  {file: 'duty-orders.html', variant: 'official', active: 'duty'},
   {file: 'admin.html', variant: 'official', active: 'admin'},
   {file: 'tools.html', variant: 'tools', active: 'tools'},
   {file: 'index.html', region: 'libraryShell', variant: 'library', active: 'records'}

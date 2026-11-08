@@ -1,0 +1,61 @@
+/* 内科医嘱参考页（/duty/orders）。只管屏幕和打印显示，不改资料文字。 */
+.visually-hidden{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+@media screen{
+  .orders-main{padding-bottom:48px}
+  .orders-breadcrumb{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;font-size:.875rem;color:var(--ws-muted)}
+  .orders-breadcrumb a{color:var(--ws-blue);text-decoration:none}
+  .orders-breadcrumb a:hover{text-decoration:underline}
+  .orders-warning{margin:0 0 20px;padding:14px 16px;border:1px solid #f0d58c;border-left:4px solid #d39b18;border-radius:12px;background:#fff8e6;color:#5c4300;font-size:.9375rem;line-height:1.75}
+  .orders-warning strong{margin-right:4px}
+  .orders-search{position:sticky;top:calc(var(--site-header-height,72px) + 8px);z-index:30;margin:0 0 16px;padding:14px 16px;border:1px solid var(--ws-line);border-radius:14px;background:rgba(255,255,255,.97);box-shadow:var(--ws-shadow)}
+  .orders-search label{display:block;margin-bottom:8px;font-size:.9375rem;font-weight:650;color:var(--ws-ink)}
+  .orders-search-field{display:flex;align-items:center;gap:8px;min-height:48px;padding:0 12px;border:1px solid #bdcddd;border-radius:10px;background:#fff}
+  .orders-search-field:focus-within{border-color:var(--ws-blue);box-shadow:0 0 0 3px #135f9c1f}
+  .orders-main .orders-search-field input{flex:1;min-width:0;width:auto;min-height:44px;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;font-size:1rem;color:var(--ws-ink);outline:none}
+  .orders-status-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px}
+  .orders-status{margin:0;font-size:.8125rem;color:var(--ws-muted)}
+  .orders-toc-link{flex-shrink:0;display:inline-flex;align-items:center;min-height:36px;font-size:.875rem;font-weight:600;color:var(--ws-blue);text-decoration:none}
+  .orders-toc{scroll-margin-top:calc(var(--site-header-height,72px) + 170px)}
+  .orders-toc{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px}
+  .orders-toc a{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid var(--ws-line);border-radius:999px;background:#fff;color:var(--ws-ink);font-size:.9375rem;font-weight:600;text-decoration:none;white-space:nowrap}
+  .orders-toc a:hover{border-color:#9fbdd4;color:var(--ws-blue)}
+  .orders-toc a[hidden]{display:none}
+  .orders-sheet{margin:0 0 28px;padding:20px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);background:#fff;scroll-margin-top:calc(var(--site-header-height,72px) + 150px)}
+  .orders-sheet-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .orders-sheet-head h2{margin:0;font-size:1.375rem;line-height:1.45}
+  .orders-sheet-head span{flex-shrink:0;font-size:.8125rem;color:var(--ws-muted);font-variant-numeric:tabular-nums}
+  .orders-table-wrap{overflow-x:auto;overscroll-behavior-x:contain}
+  .orders-table{width:100%;border-collapse:collapse;font-size:.9375rem;line-height:1.7;color:var(--ws-text)}
+  .orders-table th{position:sticky;top:0;padding:10px 12px;border-bottom:2px solid var(--ws-line);background:var(--ws-soft);color:var(--ws-ink);font-size:.8125rem;font-weight:700;text-align:left;white-space:nowrap}
+  .orders-table td{padding:10px 12px;border-bottom:1px solid #edf1f5;vertical-align:top;white-space:pre-wrap;overflow-wrap:break-word;min-width:8em}
+  .orders-table td:empty{min-width:3em}
+  .orders-table td.orders-main-cell{min-width:18em;color:var(--ws-ink);font-weight:550}
+  .orders-table tr.orders-subhead td{padding-top:18px;border-bottom:1px solid #c9dce8;background:#f4f8fb;color:var(--ws-blue);font-weight:700}
+  .orders-table mark{padding:0 1px;border-radius:3px;background:#ffe58a;color:inherit}
+}
+@media screen and (max-width:760px){
+  .orders-search{padding:12px;border-radius:12px}
+  .orders-toc{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;margin:0 -16px 20px;padding:0 16px}
+  .orders-toc::-webkit-scrollbar{display:none}
+  .orders-toc a{flex:none}
+  .orders-sheet{padding:14px;scroll-margin-top:calc(var(--site-header-height,93px) + 140px)}
+  .orders-sheet-head h2{font-size:1.1875rem}
+  /* 手机上每条医嘱变成一张小卡片：左边是栏目名，右边是内容；空白栏目不显示。 */
+  .orders-table,.orders-table tbody,.orders-table tr,.orders-table td{display:block;width:100%}
+  .orders-table thead{display:none}
+  .orders-table tr{padding:10px 0;border-bottom:1px solid #e3e9ef}
+  .orders-table tr[hidden]{display:none}
+  .orders-table td{display:grid;grid-template-columns:5.5em minmax(0,1fr);gap:8px;padding:3px 0;border:0;min-width:0}
+  .orders-table td.orders-main-cell{min-width:0}
+  .orders-table td::before{content:attr(data-label);color:var(--ws-muted);font-size:.8125rem;font-weight:600;line-height:1.9;overflow-wrap:anywhere}
+  .orders-table td.orders-empty{display:none}
+  .orders-table tr.orders-subhead{padding:0;border:0}
+  .orders-table tr.orders-subhead td{display:block;margin-top:8px;padding:10px 12px;border-radius:8px;border:0}
+  .orders-table tr.orders-subhead td::before{content:none}
+}
+@media print{
+  .orders-search,.orders-toc,.orders-breadcrumb,.skip-link,.official-nav{display:none!important}
+  .orders-table{width:100%;border-collapse:collapse;font-size:10pt}
+  .orders-table th,.orders-table td{border:1px solid #999;padding:3pt 4pt;vertical-align:top;white-space:pre-wrap}
+  .orders-table tr[hidden],.orders-sheet[hidden]{display:none}
+}

@@ -2027,3 +2027,23 @@ test('editors can be enlarged: supplement boxes open a full-size editor and CMS 
     }finally{await context.close();}
   }
 });
+
+test('order reference page lists the sheets, filters by keyword and stays inside the screen', async () => {
+  for (const width of [390, 1280]) {
+    const {page, context, errors} = await pageFor(width);
+    await page.goto(base + '/duty/orders');
+    await page.locator('#ordersSearch:not([disabled])').waitFor();
+    assert.equal(await page.locator('#ordersToc a').count(), 12);
+    assert.match(await page.textContent('#ordersStatus'), /共 12 个分页/);
+    await page.fill('#ordersSearch', '去甲肾上腺素');
+    await page.waitForFunction(() => /找到 \d+ 条/.test(document.querySelector('#ordersStatus').textContent));
+    assert.ok(await page.locator('.orders-table mark').count() > 0);
+    assert.ok(await page.locator('.orders-sheet:not([hidden])').count() < 12);
+    await page.fill('#ordersSearch', '');
+    await page.waitForFunction(() => /共 12 个分页/.test(document.querySelector('#ordersStatus').textContent));
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no horizontal page scroll');
+    assert.equal(await page.getAttribute('header nav a[aria-current="page"]', 'href'), '/duty');
+    assert.deepEqual(errors, []);
+    await context.close();
+  }
+});
