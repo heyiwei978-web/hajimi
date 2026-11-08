@@ -9,6 +9,7 @@
 - 未配置 `HAJIMI_SESSION_SECRET` 时拒绝验证或签发会话；过期、篡改、格式错误的会话无效。审计 API 也要求管理员身份，避免匿名请求触发大批模板执行。
 - `Content-Security-Policy` 只允许本站脚本及连接；保留页面需要的内联样式和本地图片预览。禁止 iframe 嵌入、对象插件及跨站表单提交。
 
+- 内科医嘱参考 `/api/duty-orders` 读取和修改都要求管理员登录，资料存放在私有 Blob（`duty-orders/`），与公开 CMS 资料和私人图库分开；每次保存或恢复前自动备份，保留最近 50 份。
 - 案例图片 `/api/image` 只向访客提供已发布案例引用的图片；草稿、已删除案例及未关联的上传图片仅管理员可见。图片只允许浏览器私有缓存，取消发布后最长 10 分钟内失效，不进入共享 CDN 缓存。
 
 生产登录使用 Vercel 项目的 `HAJIMI_ADMIN_USER`、`HAJIMI_SESSION_SECRET`，以及管理员密码哈希：
@@ -28,7 +29,7 @@
 | --- | --- | --- | --- |
 | hajimi-login-limit | Path = `/api/login` 且 Method = POST | 10 次 / 60 秒 | Deny |
 | hajimi-upload-limit | Path = `/api/upload` 且 Method = POST | 30 次 / 60 秒 | Deny |
-| hajimi-admin-write-limit | `/api/content` + PUT，或 `/api/logout` + POST | 两类请求合计 60 次 / 60 秒 | Deny |
+| hajimi-admin-write-limit | `/api/content` + PUT，`/api/duty-orders` + PUT/POST，或 `/api/logout` + POST | 合计 60 次 / 60 秒 | Deny |
 | hajimi-audit-limit | `/api/ortho-audit-runtime` + GET | 3 次 / 60 秒 | Deny |
 | hajimi-block-scanner-paths | Path 匹配 JSON 中的正则：WordPress、phpMyAdmin、Git 和环境文件探测 | 直接拦截 | Deny |
 

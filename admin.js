@@ -68,11 +68,16 @@
     status.querySelector('small').textContent=auth?'可维护模板、案例和备份':'登录后显示管理工具';
     if(auth){loadDashboard();window.HAJIMI_PRIVATE_GALLERY.load();}
   }
+  // /admin?next=/duty/orders：登录成功后回到原页面；只接受本站以 / 开头的路径。
+  function returnAfterLogin(){
+    const next=new URLSearchParams(location.search).get('next')||'';
+    if(/^\/(?![\/\\])[A-Za-z0-9\-\/_]*$/.test(next))location.assign(next);
+  }
   document.getElementById('refreshHistory').onclick=loadDashboard;
   downloadCurrent.onclick=()=>{if(content)download({version:1,templateOverrides:content.templateOverrides,cases:content.cases,...(content.supplementOverrides?{supplementOverrides:content.supplementOverrides}:{})},'hajimi-content-'+new Date().toISOString().slice(0,10)+'.json');};
   form.addEventListener('submit',async event=>{
     event.preventDefault();error.hidden=true;const button=form.querySelector('button[type=submit]');button.disabled=true;button.textContent='登录中…';
-    try{const session=await json('/api/login',{method:'POST',body:JSON.stringify(Object.fromEntries(new FormData(form).entries()))});form.reset();showAuth(true,session.user);notify('已进入网站管理模式');}
+    try{const session=await json('/api/login',{method:'POST',body:JSON.stringify(Object.fromEntries(new FormData(form).entries()))});form.reset();showAuth(true,session.user);notify('已进入网站管理模式');returnAfterLogin();}
     catch(ex){error.textContent=ex.message;error.hidden=false;}finally{button.disabled=false;button.textContent='登录管理后台';}
   });
   document.getElementById('adminLogout').onclick=async()=>{try{await json('/api/logout',{method:'POST',body:'{}'});showAuth(false);notify('已退出管理模式');}catch(ex){notify(ex.message);}};

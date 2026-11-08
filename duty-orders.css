@@ -59,3 +59,57 @@
   .orders-table th,.orders-table td{border:1px solid #999;padding:3pt 4pt;vertical-align:top;white-space:pre-wrap}
   .orders-table tr[hidden],.orders-sheet[hidden]{display:none}
 }
+
+/* 登录提示、编辑模式与对话框（2026-11-08） */
+@media screen{
+  .orders-loading{margin:0 0 20px;color:var(--ws-muted)}
+  .orders-locked,.orders-error{margin:0 0 24px;padding:28px 24px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);background:#fff;text-align:center}
+  .orders-locked h2{margin:0 0 8px;font-size:1.375rem}
+  .orders-locked p{margin:0 0 18px;color:var(--ws-muted);line-height:1.8}
+  .orders-locked .btn,.orders-error .btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;font-size:1rem}
+  .orders-error p{margin:0 0 14px;color:#9b2c2c}
+  .orders-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 14px}
+  .orders-toolbar .btn{min-height:40px;padding:0 14px;font-size:.9375rem}
+  .orders-toolbar #ordersEditToggle[aria-pressed="true"]{background:var(--ws-blue);border-color:var(--ws-blue);color:#fff}
+  .orders-updated{font-size:.8125rem;color:var(--ws-muted)}
+  .orders-save-status{flex-basis:100%;margin:0;font-size:.875rem;color:#1f6f43;min-height:1.2em}
+  .orders-edit-hint{margin:0 0 16px;padding:10px 14px;border-left:3px solid var(--ws-blue);background:var(--ws-soft);font-size:.875rem;line-height:1.8;color:var(--ws-text)}
+  .orders-sheet-head{flex-wrap:wrap}
+  .orders-sheet-tools{display:flex;gap:8px;flex-basis:100%}
+  .orders-action{min-height:36px;padding:0 10px;border:1px solid var(--ws-line);border-radius:8px;background:#fff;color:var(--ws-blue);font-size:.875rem;font-weight:600;cursor:pointer;white-space:nowrap}
+  .orders-action:hover{border-color:#9fbdd4;background:var(--ws-soft)}
+  .orders-action[data-action="delete"]{color:#a12a2a}
+  .orders-action:disabled{opacity:.5;cursor:wait}
+  .orders-table td.orders-actions{min-width:0;white-space:nowrap}
+  .orders-table td.orders-actions .orders-action+.orders-action{margin-left:6px}
+  .is-editing .orders-table th:last-child,.is-editing .orders-table td.orders-actions{position:sticky;right:0;z-index:1;background:#fff;box-shadow:-8px 0 8px -8px rgba(20,44,66,.25)}
+  .is-editing .orders-table th:last-child{z-index:2;background:var(--ws-soft)}
+  .is-editing .orders-table tr.orders-subhead td.orders-actions{background:#f4f8fb}
+  .orders-dialog{width:min(720px,calc(100vw - 24px));max-height:min(88vh,900px);padding:0;border:0;border-radius:16px;box-shadow:0 24px 70px rgba(20,44,66,.25)}
+  .orders-dialog::backdrop{background:rgba(20,44,66,.4)}
+  .orders-dialog form{display:flex;flex-direction:column;max-height:inherit}
+  .orders-dialog-head{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--ws-line);background:#fff}
+  .orders-dialog-head h2{margin:0;font-size:1.125rem;line-height:1.5}
+  .orders-dialog-head .icon-btn{width:40px;height:40px;flex-shrink:0;font-size:1.375rem;cursor:pointer}
+  .orders-dialog-fields{display:grid;gap:14px;padding:16px 20px;overflow:auto}
+  .orders-dialog-fields label{display:grid;gap:6px;font-size:.875rem;font-weight:600;color:var(--ws-ink)}
+  .orders-dialog-fields textarea{width:100%;min-height:44px;padding:10px 12px;border:1px solid #bdcddd;border-radius:8px;font-size:1rem;line-height:1.7;color:var(--ws-ink);resize:vertical}
+  .orders-dialog-fields textarea:focus{border-color:var(--ws-blue);outline:3px solid #135f9c33;outline-offset:0}
+  .orders-dialog-status{margin:0;padding:0 20px;min-height:1.4em;font-size:.875rem;color:#9b2c2c}
+  .orders-dialog-actions{position:sticky;bottom:0;display:flex;gap:10px;padding:14px 20px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--ws-line);background:#fff}
+  .orders-dialog-actions .btn{min-height:44px;padding:0 20px;font-size:1rem}
+  .orders-dialog-note{margin:0;padding:14px 20px 0;font-size:.875rem;line-height:1.8;color:var(--ws-muted)}
+  .orders-history-list{margin:0;padding:12px 20px 16px;list-style:none;overflow:auto}
+  .orders-history-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #edf1f5;font-size:.9375rem}
+  .orders-history-list .btn{flex-shrink:0;min-height:40px;padding:0 12px}
+}
+@media screen and (max-width:760px){
+  .orders-table td.orders-actions{position:static!important;display:flex;flex-wrap:wrap;gap:6px;padding-top:8px;box-shadow:none!important;background:transparent!important}
+  .orders-table td.orders-actions::before{content:none}
+  .orders-table td.orders-actions .orders-action+.orders-action{margin-left:0}
+  .orders-table td.orders-actions .orders-action{flex:1 1 auto;min-height:40px}
+  .orders-history-list li{flex-direction:column;align-items:stretch}
+}
+@media print{
+  .orders-toolbar,.orders-edit-hint,.orders-actions,.orders-sheet-tools,.orders-locked{display:none!important}
+}

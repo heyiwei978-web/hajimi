@@ -91,6 +91,34 @@
             {
               "type": "path",
               "op": "eq",
+              "value": "/api/duty-orders"
+            },
+            {
+              "type": "method",
+              "op": "eq",
+              "value": "POST"
+            }
+          ]
+        },
+        {
+          "conditions": [
+            {
+              "type": "path",
+              "op": "eq",
+              "value": "/api/duty-orders"
+            },
+            {
+              "type": "method",
+              "op": "eq",
+              "value": "PUT"
+            }
+          ]
+        },
+        {
+          "conditions": [
+            {
+              "type": "path",
+              "op": "eq",
               "value": "/api/logout"
             },
             {
