@@ -284,3 +284,7 @@ svg.is-measuring:focus-visible{outline:3px solid var(--ws-blue);outline-offset:2
   .ecg-page a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#444;overflow-wrap:anywhere}
   body.ecg-entry-page main{padding-bottom:0!important}
 }
+/* 报告生成器：心律必选提示、未选时的错误边框、停用的 PR 间期 */
+.ecg-form-hint{margin:10px 0 0;font-size:.875rem;line-height:1.7;color:var(--ws-muted,#526577)}
+.ecg-form select[aria-invalid="true"]{border-color:#b42318;box-shadow:0 0 0 3px rgba(180,35,24,.14)}
+.ecg-form input:disabled{background:#f1f4f7;color:#8a97a5;cursor:not-allowed}

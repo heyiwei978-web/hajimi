@@ -300,6 +300,26 @@ test('ECG routes share the public layout, expose learning sections, case practic
       assert.match(await page.locator('#ecgQuizScore').innerText(),/已答 0/);
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
       await page.goto(base+'/ecg/report',{waitUntil:'networkidle'});
+      // 心律不预设：未选择时不能生成报告。
+      assert.equal(await page.locator('#ecgRpRhythm').inputValue(),'');
+      await page.getByRole('button',{name:'生成报告'}).click();
+      assert.match(await page.locator('#ecgRpResult').innerText(),/请先选择心律/);
+      assert.equal(await page.locator('#ecgRpRhythm').getAttribute('aria-invalid'),'true');
+      // 心房颤动时 PR 间期停用，报告中不出现 PR。
+      await page.locator('#ecgRpPr').fill('180');
+      await page.locator('#ecgRpRhythm').selectOption('心房颤动');
+      assert.equal(await page.locator('#ecgRpPr').isDisabled(),true);
+      assert.equal(await page.locator('#ecgRpPr').inputValue(),'');
+      assert.match(await page.locator('#ecgRpRhythmHint').innerText(),/PR 间期不能常规测量/);
+      await page.locator('#ecgRpRate').fill('110');await page.getByRole('button',{name:'生成报告'}).click();
+      const afText=await page.locator('#ecgRpResult').innerText();
+      assert.match(afText,/心律：心房颤动。心率：110 次\/分/);assert.doesNotMatch(afText,/PR 间期/);
+      // 「其他」必须在描述中写明。
+      await page.locator('#ecgRpRhythm').selectOption({index:8});
+      await page.getByRole('button',{name:'生成报告'}).click();
+      assert.match(await page.locator('#ecgRpResult').innerText(),/请在「其他描述」中写明心律/);
+      await page.locator('#ecgRpRhythm').selectOption('窦性心律');
+      assert.equal(await page.locator('#ecgRpPr').isDisabled(),false);
       await page.locator('#ecgRpRate').fill('68');await page.locator('#ecgRpPr').fill('224');await page.locator('#ecgRpQt').fill('420');await page.locator('#ecgRpAxis').fill('75');
       await page.locator('#ecgRpConclusion').fill('窦性心律\n一度房室传导阻滞');
       await page.getByRole('button',{name:'生成报告'}).click();
