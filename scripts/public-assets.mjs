@@ -7,7 +7,7 @@ export const PUBLIC_PAGES=[
 export const PUBLIC_STYLES=[
   'accessibility.css','admin.css','case-workspace-preview.css','classification-home.css',
   'classification.css','cms.css','duty.css','duty-orders.css','ecg.css','library-personal.css','pathway.css',
-  'styles.css','tools-page.css','tools-polish.css','ui-polish.css','workspace-design.css','private-gallery.css'
+  'design-system.css','styles.css','tools-page.css','tools-polish.css','ui-polish.css','workspace-design.css','private-gallery.css'
 ];
 export const PUBLIC_SCRIPTS=[
   'admin-content.js','admin.js','classification-data.js','classification-detail-v2-lower.js',

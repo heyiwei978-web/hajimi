@@ -1,0 +1,159 @@
+/* 设计系统 v2（2026-11-08）
+   参考 Stripe、Linear、Vercel、Apple 等站点的界面做法：统一内容宽度、半透明吸顶顶栏、
+   柔和分层阴影、悬停反馈、胶囊式标签与清晰的焦点环。
+   本文件在每个页面最后加载，只改屏幕显示；打印样式、病历正文、复制内容均不受影响。 */
+:root{
+  --ds-ink:#0f1f33;
+  --ds-text:#26384b;
+  --ds-muted:#56687a;
+  --ds-line:#e2e8ef;
+  --ds-line-strong:#c9d6e3;
+  --ds-bg:#f5f7fa;
+  --ds-blue:#135f9c;
+  --ds-blue-strong:#0e4d82;
+  --ds-blue-50:#eef5fb;
+  --ds-blue-100:#d9e9f6;
+  --ds-shadow-xs:0 1px 2px rgba(15,31,51,.05);
+  --ds-shadow-sm:0 1px 2px rgba(15,31,51,.04),0 3px 8px -2px rgba(15,31,51,.06);
+  --ds-shadow-md:0 2px 4px rgba(15,31,51,.04),0 14px 32px -10px rgba(15,31,51,.18);
+  --ds-ring:0 0 0 3px rgba(19,95,156,.18);
+  --ds-ease:cubic-bezier(.2,.8,.2,1);
+  /* 让旧样式里的设计变量与新系统一致 */
+  --ws-ink:var(--ds-ink);--ws-text:var(--ds-text);--ws-muted:var(--ds-muted);
+  --ws-line:var(--ds-line);--ws-bg:var(--ds-bg);--ws-soft:var(--ds-blue-50)
+}
+
+@media screen{
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+  body,.official-home,body.duty-page,body.pathway-page,body.admin-page,body.class-page,body.tools-page,#libraryShell,#libraryShell .page{background-color:var(--ds-bg)}
+  :where(h1,h2,h3){letter-spacing:-.01em}
+  :where(h1){letter-spacing:-.022em}
+  ::selection{background:#cfe3f5;color:var(--ds-ink)}
+
+  /* ---------- 顶栏：半透明磨砂（Apple / Vercel） ---------- */
+  .official-nav,.tools-page .nav,#libraryShell .library-topbar{
+    background:rgba(255,255,255,.96);border-bottom:1px solid rgba(15,31,51,.08);box-shadow:none
+  }
+  @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+    .official-nav,.tools-page .nav,#libraryShell .library-topbar{
+      background:rgba(255,255,255,.8);
+      -webkit-backdrop-filter:saturate(180%) blur(14px);backdrop-filter:saturate(180%) blur(14px)
+    }
+  }
+  .official-brand-mark,.library-brand-mark{
+    background:linear-gradient(145deg,#1d74ba 0%,#135f9c 55%,#0e4d82 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 1px 2px rgba(15,31,51,.18)
+  }
+
+  /* 导航：悬停时出现浅色胶囊（Linear / GitHub），当前栏目保留底部指示条 */
+  .official-nav .official-links a,.tools-page .nav nav a,#libraryShell .library-top-actions .text-action{position:relative;transition:color .15s ease}
+  .official-nav .official-links a::before,.tools-page .nav nav a::before,#libraryShell .library-top-actions .text-action::before{
+    content:"";position:absolute;left:-9px;right:-9px;top:50%;height:34px;margin-top:-17px;border-radius:8px;
+    background:transparent;transition:background-color .15s ease;z-index:-1
+  }
+  .official-nav .official-links,.tools-page .nav nav,#libraryShell .library-top-actions{isolation:isolate}
+  .official-nav .official-links a:hover::before,.tools-page .nav nav a:hover::before,#libraryShell .library-top-actions .text-action:hover::before{background:rgba(19,95,156,.07)}
+  .official-nav .official-links a.active,.tools-page .nav nav a.active,#libraryShell .library-top-actions .library-active-link{color:var(--ds-blue);font-weight:650}
+
+  /* ---------- 卡片：统一边框与分层阴影（Stripe） ---------- */
+  .home-quick-panel,.official-feature,.pathway-home-banner,
+  #libraryShell .controls-section,.library-overview,.library-department-card,.ortho-disease-card,
+  .class-page .class-shell .class-hero,.class-dept-card,.class-disease-card,.class-content-section,
+  .duty-card,.duty-privacy,.orders-sheet,.orders-search,.orders-locked,
+  .tools-page .card,.tools-page .notice,
+  .admin-tool-card,.admin-login-card,.admin-guide,.admin-status,
+  .pathway-hero,.pathway-main>section,.pathway-sidebar{
+    border-color:var(--ds-line);box-shadow:var(--ds-shadow-sm)
+  }
+  .pathway-home-banner{border-color:#c9dcea}
+
+  /* 可点击的卡片：悬停轻微上浮（仅限鼠标设备） */
+  .official-feature,.home-quick-grid>a,.library-department-card,.ortho-disease-card,
+  .class-dept-card,.class-disease-card,.duty-link-grid a,.tools-page .card,.admin-tool-card,.pathway-home-banner{
+    transition:transform .2s var(--ds-ease),box-shadow .2s var(--ds-ease),border-color .2s ease,background-color .2s ease
+  }
+  @media (hover:hover) and (pointer:fine){
+    .official-feature:hover,.library-department-card:hover,.ortho-disease-card:hover,
+    .class-dept-card:not(.is-pending):hover,.class-disease-card:hover,.duty-link-grid a:hover,
+    .tools-page .card:hover,.admin-tool-card:hover,.pathway-home-banner:hover{
+      transform:translateY(-2px);box-shadow:var(--ds-shadow-md);border-color:var(--ds-line-strong)
+    }
+    .home-quick-grid>a:hover{border-color:var(--ds-line-strong);background:#f8fbfe;box-shadow:var(--ds-shadow-sm)}
+  }
+  /* 卡片里的「进入 →」箭头随悬停右移 */
+  .feature-enter,.department-card-open,.class-dept-foot a,.ortho-disease-card .disease-open{transition:transform .2s var(--ds-ease)}
+  @media (hover:hover) and (pointer:fine){
+    .official-feature:hover .feature-enter{transform:translateX(3px)}
+  }
+
+  /* ---------- 按钮 ---------- */
+  .btn,.official-cta,.home-search-field button,.orders-action{transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease,transform .1s ease}
+  .btn:active,.official-cta:active,.home-search-field button:active{transform:translateY(1px)}
+  .official-cta.primary,.home-search-field button,.orders-locked .btn.primary,.duty-task-form .btn.primary,.duty-note-actions .btn.primary,.orders-dialog-actions .btn.primary{
+    background:linear-gradient(180deg,#1a6aab 0%,#135f9c 100%);border-color:#11578f;color:#fff;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 1px 2px rgba(15,31,51,.16)
+  }
+  .official-cta.primary:hover,.home-search-field button:hover,.orders-locked .btn.primary:hover,.duty-task-form .btn.primary:hover,.duty-note-actions .btn.primary:hover,.orders-dialog-actions .btn.primary:hover{
+    background:linear-gradient(180deg,#155f9b 0%,#0e4d82 100%)
+  }
+  .official-cta.secondary:hover,.btn.ghost:hover{background-color:#f4f8fc;border-color:var(--ds-line-strong)}
+
+  /* ---------- 搜索框：统一焦点环 ---------- */
+  .home-search-field,#libraryShell .searchbox,.orders-search-field,.ecg-global-field,.tools-page .formula-search{transition:border-color .15s ease,box-shadow .15s ease}
+  .home-search-field:focus-within,#libraryShell .searchbox:focus-within,.orders-search-field:focus-within,.ecg-global-field:focus-within,.tools-page .formula-search:focus-within{
+    border-color:var(--ds-blue);box-shadow:var(--ds-ring)
+  }
+
+  /* ---------- 数字：等宽对齐 ---------- */
+  .official-stats strong,.library-overview-stats strong,.class-hero-stats strong,.pathway-hero strong,#checklistProgress,#dutyTaskCount,.orders-sheet-count{font-variant-numeric:tabular-nums}
+
+  /* ---------- 首页首屏：柔和渐变与网格底纹（Vercel / Linear） ---------- */
+  body.portal-mode{
+    background:
+      radial-gradient(1100px 520px at 12% -8%,rgba(19,95,156,.10),transparent 62%),
+      radial-gradient(900px 460px at 92% -4%,rgba(56,160,220,.10),transparent 60%),
+      var(--ds-bg);
+    background-repeat:no-repeat
+  }
+  .official-hero{position:relative;isolation:isolate}
+  .official-hero::after{
+    content:"";position:absolute;inset:-48px 0 0;z-index:-1;pointer-events:none;
+    background-image:linear-gradient(rgba(19,95,156,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(19,95,156,.06) 1px,transparent 1px);
+    background-size:32px 32px;
+    -webkit-mask-image:radial-gradient(ellipse 70% 70% at 28% 35%,#000 20%,transparent 75%);
+    mask-image:radial-gradient(ellipse 70% 70% at 28% 35%,#000 20%,transparent 75%)
+  }
+  .official-hero h1 span{background:linear-gradient(90deg,#135f9c 0%,#1f86c6 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#135f9c}
+
+  /* ---------- 页脚与免责声明 ---------- */
+  .site-disclaimer{color:var(--ds-muted);border-top-color:var(--ds-line)}
+}
+
+/* ---------- 统一内容宽度：与顶栏同一列（电脑宽度） ---------- */
+@media screen and (min-width:1101px){
+  .official-main{max-width:1328px}
+  .class-page:not(.ecg-page) .class-shell{width:min(1280px,calc(100% - 48px))}
+  .library-root-page #libraryShell .page{max-width:1328px}
+  .library-root-page #libraryShell .content{width:min(1280px,calc(100% - 48px))}
+}
+
+/* ---------- 眉题：胶囊标签（电脑宽度；手机上这些眉题本来就隐藏） ---------- */
+@media screen and (min-width:641px){
+  .official-kicker,.duty-kicker,.class-page .class-shell .class-eyebrow,.tools-page .hero .eyebrow,.pathway-hero .pathway-kicker,#libraryShell .article-intro>.breadcrumb{
+    display:inline-flex;align-items:center;gap:8px;width:fit-content;padding:5px 12px 5px 10px;
+    border:1px solid var(--ds-blue-100);border-radius:999px;background:rgba(238,245,251,.85);
+    color:var(--ds-blue);font-size:.6875rem;line-height:1.4;letter-spacing:.12em;font-weight:700
+  }
+  .official-kicker::before,.duty-kicker::before,.class-page .class-shell .class-eyebrow::before,.tools-page .hero .eyebrow::before,.pathway-hero .pathway-kicker::before,#libraryShell .article-intro>.breadcrumb::before{
+    content:"";width:6px;height:6px;border-radius:50%;background:#1f86c6;box-shadow:0 0 0 3px rgba(31,134,198,.18)
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .official-feature,.home-quick-grid>a,.library-department-card,.ortho-disease-card,.class-dept-card,.class-disease-card,
+  .duty-link-grid a,.tools-page .card,.admin-tool-card,.pathway-home-banner,.feature-enter,.btn,.official-cta{transition:none!important;transform:none!important}
+}
+@media print{
+  .official-hero::after{display:none}
+}
