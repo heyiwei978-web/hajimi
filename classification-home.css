@@ -16,11 +16,3 @@
 .official-home .card-classification .feature-enter{color:#1c6cae}
 .official-home .official-feature.card-ecg{border-top:3px solid var(--ws-blue)}
 .official-home .home-quick-panel .home-quick-pathway + .home-quick-pathway{margin-top:8px}
-@media screen and (min-width:1050px) and (max-width:1380px){
-  .official-nav .official-links{gap:12px}
-  .official-nav .official-links a{font-size:12px}
-}
-@media screen and (max-width:1049px){
-  .official-nav .official-links{gap:16px}
-  .official-nav .official-links a{font-size:12px}
-}
