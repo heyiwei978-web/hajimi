@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
 <link rel="stylesheet" href="/duty.css?v=20261009-layout1">
 <link rel="stylesheet" href="/workspace-design.css?v=20261030-ui1">
-<link rel="stylesheet" href="/duty-orders.css?v=20261108-orders1">
+<link rel="stylesheet" href="/duty-orders.css?v=20261108-orders2">
 </head>
 <body class="duty-page duty-orders-page">
 <a class="skip-link" href="#ordersMain">跳到主要内容</a>
@@ -25,18 +25,46 @@
   <nav class="orders-breadcrumb" aria-label="当前位置"><a href="/duty">值班资料</a><span aria-hidden="true">/</span><span>内科医嘱参考</span></nav>
   <section class="duty-hero orders-hero"><div><p class="duty-kicker">ORDER REFERENCE</p><h1>内科医嘱参考</h1><p>常用口服药与对症处理、各科用药与检查、抢救药品泵法、常见滴速和过敏性休克处理，按原表格分页整理。</p></div><a class="btn ghost" href="/duty">返回值班工作台</a></section>
   <p class="orders-warning" role="note"><strong>个人整理资料，仅供参考。</strong>剂量、配法和泵速请以药品说明书、所在医院规定和上级医师意见为准；用药前核对过敏史、肝肾功能和禁忌证。</p>
-  <div class="orders-search">
-    <label for="ordersSearch">搜索药名、检查或处理</label>
-    <div class="orders-search-field"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="ordersSearch" type="search" autocomplete="off" placeholder="例如：去甲肾上腺素、胰岛素、甘露醇" disabled></div>
-    <div class="orders-status-row"><p id="ordersStatus" class="orders-status" role="status" aria-live="polite">正在加载资料…</p><a class="orders-toc-link" href="#ordersToc">分页目录 ↑</a></div>
+  <p id="ordersLoading" class="orders-loading" role="status">正在加载资料…</p>
+  <section id="ordersLocked" class="orders-locked" aria-labelledby="ordersLockedTitle" hidden>
+    <h2 id="ordersLockedTitle">登录后可见</h2>
+    <p>本页资料仅管理员登录后可以查看和编辑。</p>
+    <a class="btn primary" href="/admin?next=%2Fduty%2Forders">登录后查看</a>
+  </section>
+  <div id="ordersError" class="orders-error" hidden><p id="ordersErrorText" role="alert"></p><button id="ordersRetry" class="btn ghost" type="button">重新加载</button></div>
+  <div id="ordersApp" hidden>
+    <div class="orders-search">
+      <label for="ordersSearch">搜索药名、检查或处理</label>
+      <div class="orders-search-field"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="ordersSearch" type="search" autocomplete="off" placeholder="例如：去甲肾上腺素、胰岛素、甘露醇"></div>
+      <div class="orders-status-row"><p id="ordersStatus" class="orders-status" role="status" aria-live="polite"></p><a class="orders-toc-link" href="#ordersToc">分页目录 ↑</a></div>
+    </div>
+    <div class="orders-toolbar">
+      <button id="ordersEditToggle" class="btn ghost" type="button" aria-pressed="false">进入编辑模式</button>
+      <button id="ordersHistoryButton" class="btn ghost" type="button">修改记录</button>
+      <button id="ordersDownload" class="btn ghost" type="button">下载备份</button>
+      <span id="ordersUpdated" class="orders-updated"></span>
+      <p id="ordersSaveStatus" class="orders-save-status" role="status" aria-live="polite"></p>
+    </div>
+    <p id="ordersEditHint" class="orders-edit-hint" hidden>编辑模式：每条右侧可「编辑 / 插入 / 删除」，每页标题旁可「编辑表头 / 添加一行」。每次保存都会自动备份修改前的资料，可在「修改记录」里恢复。</p>
+    <nav id="ordersToc" class="orders-toc" aria-label="资料分页"></nav>
+    <div id="ordersContent" class="orders-content"></div>
   </div>
-  <nav id="ordersToc" class="orders-toc" aria-label="资料分页"></nav>
-  <div id="ordersContent" class="orders-content"></div>
   <noscript><p class="orders-warning">本页需要启用 JavaScript 才能显示资料。</p></noscript>
   <p class="site-disclaimer" role="note">本站为教学示例与临床参考资料，仅供参考，不替代医生的临床判断。</p>
 </main>
-<script defer src="/duty-orders-data.js?v=20261108-orders1"></script>
-<script defer src="/duty-orders.js?v=20261108-orders1"></script>
+<dialog id="ordersEditDialog" class="orders-dialog" aria-labelledby="ordersEditTitle"><form id="ordersEditForm">
+  <div class="orders-dialog-head"><h2 id="ordersEditTitle">编辑</h2><button id="ordersEditClose" class="icon-btn" type="button" aria-label="关闭">×</button></div>
+  <div id="ordersEditFields" class="orders-dialog-fields"></div>
+  <p id="ordersEditStatus" class="orders-dialog-status" role="status" aria-live="polite"></p>
+  <div class="orders-dialog-actions"><button class="btn primary" type="submit">保存</button><button id="ordersEditCancel" class="btn ghost" type="button">取消</button></div>
+</form></dialog>
+<dialog id="ordersHistoryDialog" class="orders-dialog" aria-labelledby="ordersHistoryTitle">
+  <div class="orders-dialog-head"><h2 id="ordersHistoryTitle">修改记录</h2><button id="ordersHistoryClose" class="icon-btn" type="button" aria-label="关闭">×</button></div>
+  <p class="orders-dialog-note">每次保存前自动备份当时的资料，最多保留最近 50 份。恢复后，当前资料也会先备份。</p>
+  <ol id="ordersHistoryList" class="orders-history-list"></ol>
+  <p id="ordersHistoryStatus" class="orders-dialog-status" role="status" aria-live="polite"></p>
+</dialog>
+<script defer src="/duty-orders.js?v=20261108-orders2"></script>
 <script defer src="/workspace.js?v=20261009-layout1"></script>
 </body>
 </html>

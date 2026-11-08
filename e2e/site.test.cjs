@@ -2028,19 +2028,74 @@ test('editors can be enlarged: supplement boxes open a full-size editor and CMS 
   }
 });
 
-test('order reference page lists the sheets, filters by keyword and stays inside the screen', async () => {
+test('order reference is locked without login; admins search, edit, insert, delete and restore', async () => {
+  const SHEETS=[
+    {title:'合成用药',columns:['长','内容','用法'],rows:[['','合成药物甲 10mg','口服'],['','分组标题',''],['是','合成药物乙 5mg','静脉注射']]},
+    {title:'合成滴速',columns:['疾病','滴速'],rows:[['合成情形','20-30滴/分']]}
+  ];
   for (const width of [390, 1280]) {
     const {page, context, errors} = await pageFor(width);
+    await context.route('**/api/duty-orders**', route => route.fulfill({status:401,json:{error:'未登录或会话已失效'}}));
     await page.goto(base + '/duty/orders');
-    await page.locator('#ordersSearch:not([disabled])').waitFor();
-    assert.equal(await page.locator('#ordersToc a').count(), 12);
-    assert.match(await page.textContent('#ordersStatus'), /共 12 个分页/);
-    await page.fill('#ordersSearch', '去甲肾上腺素');
-    await page.waitForFunction(() => /找到 \d+ 条/.test(document.querySelector('#ordersStatus').textContent));
-    assert.ok(await page.locator('.orders-table mark').count() > 0);
-    assert.ok(await page.locator('.orders-sheet:not([hidden])').count() < 12);
+    await page.locator('#ordersLocked').waitFor();
+    assert.equal(await page.isHidden('#ordersApp'), true);
+    assert.equal(await page.getAttribute('#ordersLocked a', 'href'), '/admin?next=%2Fduty%2Forders');
+
+    // Logged in: an in-memory stand-in for /api/duty-orders with revisions and backups.
+    let current = structuredClone(SHEETS), revision = 'seed', history = [], puts = 0;
+    await context.unroute('**/api/duty-orders**');
+    await context.route('**/api/duty-orders**', async route => {
+      const request = route.request(), method = request.method();
+      if (method !== 'GET') assert.equal(request.headers()['x-hajimi-admin'], '1');
+      if (method === 'GET') return route.fulfill({json:{sheets:current,revision,history,updatedAt:history.length?new Date().toISOString():null}});
+      const body = request.postDataJSON();
+      if (body.revision !== revision) return route.fulfill({status:409,json:{error:'资料已在其他页面更新'}});
+      const id = Date.now() + '-00000000-0000-4000-8000-' + String(++puts).padStart(12, '0');
+      history = [{id,createdAt:new Date().toISOString(),user:'fixture',action:method==='PUT'?'save':'restore',rowCount:current.reduce((n,s)=>n+s.rows.length,0),sheets:current},...history];
+      current = method === 'PUT' ? body.sheets : history.find(item => item.id === body.id).sheets;
+      revision = 'r' + puts;
+      return route.fulfill({json:{sheets:current,revision,history,updatedAt:new Date().toISOString()}});
+    });
+    await page.reload();
+    await page.locator('#ordersApp:not([hidden])').waitFor();
+    assert.equal(await page.locator('#ordersToc a').count(), 2);
+    assert.match(await page.textContent('#ordersStatus'), /共 2 个分页、4 条/);
+    await page.fill('#ordersSearch', '药物乙');
+    await page.waitForFunction(() => /找到 1 条/.test(document.querySelector('#ordersStatus').textContent));
+    assert.equal(await page.textContent('.orders-table mark'), '药物乙');
     await page.fill('#ordersSearch', '');
-    await page.waitForFunction(() => /共 12 个分页/.test(document.querySelector('#ordersStatus').textContent));
+    await page.waitForFunction(() => /共 2 个分页/.test(document.querySelector('#ordersStatus').textContent));
+    assert.equal(await page.locator('.orders-action').count(), 0, 'no edit buttons outside edit mode');
+
+    await page.click('#ordersEditToggle');
+    assert.equal(await page.getAttribute('#ordersEditToggle', 'aria-pressed'), 'true');
+    await page.click('button[data-action="edit"][data-sheet="0"][data-row="0"]');
+    const fields = page.locator('#ordersEditFields textarea');
+    assert.equal(await fields.count(), 3);
+    await fields.nth(1).fill('合成药物甲 20mg');
+    await page.click('#ordersEditForm button[type=submit]');
+    await page.waitForFunction(() => /已保存修改/.test(document.querySelector('#ordersSaveStatus').textContent));
+    assert.equal(current[0].rows[0][1], '合成药物甲 20mg');
+    assert.ok(await page.locator('td', {hasText: '合成药物甲 20mg'}).count());
+
+    await page.click('button[data-action="insert"][data-sheet="0"][data-row="0"]');
+    await page.locator('#ordersEditFields textarea').nth(1).fill('新插入条目');
+    await page.click('#ordersEditForm button[type=submit]');
+    await page.waitForFunction(() => /已插入一行/.test(document.querySelector('#ordersSaveStatus').textContent));
+    assert.equal(current[0].rows[1][1], '新插入条目');
+
+    page.once('dialog', dialog => dialog.accept());
+    await page.click('button[data-action="delete"][data-sheet="0"][data-row="1"]');
+    await page.waitForFunction(() => /已删除一条/.test(document.querySelector('#ordersSaveStatus').textContent));
+    assert.equal(current[0].rows.length, 3);
+
+    await page.click('#ordersHistoryButton');
+    assert.equal(await page.locator('#ordersHistoryList li').count(), 3);
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('#ordersHistoryList button').last().click();
+    await page.waitForFunction(() => /已恢复备份/.test(document.querySelector('#ordersSaveStatus').textContent));
+    assert.deepEqual(current, SHEETS, 'restored to the first backup');
+
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no horizontal page scroll');
     assert.equal(await page.getAttribute('header nav a[aria-current="page"]', 'href'), '/duty');
     assert.deepEqual(errors, []);
