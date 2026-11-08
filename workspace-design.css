@@ -652,3 +652,24 @@
   body.disease-book-page #libraryShell .record-book-hero>strong{display:none}
   #libraryShell .library-brand-copy small{display:none}
 }
+
+/* 统一顶栏，2026-11-08：参考 GitHub、Stripe、Vercel 等站点的全局导航——
+   标志在左、栏目紧跟其后、搜索/登录等按钮靠右。各栏目（含病历模板）顶栏同高，
+   标志与栏目起点位置一致，换页时导航不再左右跳动。只改电脑宽度的屏幕显示。 */
+@media screen and (min-width:1101px){
+  .official-nav-inner,.tools-page .navin{justify-content:flex-start}
+  .official-nav .official-brand,.tools-page .nav .workspace-brand,#libraryShell .library-topbar .brandline{flex:0 0 208px;width:208px;min-width:0}
+  .official-nav-inner,.tools-page .navin{flex-wrap:nowrap;padding-top:0}
+  .official-nav .official-links,.tools-page .nav nav{margin-left:16px;align-self:stretch;height:auto;overflow:visible}
+  .official-nav .official-links a,.tools-page .nav nav a{min-height:0;height:100%;padding-top:3px}
+  .official-nav-right{margin-left:auto}
+  #libraryShell .library-topbar{height:72px;min-height:72px;justify-content:flex-start;column-gap:24px;
+    padding-left:max(24px,calc((100% - 1328px) / 2 + 24px),env(safe-area-inset-left,0px));
+    padding-right:max(24px,calc((100% - 1328px) / 2 + 24px),env(safe-area-inset-right,0px))}
+  #libraryShell .library-top-actions{margin-left:16px;gap:24px;align-self:stretch;align-items:stretch}
+  #libraryShell .library-top-actions .text-action{display:flex;align-items:center;padding:3px 1px 0;font-size:.9375rem;font-weight:600;white-space:nowrap}
+  #libraryShell .library-top-actions .text-action:hover{color:var(--ws-blue)}
+  #libraryShell .library-top-actions .library-active-link{color:var(--ws-blue)}
+  #libraryShell .library-top-actions .library-active-link:after{height:3px;border-radius:0;background:var(--ws-blue)}
+  #libraryShell .library-header-tools{margin-left:auto}
+}
