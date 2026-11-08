@@ -54,7 +54,7 @@ export function validateEcg(window){
   else{
     const seen=new Set();
     for(const item of classic.items){
-      if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.id)||seen.has(item.id))fail('classic ECG '+item.id+': id must be a unique lowercase slug');
+      if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.id)||seen.has(item.id)||item.id==='practice')fail('classic ECG '+item.id+': id must be a unique lowercase slug');
       seen.add(item.id);
       if(item.entry&&!ids.has(item.entry))fail('classic ECG '+item.id+': entry '+item.entry+' does not exist');
       if(!item.entry&&!item.link)fail('classic ECG '+item.id+': needs an atlas entry or a link');
