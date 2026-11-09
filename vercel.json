@@ -73,6 +73,14 @@
       "destination": "/duty.html"
     },
     {
+      "source": "/labs",
+      "destination": "/labs.html"
+    },
+    {
+      "source": "/labs/",
+      "destination": "/labs.html"
+    },
+    {
       "source": "/duty/orders",
       "destination": "/duty-orders.html"
     },

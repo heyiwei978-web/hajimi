@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f8fb">
+<title>检验解读 · 哈基米工作站</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231d67d8%22/%3E%3Cpath d=%22M10 8v16m12-16v16M10 16h12%22 stroke=%22white%22 stroke-width=%223.5%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/styles.css?v=20261030-ui1">
+<link rel="stylesheet" href="/ui-polish.css?v=20261011-jump1">
+<link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
+<link rel="stylesheet" href="/workspace-design.css?v=20261030-ui1">
+<link rel="stylesheet" href="/labs.css?v=20261108-labs1">
+<link rel="stylesheet" href="/design-system.css?v=20261108-ds1">
+</head>
+<body class="labs-page">
+<a class="skip-link" href="#labsMain">跳到主要内容</a>
+<header class="global-nav official-nav">
+  <div class="global-nav-inner official-nav-inner">
+    <a class="global-brand official-brand" href="/"><span class="official-brand-mark" aria-hidden="true">H</span><span class="official-brand-text"><strong>哈基米工作站</strong><small>hajimi Clinical Workspace</small></span></a>
+    <nav class="global-links official-links" aria-label="主导航"><a href="/">首页</a><a href="/bl">病历模板</a><a href="/classification">疾病分型</a><a href="/ecg">心电图</a><a class="active" href="/labs" aria-current="page">检验解读</a><a href="/pathway">临床路径</a><a href="/duty">值班资料</a><a href="/tools">临床工具</a><a href="/admin">管理入口</a></nav>
+  </div>
+</header>
+<main id="labsMain" class="labs-main">
+  <section class="labs-hero">
+    <div>
+      <p class="labs-kicker">LABORATORY INTERPRETATION</p>
+      <h1>检验解读</h1>
+      <p class="labs-lead">常见化验项目的参考范围、升高与降低的原因和临床要点，偏重骨科与围手术期。</p>
+    </div>
+    <dl class="labs-stats"><div><dt>项目</dt><dd id="labsCount">—</dd></div><div><dt>资料状态</dt><dd id="labsStatus">待审核</dd></div></dl>
+  </section>
+  <p class="labs-warning" role="note"><strong>草稿 · 待审核。</strong>参考范围随医院、检测方法和年龄性别而不同，判读一律以本院化验单上的参考范围和危急值规定为准；本页不替代医生的临床判断。</p>
+  <section class="labs-steps" aria-labelledby="labsStepsTitle"><h2 id="labsStepsTitle">读化验单的五个步骤</h2><ol id="labsSteps"></ol></section>
+  <div class="labs-search">
+    <label for="labsSearch">搜索化验项目</label>
+    <div class="labs-search-field"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="labsSearch" type="search" autocomplete="off" placeholder="例如：钾、肌酐、D-二聚体、PCT、关节液"></div>
+    <p id="labsResult" class="labs-result" role="status" aria-live="polite"></p>
+  </div>
+  <nav id="labsToc" class="labs-toc" aria-label="检验分类"></nav>
+  <div id="labsContent" class="labs-content"></div>
+  <section class="labs-refs" aria-labelledby="labsRefsTitle"><h2 id="labsRefsTitle">主要参考资料</h2><ol id="labsRefs"></ol></section>
+  <noscript><p class="labs-warning">本页需要启用 JavaScript 才能显示资料。</p></noscript>
+  <p class="site-disclaimer" role="note">本站为教学示例与临床参考资料，仅供参考，不替代医生的临床判断。</p>
+</main>
+<script defer src="/labs-data.js?v=20261108-labs1"></script>
+<script defer src="/labs.js?v=20261108-labs1"></script>
+<script defer src="/workspace.js?v=20261009-layout1"></script>
+</body>
+</html>

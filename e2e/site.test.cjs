@@ -1510,7 +1510,7 @@ test('record pages: phone header matches other sections with a scrolling navigat
       const active=page.locator('.library-top-actions .library-active-link');
       const box=await active.boundingBox();
       assert(box&&box.width>0&&box.x>=0&&box.x+box.width<=width,'the current section is shown in the navigation');
-      assert.equal(await page.locator('.library-top-actions a').count(),8);
+      assert.equal(await page.locator('.library-top-actions a').count(),9,'all main sections, including 检验解读');
       assert.equal(await page.locator('#patientBtn').isVisible(),true);
       assert.equal(await page.locator('#libraryShell [data-auth-slot] [data-cms-login]').isVisible(),true);
       if(width<=650){
@@ -2118,6 +2118,31 @@ test('order reference is locked without login; admins search, edit, insert, dele
 
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no horizontal page scroll');
     assert.equal(await page.getAttribute('header nav a[aria-current="page"]', 'href'), '/duty');
+    assert.deepEqual(errors, []);
+    await context.close();
+  }
+});
+
+test('lab interpretation lists every item, searches, opens deep links and fits phones and desktops', async () => {
+  for (const width of [390, 1280]) {
+    const {page, context, errors} = await pageFor(width);
+    await page.goto(base + '/labs', {waitUntil: 'networkidle'});
+    const total = await page.locator('.labs-item').count();
+    assert.ok(total >= 50);
+    assert.match(await page.textContent('#labsResult'), new RegExp('共 ' + total + ' 项'));
+    assert.equal(await page.getAttribute('header nav a[aria-current="page"]', 'href'), '/labs');
+    await page.fill('#labsSearch', 'Cr');
+    await page.waitForFunction(() => /找到 \d+ 项/.test(document.querySelector('#labsResult').textContent));
+    assert.equal(await page.locator('#lab-cr').isVisible(), true);
+    await page.fill('#labsSearch', '不存在的项目');
+    await page.waitForFunction(() => /没有找到/.test(document.querySelector('#labsResult').textContent));
+    await page.fill('#labsSearch', '');
+    await page.goto(base + '/labs#lab-k', {waitUntil: 'networkidle'});
+    assert.equal(await page.locator('#lab-k').evaluate(element => element.open), true);
+    assert.match(await page.locator('#lab-k').innerText(), /危急值参考/);
+    await page.locator('#lab-k a[data-lab="mg"]').click();
+    await page.waitForFunction(() => document.getElementById('lab-mg').open);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no horizontal page scroll');
     assert.deepEqual(errors, []);
     await context.close();
   }
