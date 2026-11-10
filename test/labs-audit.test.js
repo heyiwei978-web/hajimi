@@ -64,6 +64,10 @@ const STANDARD = [
   ['WS/T 404.1-2012', 'alt', '女', 7, 40],
   ['WS/T 404.1-2012', 'ast', '男', 15, 40],
   ['WS/T 404.1-2012', 'ast', '女', 13, 35],
+  ['WS/T 404.1-2012', 'alt', '男（试剂含磷酸吡哆醛）', 9, 60],
+  ['WS/T 404.1-2012', 'alt', '女（试剂含磷酸吡哆醛）', 7, 45],
+  ['WS/T 404.1-2012', 'ast', '男（试剂含磷酸吡哆醛）', 15, 45],
+  ['WS/T 404.1-2012', 'ast', '女（试剂含磷酸吡哆醛）', 13, 40],
   ['WS/T 404.1-2012', 'alp', '男', 45, 125],
   ['WS/T 404.1-2012', 'alp', '女（20–49 岁）', 35, 100],
   ['WS/T 404.1-2012', 'alp', '女（50–79 岁）', 50, 135],
@@ -88,9 +92,14 @@ const STANDARD = [
   ['WS/T 404.6-2015', 'ca', '总钙', 2.11, 2.52],
   ['WS/T 404.6-2015', 'p', '成人', 0.85, 1.51],
   ['WS/T 404.6-2015', 'mg', '成人', 0.75, 1.02],
+  ['WS/T 404.6-2015', 'iron', '血清铁（男）', 10.6, 36.7],
+  ['WS/T 404.6-2015', 'iron', '血清铁（女）', 7.8, 32.2],
   ['WS/T 404.7-2015', 'ck', 'CK 男', 50, 310],
   ['WS/T 404.7-2015', 'ck', 'CK 女', 40, 200],
   ['WS/T 404.9-2026', 'crp', '常规', -Infinity, 6.0],
+  ['WS/T 404.9-2026', 'alb', '前白蛋白（男）', 200, 430],
+  ['WS/T 404.9-2026', 'alb', '前白蛋白（女）', 180, 350],
+  ['WS/T 404.9-2026', 'iron', '转铁蛋白', 2.0, 3.6],
   ['WS/T 404.10-2022', 'thyroid', 'TSH', 0.60, 5.60]
 ];
 // 与标准不一致、待负责人决定的项目（item:行名）。
@@ -132,6 +141,8 @@ const CRITICAL = {
   hb: {'': ['成年男性', '成年女性']},
   plt: {'': ['成人']},
   pt: {INR: ['INR（未抗凝）', '华法林治疗目标']},
+  aptt: {'': ['成人']}, // 参考范围是文字（较对照延长），只检查格式
+  fib: {'': ['成人']},
   k: {'': ['成人']},
   na: {'': ['成人']},
   ca: {'': ['总钙']},
@@ -161,7 +172,7 @@ test('危急值都在参考范围之外，且每项都有说明「以本院为�
     assert.ok(bounds.length, id + ' 危急值无法解析：' + item.critical);
     for (const {key, side, values} of bounds) {
       assert.ok(map[key], id + ' 危急值分段「' + key + '」没有对应的参考范围');
-      const refs = map[key].map(label => parseRange(row(id, label)));
+      const refs = map[key].map(label => parseRange(row(id, label))).filter(Boolean);
       for (const value of values) {
         if (side === '<') assert.ok(refs.every(r => value < r.lo), id + ' 低危急值 ' + value + ' 落入参考范围');
         else assert.ok(refs.every(r => value > r.hi), id + ' 高危急值 ' + value + ' 落入参考范围');
@@ -177,7 +188,8 @@ test('危急值都在参考范围之外，且每项都有说明「以本院为�
 });
 
 // 只有低侧或高侧危急值的项目（待负责人决定是否补另一侧）。
-const KNOWN_ONE_SIDED_CRITICAL = new Set(['hb', 'lac', 'pt']);
+// 乳酸、INR、APTT 只有高侧、纤维蛋白原只有低侧有临床意义；血红蛋白 2026-11-10 已补高值。
+const KNOWN_ONE_SIDED_CRITICAL = new Set(['aptt', 'fib', 'lac', 'pt']);
 test('危急值单侧缺失的项目与审核清单一致', () => {
   const oneSided = Object.keys(CRITICAL).filter(id => {
     const sides = new Set(criticalBounds(byId.get(id).critical).map(b => b.side));
@@ -194,11 +206,11 @@ test('分级、分层的界值连续且不重叠', () => {
     // 「60–89」是整数闭区间，下一档从 90 开始；「<15」不含 15，紧接「15–29」。
     assert.equal(upper.lo === -Infinity ? upper.hi : upper.hi + 1, lower.lo, 'eGFR 分期不连续：' + JSON.stringify([lower, upper]));
   }
-  // PCT 界值递增：0.05 < 0.5 < 2 < 10；抗生素停药界值 0.5 与分层一致。
+  // PCT 分层首尾相接、不重叠：<0.05 / 0.05–<0.5 / 0.5–<2 / 2–<10 / ≥10；停药界值 0.5 与分层一致。
   const pct = byId.get('pct');
-  const cuts = pct.ranges.map(([label, value]) => parseRange(label) || parseRange(value));
-  const points = [cuts[0].hi, cuts[1].hi, cuts[2].lo, cuts[2].hi, cuts[3].lo, cuts[4].lo];
-  assert.deepEqual(points, [0.05, 0.5, 0.5, 2, 2, 10]);
+  const cuts = pct.ranges.map(([, value]) => parseRange(value));
+  for (let i = 1; i < cuts.length; i += 1) assert.equal(cuts[i].lo, cuts[i - 1].hi, 'PCT 分层不连续');
+  assert.deepEqual(cuts.map(c => c.lo).slice(1), [0.05, 0.5, 2, 10]);
   assert.match(pct.points.join(''), /<0\.5 ng\/mL/);
   // 关节液白细胞分层 200 / 2000 / 50000。
   const syn = byId.get('synovial').ranges.map(([, v]) => parseRange(v));
@@ -219,7 +231,8 @@ test('同一界值在不同条目、不同句子中写法一致', () => {
   const hb = byId.get('hb');
   // 输血指征：<70 考虑输血，>100 一般不输；两个界值都高于 Hb 危急值。
   assert.match(hb.points.join(''), /Hb >100 g\/L 不需输血，<70 g\/L 多需考虑输血，70–100 g\/L/);
-  for (const {values} of criticalBounds(hb.critical)) assert.ok(values.every(v => v < 70), 'Hb 危急值应低于输血界值 70');
+  for (const {side, values} of criticalBounds(hb.critical)) if (side === '<') assert.ok(values.every(v => v < 70), 'Hb 低危急值应低于输血界值 70');
+  assert.ok(70 < 80 && 80 < 100, '骨科/心血管界值 80 介于 70 与 100 之间');
   // 低血糖界值 3.9 与空腹下限一致；严重低血糖界值高于危急值下限。
   const glu = byId.get('glu');
   assert.equal(parseRange(row('glu', '空腹')).lo, 3.9);
@@ -345,6 +358,26 @@ test('2026-11-10 负责人确认的修订保持不变（低血糖分级、脓毒
   assert.match(byId.get('lac').points[0], /充分液体复苏后仍需血管活性药维持 MAP ≥65 mmHg，且乳酸 >2 mmol\/L/);
   assert.match(row('synovial', '化脓性关节炎（自体关节）'), /中性粒细胞多 >75%（常 >90%）/);
   for (const ref of ['WS/T 404.4-2018', 'WS/T 404.9-2026', 'WS/T 404.10-2022']) {
+    assert.ok(data.references.some(text => text.includes(ref)), '参考资料缺少 ' + ref);
+  }
+});
+
+test('2026-11-10 剩余清单条目的修订保持不变', () => {
+  assert.ok(items.every(item => typeof item.source === 'string' && item.source.trim()), '每项都写明来源');
+  const hb = byId.get('hb');
+  assert.match(hb.points.join(''), /WS\/T 623-2018/);
+  assert.match(hb.points.join(''), /Hb <80 g\/L 作为输血界值（AABB 2023/);
+  assert.match(byId.get('mcv').points.join(''), /MCV 80–82 fL/);
+  assert.match(byId.get('fib').points.join(''), /产后出血常以 <2\.0 g\/L/);
+  assert.match(byId.get('ua').points.join(''), />420 μmol\/L[\s\S]*<360 μmol\/L[\s\S]*<300 μmol\/L/);
+  assert.match(byId.get('abg').points.join(''), /危急值不等于补碱指征/);
+  assert.match(byId.get('crp').points.join(''), /急性感染 CRP 界值为 >100 mg\/L/);
+  assert.match(byId.get('ddimer').points.join(''), /D-二聚体 >860 ng\/mL/);
+  assert.match(byId.get('synovial').points.join(''), /≥6 分为感染/);
+  assert.match(byId.get('glu').points.join(''), /艾托格列净停药 4 天/);
+  assert.match(byId.get('hba1c').points.join(''), /HbA1c >8\.5%（69 mmol\/mol）[\s\S]*CPOC 2021/);
+  assert.match(byId.get('vitd').points.join(''), /2024 指南/);
+  for (const ref of ['WS/T 623-2018', 'AABB', 'CPOC', '高尿酸血症与痛风', 'Endocrine Society']) {
     assert.ok(data.references.some(text => text.includes(ref)), '参考资料缺少 ' + ref);
   }
 });
