@@ -74,7 +74,8 @@ const STANDARD = [
   ['WS/T 404.3-2012', 'k', '成人', 3.5, 5.3],
   ['WS/T 404.3-2012', 'na', '成人', 137, 147],
   ['WS/T 404.3-2012', 'cl', '成人', 99, 110],
-  ['WS/T 404.4-2018', 'tbil', '总胆红素', -Infinity, 26.0], // 男 ≤26.0，女 ≤21.0，男女合并 ≤23.0
+  ['WS/T 404.4-2018', 'tbil', '总胆红素（男）', -Infinity, 26.0],
+  ['WS/T 404.4-2018', 'tbil', '总胆红素（女）', -Infinity, 21.0],
   ['WS/T 404.4-2018', 'tbil', '直接胆红素', -Infinity, 8.0], // 罗氏 ≤8.0；贝克曼 ≤4.0
   ['WS/T 404.5-2015', 'cr', '男（20–59 岁）', 57, 97],
   ['WS/T 404.5-2015', 'cr', '男（60–79 岁）', 57, 111],
@@ -93,12 +94,8 @@ const STANDARD = [
   ['WS/T 404.10-2022', 'thyroid', 'TSH', 0.60, 5.60]
 ];
 // 与标准不一致、待负责人决定的项目（item:行名）。
-const KNOWN_STANDARD_DEVIATIONS = new Set([
-  'tbil:总胆红素', // 页面 3.4–17.1（《诊断学》），标准 男 ≤26.0 / 女 ≤21.0
-  'tbil:直接胆红素', // 页面 0–6.8，标准按系统 ≤8.0 或 ≤4.0
-  'crp:常规', // 页面 <10，WS/T 404.9-2026 为 ≤6.0 mg/L
-  'thyroid:TSH' // 页面约 0.3–4.5，WS/T 404.10-2022 按系统约 0.60–5.60
-]);
+// 2026-11-10 负责人确认后已按标准修订胆红素、CRP、TSH，目前没有已知差异。
+const KNOWN_STANDARD_DEVIATIONS = new Set([]);
 
 test('参考范围与 WS/T 405、WS/T 404 系列原文一致（已知差异除外）', () => {
   const deviations = new Set();
@@ -338,4 +335,16 @@ test('与内科医嘱参考（初始资料）：高钾处理界值落在检验�
 test('页面状态保持「待审核」', () => {
   assert.equal(data.reviewStatus, '待审核');
   assert.match(read('labs-data.js'), /草稿 · 待审核/);
+});
+
+test('2026-11-10 负责人确认的修订保持不变（低血糖分级、脓毒性休克、化脓性关节炎）', () => {
+  const glu = byId.get('glu').points[0];
+  assert.match(glu, /<3\.0 mmol\/L 为 2 级（临床显著）低血糖/);
+  assert.match(glu, /3 级（严重）低血糖，不以血糖数值界定/);
+  assert.doesNotMatch(glu, /<3\.0 mmol\/L 为严重低血糖/);
+  assert.match(byId.get('lac').points[0], /充分液体复苏后仍需血管活性药维持 MAP ≥65 mmHg，且乳酸 >2 mmol\/L/);
+  assert.match(row('synovial', '化脓性关节炎（自体关节）'), /中性粒细胞多 >75%（常 >90%）/);
+  for (const ref of ['WS/T 404.4-2018', 'WS/T 404.9-2026', 'WS/T 404.10-2022']) {
+    assert.ok(data.references.some(text => text.includes(ref)), '参考资料缺少 ' + ref);
+  }
 });
