@@ -24,6 +24,7 @@ test('lab interpretation data is complete, unique and cross-linked', () => {
     for (const key of ['ranges', 'high', 'low', 'points']) assert.ok(Array.isArray(item[key]) && item[key].length, item.id + ' ' + key);
     assert.ok(item.ranges.every(row => row.length === 2 && row.every(cell => typeof cell === 'string' && cell)), item.id + ' ranges');
     for (const id of item.related || []) assert.ok(ids.has(id), item.id + ' links to missing ' + id);
+    if (item.source !== undefined) assert.ok(typeof item.source === 'string' && item.source.trim(), item.id + ' source');
   }
 });
 
@@ -47,4 +48,5 @@ test('lab page is registered in the navigation, routes and public files', () => 
   for (const file of ['labs.html', 'labs.css', 'labs.js', 'labs-data.js']) assert.ok(PUBLIC_FILES.includes(file), file);
   assert.doesNotMatch(read('labs.html'), /<script>(?!<\/script>)|\son[a-z]+=/i);
   assert.doesNotMatch(read('labs.js'), /innerHTML|insertAdjacentHTML|eval\(|new Function/);
+  assert.match(read('labs.js'), /item\.source[\s\S]*labs-source/, 'per-item source line is rendered when present');
 });
