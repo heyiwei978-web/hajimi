@@ -2147,3 +2147,52 @@ test('lab interpretation lists every item, searches, opens deep links and fits p
     await context.close();
   }
 });
+
+test('lab calculators default to Chinese report units and give the same result after switching to US units', async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await page.goto(base+'/tools',{waitUntil:'networkidle'});
+    const run=async(tool,steps,expect)=>{
+      await page.locator('.card[data-tool="'+tool+'"]').click();
+      const dlg=page.locator('#dlg');await dlg.waitFor({state:'visible'});
+      for(const [kind,target,value] of steps){
+        if(kind==='sel')await dlg.locator('#'+target).selectOption(value);
+        else await dlg.locator('#'+target).fill(String(value));
+      }
+      await dlg.locator('#go').click();
+      const text=await dlg.locator('#res').innerText();
+      for(const pattern of expect)assert.match(text,pattern,tool+': '+text);
+      await dlg.locator('#close').click();
+    };
+    const base40=[['fill','age',40],['sel','sex','m'],['fill','w',70]];
+    // (140−40)×70 / (72×1.0 mg/dL) = 97.2；88.4 μmol/L = 1.0 mg/dL
+    await run('crcl',[...base40,['fill','cr',88.4]],[/97\.2 mL\/min/]);
+    await run('crcl',[...base40,['sel','sys','us'],['fill','cr',1]],[/97\.2 mL\/min/]);
+    // 2.00 mmol/L + 0.02×(40−30) = 2.20 mmol/L（≈ 8.82 mg/dL）
+    await run('corrca',[['fill','ca',2],['fill','alb',30]],[/2\.20 mmol\/L/,/8\.82 mg\/dL/]);
+    await run('corrca',[['sel','sys','us'],['fill','ca',8.016],['fill','alb',3]],[/8\.82 mg\/dL/,/2\.20 mmol\/L/]);
+    // 2×140 + 5 + 5 = 290
+    await run('osm',[['fill','na',140],['fill','glu',5],['fill','bun',5]],[/290\.0 mOsm/]);
+    await run('osm',[['sel','sys','us'],['fill','na',140],['fill','glu',90],['fill','bun',14]],[/290\.0 mOsm/]);
+    // 140 + 1.6×(360−100)/100 = 144.2；20 mmol/L = 360 mg/dL
+    await run('corrna',[['fill','na',140],['fill','glu',20]],[/144\.2 mmol\/L/]);
+    // 3.8 − 1.5×88.57/5/38.67 = 3.11 mmol/L
+    await run('ldl',[['fill','tc',5],['fill','hdl',1.2],['fill','tg',1.5]],[/3\.11 mmol\/L/]);
+    await run('ldl',[['fill','tc',5],['fill','hdl',1.2],['fill','tg',5]],[/不建议使用Friedewald/]);
+    await run('nonhdl',[['fill','tc',5],['fill','hdl',1.2]],[/3\.80 mmol\/L/]);
+    await run('tsat',[['fill','iron',15],['fill','tibc',60]],[/25\.0%/]);
+    // 12 + 2.5×(4 − 30/10) = 14.5
+    await run('corrag',[['fill','na',140],['fill','cl',104],['fill','hco3',24],['fill','alb',30]],[/14\.5 mEq\/L/]);
+    // Label follows the unit switch and a stale result is hidden.
+    await page.locator('.card[data-tool="crcl"]').click();
+    const dlg=page.locator('#dlg');
+    await dlg.locator('#age').fill('40');await dlg.locator('#w').fill('70');await dlg.locator('#cr').fill('88.4');await dlg.locator('#go').click();
+    assert.match(await dlg.locator('label:has(#cr)').innerText(),/μmol\/L/);
+    await dlg.locator('#sys').selectOption('us');
+    assert.match(await dlg.locator('label:has(#cr)').innerText(),/mg\/dL/);
+    assert.equal(await dlg.locator('#res').isHidden(),true,'switching units hides the old result');
+    await dlg.locator('#close').click();
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal page scroll');
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
