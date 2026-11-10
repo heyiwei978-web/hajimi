@@ -75,6 +75,11 @@
       }
       table.append(tbody);
       body.append(table);
+      if (item.source) {
+        const source = el('p', 'labs-source');
+        source.append(el('span', '', '来源：'), document.createTextNode(item.source));
+        body.append(source);
+      }
       if (item.critical) {
         const critical = el('p', 'labs-critical');
         critical.append(el('strong', '', '危急值参考：'), document.createTextNode(item.critical));

@@ -52,6 +52,8 @@
   .labs-ranges caption{text-align:left;font-size:.8125rem;font-weight:650;color:var(--ws-muted,#56687a);padding-bottom:6px}
   .labs-ranges th,.labs-ranges td{padding:8px 10px;border-bottom:1px solid #edf1f5;text-align:left;vertical-align:top}
   .labs-ranges th{width:38%;font-weight:600;color:var(--ws-text,#26384b);background:#f7f9fc}
+  .labs-source{margin:6px 0 0;font-size:.8125rem;line-height:1.6;color:var(--ws-muted,#56687a)}
+  .labs-source span{font-weight:650}
   .labs-critical{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:#fdecec;color:#8a1f1f;font-size:.9375rem;line-height:1.7}
   .labs-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
   .labs-block{min-width:0;padding:12px 14px;border-radius:12px;background:#f7f9fc}
