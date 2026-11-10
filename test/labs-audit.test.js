@@ -278,10 +278,14 @@ const toolForm = key => {
 
 test('与临床工具：公式、系数一致', () => {
   // 校正钙：页面 0.02 mmol/L per g/L；工具 0.8 mg/dL per g/dL。换算：0.8 / 4.008 / 10 ≈ 0.020。
-  assert.match(toolCalc('corrca'), /num\('#ca'\)\+\.8\*\(4-num\('#alb'\)\)/);
+  assert.match(toolCalc('corrca'), /num\('#ca'\)\*\(si\?4\.008:1\)\+\.8\*\(4-num\('#alb'\)\/\(si\?10:1\)\)/);
   assert.ok(Math.abs(0.8 / 4.008 / 10 - 0.02) < 0.0005);
   // 校正 AG：页面每 10 g/L 2.5；工具 2.5 ×（4 − g/dL）。
-  assert.match(toolCalc('corrag'), /ag\+2\.5\*\(4-num\('#alb'\)\)/);
+  assert.match(toolCalc('corrag'), /ag\+2\.5\*\(4-num\('#alb'\)\/\(isSI\(\)\?10:1\)\)/);
+  // 国内单位换算系数：肌酐 88.4、钙 4.008、血糖 18、尿素→BUN 2.8、胆固醇 38.67、甘油三酯 88.57。
+  for (const key of ['crcl', 'egfrcc']) assert.match(toolCalc(key), /num\('#cr'\)\/\(isSI\(\)\?88\.4:1\)/);
+  assert.match(toolCalc('corrna'), /num\('#glu'\)\*\(isSI\(\)\?18:1\)/);
+  assert.match(toolCalc('ldl'), /si\?88\.57:1[\s\S]*si\?38\.67:1/);
   // AG 公式与 Delta ratio 基线 12 在页面参考范围 8–16 内。
   assert.match(toolCalc('ag'), /num\('#na'\)-num\('#cl'\)-num\('#hco3'\)/);
   assert.match(byId.get('ag').points[0], /AG = Na⁺ −（Cl⁻ \+ HCO₃⁻）/);
@@ -297,12 +301,12 @@ test('与临床工具：公式、系数一致', () => {
   assert.match(toolCalc('anc'), /×10⁹\/L/);
 });
 
-// 页面用法定单位（mmol/L、g/L、μmol/L），以下链接到的工具要求输入美制单位，医生需先换算。
-const KNOWN_TOOL_UNIT_MISMATCH = new Set(['corrag', 'corrca', 'corrna', 'crcl', 'egfrcc', 'ldl', 'nonhdl', 'osm', 'osmgap', 'tsat']);
+// 页面用法定单位（mmol/L、g/L、μmol/L）。2026-11-10 起链接到的工具都可切换为国内单位，清单为空。
+const KNOWN_TOOL_UNIT_MISMATCH = new Set([]);
 test('与临床工具：输入单位与检验解读页面单位不一致的工具与审核清单一致', () => {
   const linked = new Set(items.flatMap(item => (item.tools || []).map(([key]) => key)));
-  // 提供 μmol/L / mmol/L 单位切换的工具（如 eGFR）不算。
-  const mismatch = [...linked].filter(key => /mg\/dL|g\/dL|μg\/dL/.test(toolForm(key)) && !/\['u','μmol\/L'\]/.test(toolForm(key)));
+  // 提供国内单位切换的工具（eGFR 的 ['u','μmol/L']，其余的 sys(…)）不算。
+  const mismatch = [...linked].filter(key => /mg\/dL|g\/dL|μg\/dL/.test(toolForm(key)) && !/\['u','μmol\/L'\]|\+sys\('/.test(toolForm(key)));
   assert.deepEqual(mismatch.sort(), [...KNOWN_TOOL_UNIT_MISMATCH].sort());
 });
 
