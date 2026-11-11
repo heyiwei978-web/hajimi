@@ -143,7 +143,7 @@
   .official-kicker,.duty-kicker,.class-page .class-shell .class-eyebrow,.tools-page .hero .eyebrow,.pathway-hero .pathway-kicker,#libraryShell .article-intro>.breadcrumb,.labs-kicker{
     display:inline-flex;align-items:center;gap:8px;width:fit-content;padding:5px 12px 5px 10px;
     border:1px solid var(--ds-blue-100);border-radius:999px;background:rgba(238,245,251,.85);
-    color:var(--ds-blue);font-size:.6875rem;line-height:1.4;letter-spacing:.12em;font-weight:700
+    color:var(--ds-blue);font-size:12px;line-height:1.4;letter-spacing:.12em;font-weight:700
   }
   .official-kicker::before,.duty-kicker::before,.class-page .class-shell .class-eyebrow::before,.tools-page .hero .eyebrow::before,.pathway-hero .pathway-kicker::before,#libraryShell .article-intro>.breadcrumb::before,.labs-kicker::before{
     content:"";width:6px;height:6px;border-radius:50%;background:#1f86c6;box-shadow:0 0 0 3px rgba(31,134,198,.18)

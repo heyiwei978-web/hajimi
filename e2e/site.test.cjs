@@ -2253,3 +2253,24 @@ test('site-wide search finds every section, filters by section and links to the 
     }finally{await context.close();}
   }
 });
+
+test('phone pages show no text smaller than 12px',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    for(const url of ['/','/search?q=TKA','/bl','/bl/guke','/bl/guke/TKA','/classification','/classification/guke','/classification/guke/femoral-neck',
+      '/ecg','/ecg/atlas/arrhythmias/atrial-fibrillation','/labs','/pathway','/pathway?p=tha','/duty','/tools','/tools?tool=caprini']){
+      await page.goto(base+url,{waitUntil:'networkidle'});
+      // Text hidden on purpose (font-size:0) and aria-hidden artwork are not reading text.
+      const small=await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(element=>{
+        if(element.closest('svg,[aria-hidden="true"]'))return false;
+        if(![...element.childNodes].some(node=>node.nodeType===3&&node.textContent.trim()))return false;
+        const box=element.getBoundingClientRect(),size=parseFloat(getComputedStyle(element).fontSize);
+        return box.width>0&&box.height>0&&size>0&&size<12;
+      }).map(element=>element.tagName.toLowerCase()+'.'+element.className+' '+getComputedStyle(element).fontSize+' “'+element.textContent.trim().slice(0,12)+'”'));
+      assert.deepEqual(small,[],url);
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth),true,url+' has no horizontal scroll');
+    }
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+

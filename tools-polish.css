@@ -6,7 +6,7 @@ button,input,select{font-family:var(--h-font)}:focus-visible{outline:3px solid r
 .navin{max-width:1360px;padding:0 28px}.brand{font-size:16px;font-weight:700;color:var(--h-ink)}
 .nav nav{gap:28px}.nav nav a{font-size:14px;font-weight:600;color:#46505d}.nav nav .active{color:var(--h-blue)}
 .main{max-width:1240px;padding:0 26px 72px}.hero{padding:58px 20px 42px}
-.eyebrow{font-size:11px;letter-spacing:.16em;color:#7c8794}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:#7c8794}
 .hero h1{font-size:48px;line-height:1.08;letter-spacing:-.035em;font-weight:700;color:var(--h-ink)}
 .hero>p:last-child{max-width:700px;margin-top:16px;font-size:16px;line-height:1.7;color:#66717e}
 .notice{border:1px solid var(--h-line);border-radius:12px;padding:15px 17px;margin-bottom:30px;box-shadow:none}.notice strong,.notice span{font-size:14px;line-height:1.75}
@@ -15,7 +15,7 @@ button,input,select{font-family:var(--h-font)}:focus-visible{outline:3px solid r
 .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .card{min-height:210px;padding:20px;border-radius:13px;border-color:#e1e5ea;box-shadow:none;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}
 .card:hover{transform:translateY(-1px);border-color:#cfd6df;box-shadow:0 6px 16px rgba(15,23,42,.05)}
-.icon{height:31px;min-width:34px;border-radius:8px;font-size:11px}.card h3{font-size:19px;line-height:1.35;letter-spacing:-.01em;margin:15px 0 6px}.card p{font-size:14px;line-height:1.75}
+.icon{height:31px;min-width:34px;border-radius:8px;font-size:12px}.card h3{font-size:19px;line-height:1.35;letter-spacing:-.01em;margin:15px 0 6px}.card p{font-size:14px;line-height:1.75}
 .bottom{padding-top:13px}.bottom button,.openext{font-size:14px;font-weight:600;color:var(--h-blue)}
 .sourcebox{border-radius:14px;padding:24px;background:#172033}
 dialog{border-radius:14px;box-shadow:0 20px 70px rgba(15,23,42,.18)}.dhead{padding:18px 20px 13px}.dhead h2{font-size:21px}.dhead button{border-radius:9px}.body{padding:18px 20px 22px}
