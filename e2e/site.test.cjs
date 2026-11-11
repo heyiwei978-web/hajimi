@@ -2296,3 +2296,29 @@ test('admin dashboard shows the login self-check; signed-out visitors never see 
   }
 });
 
+test('admin dashboard lists recent sign-ins and failed attempts as plain text',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      const failure=Array.from({length:8},(_,index)=>({at:new Date(Date.now()-index*60000).toISOString(),kind:index===0?'blocked':'failure',ip:'198.51.100.'+index,country:'US',region:'',city:'',agent:'curl/8.0'}));
+      await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin',security:[]}}));
+      await context.route('**/api/content-history**',route=>route.fulfill({json:{revision:'fixture-v1',updatedAt:null,history:[]}}));
+      await context.route('**/api/private-gallery',route=>route.fulfill({json:{items:[],revision:'missing'}}));
+      await context.route('**/api/login-log',route=>route.fulfill({json:{success:[{at:'2026-11-11T08:00:00.000Z',kind:'success',ip:'203.0.113.7',country:'CN',region:'SH',city:'上海<img src=x onerror=alert(1)>',
+        agent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'}],failure}}));
+      await page.goto(base+'/admin',{waitUntil:'networkidle'});
+      await page.locator('#loginLogSuccess li').first().waitFor({state:'visible'});
+      assert.match(await page.locator('#loginLogStatus').innerText(),/已记录 1 次成功登录；最近 24 小时有 8 次失败尝试/);
+      const first=await page.locator('#loginLogSuccess li').first().innerText();
+      assert.match(first,/登录成功/);assert.match(first,/203\.0\.113\.7/);assert.match(first,/iPhone · Safari/);
+      assert.equal(await page.locator('#loginLog img').count(),0,'log fields are rendered as text');
+      assert.equal(await page.locator('#loginLogFailure li').count(),5);
+      assert.match(await page.locator('#loginLogFailure li').first().innerText(),/失败并被暂时封锁[\s\S]*脚本程序/);
+      await page.getByRole('button',{name:'显示全部 8 次失败尝试'}).click();
+      assert.equal(await page.locator('#loginLogFailure li').count(),8);
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth),true);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+

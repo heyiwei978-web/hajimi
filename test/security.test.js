@@ -4,7 +4,9 @@ import test from 'node:test';
 import fs from 'node:fs';
 import {createSession,readSession,sha256,hashPassword,verifyPassword,securityChecks} from '../api/_auth.js';
 import {guardRequest} from '../api/_security.js';
-import login from '../api/login.js';
+import login,{createLoginHandler} from '../api/login.js';
+import {createLoginLog,describeRequest,LIMITS} from '../api/_login-log.js';
+import {createLoginLogHandler} from '../api/login-log.js';
 import logout from '../api/logout.js';
 import session from '../api/session.js';
 import content from '../api/content.js';
@@ -275,5 +277,84 @@ test('security response headers are present and not weakened', () => {
   }
   // Copying records to the clipboard is a core function and must stay allowed.
   assert.ok(![...denied].some(item => item.startsWith('clipboard')));
+});
+
+function memoryStorage() {
+  const files = new Map();
+  return {files,
+    async get(pathname) {
+      if (!files.has(pathname)) return null;
+      return {statusCode:200,stream:new Response(files.get(pathname)).body,blob:{etag:'"e"'}};
+    },
+    async put(pathname,body) { files.set(pathname,String(body)); return {pathname,etag:'"e"'}; }
+  };
+}
+
+test('login record keeps time, place and device, and never the credentials', async t => {
+  adminEnvironment(t);
+  const storage = memoryStorage(), log = createLoginLog(storage,{now:() => new Date('2026-11-11T08:00:00Z')});
+  const handler = createLoginHandler({log});
+  const from = {'x-forwarded-for':'203.0.113.7, 10.0.0.1','x-vercel-ip-country':'CN','x-vercel-ip-country-region':'SH',
+    'x-vercel-ip-city':'Shang%20Hai','user-agent':'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) Safari/604.1'};
+  const wrong = response();
+  await handler(request({headers:from,body:{username:'typed-secret-by-mistake',password:'wrong-password'}}),wrong);
+  assert.equal(wrong.code,401);
+  const ok = response();
+  await handler(request({headers:from,body:{username:'test-admin',password:'test-password'}}),ok);
+  assert.equal(ok.code,200);
+  const recorded = await log.read();
+  assert.deepEqual(recorded.success,[{at:'2026-11-11T08:00:00.000Z',kind:'success',ip:'203.0.113.7',country:'CN',region:'SH',city:'Shang Hai',agent:from['user-agent']}]);
+  assert.deepEqual(recorded.failure.map(item => item.kind),['failure']);
+  const stored = [...storage.files.values()].join('');
+  for (const secret of ['typed-secret-by-mistake','wrong-password','test-password','test-admin','hajimi_session']) {
+    assert.ok(!stored.includes(secret),secret+' is never written to the login record');
+  }
+  assert.deepEqual([...storage.files.keys()],['security/login-log.json']);
+});
+
+test('login record is bounded, sanitised and never blocks a login', async t => {
+  adminEnvironment(t);
+  const storage = memoryStorage(), log = createLoginLog(storage);
+  for (let index = 0; index < LIMITS.failure + 20; index++) await log.record('failure',request({headers:{'x-forwarded-for':'198.51.100.'+(index % 250)}}));
+  await log.record('success',request({headers:{'x-forwarded-for':'203.0.113.9'}}));
+  const recorded = await log.read();
+  assert.equal(recorded.failure.length,LIMITS.failure,'old failed attempts are dropped');
+  assert.equal(recorded.success.length,1,'failed attempts cannot push real sign-ins out');
+  assert.equal(await log.record('unknown-kind',request()),false);
+  const described = describeRequest(request({headers:{'x-forwarded-for':'1.2.3.4\r\nX: y','user-agent':'a'.repeat(500)+'\u0000','x-vercel-ip-city':'%E4%B8%8A%E6%B5%B7','x-vercel-ip-country':'%ZZ-bad'}}));
+  assert.doesNotMatch(JSON.stringify(described),/\\r|\\n|\\u0000/);
+  assert.equal(described.agent.length,200);
+  assert.equal(described.city,'上海');
+  // A broken store neither throws nor changes the login result.
+  const broken = createLoginLog({async get() { throw new Error('offline'); },async put() { throw new Error('offline'); }});
+  assert.equal(await broken.record('success',request()),false);
+  const res = response();
+  await createLoginHandler({log:broken})(request({body:{username:'test-admin',password:'test-password'}}),res);
+  assert.equal(res.code,200);
+  // A corrupted document reads as empty instead of failing the page.
+  storage.files.set('security/login-log.json','{not json');
+  assert.deepEqual(await log.read(),{success:[],failure:[]});
+});
+
+test('login record can only be read by a signed-in administrator', async t => {
+  const cookie = adminEnvironment(t);
+  const storage = memoryStorage(), log = createLoginLog(storage);
+  await log.record('success',request({headers:{'x-forwarded-for':'203.0.113.9'}}));
+  const handler = createLoginLogHandler(log);
+  const anonymous = response();
+  await handler(request({method:'GET',headers:{cookie:''}}),anonymous);
+  assert.equal(anonymous.code,401);
+  assert.equal(anonymous.body.success,undefined);
+  const write = response();
+  await handler(request({method:'POST',headers:{cookie}}),write);
+  assert.equal(write.code,405,'the record cannot be edited or cleared through the API');
+  const admin = response();
+  await handler(request({method:'GET',headers:{cookie}}),admin);
+  assert.equal(admin.code,200);
+  assert.equal(admin.body.success[0].ip,'203.0.113.9');
+  assert.equal(admin.headers['cache-control'],'private, no-store');
+  const failing = response();
+  await createLoginLogHandler({async read() { throw new Error('offline'); }})(request({method:'GET',headers:{cookie}}),failing);
+  assert.equal(failing.code,503);
 });
 
