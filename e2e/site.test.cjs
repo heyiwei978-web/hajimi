@@ -832,10 +832,13 @@ test('homepage search opens shareable clinical results and reset restores depart
       const requests=[];page.on('request',request=>requests.push(new URL(request.url()).pathname));
       await page.goto(base+'/',{waitUntil:'networkidle'});
       assert.equal(requests.filter(url=>/^\/(?:catalog-|records-|app-runtime-|department-runtime-)/.test(url)).length,0,'landing stays independent of clinical data');
-      const search=page.getByRole('searchbox',{name:'搜索病历模板',exact:true});
+      const search=page.getByRole('searchbox',{name:'搜索全站资料',exact:true});
       const bounds=await search.boundingBox();assert(bounds.y>0&&bounds.y+bounds.height<900,'homepage search is in the initial viewport');
       assert.equal(await page.locator('.home-quick-grid a').count(),4);
       await search.fill('肝脓肿');await page.locator('.home-search button').click();
+      // The homepage box searches every section; record-level search stays one link away.
+      await page.waitForURL(/\/search\?q=/);
+      await page.locator('.site-search-group a.site-search-more').click();
       await page.waitForURL(/\/bl\?q=/);await page.locator('.case-search-card').waitFor({state:'visible'});
       assert.equal(await page.locator('#searchInput').inputValue(),'肝脓肿');
       assert.equal(await page.locator('.case-search-card').count(),1);
@@ -2195,4 +2198,58 @@ test('lab calculators default to Chinese report units and give the same result a
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal page scroll');
     assert.deepEqual(errors,[]);
   }finally{await context.close();}
+});
+
+test('site-wide search finds every section, filters by section and links to the matching page',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      const requests=[];page.on('request',request=>requests.push(new URL(request.url()).pathname));
+      await page.goto(base+'/search',{waitUntil:'networkidle'});
+      assert.equal(requests.filter(url=>/^\/(?:catalog-|records-|app-runtime-|department-runtime-|assets\/ecg-)/.test(url)).length,0,'search loads no clinical bodies or section bundles');
+      assert(await page.locator('#siteSearchStart').isVisible());
+      const input=page.getByRole('searchbox',{name:'搜索全站资料',exact:true});
+      await input.fill('钾');
+      await page.locator('.site-search-group').first().waitFor({state:'visible'});
+      assert.match(await page.locator('#siteSearchStatus').innerText(),/找到 \d+ 条结果，分布在 2 个栏目/);
+      assert.deepEqual(await page.locator('.site-search-group h2').evaluateAll(items=>items.map(item=>item.firstChild.textContent)),['检验解读','心电图'],'exact title match ranks its section first');
+      assert(await page.locator('#siteSearchStart').isHidden());
+      assert.equal(new URL(page.url()).searchParams.get('q'),'钾','query is shareable');
+      assert.equal(await page.locator('.site-search-hit mark').first().innerText(),'钾');
+      await page.getByRole('button',{name:/^心电图/}).click();
+      assert.deepEqual(await page.locator('.site-search-group h2').evaluateAll(items=>items.map(item=>item.firstChild.textContent)),['心电图']);
+      assert.equal(await page.getByRole('button',{name:/^心电图/}).getAttribute('aria-pressed'),'true');
+
+      // Aliases and abbreviations reach the right entry; markup in a query stays text.
+      await input.fill('AF');
+      // Typing is debounced; wait for the new results rather than the previous ones.
+      await page.waitForFunction(()=>document.querySelector('.site-search-hit-title')?.textContent==='房颤');
+      await input.fill('<img src=x onerror=alert(1)>');
+      await page.locator('.site-search-empty').waitFor({state:'visible'});
+      assert.equal(await page.locator('#searchMain img').count(),0);
+      assert.match(await page.locator('#siteSearchStatus').innerText(),/没有找到/);
+
+      for(const [query,title,url,landing] of [
+        ['TKA','全膝关节置换',/\/bl\/guke\/TKA$/,'#caseWorkspace'],
+        ['股骨颈','股骨颈骨折',/\/classification\/guke\/femoral-neck$/,'.class-type'],
+        ['肌酐清除率','Cockcroft–Gault 肌酐清除率',/\/tools\?tool=crcl$/,'#dlg[open]'],
+        ['D-二聚体','D-二聚体',/\/labs#lab-ddimer$/,'#lab-ddimer[open]'],
+        ['全髋','全髋关节置换术',/\/pathway\?p=tha$/,'#dynamicPathway:not([hidden])'],
+        ['房颤','房颤',/\/ecg\/atlas\/arrhythmias\/atrial-fibrillation$/,'#ecgApp, main']
+      ]){
+        await page.goto(base+'/search?q='+encodeURIComponent(query),{waitUntil:'networkidle'});
+        assert.equal(await input.inputValue(),query,'query restored from the URL');
+        await page.locator('.site-search-hit',{has:page.locator('.site-search-hit-title',{hasText:new RegExp('^'+title.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$')})}).first().click();
+        await page.waitForURL(url);
+        await page.locator(landing).first().waitFor({state:'visible'});
+      }
+      await page.goto(base+'/search?q='+encodeURIComponent('手术记录'),{waitUntil:'networkidle'});
+      const shown=await page.locator('.site-search-hit').count();
+      await page.getByRole('button',{name:/^显示全部/}).click();
+      assert(await page.locator('.site-search-hit').count()>shown,'long groups expand in place');
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth),true,'no horizontal scroll');
+      assert(await page.locator('.site-search-hit, .site-search-filter, .site-search-more').evaluateAll(items=>items.every(item=>item.getBoundingClientRect().height>=44)),'touch targets are at least 44px tall');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
 });

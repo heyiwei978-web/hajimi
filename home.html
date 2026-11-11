@@ -31,7 +31,7 @@
       <a href="/tools">临床工具</a>
       <a href="/admin">管理入口</a>
     </nav>
-    <div class="official-nav-right"><a class="official-search" href="/bl" aria-label="搜索模板"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span>搜索资料</span></a>
+    <div class="official-nav-right"><a class="official-search" href="/search" aria-label="全站搜索"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span>搜索资料</span></a>
       <span class="official-auth" data-auth-slot></span></div>
   </div>
 </header>
@@ -46,11 +46,11 @@
       <p class="official-kicker">HAJIMI CLINICAL WORKSPACE</p>
       <h1>临床资料，<span>一个入口。</span></h1>
       <p class="official-lead">病历模板、疾病分型、心电图、临床路径、值班资料和常用临床工具统一整理，打开即用，持续更新。</p>
-      <form class="home-search" action="/bl" method="get" role="search">
-        <label for="homeSearch">搜索病历模板</label>
+      <form class="home-search" action="/search" method="get" role="search">
+        <label for="homeSearch">搜索全站资料</label>
         <div class="home-search-field">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg>
-          <input id="homeSearch" enterkeyhint="search" autocomplete="off" spellcheck="false" name="q" type="search" placeholder="疾病、术式或文书名称" required>
+          <input id="homeSearch" enterkeyhint="search" autocomplete="off" spellcheck="false" name="q" type="search" placeholder="疾病、化验、心电图、工具" required>
           <button type="submit">搜索 <span aria-hidden="true">→</span></button>
         </div>
       </form>

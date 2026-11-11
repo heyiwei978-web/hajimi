@@ -81,6 +81,14 @@
       "destination": "/labs.html"
     },
     {
+      "source": "/search",
+      "destination": "/search.html"
+    },
+    {
+      "source": "/search/",
+      "destination": "/search.html"
+    },
+    {
       "source": "/duty/orders",
       "destination": "/duty-orders.html"
     },

@@ -31,7 +31,9 @@ export const MODULES = Object.freeze([
   {id: 'pathway', label: '临床路径', href: '/pathway', nav: true, routes: ['/pathway', '/pathway/']},
   {id: 'duty', label: '值班资料', href: '/duty', nav: true, routes: ['/duty', '/duty/', '/duty/orders', '/duty/orders/']},
   {id: 'tools', label: '临床工具', href: '/tools', nav: true, routes: ['/tools', '/tools/']},
-  {id: 'admin', label: '管理入口', href: '/admin', nav: true, routes: ['/admin', '/admin/', '/admin/password']}
+  {id: 'admin', label: '管理入口', href: '/admin', nav: true, routes: ['/admin', '/admin/', '/admin/password']},
+  // Site-wide search is reached from the homepage search box, not the main navigation.
+  {id: 'search', label: '全站搜索', href: '/search', nav: false, routes: ['/search', '/search/']}
 ].map(Object.freeze));
 
 // Departments and which sections already have material for them.
@@ -86,6 +88,7 @@ export const NAV_SURFACES = Object.freeze([
   {file: 'duty.html', variant: 'official', active: 'duty'},
   {file: 'duty-orders.html', variant: 'official', active: 'duty'},
   {file: 'admin.html', variant: 'official', active: 'admin'},
+  {file: 'search.html', variant: 'official', active: null},
   {file: 'tools.html', variant: 'tools', active: 'tools'},
   {file: 'index.html', region: 'libraryShell', variant: 'library', active: 'records'}
 ].map(Object.freeze));
