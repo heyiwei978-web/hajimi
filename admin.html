@@ -130,6 +130,17 @@
       <div id="historyList" class="admin-history-list"></div>
     </section>
 
+    <section id="loginLog" class="admin-guide admin-security admin-login-log" aria-labelledby="loginLogTitle">
+      <div class="admin-card-head"><div><span>仅管理员可见</span><h2 id="loginLogTitle">登录记录</h2></div><button id="refreshLoginLog" class="admin-secondary" type="button">刷新</button></div>
+      <p id="loginLogStatus" role="status" aria-live="polite">正在加载登录记录…</p>
+      <h3 id="loginLogSuccessTitle" hidden>最近登录成功</h3>
+      <ul id="loginLogSuccess" class="admin-login-log-list" aria-labelledby="loginLogSuccessTitle"></ul>
+      <h3 id="loginLogFailureTitle" hidden>最近失败的登录尝试</h3>
+      <ul id="loginLogFailure" class="admin-login-log-list" aria-labelledby="loginLogFailureTitle"></ul>
+      <button id="loginLogMore" class="admin-secondary" type="button" hidden>显示全部失败尝试</button>
+      <p class="admin-security-note">记录登录的时间、大致地区、网络地址和设备，不记录密码和输入的用户名。保留最近 50 次成功登录和 100 次失败尝试。发现不是自己的登录，请立即更换密码和 HAJIMI_SESSION_SECRET 并重新部署。</p>
+    </section>
+
     <section id="securityCheck" class="admin-guide admin-security" aria-labelledby="securityCheckTitle" hidden>
       <div class="admin-card-head"><div><span>仅管理员可见</span><h2 id="securityCheckTitle">登录安全自检</h2></div></div>
       <p id="securityCheckSummary" role="status" aria-live="polite"></p>

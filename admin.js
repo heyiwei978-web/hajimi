@@ -67,8 +67,57 @@
     status.querySelector('strong').textContent=auth?'已登录 · '+(user||'admin'):'未登录管理后台';
     status.querySelector('small').textContent=auth?'可维护模板、案例和备份':'登录后显示管理工具';
     renderSecurity(null);
-    if(auth){loadDashboard();window.HAJIMI_PRIVATE_GALLERY.load();loadSecurity();}
+    renderLoginLog(null);
+    if(auth){loadDashboard();window.HAJIMI_PRIVATE_GALLERY.load();loadSecurity();loadLoginLog();}
   }
+  // Login record: who signed in from where, and recent failed attempts. Text only.
+  const LOGIN_PREVIEW=5;
+  let loginLogData=null,loginLogExpanded=false;
+  function deviceLabel(agent){
+    const text=String(agent||'');
+    if(!text)return '未知设备';
+    const system=/iPhone/.test(text)?'iPhone':/iPad/.test(text)?'iPad':/Android/.test(text)?'安卓':/Windows/.test(text)?'Windows 电脑':/Macintosh|Mac OS X/.test(text)?'Mac 电脑':/Linux/.test(text)?'Linux':'其他设备';
+    const browser=/MicroMessenger/.test(text)?'微信':/Edg\//.test(text)?'Edge':/Firefox\//.test(text)?'Firefox':/Chrome\/|CriOS\//.test(text)?'Chrome':/Safari\//.test(text)?'Safari':/curl|python|node|Go-http|wget/i.test(text)?'脚本程序':'其他浏览器';
+    return system+' · '+browser;
+  }
+  function loginRow(item){
+    const row=document.createElement('li'),mark=document.createElement('strong'),text=document.createElement('span'),detail=document.createElement('small');
+    const date=new Date(item.at),place=[item.country,item.region,item.city].filter(Boolean).join(' ');
+    row.className=item.kind==='success'?'is-ok':'is-warning';
+    mark.textContent=item.kind==='success'?'登录成功':item.kind==='blocked'?'失败并被暂时封锁':'登录失败';
+    text.textContent=Number.isNaN(date.getTime())?String(item.at):date.toLocaleString('zh-CN',{hour12:false});
+    detail.textContent=[place||'地区未知',item.ip||'地址未知',deviceLabel(item.agent)].join(' · ');
+    text.append(document.createElement('br'),detail);row.append(mark,text);
+    return row;
+  }
+  function renderLoginLog(data){
+    loginLogData=data;
+    const status=document.getElementById('loginLogStatus'),more=document.getElementById('loginLogMore');
+    const lists={success:document.getElementById('loginLogSuccess'),failure:document.getElementById('loginLogFailure')};
+    for(const key of ['success','failure']){lists[key].replaceChildren();document.getElementById(key==='success'?'loginLogSuccessTitle':'loginLogFailureTitle').hidden=true;}
+    more.hidden=true;
+    if(!data){status.textContent='正在加载登录记录…';return;}
+    const success=Array.isArray(data.success)?data.success:[],failure=Array.isArray(data.failure)?data.failure:[];
+    const dayAgo=Date.now()-86400000,recent=failure.filter(item=>new Date(item.at).getTime()>=dayAgo).length;
+    status.textContent=!success.length&&!failure.length?'暂无登录记录；从这次更新之后的登录才会被记录。'
+      :'已记录 '+success.length+' 次成功登录；最近 24 小时有 '+recent+' 次失败尝试。';
+    if(success.length){document.getElementById('loginLogSuccessTitle').hidden=false;lists.success.append(...success.slice(0,LOGIN_PREVIEW*2).map(loginRow));}
+    if(failure.length){
+      document.getElementById('loginLogFailureTitle').hidden=false;
+      lists.failure.append(...(loginLogExpanded?failure:failure.slice(0,LOGIN_PREVIEW)).map(loginRow));
+      more.hidden=loginLogExpanded||failure.length<=LOGIN_PREVIEW;
+      more.textContent='显示全部 '+failure.length+' 次失败尝试';
+    }
+  }
+  async function loadLoginLog(){
+    const generation=epoch,button=document.getElementById('refreshLoginLog');
+    loginLogExpanded=false;renderLoginLog(null);button.disabled=true;
+    try{const data=await json('/api/login-log',{cache:'no-store'});if(generation===epoch)renderLoginLog(data);}
+    catch(ex){if(generation===epoch)document.getElementById('loginLogStatus').textContent=ex.message||'登录记录暂时无法读取。';}
+    finally{button.disabled=false;}
+  }
+  document.getElementById('refreshLoginLog').onclick=loadLoginLog;
+  document.getElementById('loginLogMore').onclick=()=>{loginLogExpanded=true;renderLoginLog(loginLogData);};
   // Login self-check: the server reports how the login is configured (never any value).
   function renderSecurity(checks){
     const panel=document.getElementById('securityCheck'),list=document.getElementById('securityCheckList');
