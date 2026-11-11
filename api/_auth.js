@@ -74,3 +74,32 @@ export function verifyPassword(password, env = process.env) {
   return safeEqHex(sha256(password), env.HAJIMI_ADMIN_PASSWORD_SHA256 || '');
 }
 export const requirePostHeader = req => req.headers['x-hajimi-admin'] === '1';
+
+// Self-check shown to the signed-in administrator only (api/session.js). It reports how the
+// login is configured — which kind of password hash, whether the signing secret is long
+// enough — and never returns any configured value.
+export function securityChecks(env = process.env) {
+  const text = name => typeof env[name] === 'string' ? env[name].trim() : '';
+  const hash = text('HAJIMI_ADMIN_PASSWORD_HASH'), legacy = text('HAJIMI_ADMIN_PASSWORD_SHA256');
+  const checks = [];
+  if (/^scrypt\$/.test(hash) || /^pbkdf2\$/.test(hash)) {
+    checks.push({id: 'password-hash', ok: true, message: '管理员密码使用加盐哈希保存。'});
+    if (legacy) checks.push({id: 'legacy-hash-left', ok: false,
+      message: '旧的 HAJIMI_ADMIN_PASSWORD_SHA256 仍保留在 Vercel 环境变量中。它已不再用于登录，但一旦泄露容易被破解，建议删除后重新部署。'});
+  } else if (hash) {
+    checks.push({id: 'password-hash', ok: false, message: 'HAJIMI_ADMIN_PASSWORD_HASH 的格式无法识别，请在 /admin/password 页面重新生成。'});
+  } else {
+    checks.push({id: 'password-hash', ok: false,
+      message: '管理员密码仍使用无盐 SHA-256（HAJIMI_ADMIN_PASSWORD_SHA256），泄露后容易被离线破解。请在 /admin/password 页面生成新的校验码，填入 HAJIMI_ADMIN_PASSWORD_HASH 后重新部署，再删除旧变量。'});
+  }
+  const secret = text('HAJIMI_SESSION_SECRET');
+  checks.push(secret.length >= 32
+    ? {id: 'session-secret', ok: true, message: '会话签名密钥长度符合要求（不少于 32 个字符）。'}
+    : {id: 'session-secret', ok: false, message: '会话签名密钥 HAJIMI_SESSION_SECRET 少于 32 个字符，建议换成更长的随机值后重新部署（所有已登录的会话会失效，需要重新登录）。'});
+  const user = text('HAJIMI_ADMIN_USER');
+  checks.push(user && user.toLowerCase() !== 'admin'
+    ? {id: 'admin-user', ok: true, message: '管理员用户名不是默认的 admin。'}
+    : {id: 'admin-user', ok: false, message: '管理员用户名是默认的 admin，容易被猜到；建议在 HAJIMI_ADMIN_USER 中改用其他名称。'});
+  return checks;
+}
+

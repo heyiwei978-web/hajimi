@@ -66,7 +66,26 @@
     loginPanel.hidden=auth;dashboard.hidden=!auth;status.classList.toggle('online',auth);
     status.querySelector('strong').textContent=auth?'已登录 · '+(user||'admin'):'未登录管理后台';
     status.querySelector('small').textContent=auth?'可维护模板、案例和备份':'登录后显示管理工具';
-    if(auth){loadDashboard();window.HAJIMI_PRIVATE_GALLERY.load();}
+    renderSecurity(null);
+    if(auth){loadDashboard();window.HAJIMI_PRIVATE_GALLERY.load();loadSecurity();}
+  }
+  // Login self-check: the server reports how the login is configured (never any value).
+  function renderSecurity(checks){
+    const panel=document.getElementById('securityCheck'),list=document.getElementById('securityCheckList');
+    list.replaceChildren();panel.hidden=!Array.isArray(checks)||!checks.length;
+    if(panel.hidden)return;
+    const warnings=checks.filter(item=>!item.ok).length;
+    document.getElementById('securityCheckSummary').textContent=warnings?'有 '+warnings+' 项建议处理。':'登录配置检查全部通过。';
+    for(const item of checks){
+      const row=document.createElement('li'),mark=document.createElement('strong'),text=document.createElement('span');
+      row.className=item.ok?'is-ok':'is-warning';mark.textContent=item.ok?'通过':'建议处理';text.textContent=String(item.message||'');
+      row.append(mark,text);list.append(row);
+    }
+  }
+  async function loadSecurity(){
+    const generation=epoch;
+    try{const session=await json('/api/session',{cache:'no-store'});if(generation===epoch&&session.authenticated)renderSecurity(session.security);}
+    catch{/* The self-check is advisory; the dashboard works without it. */}
   }
   // /admin?next=/duty/orders：登录成功后回到原页面；只接受本站以 / 开头的路径。
   function returnAfterLogin(){
