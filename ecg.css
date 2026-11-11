@@ -14,7 +14,7 @@ body.ecg-page{
 .ecg-page .class-hero-stats div{min-width:104px;min-height:76px;padding:12px}
 .ecg-page .class-hero-stats strong{font-size:24px}
 .ecg-page .class-hero-stats span{font-size:14px;color:#e0ebf3}
-.ecg-page .class-eyebrow{font-size:11px;line-height:1.8;overflow-wrap:anywhere}
+.ecg-page .class-eyebrow{font-size:12px;line-height:1.8;overflow-wrap:anywhere}
 .ecg-page .class-breadcrumb{font-size:14px;line-height:1.8}
 .ecg-page .class-notice{font-size:16px;flex-wrap:wrap;margin-bottom:24px;color:var(--ws-muted);gap:4px 14px}
 .ecg-page .class-notice strong{color:var(--ws-ink)}

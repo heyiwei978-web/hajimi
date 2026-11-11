@@ -15,7 +15,7 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .official-nav-inner{max-width:1360px;padding:0 28px}
 .official-brand-mark,.library-brand-mark{width:32px;height:32px;border-radius:9px;box-shadow:none;background:linear-gradient(145deg,#1769d7,#1f7be8)}
 .official-brand-text strong{font-size:16px;font-weight:700;letter-spacing:-.01em}
-.official-brand-text small{font-size:11px;color:#697586}
+.official-brand-text small{font-size:12px;color:#697586}
 .official-links{gap:28px}
 .official-links a,.library-top-actions .text-action{font-size:14px;font-weight:600;white-space:nowrap}
 .official-search{background:#f4f6f8;color:#75808d}
@@ -26,7 +26,7 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 /* homepage */
 .official-home{font-family:var(--h-font);background:var(--h-bg);color:var(--h-ink)}
 .official-hero{min-height:430px;grid-template-columns:minmax(0,1.08fr) minmax(390px,.78fr);gap:26px;padding:56px max(5vw,52px) 64px;background:linear-gradient(90deg,#fff 0%,#f8fbff 55%,#eef5fd 100%)}
-.official-kicker{margin-bottom:16px;font-size:11px;font-weight:700;letter-spacing:.18em}
+.official-kicker{margin-bottom:16px;font-size:12px;font-weight:700;letter-spacing:.18em}
 .official-hero h1{font-size:clamp(48px,4.5vw,70px);line-height:1.08;letter-spacing:-.045em;font-weight:700}
 .official-lead{max-width:680px;margin-top:22px;font-size:18px;line-height:1.68;color:#556170}
 .official-hero-actions{margin-top:26px}
@@ -50,8 +50,8 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 #libraryShell{background:var(--h-bg)}
 #libraryShell .page{background:var(--h-bg)}
 #libraryShell .sidebar{top:62px;height:calc(100vh - 62px);background:#fbfcfd;border-right:1px solid #e4e8ed;padding:22px 12px}
-#libraryShell .side-head{font-size:10px;font-weight:700;letter-spacing:.08em}
-#libraryShell .nav-label{padding-top:17px;font-size:10px}
+#libraryShell .side-head{font-size:12px;font-weight:700;letter-spacing:.08em}
+#libraryShell .nav-label{padding-top:17px;font-size:12px}
 #libraryShell .nav-item{padding:8px 10px;border-radius:8px;font-size:12.5px;line-height:1.35}
 #libraryShell .nav-item:hover,#libraryShell .nav-item.active{background:#eaf2fc;color:#175eaf}
 #libraryShell .content{color:var(--h-text)}
@@ -98,12 +98,12 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .record-book-toc nav{gap:2px;margin-top:8px}
 .record-book-toc a{grid-template-columns:25px minmax(0,1fr) auto;padding:8px 7px;border-radius:7px}
 .record-book-toc a>b{font-size:13px;font-weight:600}
-.record-book-toc a>span{font-size:11px}
+.record-book-toc a>span{font-size:12px}
 .record-book-section{border-radius:12px;margin-bottom:14px;border-color:#dfe4e9;box-shadow:none}
 .record-book-section-head{grid-template-columns:42px minmax(0,1fr) auto;gap:12px;padding:16px 18px;background:#fbfcfd;border-bottom-color:#e7eaee}
-.record-chapter-no{width:38px;height:38px;border-radius:9px;background:#1c293b;font-size:10px}
+.record-chapter-no{width:38px;height:38px;border-radius:9px;background:#1c293b;font-size:12px}
 .record-chapter-title h3{font-size:18px;font-weight:700;letter-spacing:-.01em}
-.record-chapter-title>span{font-size:11px}
+.record-chapter-title>span{font-size:12px}
 .record-book-body{padding:24px 30px 28px;font-family:var(--h-serif);font-size:16px;line-height:1.9;letter-spacing:.008em;color:#242b33;font-weight:400}
 .record-back-toc{margin:0 30px 18px auto}
 .record-book-reserved{background:#fbfcfd}
@@ -148,7 +148,7 @@ body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
   #libraryShell .content,.disease-book-page .content{width:calc(100% - 20px);padding-top:18px}
   .ortho-hero{padding:20px;border-radius:14px}.ortho-hero h2{font-size:27px}.ortho-stats{grid-template-columns:repeat(2,1fr)}
   .ortho-jump{grid-template-columns:repeat(2,1fr)}
-  .ortho-category{padding:14px;border-radius:13px}.ortho-category-head{gap:10px}.ortho-category-head h3{font-size:19px}.ortho-category-head>strong{font-size:9px}
+  .ortho-category{padding:14px;border-radius:13px}.ortho-category-head{gap:10px}.ortho-category-head h3{font-size:19px}.ortho-category-head>strong{font-size:12px}
   .ortho-disease-grid{grid-template-columns:minmax(0,1fr)}.ortho-disease-card{min-height:138px;padding:13px}
   .record-book-toc{padding:12px;border-radius:11px}.record-book-toc nav{grid-template-columns:1fr}
   .record-book-section{border-radius:9px}.record-book-section-head{grid-template-columns:36px minmax(0,1fr);padding:13px 12px;gap:9px}
@@ -183,12 +183,12 @@ body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
   width:58px;height:58px;display:grid;place-items:center;border-radius:14px;
   background:#173a61;color:#fff;font-size:15px;font-weight:800;letter-spacing:.08em
 }
-.pathway-home-copy>span{font-size:9px;font-weight:700;letter-spacing:.13em;color:#7190b1}
+.pathway-home-copy>span{font-size:12px;font-weight:700;letter-spacing:.13em;color:#7190b1}
 .pathway-home-copy h2{margin:5px 0 4px;font-size:22px;letter-spacing:-.02em}
 .pathway-home-copy p{margin:0;max-width:800px;color:#627183;font-size:14px;line-height:1.65}
 .pathway-home-meta{display:flex;gap:18px;align-items:center}
 .pathway-home-meta strong{font-size:28px;color:#173a61}
-.pathway-home-meta strong small{display:block;margin-top:3px;font-size:9px;color:#7b8794;font-weight:600}
+.pathway-home-meta strong small{display:block;margin-top:3px;font-size:12px;color:#7b8794;font-weight:600}
 .pathway-home-meta b{padding:12px 16px;border-radius:9px;background:#173a61;color:#fff;font-size:14px}
 @media(max-width:760px){
   .pathway-home-banner{margin:12px 13px 0;grid-template-columns:48px 1fr;padding:18px;gap:13px}
