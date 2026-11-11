@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import test from 'node:test';
-import {createSession,readSession,sha256,hashPassword,verifyPassword} from '../api/_auth.js';
+import fs from 'node:fs';
+import {createSession,readSession,sha256,hashPassword,verifyPassword,securityChecks} from '../api/_auth.js';
 import {guardRequest} from '../api/_security.js';
 import login from '../api/login.js';
 import logout from '../api/logout.js';
@@ -206,3 +207,73 @@ test('browser-generated PBKDF2 hash (password-hash.js) is accepted by the login 
   const weak = hash.replace('pbkdf2$600000$','pbkdf2$100000$');
   assert.equal(verifyPassword('a long admin password',{HAJIMI_ADMIN_PASSWORD_HASH:weak}),false,'too few iterations are refused');
 });
+
+test('a sibling subdomain (Sec-Fetch-Site: same-site) cannot perform admin writes', async t => {
+  const cookie = adminEnvironment(t);
+  for (const site of ['same-site','cross-site','unexpected-value']) {
+    const res = response();
+    await content(request({method:'PUT',headers:{cookie,'sec-fetch-site':site},body:{revision:'x',templateOverrides:{},cases:[]}}),res);
+    assert.equal(res.code,403,site);
+  }
+  for (const site of ['same-origin','none']) {
+    const res = response();
+    assert.equal(guardRequest(request({method:'PUT',headers:{cookie,'sec-fetch-site':site,origin:'https://wdyxzl.icu'}}),res,{methods:['PUT'],admin:true}),true,site);
+  }
+});
+
+test('login self-check is shown to the administrator only and never contains configured values', async t => {
+  const cookie = adminEnvironment(t);
+  const anonymous = response();
+  await session(request({method:'GET',headers:{cookie:''}}),anonymous);
+  assert.deepEqual(anonymous.body,{authenticated:false,user:null},'anonymous visitors learn nothing about the configuration');
+  const forged = response();
+  await session(request({method:'GET',headers:{cookie:cookie.slice(0,-2)+'xx'}}),forged);
+  assert.equal(forged.body.security,undefined);
+  const admin = response();
+  await session(request({method:'GET',headers:{cookie}}),admin);
+  assert.equal(admin.body.authenticated,true);
+  assert.deepEqual(admin.body.security.map(item => [item.id,item.ok]),[['password-hash',false],['session-secret',true],['admin-user',true]]);
+  const serialized = JSON.stringify(admin.body);
+  for (const name of ['HAJIMI_ADMIN_PASSWORD_SHA256','HAJIMI_SESSION_SECRET']) {
+    assert.ok(!serialized.includes(process.env[name]),name+' value is never returned');
+  }
+});
+
+test('login self-check recognises each configuration', () => {
+  const status = env => Object.fromEntries(securityChecks(env).map(item => [item.id,item.ok]));
+  const strong = 's'.repeat(32);
+  assert.deepEqual(status({HAJIMI_ADMIN_PASSWORD_HASH:hashPassword('a-long-password'),HAJIMI_SESSION_SECRET:strong,HAJIMI_ADMIN_USER:'doctor'}),
+    {'password-hash':true,'session-secret':true,'admin-user':true});
+  assert.deepEqual(status({HAJIMI_ADMIN_PASSWORD_HASH:'pbkdf2$600000$'+'a'.repeat(22)+'$'+'b'.repeat(43),HAJIMI_ADMIN_PASSWORD_SHA256:sha256('x'),HAJIMI_SESSION_SECRET:strong,HAJIMI_ADMIN_USER:'doctor'}),
+    {'password-hash':true,'legacy-hash-left':false,'session-secret':true,'admin-user':true});
+  assert.deepEqual(status({HAJIMI_ADMIN_PASSWORD_HASH:'plain-text',HAJIMI_SESSION_SECRET:'short',HAJIMI_ADMIN_USER:'Admin'}),
+    {'password-hash':false,'session-secret':false,'admin-user':false});
+  assert.deepEqual(status({}),{'password-hash':false,'session-secret':false,'admin-user':false});
+  for (const item of securityChecks({})) assert.ok(typeof item.message === 'string' && item.message.length > 0);
+});
+
+test('security response headers are present and not weakened', () => {
+  const config = JSON.parse(fs.readFileSync(new URL('../vercel.json',import.meta.url),'utf8'));
+  const headers = Object.fromEntries(config.headers.find(rule => rule.source === '/(.*)').headers.map(item => [item.key,item.value]));
+  const csp = Object.fromEntries(headers['Content-Security-Policy'].split(';').map(part => part.trim().split(/\s+/)).map(([name,...values]) => [name,values.join(' ')]));
+  assert.deepEqual(csp,{
+    'default-src':"'self'",'script-src':"'self'",'style-src':"'self' 'unsafe-inline'",'img-src':"'self' data: blob:",'font-src':"'self'",
+    'connect-src':"'self'",'frame-src':"'none'",'object-src':"'none'",'base-uri':"'self'",'form-action':"'self'",'frame-ancestors':"'none'"
+  });
+  assert.equal(headers['X-Content-Type-Options'],'nosniff');
+  assert.equal(headers['X-Frame-Options'],'DENY');
+  assert.equal(headers['Referrer-Policy'],'strict-origin-when-cross-origin');
+  assert.match(headers['Strict-Transport-Security'],/^max-age=(\d+); includeSubDomains$/);
+  assert.ok(Number(/max-age=(\d+)/.exec(headers['Strict-Transport-Security'])[1]) >= 31536000);
+  assert.equal(headers['Cross-Origin-Opener-Policy'],'same-origin');
+  assert.equal(headers['Cross-Origin-Resource-Policy'],'same-origin');
+  assert.equal(headers['X-Permitted-Cross-Domain-Policies'],'none');
+  assert.match(headers['X-Robots-Tag'],/noindex/);
+  const denied = new Set(headers['Permissions-Policy'].split(',').map(part => part.trim()));
+  for (const feature of ['camera','microphone','geolocation','payment','usb','serial','hid','midi','display-capture']) {
+    assert.ok(denied.has(feature+'=()'),feature+' is disabled');
+  }
+  // Copying records to the clipboard is a core function and must stay allowed.
+  assert.ok(![...denied].some(item => item.startsWith('clipboard')));
+});
+

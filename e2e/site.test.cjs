@@ -2274,3 +2274,25 @@ test('phone pages show no text smaller than 12px',async()=>{
   }finally{await context.close();}
 });
 
+test('admin dashboard shows the login self-check; signed-out visitors never see it',async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/admin',{waitUntil:'networkidle'});
+      assert(await page.locator('#securityCheck').isHidden(),'hidden while signed out');
+      await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin',security:[
+        {id:'password-hash',ok:false,message:'管理员密码仍使用无盐 SHA-256<img src=x onerror=alert(1)>'},
+        {id:'session-secret',ok:true,message:'会话签名密钥长度符合要求。'}]}}));
+      await context.route('**/api/content-history**',route=>route.fulfill({json:{revision:'fixture-v1',updatedAt:null,history:[]}}));
+      await context.route('**/api/private-gallery',route=>route.fulfill({json:{items:[],revision:'missing'}}));
+      await page.reload({waitUntil:'networkidle'});
+      await page.locator('#securityCheck').waitFor({state:'visible'});
+      assert.equal(await page.locator('#securityCheckSummary').innerText(),'有 1 项建议处理。');
+      assert.deepEqual(await page.locator('#securityCheckList li strong').allInnerTexts(),['建议处理','通过']);
+      assert.equal(await page.locator('#securityCheckList img').count(),0,'messages are rendered as text');
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth),true);
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+

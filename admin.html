@@ -130,6 +130,13 @@
       <div id="historyList" class="admin-history-list"></div>
     </section>
 
+    <section id="securityCheck" class="admin-guide admin-security" aria-labelledby="securityCheckTitle" hidden>
+      <div class="admin-card-head"><div><span>仅管理员可见</span><h2 id="securityCheckTitle">登录安全自检</h2></div></div>
+      <p id="securityCheckSummary" role="status" aria-live="polite"></p>
+      <ul id="securityCheckList" class="admin-security-list"></ul>
+      <p class="admin-security-note">这里只检查登录配置的方式，不显示密码、密钥等任何配置值。修改在 Vercel 项目的 Environment Variables 中完成。</p>
+    </section>
+
     <section class="admin-guide">
       <div class="admin-card-head"><div><span>固定维护流程</span><h2>以后都从这一套站点修改</h2></div><button id="adminLogout" type="button" class="admin-secondary">退出登录</button></div>
       <ol>

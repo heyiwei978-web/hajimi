@@ -8,6 +8,10 @@
 - 登录 JSON 上限 4 KiB、内容 JSON 上限 1,500,000 字节、上传请求上限 4,400,000 字节（包含 base64 开销）。图片只接受 JPG、PNG、WebP，并检查文件签名。
 - 未配置 `HAJIMI_SESSION_SECRET` 时拒绝验证或签发会话；过期、篡改、格式错误的会话无效。审计 API 也要求管理员身份，避免匿名请求触发大批模板执行。
 - `Content-Security-Policy` 只允许本站脚本及连接；保留页面需要的内联样式和本地图片预览。禁止 iframe 嵌入、对象插件及跨站表单提交。
+- 写操作的来源校验：浏览器带有 Fetch Metadata 时，只接受 `Sec-Fetch-Site: same-origin`（或用户直接发起的 `none`）；同站的其他子域名（`same-site`）与跨站一样拒绝。
+- `Content-Security-Policy` 另设 `frame-src 'none'`：页面里不允许嵌入任何 iframe。`Permissions-Policy` 关闭本站不使用的浏览器能力（摄像头、麦克风、定位、支付、USB、串口、HID、MIDI、屏幕捕获、传感器等）；复制到剪贴板不受影响。响应头的完整取值由 `test/security.test.js` 固定，放宽任何一项都会让测试失败。
+- 登录安全自检：管理员登录后，`/admin` 页面显示「登录安全自检」——密码是否使用加盐哈希、旧的无盐 SHA-256 变量是否还留着、会话签名密钥是否不少于 32 个字符、用户名是否仍是默认的 `admin`。只报告配置方式，不返回任何配置值；未登录的访客拿不到这些信息。
+- `.github/dependabot.yml` 每月检查 npm 依赖和 GitHub Actions 的更新并提出 PR；这些 PR 同样需要 CI 通过并由站点负责人审核后合并。
 
 - 内科医嘱参考 `/api/duty-orders` 读取和修改都要求管理员登录，资料存放在私有 Blob（`duty-orders/`），与公开 CMS 资料和私人图库分开；每次保存或恢复前自动备份，保留最近 50 份。
 - 案例图片 `/api/image` 只向访客提供已发布案例引用的图片；草稿、已删除案例及未关联的上传图片仅管理员可见。图片只允许浏览器私有缓存，取消发布后最长 10 分钟内失效，不进入共享 CDN 缓存。

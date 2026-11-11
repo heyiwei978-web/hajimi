@@ -3,7 +3,10 @@ import {isAdmin,requirePostHeader} from './_auth.js';
 const writes = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 function sameOrigin(req) {
-  if (req.headers['sec-fetch-site'] === 'cross-site') return false;
+  // Browsers that send Fetch Metadata must report a same-origin request (or a direct,
+  // user-initiated one). A sibling subdomain ("same-site") is treated like any other site.
+  const site = req.headers['sec-fetch-site'];
+  if (site !== undefined && site !== 'same-origin' && site !== 'none') return false;
   const origin = req.headers.origin;
   if (!origin) return true; // Non-browser clients still need the admin marker and session.
   const host = req.headers.host;
