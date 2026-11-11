@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f8fb">
+<title>全站搜索 · 哈基米工作站</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231d67d8%22/%3E%3Cpath d=%22M10 8v16m12-16v16M10 16h12%22 stroke=%22white%22 stroke-width=%223.5%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/styles.css?v=20261030-ui1">
+<link rel="stylesheet" href="/ui-polish.css?v=20261011-jump1">
+<link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
+<link rel="stylesheet" href="/workspace-design.css?v=20261030-ui1">
+<link rel="stylesheet" href="/site-search.css?v=20261111-search1">
+<link rel="stylesheet" href="/design-system.css?v=20261108-ds1">
+</head>
+<body class="site-search-page">
+<a class="skip-link" href="#searchMain">跳到主要内容</a>
+<header class="global-nav official-nav">
+  <div class="global-nav-inner official-nav-inner">
+    <a class="global-brand official-brand" href="/"><span class="official-brand-mark" aria-hidden="true">H</span><span class="official-brand-text"><strong>哈基米工作站</strong><small>hajimi Clinical Workspace</small></span></a>
+    <nav class="global-links official-links" aria-label="主导航"><a href="/">首页</a><a href="/bl">病历模板</a><a href="/classification">疾病分型</a><a href="/ecg">心电图</a><a href="/labs">检验解读</a><a href="/pathway">临床路径</a><a href="/duty">值班资料</a><a href="/tools">临床工具</a><a href="/admin">管理入口</a></nav>
+  </div>
+</header>
+<main id="searchMain" class="site-search-main">
+  <h1>全站搜索</h1>
+  <p class="site-search-lead">一次查找病历模板、疾病分型、心电图、检验解读、临床路径和临床工具。</p>
+  <form id="siteSearchForm" class="site-search-form" action="/search" method="get" role="search">
+    <label for="siteSearchInput">搜索全站资料</label>
+    <div class="site-search-field">
+      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+      <input id="siteSearchInput" name="q" type="search" enterkeyhint="search" autocomplete="off" spellcheck="false" placeholder="疾病、化验、心电图、工具">
+      <button type="submit">搜索</button>
+    </div>
+  </form>
+  <p id="siteSearchStatus" class="site-search-status" role="status" aria-live="polite"></p>
+  <div id="siteSearchFilters" class="site-search-filters" role="group" aria-label="按栏目筛选" hidden></div>
+  <div id="siteSearchResults" class="site-search-results"></div>
+  <section id="siteSearchStart" class="site-search-start" aria-labelledby="siteSearchStartTitle">
+    <h2 id="siteSearchStartTitle">可以这样搜</h2>
+    <p>输入名称、缩写或别名即可；多个词用空格隔开，会同时匹配。</p>
+    <ul class="site-search-examples">
+      <li><a href="/search?q=%E8%82%A1%E9%AA%A8%E9%A2%88">股骨颈</a></li>
+      <li><a href="/search?q=%E6%88%BF%E9%A2%A4">房颤</a></li>
+      <li><a href="/search?q=%E8%82%8C%E9%85%90">肌酐</a></li>
+      <li><a href="/search?q=eGFR">eGFR</a></li>
+      <li><a href="/search?q=TKA">TKA</a></li>
+      <li><a href="/search?q=Wells">Wells</a></li>
+    </ul>
+    <p class="site-search-scope">搜索范围是各栏目的标题、缩写和别名，不包含病历正文；查找某一份文书请到<a href="/bl">病历模板库</a>搜索。</p>
+  </section>
+  <noscript><p class="site-search-status">搜索需要启用 JavaScript；也可以从上方导航进入各栏目。</p></noscript>
+  <p class="site-disclaimer" role="note">本站为教学示例与临床参考资料，仅供参考，不替代医生的临床判断。</p>
+</main>
+<script defer src="/site-search-data.js?v=20261111-search1"></script>
+<script defer src="/ecg-search.js?v=20261111-search1"></script>
+<script defer src="/site-search.js?v=20261111-search1"></script>
+<script defer src="/workspace.js?v=20261009-layout1"></script>
+</body>
+</html>

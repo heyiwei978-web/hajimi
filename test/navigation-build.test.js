@@ -92,10 +92,15 @@ test('normal build consumes registry changes from a clean copy without exposing 
     if (bytes.equals(before.get(name))) continue;
     changed.push(name);
     const html = bytes.toString('utf8');
-    occurrences += html.split(label).length - 1;
-    assert.deepEqual(Buffer.from(html.replaceAll(label, '心电图')), before.get(name), name + ' only changes the navigation label');
+    // The site search index takes its section labels from the registry, so the
+    // index and the content hash that /search references change with the label.
+    const searchVersion = /(\/site-search-data\.js\?v=)[0-9a-f]+/;
+    const comparable = text => name === 'search.html' ? text.replace(searchVersion, '$1') : text;
+    if (name !== 'site-search-data.js') occurrences += html.split(label).length - 1;
+    assert.equal(comparable(html.replaceAll(label, '心电图')), comparable(before.get(name).toString('utf8')),
+      name + ' only changes the navigation label');
   }
   assert.deepEqual(changed.sort(), ['admin.html', 'classification.html', 'duty-orders.html', 'duty.html', 'ecg.html', 'home.html',
-    'index.html', 'labs.html', 'library.html', 'pathway.html', 'tools.html'].sort());
-  assert.equal(occurrences, 12, 'eleven registered ECG links plus the lightweight homepage alias');
+    'index.html', 'labs.html', 'library.html', 'pathway.html', 'search.html', 'site-search-data.js', 'tools.html'].sort());
+  assert.equal(occurrences, 13, 'twelve registered ECG links plus the lightweight homepage alias');
 });

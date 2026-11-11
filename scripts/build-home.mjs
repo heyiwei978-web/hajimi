@@ -7,6 +7,7 @@ import {assertPublicResources} from './public-resources.mjs';
 import {writeBuiltNavigation} from './navigation-build.mjs';
 import {writeBuiltDepartmentPages} from './department-build.mjs';
 import {writeAssetVersions} from './asset-versions.mjs';
+import {writeSiteSearch} from './site-search-build.mjs';
 
 // Keep homepage markup in index.html as the single source for both entry points.
 export function buildHome(source) {
@@ -39,13 +40,16 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     for(const file of PUBLIC_FILES)copyFileSync(new URL('../'+file,import.meta.url),new URL(file,directory));
     writeFileSync(new URL('home.html',directory),output);
     writeFileSync(new URL('index.html',directory),output);
-    const {manifest}=compileClinicalSite(readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);
+    const {manifest,publication}=compileClinicalSite(readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);
     const ecg=compileEcg(directory);
+    // Written before asset versioning so /search picks up a content-hashed URL.
+    const search=writeSiteSearch(directory,manifest,publication.published);
     writeBuiltNavigation(directory);
     writeBuiltDepartmentPages(directory);
     writeAssetVersions(directory);
     assertPublicResources(directory,JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8')),manifest);
     console.log('Built lightweight homepage and clinical library in dist/');
+    console.log('Built site search index ('+search.documents.length+' entries)');
     console.log('Built ECG bundle assets/'+ecg.name+' ('+ecg.entries+' entries, '+Math.round(ecg.bytes/1024)+' KB)');
   }
 }
