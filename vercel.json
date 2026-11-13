@@ -49,6 +49,14 @@
       "destination": "/pathway.html"
     },
     {
+      "source": "/note",
+      "destination": "/note.html"
+    },
+    {
+      "source": "/note/",
+      "destination": "/note.html"
+    },
+    {
       "source": "/tools",
       "destination": "/tools.html"
     },
