@@ -96,11 +96,40 @@ test('note generator maps AI errors to readable messages', async t => {
 
 test('every document type tells the model not to invent facts', () => {
   for (const type of Object.keys(DOC_TYPES)) {
-    const checked = validateInput({...BODY, type});
+    const checked = validateInput({...BODY, type, day: '2', caseReference: '教学病例', chapterTitle: '入院记录'});
     const [system, user] = buildMessages(checked);
     assert.match(system.content, /不得编造/);
     assert.match(user.content, new RegExp(DOC_TYPES[type].label));
   }
+});
+
+test('daily progress requires a valid day and sends the correct stage and observations', () => {
+  for (const [type, stage] of [['preDaily', '住院'], ['postDaily', '术后']]) {
+    for (const day of ['', '0', '366', '-1', '1.5']) {
+      assert.match(validateInput({...BODY, type, day}).error, /病程天数/);
+    }
+    const checked = validateInput({...BODY, type, day: '2', daily: '虚构示例：当日情况待填写'});
+    assert.equal(checked.error, undefined);
+    const content = buildMessages(checked)[1].content;
+    assert.match(content, new RegExp(stage + '第2天'));
+    assert.match(content, /虚构示例：当日情况待填写/);
+    assert.match(content, /不得推断/);
+  }
+  assert.match(validateInput({...BODY, type: 'postDaily', day: '1', operation: ''}).error, /手术方式/);
+  assert.match(validateInput({...BODY, type: 'preDaily', day: '1', daily: '联系电话：13800138000'}).error, /手机号|身份信息/);
+});
+
+test('other specialties and case names are carried as context, not as current case facts', () => {
+  const checked = validateInput({...BODY, type: 'caseChapter', department: '普外科', caseReference: '肝脓肿', chapterTitle: '首次病程记录'});
+  const content = buildMessages(checked)[1].content;
+  assert.match(content, /科室：普外科/);
+  assert.match(content, /参考病例及章节名称：肝脓肿/);
+  assert.match(content, /不得将参考病例的事实当成当前病例事实/);
+  assert.match(validateInput({...BODY, type: 'caseChapter'}).error, /病例和章节/);
+  const withExcerpt=validateInput({...BODY, type:'caseChapter', caseReference:'肝脓肿', chapterTitle:'入院记录', referenceText:'病史结构示例'});
+  assert.match(buildMessages(withExcerpt)[1].content, /病史结构示例/);
+  assert.match(validateInput({...BODY, referenceText:'姓名：张三'}).error, /身份信息/);
+  assert.match(validateInput({...BODY, department: '无效科室'}).error, /科室/);
 });
 
 test('note page is published, routed and kept out of the main navigation', () => {

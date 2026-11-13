@@ -41,6 +41,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     writeFileSync(new URL('home.html',directory),output);
     writeFileSync(new URL('index.html',directory),output);
     const {manifest,publication}=compileClinicalSite(readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);
+    const records=new Map(publication.published.map(({record,identity})=>[identity.legacyId,record]));
+    const noteCases=manifest.caseTemplates.items.map(item=>({id:item.caseId,title:item.title,department:item.department,
+      bodyUrl:manifest.bodies[item.department+'\0'+item.group]||null,
+      chapters:item.chapterIds.map(id=>({id,title:records.get(id)?.short||records.get(id)?.name||'文书',hasBody:!!records.get(id)?.sourceBody}))}));
+    writeFileSync(new URL('note-cases.json',directory),JSON.stringify(noteCases));
     const ecg=compileEcg(directory);
     // Written before asset versioning so /search picks up a content-hashed URL.
     const search=writeSiteSearch(directory,manifest,publication.published);

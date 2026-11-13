@@ -14,6 +14,7 @@
 .note-card h2 small{display:block;margin-top:2px;font-size:.8125rem;font-weight:400;color:var(--ws-muted,#526577)}
 .note-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .note-field{display:block;margin:0 0 14px;font-size:.9375rem;font-weight:650;color:var(--ws-text,#293f50)}
+.note-field[hidden]{display:none}
 .note-field em{margin-left:4px;font-style:normal;font-size:.75rem;font-weight:600;color:#b42318}
 .note-field input,.note-field select,.note-field textarea,.note-result textarea{display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:10px 12px;min-height:46px;border:1px solid #bdcddd;border-radius:10px;background:#fff;font:inherit;font-weight:400;font-size:1rem;line-height:1.6;color:var(--ws-ink,#142c42)}
 .note-field textarea{resize:vertical}
