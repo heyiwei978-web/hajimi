@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f8fb">
+<title>AI 病历生成 · 哈基米工作站</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231d67d8%22/%3E%3Cpath d=%22M10 8v16m12-16v16M10 16h12%22 stroke=%22white%22 stroke-width=%223.5%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/styles.css?v=20261030-ui1">
+<link rel="stylesheet" href="/ui-polish.css?v=20261011-jump1">
+<link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
+<link rel="stylesheet" href="/workspace-design.css?v=20261030-ui1">
+<link rel="stylesheet" href="/design-system.css?v=20261108-ds1">
+<link rel="stylesheet" href="/note.css?v=20261113-note1">
+</head>
+<body class="note-page">
+<a class="skip-link" href="#noteMain">跳到主要内容</a>
+<header class="global-nav official-nav">
+  <div class="global-nav-inner official-nav-inner">
+    <a class="global-brand official-brand" href="/"><span class="official-brand-mark" aria-hidden="true">H</span><span class="official-brand-text"><strong>哈基米工作站</strong><small>hajimi Clinical Workspace</small></span></a>
+    <nav class="global-links official-links" aria-label="主导航"><a href="/">首页</a><a href="/bl">病历模板</a><a href="/classification">疾病分型</a><a href="/ecg">心电图</a><a href="/labs">检验解读</a><a href="/pathway">临床路径</a><a href="/duty">值班资料</a><a class="active" href="/tools" aria-current="page">临床工具</a><a href="/admin">管理入口</a></nav>
+  </div>
+</header>
+<main id="noteMain" class="note-main">
+  <section class="note-hero">
+    <p class="note-kicker">AI RECORD DRAFT</p>
+    <h1>AI 病历生成</h1>
+    <p>输入虚构教学病例的主诉、主诊断和手术方式，由 AI 生成专科检查、病程记录、手术记录等草稿。</p>
+  </section>
+
+  <section class="note-privacy" aria-label="隐私说明">
+    <strong>仅供虚构教学示例，请勿输入真实患者信息</strong>
+    <span>示例内容会发送给第三方 AI 服务。系统会尝试识别部分身份信息，但不能保证识别完整；请勿输入真实患者的姓名、身份信息或病情。生成内容仅供教学，需由专业人员审核。</span>
+  </section>
+
+  <p id="noteLogin" class="note-login" hidden>需要先<a href="/admin">登录管理入口</a>才能使用 AI 生成，登录后回到本页即可。</p>
+
+  <form id="noteForm" class="note-card" novalidate>
+    <h2>1. 病情信息</h2>
+    <label class="note-field note-wide">参考现有教学病例（可选）
+      <select id="noteCase"><option value="">不选择参考病例</option></select>
+    </label>
+    <label class="note-field note-wide">参考章节
+      <select id="noteChapter" disabled><option value="">选择病例后查看</option></select>
+    </label>
+    <p id="noteCaseStatus" class="note-tip" role="status">病例正文供本页查看；仅所选名称和你确认的参考片段会发送给 AI。</p>
+    <label class="note-field note-wide" id="noteReferenceWrap" hidden>教学病例原文
+      <textarea id="noteReference" rows="8" readonly></textarea>
+    </label>
+    <label class="note-field note-wide">参考片段（可选，最多 1000 字）
+      <textarea name="referenceText" maxlength="1000" rows="4" placeholder="可从原文复制并编辑参考片段；请先删除姓名、住院号等身份信息。片段将发送给 AI。"></textarea>
+    </label>
+    <label class="note-field note-wide">科室
+      <select name="department"><option>骨科</option><option>普外科</option><option>肾内科</option><option>妇科</option></select>
+    </label>
+    <label class="note-field note-wide">常见病种（可选，选后自动填入示例）
+      <select id="notePreset"><option value="">— 不使用示例，手动填写 —</option></select>
+    </label>
+    <div class="note-row">
+      <label class="note-field">性别
+        <select name="sex"><option value="">未填</option><option>男</option><option>女</option></select>
+      </label>
+      <label class="note-field">年龄（岁）
+        <input name="age" inputmode="numeric" maxlength="3" pattern="\d{1,3}" autocomplete="off">
+      </label>
+    </div>
+    <label class="note-field note-wide">主诉 <em>必填</em>
+      <input name="complaint" maxlength="120" autocomplete="off" placeholder="例如：摔伤致右髋部疼痛、活动受限3小时">
+    </label>
+    <label class="note-field note-wide">主诊断 <em>必填</em>
+      <input name="diagnosis" maxlength="160" autocomplete="off" placeholder="例如：右股骨颈骨折（Garden Ⅳ型）">
+    </label>
+    <label class="note-field note-wide">现病史要点（可选）
+      <textarea name="history" maxlength="600" rows="3" placeholder="受伤经过、院外处理、影像检查结果等"></textarea>
+    </label>
+    <label class="note-field note-wide">其他诊断 / 合并症（可选）
+      <input name="secondary" maxlength="300" autocomplete="off" placeholder="例如：高血压病2级、2型糖尿病">
+    </label>
+
+    <h2>2. 手术信息 <small>生成术前小结、手术记录、术后病程时需要</small></h2>
+    <label class="note-field note-wide">手术方式
+      <input name="operation" maxlength="160" autocomplete="off" list="noteOperations" placeholder="例如：右侧人工股骨头置换术">
+      <datalist id="noteOperations"></datalist>
+    </label>
+    <label class="note-field note-wide">麻醉方式
+      <select name="anesthesia"><option value="">未填</option><option>全身麻醉</option><option>腰硬联合麻醉</option><option>神经阻滞麻醉</option><option>椎管内麻醉</option><option>局部麻醉</option></select>
+    </label>
+    <label class="note-field note-wide">补充说明（可选）
+      <textarea name="extra" maxlength="400" rows="2" placeholder="希望 AI 特别注意的地方，例如：术中复位满意、放置引流管1根"></textarea>
+    </label>
+
+    <h2>3. 每日病程 <small>生成术前或术后病程时填写</small></h2>
+    <label class="note-field note-wide">住院天数或术后天数
+      <input name="day" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="填写第几天，例如 2">
+    </label>
+    <label class="note-field note-wide">当日情况（可选）
+      <textarea name="daily" maxlength="600" rows="3" placeholder="填写虚构示例当日的情况；未提供的信息将保留待补充"></textarea>
+    </label>
+    <h2>4. 生成文书</h2>
+    <div class="note-actions" role="group" aria-label="选择要生成的文书">
+      <button type="button" data-type="caseChapter">生成所选章节</button>
+      <button type="button" data-type="spec">专科检查</button>
+      <button type="button" data-type="first">首次病程记录</button>
+      <button type="button" data-type="preDaily">术前病程记录</button>
+      <button type="button" data-type="preop">术前小结</button>
+      <button type="button" data-type="op">手术记录</button>
+      <button type="button" data-type="postop">术后首次病程</button>
+      <button type="button" data-type="postDaily">术后病程记录</button>
+    </div>
+    <p id="noteStatus" class="note-status" role="status" aria-live="polite"></p>
+  </form>
+
+  <section id="noteResult" class="note-card note-result" hidden>
+    <div class="note-result-head">
+      <h2 id="noteResultTitle">生成结果</h2>
+      <div class="note-result-buttons">
+        <button type="button" id="noteCopy">复制</button>
+        <button type="button" id="noteClear" class="note-secondary">清空</button>
+      </div>
+    </div>
+    <label class="visually-hidden" for="noteOutput">生成结果（可直接修改）</label>
+    <textarea id="noteOutput" rows="18" spellcheck="false"></textarea>
+    <p class="note-tip">可以直接在框里修改并复制；生成内容仅供教学，需由专业人员审核。</p>
+  </section>
+</main>
+<script defer src="/note.js?v=20261113-note1"></script>
+<script defer src="/workspace.js?v=20261009-layout1"></script>
+</body>
+</html>

@@ -67,6 +67,80 @@ async function closeRecordDirectory(page){
   if(await summary.isVisible()&&await page.locator('#caseDirectoryPanel').evaluate(element=>element.open))await summary.click();
 }
 
+test('note draft preserves edited output and manual selection, and reports copy failure',async()=>{
+  for(const width of [390,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      let requests=0;
+      await page.route('**/api/note-generate',route=>{requests++;return route.fulfill({json:{label:'示例草稿',text:'虚构示例'}});});
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await page.locator('#notePreset').selectOption('1');
+      const complaint=await page.locator('[name=complaint]').inputValue();
+      await page.locator('#notePreset').selectOption('');
+      assert.equal(await page.locator('[name=complaint]').inputValue(),complaint);
+      await page.locator('[data-type=spec]').click();
+      await page.locator('#noteResult').waitFor({state:'visible'});
+      await page.locator('#noteOutput').fill('已编辑的示例');
+      page.once('dialog',dialog=>dialog.dismiss());
+      await page.locator('[data-type=first]').click();
+      assert.equal(requests,1);
+      assert.equal(await page.locator('#noteOutput').inputValue(),'已编辑的示例');
+      await page.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{value:{writeText:()=>Promise.reject(new Error('denied'))}});document.execCommand=()=>false;});
+      await page.locator('#noteCopy').click();
+      assert.match(await page.locator('#noteStatus').innerText(),/复制失败/);
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('note page exposes published cases and generates daily notes without sending case bodies',async()=>{
+  for(const width of [390,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      let sent;
+      await page.route('**/api/note-generate',route=>{sent=route.request().postDataJSON();return route.fulfill({json:{label:'术后病程记录',text:'虚构示例草稿'}});});
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      const catalog=await (await page.request.get(base+'/note-cases.json')).json();
+      assert.equal(await page.locator('#noteCase option').count(),catalog.length+1);
+      const manifestFile=fs.readdirSync(path.join(root,'dist')).find(name=>/^library-manifest-.*\.js$/.test(name));
+      const manifestText=fs.readFileSync(path.join(root,'dist',manifestFile),'utf8');
+      const manifest=JSON.parse(manifestText.slice(manifestText.indexOf('=')+1,-1));
+      assert.deepEqual(catalog.map(item=>item.id),manifest.caseTemplates.items.map(item=>item.caseId));
+      assert.deepEqual(new Set(catalog.map(item=>item.department)),new Set(['骨科','普外科','肾内科','妇科']));
+      const index=catalog.findIndex(item=>item.department==='普外科');
+      await page.locator('#noteCase').selectOption(String(index));
+      assert.equal(await page.locator('[name=department]').inputValue(),'普外科');
+      const chapterIndex=catalog[index].chapters.findIndex(item=>item.hasBody);
+      await page.locator('#noteChapter').selectOption(String(chapterIndex));
+      await page.locator('#noteReferenceWrap').waitFor({state:'visible'});
+      const reference=await page.locator('#noteReference').inputValue();
+      assert(reference.length>0);
+      await page.locator('[name=complaint]').fill('虚构主诉');
+      await page.locator('[name=diagnosis]').fill('虚构诊断');
+      await page.locator('[name=operation]').fill('虚构手术');
+      await page.locator('[data-type=postDaily]').click();
+      assert.match(await page.locator('#noteStatus').innerText(),/病程天数/);
+      await page.locator('[name=day]').fill('2');
+      await page.locator('[name=daily]').fill('虚构当日情况');
+      await page.locator('[data-type=postDaily]').click();
+      await page.locator('#noteResult').waitFor({state:'visible'});
+      assert.equal(sent.type,'postDaily');assert.equal(sent.department,'普外科');
+      assert.equal(sent.day,'2');assert.equal(sent.daily,'虚构当日情况');
+      assert.match(sent.caseReference,/肝脓肿/);
+      assert(!JSON.stringify(sent).includes(reference));
+      await page.locator('[name=referenceText]').fill('虚构参考格式');
+      page.once('dialog',dialog=>dialog.accept());
+      await page.locator('[data-type=caseChapter]').click();
+      await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('已生成'));
+      assert.equal(sent.type,'caseChapter');assert.equal(sent.referenceText,'虚构参考格式');
+      assert.equal(sent.chapterTitle,catalog[index].chapters[chapterIndex].title);
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('template totals count complete cases before and after catalogs load; utility records stay separate',async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width);
