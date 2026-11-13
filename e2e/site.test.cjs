@@ -67,6 +67,33 @@ async function closeRecordDirectory(page){
   if(await summary.isVisible()&&await page.locator('#caseDirectoryPanel').evaluate(element=>element.open))await summary.click();
 }
 
+test('note draft preserves edited output and manual selection, and reports copy failure',async()=>{
+  for(const width of [390,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      let requests=0;
+      await page.route('**/api/note-generate',route=>{requests++;return route.fulfill({json:{label:'示例草稿',text:'虚构示例'}});});
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await page.locator('#notePreset').selectOption('1');
+      const complaint=await page.locator('[name=complaint]').inputValue();
+      await page.locator('#notePreset').selectOption('');
+      assert.equal(await page.locator('[name=complaint]').inputValue(),complaint);
+      await page.locator('[data-type=spec]').click();
+      await page.locator('#noteResult').waitFor({state:'visible'});
+      await page.locator('#noteOutput').fill('已编辑的示例');
+      page.once('dialog',dialog=>dialog.dismiss());
+      await page.locator('[data-type=first]').click();
+      assert.equal(requests,1);
+      assert.equal(await page.locator('#noteOutput').inputValue(),'已编辑的示例');
+      await page.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{value:{writeText:()=>Promise.reject(new Error('denied'))}});document.execCommand=()=>false;});
+      await page.locator('#noteCopy').click();
+      assert.match(await page.locator('#noteStatus').innerText(),/复制失败/);
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('template totals count complete cases before and after catalogs load; utility records stay separate',async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width);

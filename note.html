@@ -25,12 +25,12 @@
   <section class="note-hero">
     <p class="note-kicker">AI RECORD DRAFT</p>
     <h1>AI 病历生成</h1>
-    <p>输入主诉、主诊断和手术方式，由 AI 生成骨科专科检查、病程记录、手术记录等草稿，改好后复制到医院系统。</p>
+    <p>输入虚构教学病例的主诉、主诊断和手术方式，由 AI 生成骨科专科检查、病程记录、手术记录等草稿。</p>
   </section>
 
   <section class="note-privacy" aria-label="隐私说明">
-    <strong>不要输入身份信息</strong>
-    <span>只填病情，不填姓名、住院号、床号、身份证号、电话。病情会发送给 AI 接口生成文字，本站不保存输入和结果，关闭页面即清空。生成内容是草稿，必须按实际查体和手术情况核对修改。</span>
+    <strong>仅供虚构教学示例，请勿输入真实患者信息</strong>
+    <span>示例内容会发送给第三方 AI 服务。系统会尝试识别部分身份信息，但不能保证识别完整；请勿输入真实患者的姓名、身份信息或病情。生成内容仅供教学，需由专业人员审核。</span>
   </section>
 
   <p id="noteLogin" class="note-login" hidden>需要先<a href="/admin">登录管理入口</a>才能使用 AI 生成，登录后回到本页即可。</p>
@@ -94,7 +94,7 @@
     </div>
     <label class="visually-hidden" for="noteOutput">生成结果（可直接修改）</label>
     <textarea id="noteOutput" rows="18" spellcheck="false"></textarea>
-    <p class="note-tip">可以直接在框里修改，改好后点「复制」，粘贴到医院系统。</p>
+    <p class="note-tip">可以直接在框里修改并复制；生成内容仅供教学，需由专业人员审核。</p>
   </section>
 </main>
 <script defer src="/note.js?v=20261113-note1"></script>

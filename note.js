@@ -42,7 +42,7 @@
 
   PRESETS.forEach((item, index) => preset.add(new Option(item.name, String(index))));
   preset.addEventListener('change', () => {
-    const item = PRESETS[Number(preset.value)];
+    const item = preset.value === '' ? null : PRESETS[Number(preset.value)];
     operations.replaceChildren();
     if (!item) return;
     form.elements.complaint.value = item.complaint;
@@ -82,8 +82,10 @@
     const data = collect();
     const problem = check(data, type);
     if (problem) { say(problem, true); return; }
+    if (!result.hidden && output.value && !window.confirm('生成新文书会替换当前结果，确定继续吗？')) return;
     busy = true;
     buttons.forEach(item => { item.disabled = true; });
+    output.readOnly = true;
     say('正在生成「' + button.textContent + '」，大约需要 10～40 秒……');
     try {
       const response = await fetch('/api/note-generate', {
@@ -109,6 +111,7 @@
     } finally {
       busy = false;
       buttons.forEach(item => { item.disabled = false; });
+      output.readOnly = false;
     }
   }
 
@@ -119,9 +122,14 @@
       await navigator.clipboard.writeText(output.value);
     } catch {
       output.select();
-      document.execCommand('copy');
+      try {
+        if (!document.execCommand('copy')) throw new Error('copy failed');
+      } catch {
+        say('复制失败，请选中结果后手动复制。', true);
+        return;
+      }
     }
-    say('已复制，可以粘贴到医院系统了。');
+    say('已复制，请继续核对内容。');
   });
 
   document.getElementById('noteClear').addEventListener('click', () => {
