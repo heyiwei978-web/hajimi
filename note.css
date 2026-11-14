@@ -1,0 +1,40 @@
+/* AI 病历生成（/note）。只管屏幕显示。 */
+.visually-hidden{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.note-main{max-width:880px;width:calc(100% - 32px);margin:0 auto;padding:28px 0 calc(56px + env(safe-area-inset-bottom))}
+.note-kicker{margin:0 0 12px;color:var(--ws-blue,#135f9c);font-size:.75rem;font-weight:700;letter-spacing:.13em}
+.note-hero h1{margin:0;font-size:clamp(1.75rem,3.4vw,2.5rem);line-height:1.2;color:var(--ws-ink,#142c42)}
+.note-hero p:last-child{margin:10px 0 18px;font-size:1rem;line-height:1.8;color:var(--ws-muted,#526577)}
+.note-privacy{display:block;margin:0 0 16px;padding:14px 16px;border:1px solid #f0d58c;border-left:4px solid #d39b18;border-radius:12px;background:#fff8e6;color:#5c4300;font-size:.9375rem;line-height:1.75}
+.note-privacy strong{display:block;margin-bottom:2px}
+.note-login{margin:0 0 16px;padding:12px 16px;border-radius:12px;background:#fdecec;color:#8a1f1f;line-height:1.7}
+.note-login a{color:inherit;font-weight:700}
+.note-card{margin:0 0 16px;padding:20px;border:1px solid var(--ws-line,#dce4eb);border-radius:16px;background:#fff;box-shadow:var(--ws-shadow,0 5px 20px rgba(20,44,66,.045))}
+.note-card h2{margin:20px 0 12px;font-size:1.125rem;color:var(--ws-ink,#142c42)}
+.note-card h2:first-child{margin-top:0}
+.note-card h2 small{display:block;margin-top:2px;font-size:.8125rem;font-weight:400;color:var(--ws-muted,#526577)}
+.note-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.note-field{display:block;margin:0 0 14px;font-size:.9375rem;font-weight:650;color:var(--ws-text,#293f50)}
+.note-field[hidden]{display:none}
+.note-field em{margin-left:4px;font-style:normal;font-size:.75rem;font-weight:600;color:#b42318}
+.note-field input,.note-field select,.note-field textarea,.note-result textarea{display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:10px 12px;min-height:46px;border:1px solid #bdcddd;border-radius:10px;background:#fff;font:inherit;font-weight:400;font-size:1rem;line-height:1.6;color:var(--ws-ink,#142c42)}
+.note-field textarea{resize:vertical}
+.note-field input:focus,.note-field select:focus,.note-field textarea:focus,.note-result textarea:focus{border-color:var(--ws-blue,#135f9c);box-shadow:0 0 0 3px rgba(19,95,156,.18);outline:none}
+.note-actions{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.note-actions button,.note-result-buttons button{min-height:46px;padding:0 14px;border:0;border-radius:10px;background:var(--ws-blue,#135f9c);color:#fff;font:inherit;font-size:.9375rem;font-weight:650;cursor:pointer;transition:background-color .15s ease}
+.note-actions button:hover,.note-result-buttons button:hover{background:var(--ws-blue-hover,#0d497c)}
+.note-actions button:disabled{background:#9fb3c6;cursor:progress}
+.note-result-buttons .note-secondary{background:#eef3f8;color:var(--ws-ink,#142c42)}
+.note-result-buttons .note-secondary:hover{background:#dde7f0}
+.note-status{min-height:1.6em;margin:12px 0 0;font-size:.9375rem;line-height:1.6;color:var(--ws-muted,#526577)}
+.note-status.note-error{color:#b42318}
+.note-result{scroll-margin-top:calc(var(--site-header-height,72px) + 12px)}
+.note-result[hidden]{display:none}
+.note-result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.note-result-head h2{margin:0}
+.note-result-buttons{display:flex;gap:8px}
+.note-result textarea{min-height:360px;resize:vertical;font-size:1rem;line-height:1.8}
+.note-tip{margin:8px 0 0;font-size:.8125rem;color:var(--ws-muted,#526577)}
+@media (max-width:640px){
+  .note-card{padding:16px}
+  .note-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+}

@@ -101,6 +101,6 @@ test('normal build consumes registry changes from a clean copy without exposing 
       name + ' only changes the navigation label');
   }
   assert.deepEqual(changed.sort(), ['admin.html', 'classification.html', 'duty-orders.html', 'duty.html', 'ecg.html', 'home.html',
-    'index.html', 'labs.html', 'library.html', 'pathway.html', 'search.html', 'site-search-data.js', 'tools.html'].sort());
-  assert.equal(occurrences, 13, 'twelve registered ECG links plus the lightweight homepage alias');
+    'index.html', 'labs.html', 'library.html', 'note.html', 'pathway.html', 'search.html', 'site-search-data.js', 'tools.html'].sort());
+  assert.equal(occurrences, 14, 'thirteen registered ECG links plus the lightweight homepage alias');
 });
