@@ -1587,7 +1587,7 @@ test('record pages: phone header matches other sections with a scrolling navigat
       const active=page.locator('.library-top-actions .library-active-link');
       const box=await active.boundingBox();
       assert(box&&box.width>0&&box.x>=0&&box.x+box.width<=width,'the current section is shown in the navigation');
-      assert.equal(await page.locator('.library-top-actions a').count(),9,'all main sections, including 检验解读');
+      assert.equal(await page.locator('.library-top-actions a').count(),10,'all main sections, including 检验解读 and AI 病历生成');
       assert.equal(await page.locator('#patientBtn').isVisible(),true);
       assert.equal(await page.locator('#libraryShell [data-auth-slot] [data-cms-login]').isVisible(),true);
       if(width<=650){
