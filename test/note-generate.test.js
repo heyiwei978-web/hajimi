@@ -5,7 +5,7 @@ import {randomBytes} from 'node:crypto';
 import {PUBLIC_FILES} from '../scripts/public-assets.mjs';
 import {MODULES, NAV_SURFACES} from '../config/site-modules.mjs';
 import {createSession} from '../api/_auth.js';
-import {createNoteHandler, validateInput, buildMessages, findIdentifier, DOC_TYPES} from '../api/note-generate.js';
+import {createNoteHandler, validateInput, buildMessages, findIdentifier, stripMarkdown, DOC_TYPES} from '../api/note-generate.js';
 
 const read = file => fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
 function res() {
@@ -26,7 +26,7 @@ function auth(t) {
 }
 const BODY = {type: 'op', sex: '女', age: '78', complaint: '摔伤致右髋部疼痛3小时', diagnosis: '右股骨颈骨折', operation: '右侧人工股骨头置换术'};
 const ENV = {NOTE_AI_API_KEY: 'fixture-key'};
-function fakeFetch(calls, reply = {choices: [{message: {content: '**手术记录**\n正文'}}]}, status = 200) {
+function fakeFetch(calls, reply = {choices: [{message: {content: '**手术记录**\n正文'}, finish_reason: 'stop'}]}, status = 200) {
   return async (url, options) => { calls.push({url, options}); return {ok: status === 200, status, json: async () => reply}; };
 }
 
@@ -94,6 +94,9 @@ test('note generator forwards only the clinical fields and returns plain text', 
   assert.equal(calls[0].options.headers.Authorization, 'Bearer fixture-key');
   const sent = JSON.parse(calls[0].options.body);
   assert.equal(sent.model, 'deepseek-chat');
+  assert.equal(sent.temperature, 0.5);
+  assert.equal(sent.max_tokens, 3500);
+  assert.equal(sent.stream, false);
   assert.match(sent.messages[1].content, /右侧人工股骨头置换术/);
   assert.doesNotMatch(calls[0].options.body, /fixture-owner|hajimi_session/);
 });
@@ -201,4 +204,89 @@ test('markdown formatting is stripped from AI output', async t => {
   assert.doesNotMatch(r.body.text, /[#*]/);
   assert.doesNotMatch(r.body.text, /^\s*[-|]/m);
   assert.match(r.body.text, /右股骨颈骨折/);
+  assert.match(r.body.text, /项目；值/);
+});
+
+test('plain-text cleanup preserves medical values, signs, units, numbering and table cells', () => {
+  const source = '```text\r\n# 术后病程记录\r\n**辅助检查**\r\n| 项目 | 结果 |\r\n| :--- | ---: |\r\n| Hb | 108 g/L |\r\n| CRP | > 10 mg/L |\r\n| 肌力 | Ⅳ+级 |\r\n\r\n1. 切口3*4 cm，Na+ 138 mmol/L，HCO3- 22 mmol/L。\r\n> 5 mm\r\n- 5°\r\n- 观察患肢血运，Homan征（-）。\r\n2. 右下肢暂不负重。\r\n医师签名：____\r\n```';
+  const text = stripMarkdown(source);
+  for (const fact of ['Hb；108 g/L', 'CRP；> 10 mg/L', '肌力；Ⅳ+级', '3*4 cm', 'Na+ 138 mmol/L', 'HCO3- 22 mmol/L', '> 5 mm', '- 5°', 'Homan征（-）', '1. 切口', '2. 右下肢暂不负重', '医师签名：____']) assert.ok(text.includes(fact), fact);
+  assert.doesNotMatch(text, /```|\r|\*\*|^#|^\|/m);
+  assert.equal(stripMarkdown(text), text);
+});
+
+test('cleanup only removes explicit AI wrappers, not medical instructions or reasoning in diagnosis', () => {
+  const source = '<think>不应展示的模型推理</think>\n以下是为您生成的手术记录：\n# 手术记录\n诊断分析：保留临床推理。\n注意：警惕骨筋膜室综合征。\n说明：术后暂不负重。\n医师签名：\n※ 本文为草稿，请按患者实际情况核对修改。';
+  assert.equal(stripMarkdown(source), '手术记录\n诊断分析：保留临床推理。\n注意：警惕骨筋膜室综合征。\n说明：术后暂不负重。\n医师签名：');
+});
+
+test('optional table borders and exponent notation do not lose medical information', () => {
+  const source = '项目 | 结果\n--- | ---\nWBC | 6.2×10^9/L\nPLT | 180×10^9/L\n\nWBC 6.2*10**9/L，RBC 4.1*10**12/L。\n> ULN\n> 正常上限3倍\n**处理意见**\n保留用药注意事项。';
+  const text = stripMarkdown(source);
+  assert.match(text, /项目；结果/);
+  assert.match(text, /WBC；6.2×10\^9\/L/);
+  assert.match(text, /PLT；180×10\^9\/L/);
+  assert.ok(text.includes('WBC 6.2*10**9/L，RBC 4.1*10**12/L。'));
+  assert.ok(text.includes('> ULN\n> 正常上限3倍'));
+  assert.ok(text.includes('\n处理意见\n'));
+  assert.doesNotMatch(text, /\|/);
+});
+
+test('incomplete finishes, reasoning-only output and malformed responses never become a successful note', async t => {
+  const cookie = auth(t);
+  const replies = [
+    ...['content_filter', 'insufficient_system_resource', 'aborted', 'tool_calls', null, undefined].map(finish_reason => ({choices: [{message: {content: '半截正文'}, finish_reason}]})),
+    {choices: [{message: {reasoning_content: '仅推理内容'}, finish_reason: 'stop'}]},
+    ...['', '  ', '```\n```', '<think>未结束', '<think>只有推理</think>', '※ 本文为草稿，请按患者实际情况核对修改。'].map(content => ({choices: [{message: {content}, finish_reason: 'stop'}]})),
+    null, {}, {choices: []}
+  ];
+  for (const reply of replies) {
+    const r = res();
+    await createNoteHandler({fetchImpl: fakeFetch([], reply), env: ENV, quota: async () => ({allowed: true})})(req(cookie, BODY), r);
+    assert.equal(r.code, 502, JSON.stringify(reply));
+    assert.equal(r.body.text, undefined);
+  }
+  const r = res();
+  await createNoteHandler({fetchImpl: fakeFetch([], {choices: [{message: {content: '完整正文', reasoning_content: '不要公开的推理'}, finish_reason: 'stop'}]}), env: ENV})(req(cookie, BODY), r);
+  assert.equal(r.body.text, '完整正文');
+  assert.doesNotMatch(JSON.stringify(r.body), /推理/);
+});
+
+test('network errors, response-body timeouts and invalid JSON are sanitized', async t => {
+  const cookie = auth(t);
+  const failure = () => { throw new Error('upstream private details and fixture-key'); };
+  const aborting = signal => new Promise((resolve, reject) => signal.addEventListener('abort', () => reject(new DOMException('timeout', 'AbortError')), {once: true}));
+  for (const [fetchImpl, code] of [
+    [failure, 502],
+    [async () => ({ok: true, json: failure}), 502],
+    [async (_, {signal}) => aborting(signal), 504],
+    [async (_, {signal}) => ({ok: true, json: () => aborting(signal)}), 504]
+  ]) {
+    const r = res();
+    await createNoteHandler({fetchImpl, env: ENV, timeoutMs: 10, quota: async () => ({allowed: true})})(req(cookie, BODY), r);
+    assert.equal(r.code, code);
+    assert.doesNotMatch(JSON.stringify(r.body), /private|fixture-key/);
+    assert.equal(r.headers['cache-control'], 'no-store');
+  }
+});
+
+test('same-origin, admin marker, JSON and byte limits still guard the AI before quota or network', async t => {
+  const cookie = auth(t), calls = [];
+  let quotaCalls = 0;
+  const handler = createNoteHandler({fetchImpl: fakeFetch(calls), env: ENV, quota: async () => { quotaCalls++; return {allowed: true}; }});
+  for (const [mutate, code] of [
+    [r => { r.method = 'GET'; }, 405],
+    [r => { r.headers.origin = 'https://other.test'; }, 403],
+    [r => { r.headers['sec-fetch-site'] = 'cross-site'; }, 403],
+    [r => { delete r.headers['x-hajimi-admin']; }, 403],
+    [r => { r.headers['content-type'] = 'text/plain'; }, 415],
+    [r => { r.body = {...BODY, extra: '字'.repeat(6000)}; }, 413]
+  ]) {
+    const request = req(cookie, BODY), r = res();
+    mutate(request);
+    await handler(request, r);
+    assert.equal(r.code, code);
+  }
+  assert.equal(quotaCalls, 0);
+  assert.equal(calls.length, 0);
 });
