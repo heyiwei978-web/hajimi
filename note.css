@@ -35,7 +35,34 @@
 .note-result-buttons button:disabled{opacity:.6;cursor:progress}
 .note-result textarea{min-height:360px;resize:vertical;font-size:1rem;line-height:1.8}
 .note-tip{margin:8px 0 0;font-size:.8125rem;color:var(--ws-muted,#526577)}
+.note-button{min-height:46px;padding:10px 14px;border:1px solid transparent;border-radius:10px;background:var(--ws-blue,#135f9c);color:#fff;font:inherit;font-weight:650;cursor:pointer}
+.note-button:hover{background:var(--ws-blue-hover,#0d497c)}
+.note-button.note-secondary{background:#eef3f8;color:var(--ws-ink,#142c42);border-color:var(--ws-line,#dce4eb)}
+.note-button:disabled{opacity:.6;cursor:progress}
+.note-button[hidden],.note-status[hidden]{display:none}
+.note-case-toolbar,.note-batch-controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:16px}
+.note-case-toolbar .note-tip{flex:1;min-width:180px;margin:0}
+.note-details{margin:16px 0;border-top:1px solid var(--ws-line,#dce4eb);padding-top:12px}
+.note-details summary{cursor:pointer;font-weight:650;color:var(--ws-ink,#142c42);padding:8px 0}
+.note-details .note-field:first-of-type{margin-top:12px}
+.note-batch{min-width:0;margin:12px 0 16px;padding:16px;border:1px solid var(--ws-line,#dce4eb);border-radius:10px;background:#f5f8fb}
+.note-batch legend{font-weight:700;color:var(--ws-ink,#142c42)}
+.note-batch-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
+.note-batch-options label{display:flex;gap:8px;align-items:center;min-height:44px;font-size:.9375rem;cursor:pointer}
+.note-batch-options input{width:18px;height:18px;flex-shrink:0;accent-color:var(--ws-blue,#135f9c)}
+.note-batch-controls{margin:0}
+.note-document-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.note-document-list button{max-width:100%;min-height:44px;padding:8px 12px;border:1px solid var(--ws-line,#dce4eb);border-radius:8px;background:#fff;color:var(--ws-ink,#142c42);font:inherit;overflow-wrap:anywhere;cursor:pointer}
+.note-document-list button[aria-pressed=true]{border-color:var(--ws-blue,#135f9c);background:#eaf3fa;font-weight:700}
+.note-facts{margin:12px 0;font-size:.9375rem}
+.note-facts>div{padding:10px 0;border-bottom:1px solid var(--ws-line,#dce4eb)}
+.note-facts dt{font-weight:650}
+.note-facts dd{margin:4px 0 0;overflow-wrap:anywhere}
+.note-fact-source{white-space:pre-wrap}
+.note-fact-status{display:block;margin-top:4px;font-size:.8125rem;color:var(--ws-muted,#526577)}
+.note-facts mark{background:#fff0bc;color:#5c4300}
 @media (max-width:640px){
   .note-card{padding:16px}
   .note-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:360px){.note-batch-options{grid-template-columns:1fr}}

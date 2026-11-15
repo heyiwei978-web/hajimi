@@ -81,9 +81,12 @@ test('note draft preserves edited output and manual selection, and reports copy 
       await page.locator('[data-type=spec]').click();
       await page.locator('#noteResult').waitFor({state:'visible'});
       await page.locator('#noteOutput').fill('已编辑的示例');
-      page.once('dialog',dialog=>dialog.dismiss());
       await page.locator('[data-type=first]').click();
-      assert.equal(requests,1);
+      await page.waitForFunction(()=>document.querySelector('#noteDocumentList').children.length===2);
+      await page.locator('#noteDocumentList button').filter({hasText:'专科检查'}).click();
+      page.once('dialog',dialog=>dialog.dismiss());
+      await page.locator('[data-type=spec]').click();
+      assert.equal(requests,2);
       assert.equal(await page.locator('#noteOutput').inputValue(),'已编辑的示例');
       await page.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{value:{writeText:()=>Promise.reject(new Error('denied'))}});document.execCommand=()=>false;});
       await page.locator('#noteCopy').click();
@@ -130,7 +133,6 @@ test('note page exposes published cases and generates daily notes without sendin
       assert.match(sent.caseReference,/肝脓肿/);
       assert(!JSON.stringify(sent).includes(reference));
       await page.locator('[name=referenceText]').fill('虚构参考格式');
-      page.once('dialog',dialog=>dialog.accept());
       await page.locator('[data-type=caseChapter]').click();
       await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('已生成'));
       assert.equal(sent.type,'caseChapter');assert.equal(sent.referenceText,'虚构参考格式');
@@ -280,6 +282,187 @@ test('note reports blocked session storage and selects the entire body when clip
     assert.match(await page.locator('#noteStatus').innerText(),/复制失败/);
     assert.deepEqual(await page.locator('#noteOutput').evaluate(element=>[element.selectionStart,element.selectionEnd,document.activeElement===element]),[0,'手动修改\n完整正文\n医师签名：'.length,true]);
     assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note sets resume only unfinished documents after reload and preserve separate edits, facts and clipboard',async()=>{
+  for(const width of [390,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await context.grantPermissions(['clipboard-read','clipboard-write']);
+      const sent=[]; let fail=true;
+      await page.route('**/api/note-generate',route=>{
+        const body=route.request().postDataJSON();sent.push(body);
+        if(body.type==='preop'&&fail){fail=false;return route.fulfill({status:429,json:{error:'生成请求过于频繁，请稍后重试'}});}
+        return route.fulfill({json:{text:body.type+'（虚构测试）\n右股骨颈骨折。Hb 108 g/L，青霉素过敏。\n医师签名：'}});
+      });
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await page.locator('#notePreset').selectOption('0');
+      await page.locator('.note-details').filter({has:page.locator('[name=allergies]')}).locator('summary').click();
+      await page.locator('[name=allergies]').fill('青霉素过敏');
+      await page.locator('[name=checks]').fill('Hb 108 g/L');
+      await page.locator('#noteGenerateSet').click();
+      await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('本套已暂停'));
+      assert.deepEqual(sent.map(body=>body.type),['first','preop']);
+      const edited='首次病程记录（虚构测试）\nHb 108 g/L，青霉素过敏。\n1. 右下肢暂不负重。\n医师签名：';
+      await page.locator('#noteOutput').fill(edited);
+      await page.reload({waitUntil:'networkidle'});
+      assert.equal(sent.length,2,'refresh must not send an AI request');
+      assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+      await page.locator('#noteResume').click();
+      await page.waitForFunction(()=>document.querySelector('#noteDocumentList').children.length===4&&document.querySelector('#noteForm').getAttribute('aria-busy')==='false');
+      assert.deepEqual(sent.map(body=>body.type),['first','preop','preop','op','postop']);
+      for(const body of sent){assert.equal(body.diagnosis,sent[0].diagnosis);assert.equal(body.allergies,'青霉素过敏');assert.equal(body.checks,'Hb 108 g/L');assert(!JSON.stringify(body).includes(edited));}
+      await page.locator('#noteDocumentList').getByRole('button',{name:'首次病程记录',exact:true}).click();
+      assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+      await page.locator('#noteFacts summary').click();
+      assert.match(await page.locator('#noteFactList').innerText(),/Hb 108 g\/L/);
+      await page.locator('[name=diagnosis]').fill('右股骨颈骨折（输入已修改）');
+      assert.doesNotMatch(await page.locator('#noteFactList').innerText(),/输入已修改/,'review must show the generation snapshot');
+      await page.locator('#noteCopy').click();
+      assert.equal(await page.evaluate(()=>navigator.clipboard.readText()),edited);
+      await page.evaluate(()=>{const el=document.createElement('textarea');el.id='workflowPaste';document.body.append(el);});
+      await page.locator('#workflowPaste').focus();await page.keyboard.press('Control+V');
+      assert.equal(await page.locator('#workflowPaste').inputValue(),edited);
+      await page.locator('#workflowPaste').evaluate(el=>el.remove());
+      await page.reload({waitUntil:'networkidle'});
+      assert.equal(await page.locator('#noteDocumentList button').count(),4);
+      assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+      if(process.env.NOTE_WORKFLOW_EVIDENCE_DIR){
+        fs.mkdirSync(process.env.NOTE_WORKFLOW_EVIDENCE_DIR,{recursive:true});
+        await page.locator('#noteFacts summary').click();
+        await page.setViewportSize({width,height:2400});
+        await page.locator('#noteResultTitle').click();
+        await page.locator('#noteResult').evaluate(element=>element.scrollIntoView({block:'start'}));await settle(page);
+        await page.locator('#noteResult').screenshot({path:path.join(process.env.NOTE_WORKFLOW_EVIDENCE_DIR,'workflow-'+width+'.png')});
+      }
+      for(const checkWidth of [320,390,768,1024,1280,1440]){
+        await page.setViewportSize({width:checkWidth,height:900});
+        assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),String(checkWidth));
+      }
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('note next day clears changes, keeps baseline and earlier documents, and supports cancel and full case reset',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    const sent=[];
+    await page.route('**/api/note-generate',route=>{const body=route.request().postDataJSON();sent.push(body);return route.fulfill({json:{text:'虚构：术后第'+body.day+'天正文\n'+body.daily}});});
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('#notePreset').selectOption('0');
+    await page.locator('[name=day]').fill('2');
+    await page.locator('[name=daily]').fill('第2天新结果 Hb 98 g/L。');
+    await page.locator('[data-type=postDaily]').click();
+    await page.locator('#noteResult').waitFor({state:'visible'});
+    await page.locator('#noteOutput').fill('第2天手动核对后的完整正文');
+    await page.locator('[name=day]').fill('3');
+    assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('hajimi-note-draft-v1')).day),'2','uncommitted day edits must not persist with old daily facts');
+    await page.reload({waitUntil:'networkidle'});
+    assert.equal(await page.locator('[name=day]').inputValue(),'2');
+    assert.equal(await page.locator('[name=daily]').inputValue(),'第2天新结果 Hb 98 g/L。');
+    page.once('dialog',d=>d.dismiss());
+    await page.locator('#noteNextDay').click();
+    assert.equal(await page.locator('[name=day]').inputValue(),'2');
+    assert.equal(await page.locator('[name=daily]').inputValue(),'第2天新结果 Hb 98 g/L。');
+    page.once('dialog',d=>d.accept());
+    await page.locator('#noteNextDay').click();
+    assert.equal(await page.locator('[name=day]').inputValue(),'3');
+    assert.equal(await page.locator('[name=daily]').inputValue(),'');
+    await page.locator('[name=daily]').fill('第3天新结果 Hb 101 g/L。');
+    await page.locator('[data-type=postDaily]').click();
+    await page.waitForFunction(()=>document.querySelector('#noteDocumentList').children.length===2);
+    assert.equal(sent[1].day,'3');assert.equal(sent[1].diagnosis,sent[0].diagnosis);
+    assert(!JSON.stringify(sent[1]).includes('98 g/L'));assert(!JSON.stringify(sent[1]).includes('手动核对'));
+    await page.locator('#noteDocumentList button').filter({hasText:'第2天'}).click();
+    assert.equal(await page.locator('#noteOutput').inputValue(),'第2天手动核对后的完整正文');
+    page.once('dialog',d=>d.dismiss());await page.locator('#noteNewCase').click();
+    assert.equal(await page.locator('#noteDocumentList button').count(),2);
+    page.once('dialog',d=>d.accept());await page.locator('#noteNewCase').click();
+    await page.reload({waitUntil:'networkidle'});
+    assert(await page.locator('#noteResult').isHidden());
+    assert.equal(await page.locator('[name=diagnosis]').inputValue(),'');
+    assert.equal(await page.locator('[name=daily]').inputValue(),'');
+    assert.equal(await page.locator('#noteDocumentList button').count(),0);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note batch validates all requests before sending and stopping retains an explicit resumable queue',async()=>{
+  const {page,context,errors}=await pageFor(1280);
+  try{
+    let count=0,release,seen;
+    const requestSeen=new Promise(resolve=>{seen=resolve;});
+    const held=new Promise(resolve=>{release=resolve;});
+    await page.route('**/api/note-generate',async route=>{count++;seen();await held;await route.fulfill({json:{text:'虚构第一份正文'}});});
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('[name=complaint]').fill('虚构右髋疼痛');
+    await page.locator('[name=diagnosis]').fill('右股骨颈骨折');
+    await page.locator('#noteGenerateSet').click();
+    assert.match(await page.locator('#noteStatus').innerText(),/手术方式/);assert.equal(count,0);
+    await page.locator('[name=operation]').fill('右侧人工股骨头置换术');
+    await page.locator('#noteGenerateSet').click();await requestSeen;
+    assert(await page.locator('[name=diagnosis]').isDisabled());
+    await page.locator('#noteStop').click();release();
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('已停止'));
+    assert.equal(count,1);assert.equal(await page.locator('#noteDocumentList button').count(),1);
+    assert.match(await page.locator('#noteResume').innerText(),/3 份/);
+    await page.reload({waitUntil:'networkidle'});assert.equal(count,1);
+    page.once('dialog',d=>d.dismiss());
+    await page.locator('[data-type=spec]').click();
+    assert.equal(count,1);
+    assert.match(await page.locator('#noteResume').innerText(),/3 份/,'canceling a new task preserves the pending queue');
+    page.once('dialog',d=>d.dismiss());
+    await page.locator('[name=dailyPhase]').selectOption('pre');
+    assert.equal(await page.locator('[name=dailyPhase]').inputValue(),'post');
+    assert.match(await page.locator('#noteResume').innerText(),/3 份/,'canceling a stage change also preserves the queue');
+    await page.locator('[name=diagnosis]').fill('新诊断');
+    await page.locator('#noteResume').click();
+    assert.match(await page.locator('#noteStatus').innerText(),/病情信息已变化/);assert.equal(count,1);
+    assert.equal(await page.locator('#noteOutput').inputValue(),'虚构第一份正文');
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note migrates the previous single result and does not resurrect it after deletion',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.evaluate(()=>{sessionStorage.removeItem('hajimi-note-documents-v1');sessionStorage.setItem('hajimi-note-result-v1',JSON.stringify({label:'旧版手术记录',text:'旧版本已编辑正文\n未输血。'}));});
+    await page.reload({waitUntil:'networkidle'});
+    assert.equal(await page.locator('#noteOutput').inputValue(),'旧版本已编辑正文\n未输血。');
+    page.once('dialog',d=>d.accept());await page.locator('#noteClear').click();
+    await page.reload({waitUntil:'networkidle'});
+    assert(await page.locator('#noteResult').isHidden());assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note protects partial facts during preset changes and isolates preoperative from postoperative daily input',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    let count=0;
+    await page.route('**/api/note-generate',route=>{count++;return route.fulfill({json:{text:'虚构病程正文'}});});
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('.note-details').filter({has:page.locator('[name=allergies]')}).locator('summary').click();
+    await page.locator('[name=allergies]').fill('青霉素过敏');
+    page.once('dialog',d=>d.dismiss());await page.locator('#notePreset').selectOption('0');
+    assert.equal(await page.locator('[name=allergies]').inputValue(),'青霉素过敏');
+    assert.equal(await page.locator('#notePreset').inputValue(),'');
+    page.once('dialog',d=>d.accept());await page.locator('#notePreset').selectOption('0');
+    assert.equal(await page.locator('[name=allergies]').inputValue(),'');
+    await page.locator('[name=day]').fill('2');
+    await page.locator('[name=daily]').fill('术后第2天新情况');
+    await page.locator('[data-type=preDaily]').click();
+    assert.match(await page.locator('#noteStatus').innerText(),/阶段与文书不符/);assert.equal(count,0);
+    page.once('dialog',d=>d.dismiss());await page.locator('[name=dailyPhase]').selectOption('pre');
+    assert.equal(await page.locator('[name=dailyPhase]').inputValue(),'post');
+    assert.equal(await page.locator('[name=daily]').inputValue(),'术后第2天新情况');
+    page.once('dialog',d=>d.accept());await page.locator('[name=dailyPhase]').selectOption('pre');
+    assert.equal(await page.locator('[name=day]').inputValue(),'');assert.equal(await page.locator('[name=daily]').inputValue(),'');
+    await page.locator('[name=day]').fill('3');await page.locator('[name=daily]').fill('住院第3天术前新情况');
+    await page.locator('[data-type=preDaily]').click();await page.locator('#noteResult').waitFor({state:'visible'});
+    assert.equal(count,1);assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
 
