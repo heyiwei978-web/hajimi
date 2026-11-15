@@ -144,3 +144,34 @@ test('note page is published, routed and kept out of the main navigation', () =>
   assert.doesNotMatch(read('note.js'), /localStorage|sessionStorage/);
   assert.match(read('tools.html'), /href="\/note"/);
 });
+
+test('completion mode keeps safety rails and length targets', () => {
+  const checked = validateInput({...BODY, type: 'op'});
+  const [system, user] = buildMessages(checked);
+  assert.match(system.content, /补全模式/);
+  assert.match(system.content, /不少于 600 字/);
+  assert.match(system.content, /不得编造/);
+  assert.match(user.content, /书写说明：/);
+  assert.match(DOC_TYPES.op.guide, /可按术式常规补全/);
+  assert.match(DOC_TYPES.op.guide, /按实际填写/);
+});
+
+test('truncated AI output is reported instead of returned silently', async t => {
+  const cookie = auth(t);
+  const reply = {choices: [{message: {content: '手术记录\n半截'}, finish_reason: 'length'}]};
+  const r = res();
+  await createNoteHandler({fetchImpl: fakeFetch([], reply), env: ENV})(req(cookie, BODY), r);
+  assert.equal(r.code, 502);
+  assert.match(r.body.error, /截断/);
+});
+
+test('markdown formatting is stripped from AI output', async t => {
+  const cookie = auth(t);
+  const reply = {choices: [{message: {content: '# 手术记录\n\n**一、术前诊断**\n- 右股骨颈骨折\n| 项目 | 值 |\n| --- | --- |'}, finish_reason: 'stop'}]};
+  const r = res();
+  await createNoteHandler({fetchImpl: fakeFetch([], reply), env: ENV})(req(cookie, BODY), r);
+  assert.equal(r.code, 200);
+  assert.doesNotMatch(r.body.text, /[#*]/);
+  assert.doesNotMatch(r.body.text, /^\s*[-|]/m);
+  assert.match(r.body.text, /右股骨颈骨折/);
+});
