@@ -60,6 +60,20 @@ test('note generator refuses identifiers and missing fields', async t => {
   assert.equal(findIdentifier('右股骨颈骨折，Garden Ⅳ型'), null);
 });
 
+test('identifier filtering catches spaced IDs, split phone numbers and unlabeled names', () => {
+  const blocked = {
+    '110101 19500101 123X': /身份证号/,
+    '联系 138 0013 8000': /手机号/,
+    '患者张三，男，65岁': /患者姓名/,
+    '病人李四 女 42岁': /患者姓名/
+  };
+  for (const [text, expected] of Object.entries(blocked)) {
+    assert.match(validateInput({...BODY, extra: text}).error || '', expected, text);
+  }
+  assert.equal(findIdentifier('患者老年男性，65岁，因摔伤入院'), null);
+  assert.equal(findIdentifier('中年女性，右髋部疼痛'), null);
+});
+
 test('note generator reports a missing key without calling out', async t => {
   const cookie = auth(t), calls = [];
   const r = res();
@@ -132,16 +146,19 @@ test('other specialties and case names are carried as context, not as current ca
   assert.match(validateInput({...BODY, department: '无效科室'}).error, /科室/);
 });
 
-test('note page is published, routed and kept out of the main navigation', () => {
+test('note page is published, routed and part of the main navigation', () => {
   for (const file of ['note.html', 'note.css', 'note.js']) assert.ok(PUBLIC_FILES.includes(file), file);
   const note = MODULES.find(module => module.id === 'note');
-  assert.equal(note.nav, false);
+  assert.equal(note.nav, true);
   assert.ok(NAV_SURFACES.some(surface => surface.file === 'note.html'));
   const vercel = JSON.parse(read('vercel.json'));
   for (const route of note.routes) assert.ok(vercel.rewrites.some(rule => rule.source === route && rule.destination === '/note.html'), route);
+  assert.equal(vercel.functions?.['api/note-generate.js']?.maxDuration, 60);
   const page = read('note.html');
   assert.doesNotMatch(page, /<script>(?!<)|\son[a-z]+=/i);
-  assert.doesNotMatch(read('note.js'), /localStorage|sessionStorage/);
+  assert.match(page, /<a class="active" href="\/note" aria-current="page">AI 病历生成<\/a>/);
+  assert.doesNotMatch(read('note.js'), /localStorage/);
+  assert.match(read('note.js'), /sessionStorage/);
   assert.match(read('tools.html'), /href="\/note"/);
 });
 
@@ -154,6 +171,16 @@ test('completion mode keeps safety rails and length targets', () => {
   assert.match(user.content, /书写说明：/);
   assert.match(DOC_TYPES.op.guide, /可按术式常规补全/);
   assert.match(DOC_TYPES.op.guide, /按实际填写/);
+});
+
+test('note generator returns 429 when the request quota is exhausted', async t => {
+  const cookie = auth(t), calls = [];
+  const r = res();
+  await createNoteHandler({fetchImpl: fakeFetch(calls), env: ENV, quota: async () => ({allowed: false, retryAfter: 120})})(req(cookie, BODY), r);
+  assert.equal(r.code, 429);
+  assert.equal(r.headers['retry-after'], '120');
+  assert.match(r.body.error, /频繁/);
+  assert.equal(calls.length, 0);
 });
 
 test('truncated AI output is reported instead of returned silently', async t => {

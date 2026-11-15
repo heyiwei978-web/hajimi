@@ -1,4 +1,5 @@
 import {guardRequest} from './_security.js';
+import {consumeNoteQuota} from './_note-limit.js';
 
 // AI 病历草稿生成（/note 页面使用）。
 // - 仅登录的管理员可用，防止他人消耗接口额度。
@@ -35,14 +36,19 @@ const FIELDS = Object.freeze({
   operation: 160, anesthesia: 40, extra: 400, day: 3, daily: 600, department: 10, caseReference: 300, chapterTitle: 160, referenceText: 1000
 });
 
+// 允许身份证号、手机号中出现空格或短横线，并补充「患者张三，男，65岁」这类
+// 没有“姓名：”标签的写法；老年、中年等通用称谓不算姓名。
 const IDENTIFIER_PATTERNS = [
-  [/\d{17}[\dXx]/, '身份证号'],
-  [/(?<!\d)1[3-9]\d{9}(?!\d)/, '手机号'],
-  [/(姓名|住院号|病案号|门诊号|床号|身份证|医保号|联系电话)/, '姓名、住院号等身份信息']
+  [/\d{6}[\s-]?\d{8}[\s-]?\d{3}[\dXx]/, '身份证号'],
+  [/(?<!\d)1[3-9]\d[\s-]?\d{4}[\s-]?\d{4}(?!\d)/, '手机号'],
+  [/(姓名|住院号|病案号|门诊号|床号|身份证|医保号|就诊卡号|联系电话)/, '姓名、住院号等身份信息']
 ];
+const GENERIC_NAME_WORDS = new Set(['老年', '中年', '青年', '男性', '女性', '高龄', '患儿', '儿童', '成年', '患者']);
 
 export function findIdentifier(text) {
   for (const [pattern, label] of IDENTIFIER_PATTERNS) if (pattern.test(text)) return label;
+  const named = text.match(/(?:患者|病人)[：:]?\s*([\u4e00-\u9fa5]{2,4})(?=[，,。；;\s]*(?:男|女|男性|女性|\d{1,3}\s*岁))/);
+  if (named && !GENERIC_NAME_WORDS.has(named[1].slice(0, 2))) return '患者姓名';
   return null;
 }
 
@@ -134,13 +140,19 @@ function aiConfig(env) {
   return {key, url: base.replace(/\/+$/, '') + '/chat/completions', model};
 }
 
-export function createNoteHandler({fetchImpl = globalThis.fetch, env = process.env, timeoutMs = 55000} = {}) {
+export function createNoteHandler({fetchImpl = globalThis.fetch, env = process.env, timeoutMs = 55000, quota = consumeNoteQuota} = {}) {
   return async function handler(req, res) {
-    if (!guardRequest(req, res, {methods: ['POST'], admin: true, json: true, bodyLimit: 8192})) return;
+    if (!guardRequest(req, res, {methods: ['POST'], admin: true, json: true, bodyLimit: 16384})) return;
     const checked = validateInput(req.body);
     if (checked.error) return res.status(400).json({error: checked.error});
     const config = aiConfig(env);
     if (!config) return res.status(503).json({error: 'AI 接口尚未配置，请在 Vercel 环境变量中设置 NOTE_AI_API_KEY'});
+    const limit = await quota(req);
+    if (limit && limit.allowed === false) {
+      const retryAfter = Math.max(1, Number(limit.retryAfter) || 60);
+      res.setHeader('Retry-After', String(retryAfter));
+      return res.status(429).json({error: '生成请求过于频繁，请约 ' + Math.max(1, Math.ceil(retryAfter / 60)) + ' 分钟后再试'});
+    }
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
