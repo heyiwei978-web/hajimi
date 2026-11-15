@@ -23,6 +23,8 @@
       operations: ['右侧人工全膝关节置换术']}
   ];
   const MAX_REQUEST_BYTES = 16384;
+  // 稍长于服务端 60 秒执行窗口，覆盖响应传输；超时不会清空已有正文。
+  const REQUEST_TIMEOUT_MS = 65000;
   const DRAFT_KEY = 'hajimi-note-draft-v1';
   const RESULT_KEY = 'hajimi-note-result-v1';
   const FIELD_NAMES = ['department', 'sex', 'age', 'complaint', 'history', 'diagnosis', 'secondary', 'operation', 'anesthesia', 'extra', 'day', 'daily', 'referenceText'];
@@ -46,10 +48,23 @@
   const caseStatus = document.getElementById('noteCaseStatus');
   const referenceWrap = document.getElementById('noteReferenceWrap');
   const reference = document.getElementById('noteReference');
+  const storageStatus = document.getElementById('noteStorageStatus');
+  const clearButton = document.getElementById('noteClear');
+  const copyStatus = document.getElementById('noteCopyStatus');
   let cases = [], referenceRequest = 0;
   let busy = false;
   let previousCase = '';
   let suppressCaseConfirm = false;
+  let restoredReference = null;
+  let resultLabel = '生成结果', resultStale = false;
+  const storageFailures = new Set();
+
+  function storageState(key, failed) {
+    if (failed) storageFailures.add(key);
+    else storageFailures.delete(key);
+    storageStatus.hidden = !storageFailures.size;
+    storageStatus.textContent = storageFailures.size ? '本标签页暂存不可用，刷新可能丢失修改，请先复制保留正文。' : '';
+  }
 
   function findIdentifier(text) {
     if (/\d{6}[\s-]?\d{8}[\s-]?\d{3}[\dXx]/.test(text)) return '身份证号';
@@ -64,15 +79,21 @@
     try {
       const data = {};
       for (const name of FIELD_NAMES) data[name] = form.elements[name].value;
-      if (Object.values(data).some(value => value.trim())) sessionStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+      const item = caseSelect.value === '' ? null : cases[Number(caseSelect.value)];
+      const chapter = chapterSelect.value === '' ? null : item?.chapters[Number(chapterSelect.value)];
+      data.caseId = item?.id || restoredReference?.caseId || '';
+      data.chapterId = chapter?.id || restoredReference?.chapterId || '';
+      if (Object.values(data).some(value => String(value).trim())) sessionStorage.setItem(DRAFT_KEY, JSON.stringify(data));
       else sessionStorage.removeItem(DRAFT_KEY);
-    } catch {}
+      storageState(DRAFT_KEY, false);
+    } catch { storageState(DRAFT_KEY, true); }
   }
 
   function restoreDraft() {
     try {
       const saved = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || 'null');
       if (!saved || typeof saved !== 'object') return false;
+      if (saved.caseId) restoredReference = {caseId: saved.caseId, chapterId: saved.chapterId};
       let restored = false;
       for (const name of FIELD_NAMES) {
         const element = form.elements[name];
@@ -82,27 +103,34 @@
         if (element.value.trim()) restored = true;
       }
       return restored;
-    } catch { return false; }
+    } catch { storageState(DRAFT_KEY, true); return false; }
   }
 
   function saveResult(label, text) {
-    try { sessionStorage.setItem(RESULT_KEY, JSON.stringify({label, text, at: Date.now()})); } catch {}
+    try {
+      if (text.trim()) sessionStorage.setItem(RESULT_KEY, JSON.stringify({label, text, stale: resultStale, at: Date.now()}));
+      else sessionStorage.removeItem(RESULT_KEY);
+      storageState(RESULT_KEY, false);
+    } catch { storageState(RESULT_KEY, true); }
   }
 
   function restoreResult() {
     try {
       const saved = JSON.parse(sessionStorage.getItem(RESULT_KEY) || 'null');
       if (!saved || typeof saved.text !== 'string' || !saved.text.trim()) return;
-      resultTitle.textContent = (saved.label || '生成结果') + '（本标签页上次生成）';
+      resultLabel = typeof saved.label === 'string' ? saved.label : '生成结果';
+      resultStale = !!saved.stale;
+      resultTitle.textContent = resultLabel + (resultStale ? '（上次生成，可能已过期）' : '（本标签页上次生成）');
       output.value = saved.text;
       result.hidden = false;
-    } catch {}
+    } catch { storageState(RESULT_KEY, true); }
   }
 
   function markResultStale() {
     if (result.hidden || !output.value) return;
-    const base = resultTitle.textContent.replace(/（(?:本标签页上次生成|上次生成，可能已过期)）/g, '');
-    resultTitle.textContent = base + '（上次生成，可能已过期）';
+    resultStale = true;
+    resultTitle.textContent = resultLabel + '（上次生成，可能已过期）';
+    saveResult(resultLabel, output.value);
   }
 
   fetch('/note-cases.json', {cache: 'no-store'})
@@ -111,6 +139,25 @@
       cases = items;
       items.forEach((item, index) => caseSelect.add(new Option(item.department + ' · ' + item.title, String(index))));
       caseStatus.textContent = '病例正文供本页查看；仅所选名称和你确认的参考片段会发送给 AI。';
+      if (restoredReference) {
+        const saved = restoredReference;
+        restoredReference = null;
+        const index = cases.findIndex(item => item.id === saved.caseId);
+        if (index >= 0) {
+          const department = form.elements.department.value;
+          caseSelect.value = String(index);
+          suppressCaseConfirm = true;
+          caseSelect.dispatchEvent(new Event('change'));
+          suppressCaseConfirm = false;
+          form.elements.department.value = department;
+          const chapterIndex = cases[index].chapters.findIndex(chapter => chapter.id === saved.chapterId);
+          if (chapterIndex >= 0) {
+            chapterSelect.value = String(chapterIndex);
+            chapterSelect.dispatchEvent(new Event('change'));
+          }
+        }
+        saveDraft();
+      }
     })
     .catch(() => { caseStatus.textContent = '病例目录加载失败，请刷新页面重试。'; });
 
@@ -130,6 +177,7 @@
       return;
     }
     if (!suppressCaseConfirm) clearCaseFields();
+    if (!suppressCaseConfirm) markResultStale();
     previousCase = caseSelect.value;
     referenceRequest++;
     referenceWrap.hidden = true;
@@ -191,12 +239,21 @@
     form.elements.diagnosis.value = item.diagnosis;
     form.elements.operation.value = item.operations[0];
     item.operations.forEach(name => operations.append(new Option(name)));
+    markResultStale();
+    saveDraft();
     say('已填入示例，请把 X 改成实际时间，左右侧按实际修改。');
   });
 
   function say(text, error = false) {
     status.textContent = text;
     status.classList.toggle('note-error', error);
+  }
+
+  function sayCopy(text, error = false) {
+    copyStatus.textContent = text;
+    copyStatus.hidden = !text;
+    copyStatus.classList.toggle('note-error', error);
+    say(text, error);
   }
 
   function collect() {
@@ -232,21 +289,32 @@
     if (new TextEncoder().encode(requestBody).length > MAX_REQUEST_BYTES) { say('输入内容总长度超出限制，请缩短病情或参考片段。', true); return; }
     if (!result.hidden && output.value && !window.confirm('生成新文书会替换当前结果，确定继续吗？')) return;
     busy = true;
-    buttons.forEach(item => { item.disabled = true; });
+    copyStatus.hidden = true;
+    const controls = [...form.elements].map(element => [element, element.disabled]);
+    controls.forEach(([element]) => { element.disabled = true; });
+    form.setAttribute('aria-busy', 'true');
+    clearButton.disabled = true;
     output.readOnly = true;
+    saveResult(resultLabel, output.value);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     const started = Date.now();
     say('正在生成「' + button.textContent + '」，大约需要 10～40 秒……');
     const ticker = setInterval(() => {
-      say('正在生成「' + button.textContent + '」，已等待 ' + Math.round((Date.now() - started) / 1000) + ' 秒（通常 5～20 秒）……');
+      say('正在生成「' + button.textContent + '」，已等待 ' + Math.round((Date.now() - started) / 1000) + ' 秒……');
     }, 1000);
     try {
       const response = await fetch('/api/note-generate', {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'X-Hajimi-Admin': '1'},
         credentials: 'same-origin',
-        body: requestBody
+        body: requestBody,
+        signal: controller.signal
       });
-      const body = await response.json().catch(() => ({}));
+      const body = await response.json().catch(error => {
+        if (controller.signal.aborted || error?.name === 'AbortError') throw error;
+        return null;
+      });
       if (response.status === 401) {
         login.hidden = false;
         markResultStale();
@@ -255,22 +323,32 @@
       }
       if (!response.ok) {
         markResultStale();
-        say(body.error || '生成失败，请稍后再试', true);
+        say((typeof body?.error === 'string' && body.error) || (response.status === 504 ? '生成超时，请重试；原结果已保留。' : '生成失败，请稍后再试；原结果已保留。'), true);
         return;
       }
-      resultTitle.textContent = body.label || '生成结果';
+      if (typeof body?.text !== 'string' || !body.text.trim()) {
+        markResultStale();
+        say('未收到有效的病历正文，原结果已保留，请重试。', true);
+        return;
+      }
+      resultLabel = typeof body.label === 'string' && body.label ? body.label : '生成结果';
+      resultStale = false;
+      resultTitle.textContent = resultLabel;
       output.value = body.text;
       result.hidden = false;
-      saveResult(body.label || '生成结果', body.text);
+      saveResult(resultLabel, body.text);
       say('已生成「' + (body.label || button.textContent) + '」，请核对修改后再复制。');
-      result.scrollIntoView({behavior: 'smooth', block: 'start'});
+      result.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'});
     } catch {
       markResultStale();
-      say('网络连接失败，请检查网络后再试', true);
+      say(controller.signal.aborted ? '生成等待超时，原结果已保留，请稍后重试。' : '网络连接失败，原结果已保留，请检查网络后再试。', true);
     } finally {
       clearInterval(ticker);
+      clearTimeout(timeout);
       busy = false;
-      buttons.forEach(item => { item.disabled = false; });
+      controls.forEach(([element, disabled]) => { element.disabled = disabled; });
+      form.setAttribute('aria-busy', 'false');
+      clearButton.disabled = false;
       output.readOnly = false;
     }
   }
@@ -278,31 +356,42 @@
   buttons.forEach(button => button.addEventListener('click', () => generate(button)));
 
   document.getElementById('noteCopy').addEventListener('click', async () => {
+    if (!output.value.trim()) { sayCopy('没有可复制的正文。', true); return; }
     try {
       await navigator.clipboard.writeText(output.value);
     } catch {
+      output.focus();
       output.select();
+      output.setSelectionRange(0, output.value.length);
       try {
         if (!document.execCommand('copy')) throw new Error('copy failed');
       } catch {
-        say('复制失败，请选中结果后手动复制。', true);
+        sayCopy('复制失败，正文已全选，请使用系统复制。', true);
         return;
       }
     }
-    say('已复制，请继续核对内容。');
+    sayCopy('已复制完整正文。');
   });
 
-  document.getElementById('noteClear').addEventListener('click', () => {
+  clearButton.addEventListener('click', () => {
+    if (busy) return;
     if (!window.confirm('确定清空生成结果吗？')) return;
     output.value = '';
     result.hidden = true;
     resultTitle.textContent = '生成结果';
-    try { sessionStorage.removeItem(RESULT_KEY); } catch {}
+    resultLabel = '生成结果';
+    resultStale = false;
+    saveResult(resultLabel, '');
     say('已清空。');
   });
 
   form.addEventListener('input', saveDraft);
   form.addEventListener('change', saveDraft);
+  form.addEventListener('input', markResultStale);
+  form.addEventListener('change', event => {
+    if (!suppressCaseConfirm && event.target !== caseSelect) markResultStale();
+  });
+  output.addEventListener('input', () => { copyStatus.hidden = true; saveResult(resultLabel, output.value); });
   login.querySelector('a')?.addEventListener('click', saveDraft);
   if (restoreDraft()) say('已恢复本标签页上次填写的草稿；如不需要可清空对应字段。');
   restoreResult();

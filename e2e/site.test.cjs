@@ -141,6 +141,148 @@ test('note page exposes published cases and generates daily notes without sendin
   }
 });
 
+test('note edits and reference selection survive reload; copying pastes only the full edited body',async()=>{
+  for(const width of [390,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await context.grantPermissions(['clipboard-read','clipboard-write']);
+      await page.route('**/api/note-generate',route=>route.fulfill({json:{label:'首次病程记录',text:'虚构教学病历正文'}}));
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      const catalog=await (await page.request.get(base+'/note-cases.json')).json();
+      const caseIndex=catalog.findIndex(item=>item.chapters.some(chapter=>chapter.hasBody));
+      await page.locator('#noteCase').selectOption(String(caseIndex));
+      const chapterIndex=catalog[caseIndex].chapters.findIndex(item=>item.hasBody);
+      await page.locator('#noteChapter').selectOption(String(chapterIndex));
+      await page.locator('#noteReferenceWrap').waitFor({state:'visible'});
+      await page.locator('[name=complaint]').fill('虚构测试：摔伤致右髋部疼痛3小时');
+      await page.locator('[name=diagnosis]').fill('右股骨颈骨折');
+      await page.locator('[name=referenceText]').fill('仅供测试的参考片段');
+      await page.locator('[data-type=first]').click();
+      await page.locator('#noteResult').waitFor({state:'visible'});
+      const edited='首次病程记录（虚构测试）\n\n一、病例特点\n摔伤致右髋部疼痛3小时，右股骨颈骨折。Hb 108 g/L，CRP > 10 mg/L，足趾活动存在。\n\n二、拟诊讨论\n结合受伤经过、局部体征与影像分析。\n\n三、诊疗计划\n1. 根据评估完善检查。\n2. 右下肢暂不负重。\n\n医师签名：';
+      await page.locator('#noteOutput').fill(edited);
+      await page.reload({waitUntil:'networkidle'});
+      assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+      assert.equal(await page.locator('#noteCase').inputValue(),String(caseIndex));
+      assert.equal(await page.locator('#noteChapter').inputValue(),String(chapterIndex));
+      assert.equal(await page.locator('[name=referenceText]').inputValue(),'仅供测试的参考片段');
+      assert.equal(await page.locator('[name=diagnosis]').inputValue(),'右股骨颈骨折');
+      await page.locator('#noteCopy').click();
+      assert.equal(await page.evaluate(()=>navigator.clipboard.readText()),edited);
+      // 使用真正的剪贴板粘贴到独立 textarea，核对编号、符号和所有换行。
+      await page.evaluate(()=>{const editor=document.createElement('textarea');editor.id='testTextEditor';editor.setAttribute('aria-label','测试文本编辑器');document.body.append(editor);});
+      await page.locator('#testTextEditor').focus();
+      await page.keyboard.press('Control+V');
+      assert.equal(await page.locator('#testTextEditor').inputValue(),edited);
+      assert.doesNotMatch(await page.locator('#testTextEditor').inputValue(),/医学审核提醒|本文为.*草稿/);
+      await page.locator('#testTextEditor').evaluate(element=>element.remove());
+      assert(await page.locator('#noteReview').isVisible());
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      if(process.env.NOTE_EVIDENCE_DIR){
+        fs.mkdirSync(process.env.NOTE_EVIDENCE_DIR,{recursive:true});
+        // 给整张结果卡留足高度，避免长卡截图时被吸顶导航遮挡。
+        await page.setViewportSize({width,height:1200});
+        await page.locator('#noteResult').evaluate(element=>element.scrollIntoView({block:'start'}));
+        await settle(page);
+        await page.locator('#noteResult').screenshot({path:path.join(process.env.NOTE_EVIDENCE_DIR,'note-'+width+'.png')});
+      }
+      await page.locator('#noteOutput').fill('');
+      await page.reload({waitUntil:'networkidle'});
+      assert(await page.locator('#noteResult').isHidden(),'deleting all text must not restore the previous body');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('note failures preserve edited content and restore controls, including a client deadline',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('#notePreset').selectOption('0');
+    await page.route('**/api/note-generate',route=>route.fulfill({json:{label:'手术记录',text:'原始生成正文'}}));
+    await page.locator('[data-type=op]').click();
+    await page.locator('#noteResult').waitFor({state:'visible'});
+    const edited='已编辑正文：未输血，未放置引流管。';
+    await page.locator('#noteOutput').fill(edited);
+    page.on('dialog',dialog=>dialog.accept());
+    for(const fulfill of [
+      {status:401,json:{error:'未登录'}}, {status:429,json:{error:'生成请求过于频繁'}},
+      {status:502,json:{error:'生成内容被截断'}}, {status:504,body:'upstream timeout'},
+      {status:200,body:'<html>bad gateway</html>'}, {status:200,json:{text:''}}, {status:200,json:null}
+    ]){
+      await page.route('**/api/note-generate',route=>route.fulfill(fulfill));
+      await page.locator('[data-type=op]').click();
+      await page.waitForFunction(()=>document.querySelector('#noteForm').getAttribute('aria-busy')==='false');
+      assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+      assert.equal(await page.locator('#noteOutput').getAttribute('readonly'),null);
+      assert(await page.locator('#noteStatus').evaluate(element=>element.classList.contains('note-error')));
+      assert(await page.locator('#noteClear').isEnabled());
+      assert(await page.locator('#noteChapter').isDisabled());
+    }
+    await page.route('**/api/note-generate',route=>route.abort('failed'));
+    await page.locator('[data-type=op]').click();
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('网络连接失败'));
+    assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+    // Playwright 虚拟时钟测试真实的 65 秒 deadline，不让回归等待 65 秒。
+    await page.clock.install();
+    let release,requestSeen;
+    const seen=new Promise(resolve=>{requestSeen=resolve;});
+    const held=new Promise(resolve=>{release=resolve;});
+    await page.route('**/api/note-generate',async route=>{requestSeen();await held;await route.fulfill({json:{label:'迟到结果',text:'不得覆盖原文'}}).catch(()=>{});});
+    await page.locator('[data-type=op]').click();
+    await seen;
+    assert(await page.locator('[name=diagnosis]').isDisabled());
+    assert(await page.locator('#noteClear').isDisabled());
+    assert.equal(await page.locator('#noteOutput').getAttribute('readonly'),'');
+    await page.clock.fastForward(66000);
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('等待超时'));
+    release();
+    assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+    assert(await page.locator('[name=diagnosis]').isEnabled());
+    assert(await page.locator('#noteClear').isEnabled());
+    // 响应头已到达但 JSON 正文流挂起，仍应正确提示超时而不是空正文。
+    await page.evaluate(()=>{
+      const originalFetch=window.fetch;
+      window.fetch=(url,options)=>url==='/api/note-generate'?Promise.resolve(new Response(new ReadableStream({
+        start(controller){
+          controller.enqueue(new TextEncoder().encode('{"text":"未完整传输'));
+          options.signal.addEventListener('abort',()=>controller.error(new DOMException('body aborted','AbortError')),{once:true});
+        }
+      }),{status:200,headers:{'Content-Type':'application/json'}})):originalFetch(url,options);
+    });
+    await page.locator('[data-type=op]').click();
+    await page.clock.fastForward(66000);
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('等待超时'));
+    assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+    assert(await page.locator('#noteClear').isEnabled());
+    await page.reload({waitUntil:'networkidle'});
+    assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note reports blocked session storage and selects the entire body when clipboard fails',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await context.addInitScript(()=>{
+      Object.defineProperty(window,'sessionStorage',{get(){throw new DOMException('blocked','SecurityError');}});
+      Object.defineProperty(navigator,'clipboard',{value:{writeText:()=>Promise.reject(new Error('blocked'))}});
+      document.execCommand=()=>false;
+    });
+    await page.route('**/api/note-generate',route=>route.fulfill({json:{label:'手术记录',text:'虚构正文\n未输血。\n医师签名：'}}));
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('#notePreset').selectOption('0');
+    await page.locator('[data-type=op]').click();
+    await page.locator('#noteResult').waitFor({state:'visible'});
+    assert(await page.locator('#noteStorageStatus').isVisible());
+    await page.locator('#noteOutput').fill('手动修改\n完整正文\n医师签名：');
+    await page.locator('#noteCopy').click();
+    assert.match(await page.locator('#noteStatus').innerText(),/复制失败/);
+    assert.deepEqual(await page.locator('#noteOutput').evaluate(element=>[element.selectionStart,element.selectionEnd,document.activeElement===element]),[0,'手动修改\n完整正文\n医师签名：'.length,true]);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('template totals count complete cases before and after catalogs load; utility records stay separate',async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width);

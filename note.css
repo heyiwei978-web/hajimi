@@ -29,9 +29,10 @@
 .note-status.note-error{color:#b42318}
 .note-result{scroll-margin-top:calc(var(--site-header-height,72px) + 12px)}
 .note-result[hidden]{display:none}
-.note-result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.note-result-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
 .note-result-head h2{margin:0}
-.note-result-buttons{display:flex;gap:8px}
+.note-result-buttons{display:flex;flex-wrap:wrap;gap:8px;flex-shrink:0}
+.note-result-buttons button:disabled{opacity:.6;cursor:progress}
 .note-result textarea{min-height:360px;resize:vertical;font-size:1rem;line-height:1.8}
 .note-tip{margin:8px 0 0;font-size:.8125rem;color:var(--ws-muted,#526577)}
 @media (max-width:640px){

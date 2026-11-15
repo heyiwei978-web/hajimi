@@ -94,7 +94,7 @@
       <input name="day" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="填写第几天，例如 2">
     </label>
     <label class="note-field note-wide">当日情况（可选）
-      <textarea name="daily" maxlength="600" rows="3" placeholder="填写虚构示例当日的情况；未提供的信息将保留待补充"></textarea>
+      <textarea name="daily" maxlength="600" rows="3" placeholder="填写虚构示例当日情况，可注明查房医师级别；常规内容自动补全，具体数值以输入为准"></textarea>
     </label>
     <h2>4. 生成文书</h2>
     <div class="note-actions" role="group" aria-label="选择要生成的文书">
@@ -109,6 +109,7 @@
     </div>
     <p id="noteStatus" class="note-status" role="status" aria-live="polite"></p>
   </form>
+  <p id="noteStorageStatus" class="note-status note-error" role="status" hidden></p>
 
   <section id="noteResult" class="note-card note-result" hidden>
     <div class="note-result-head">
@@ -119,8 +120,10 @@
       </div>
     </div>
     <label class="visually-hidden" for="noteOutput">生成结果（可直接修改）</label>
-    <textarea id="noteOutput" rows="18" spellcheck="false"></textarea>
-    <p class="note-tip">可以直接在框里修改并复制；生成内容仅供教学，需由专业人员审核。草稿与生成结果只保存在本标签页，关闭页面后清空。</p>
+    <textarea id="noteOutput" rows="18" spellcheck="false" aria-describedby="noteReview"></textarea>
+    <p id="noteCopyStatus" class="note-status" role="status" aria-live="polite" hidden></p>
+    <p id="noteReview" class="note-tip">医学审核提醒：生成内容仅供虚构教学，自动补全内容需由专业人员核对。此提醒不随正文复制。</p>
+    <p class="note-tip">可直接编辑并复制完整正文；输入与编辑后的结果仅暂存在本标签页会话中，刷新可恢复。共用设备使用后请清空结果并关闭标签页。</p>
   </section>
 </main>
 <script defer src="/note.js?v=20261115-note2"></script>
