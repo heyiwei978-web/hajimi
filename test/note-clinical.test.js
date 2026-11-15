@@ -45,7 +45,8 @@ test('reference chapters use the matching document structure without importing r
     assert.match(user, /用户填写的天数优先于参考章节名称中的天数/);
     assert.match(user, /不得套用其中事实/);
     assert.match(user, /主诊断：右股骨颈骨折/);
-    assert.match(user, /记录天数（以所选章节阶段为准）：第2天/);
+    if (['preDaily','postDaily'].includes(type)) assert.match(user, /记录天数（以所选章节阶段为准）：第2天/);
+    else assert.doesNotMatch(user, /记录天数（以所选章节阶段为准）/);
   }
   const checked = validateInput({...NOTE_SCENARIOS[0].body, type: 'caseChapter', caseReference: '教学病例', chapterTitle: '入院记录'});
   assert.doesNotMatch(buildMessages(checked)[1].content, /所选章节结构要求：按查房/);
