@@ -240,6 +240,21 @@ test('note failures preserve edited content and restore controls, including a cl
     assert.equal(await page.locator('#noteOutput').inputValue(),edited);
     assert(await page.locator('[name=diagnosis]').isEnabled());
     assert(await page.locator('#noteClear').isEnabled());
+    // 响应头已到达但 JSON 正文流挂起，仍应正确提示超时而不是空正文。
+    await page.evaluate(()=>{
+      const originalFetch=window.fetch;
+      window.fetch=(url,options)=>url==='/api/note-generate'?Promise.resolve(new Response(new ReadableStream({
+        start(controller){
+          controller.enqueue(new TextEncoder().encode('{"text":"未完整传输'));
+          options.signal.addEventListener('abort',()=>controller.error(new DOMException('body aborted','AbortError')),{once:true});
+        }
+      }),{status:200,headers:{'Content-Type':'application/json'}})):originalFetch(url,options);
+    });
+    await page.locator('[data-type=op]').click();
+    await page.clock.fastForward(66000);
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('等待超时'));
+    assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+    assert(await page.locator('#noteClear').isEnabled());
     await page.reload({waitUntil:'networkidle'});
     assert.equal(await page.locator('#noteOutput').inputValue(),edited);
     assert.deepEqual(errors,[]);

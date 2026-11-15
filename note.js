@@ -311,7 +311,10 @@
         body: requestBody,
         signal: controller.signal
       });
-      const body = await response.json().catch(() => ({}));
+      const body = await response.json().catch(error => {
+        if (controller.signal.aborted || error?.name === 'AbortError') throw error;
+        return null;
+      });
       if (response.status === 401) {
         login.hidden = false;
         markResultStale();
