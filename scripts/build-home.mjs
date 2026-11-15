@@ -42,9 +42,14 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     writeFileSync(new URL('index.html',directory),output);
     const {manifest,publication}=compileClinicalSite(readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);
     const records=new Map(publication.published.map(({record,identity})=>[identity.legacyId,record]));
-    const noteCases=manifest.caseTemplates.items.map(item=>({id:item.caseId,title:item.title,department:item.department,
-      bodyUrl:manifest.bodies[item.department+'\0'+item.group]||null,
-      chapters:item.chapterIds.map(id=>({id,title:records.get(id)?.short||records.get(id)?.name||'文书',hasBody:!!records.get(id)?.sourceBody}))}));
+    const noteCases=manifest.caseTemplates.items.map(item=>{
+      const chapters=item.chapterIds.map(id=>({id,title:records.get(id)?.short||records.get(id)?.name||'文书',hasBody:!!records.get(id)?.sourceBody}));
+      const operationRecord=chapters.find(chapter=>chapter.title==='手术记录');
+      const operationBody=records.get(operationRecord?.id)?.sourceBody||'';
+      const operation=(operationBody.match(/(?:^|\n)[ \t]*(?:手术名称|手术方式)[ \t]*[：:][ \t]*([^\n]+)/)?.[1]||'').split(/　| {2,}/)[0].trim().slice(0,160);
+      return {id:item.caseId,title:item.title,department:item.department,caseType:item.caseType,operation,
+        bodyUrl:manifest.bodies[item.department+'\0'+item.group]||null,chapters};
+    });
     writeFileSync(new URL('note-cases.json',directory),JSON.stringify(noteCases));
     const ecg=compileEcg(directory);
     // Written before asset versioning so /search picks up a content-hashed URL.

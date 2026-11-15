@@ -36,6 +36,7 @@
   const status = document.getElementById('noteStatus');
   const result = document.getElementById('noteResult');
   const resultTitle = document.getElementById('noteResultTitle');
+  const resultRoute = document.getElementById('noteRoute');
   const output = document.getElementById('noteOutput');
   const login = document.getElementById('noteLogin');
   const buttons = [...form.querySelectorAll('[data-type]')];
@@ -44,15 +45,17 @@
   const caseStatus = document.getElementById('noteCaseStatus');
   const referenceWrap = document.getElementById('noteReferenceWrap');
   const reference = document.getElementById('noteReference');
-  let cases = [], referenceRequest = 0;
+  let cases = [], referenceRequest = 0, catalogReady = false;
   let busy = false;
 
   fetch('/note-cases.json', {cache: 'no-store'})
     .then(response => { if (!response.ok) throw new Error(); return response.json(); })
     .then(items => {
+      if (!Array.isArray(items)) throw new Error();
       cases = items;
       items.forEach((item, index) => caseSelect.add(new Option(item.department + ' · ' + item.title, String(index))));
-      caseStatus.textContent = '病例正文供本页查看；仅所选名称和你确认的参考片段会发送给 AI。';
+      catalogReady = true;
+      caseStatus.textContent = '适合常规模板时，模板片段会发送给 AI 作为写法参考；不适合时将单独生成，不使用参考片段。';
     })
     .catch(() => { caseStatus.textContent = '病例目录加载失败，请刷新页面重试。'; });
 
@@ -92,7 +95,7 @@
       if (request !== referenceRequest) return;
       reference.value = row[1];
       referenceWrap.hidden = false;
-      caseStatus.textContent = '已显示原文；参考片段会发送给 AI，请先删除身份信息。';
+      caseStatus.textContent = '已显示原文；自动匹配的模板片段或手动填写的参考片段会发送给 AI。';
     } catch {
       if (request === referenceRequest) caseStatus.textContent = '病例原文加载失败，请重新选择章节。';
     }
@@ -146,40 +149,109 @@
     return '';
   }
 
+  function candidatesFor(type, data) {
+    const selected = caseSelect.value === '' ? null : Number(caseSelect.value);
+    const selectedChapter = chapterSelect.value === '' ? null : Number(chapterSelect.value);
+    const day = /^[1-9]\d{0,2}$/.test(data.day) ? data.day : '';
+    const patterns = {
+      spec: /^入院记录$/,
+      first: /^首次病程(?:记录)?$/,
+      preop: /^术前小结$/,
+      op: /^手术记录$/,
+      postop: /^术后首次病程(?:记录)?$/,
+      preDaily: new RegExp('^(?:住院第' + day + '天(?:日常)?病程(?:记录)?' + (day === '1' ? '|入院当日查房记录' : '') + ')$'),
+      postDaily: new RegExp('^术后第' + day + '天(?:日常)?病程(?:记录)?$')
+    };
+    return cases.flatMap((item, id) => {
+      if (item.caseType !== 'standard' || item.department !== data.department || (selected !== null && selected !== id)
+        || !item.bodyUrl || (data.operation && !item.operation)) return [];
+      const chapter = type === 'caseChapter' ? item.chapters[selectedChapter] : item.chapters.find(entry => patterns[type]?.test(entry.title));
+      return chapter?.hasBody ? [{id, item, chapter}] : [];
+    });
+  }
+
+  async function templateExcerpt(candidate, type) {
+    const response = await fetch(candidate.item.bodyUrl);
+    if (!response.ok) throw new Error('匹配到模板，但原文加载失败，请重试。');
+    const rows = await response.json();
+    if (!Array.isArray(rows)) throw new Error('匹配到模板，但章节原文不可用，请重试。');
+    const text = rows.find(entry => entry[0] === candidate.chapter.id)?.[1];
+    if (typeof text !== 'string') throw new Error('匹配到模板，但章节原文不可用，请重试。');
+    // Source records are fictional examples, but omit identifier and named-staff lines.
+    const safe = text.split(/\r?\n/).filter(line => !IDENTIFIERS.some(([pattern]) => pattern.test(line))
+      && !/(术者|第一助手|麻醉医师)[：:]/.test(line)).join('\n').replace(/[\u4e00-\u9fff]{1,3}某{1,2}/g, '患者');
+    const start = type === 'spec' ? safe.search(/专科(?:检查|情况)[：:]/) : -1;
+    if (type === 'spec' && start < 0) return '';
+    return safe.slice(Math.max(0, start), Math.max(0, start) + 1000).trim();
+  }
+
+  async function postNote(data) {
+    const requestBody = JSON.stringify(data);
+    if (new TextEncoder().encode(requestBody).length > 8192) throw new Error('输入内容总长度超出限制，请缩短病情或参考片段。');
+    const response = await fetch('/api/note-generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-Hajimi-Admin': '1'},
+      credentials: 'same-origin',
+      body: requestBody
+    });
+    const body = await response.json().catch(() => ({}));
+    if (response.status === 401) {
+      login.hidden = false;
+      throw new Error('还没有登录，请先登录管理入口。');
+    }
+    if (!response.ok) throw new Error(body.error || '生成失败，请稍后再试');
+    return body;
+  }
+
   async function generate(button) {
     if (busy) return;
     const type = button.dataset.type;
     const data = collect();
     const problem = check(data, type);
     if (problem) { say(problem, true); return; }
-    const requestBody = JSON.stringify({type, ...data});
-    if (new TextEncoder().encode(requestBody).length > 8192) { say('输入内容总长度超出限制，请缩短病情或参考片段。', true); return; }
+    if (!catalogReady) { say('病例目录尚未加载，请稍后重试；如持续失败，请刷新页面。', true); return; }
     if (!result.hidden && output.value && !window.confirm('生成新文书会替换当前结果，确定继续吗？')) return;
     busy = true;
     buttons.forEach(item => { item.disabled = true; });
     output.readOnly = true;
-    say('正在生成「' + button.textContent + '」，大约需要 10～40 秒……');
+    say('AI 正在判断是否适合参考常规模板……');
     try {
-      const response = await fetch('/api/note-generate', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json', 'X-Hajimi-Admin': '1'},
-        credentials: 'same-origin',
-        body: requestBody
-      });
-      const body = await response.json().catch(() => ({}));
-      if (response.status === 401) {
-        login.hidden = false;
-        say('还没有登录，请先登录管理入口。', true);
-        return;
+      const candidates = candidatesFor(type, data);
+      const decision = await postNote({type, ...data, referenceText: '', action: 'classify',
+        candidates: candidates.map(({id, item, chapter}) => ({id, caseTitle: item.title, chapterTitle: chapter.title, operation: item.operation || ''}))});
+      const candidate = decision.route === 'template' ? candidates.find(item => item.id === decision.candidateId) : null;
+      let routeText;
+      if (candidate) {
+        const manualReference = !!data.referenceText;
+        const excerpt = data.referenceText || await templateExcerpt(candidate, type);
+        if (excerpt) {
+          data.caseReference = candidate.item.title;
+          data.chapterTitle = candidate.chapter.title;
+          data.referenceText = excerpt;
+          routeText = (manualReference ? 'AI 选择常规模板：' : '已参考常规模板：') + candidate.item.title + ' · ' + candidate.chapter.title
+            + (manualReference ? '；使用了手动填写的参考片段。' : '。');
+        } else {
+          data.referenceText = '';
+          if (type !== 'caseChapter') data.caseReference = data.chapterTitle = '';
+          routeText = '未找到适合的模板片段，已单独生成。';
+        }
+      } else {
+        const hadReference = !!data.referenceText;
+        data.referenceText = '';
+        if (type !== 'caseChapter') data.caseReference = data.chapterTitle = '';
+        routeText = (decision.route === 'separate' ? 'AI 未选择常规模板，已单独生成' : 'AI 未能确定模板匹配，已单独生成')
+          + (hadReference ? '；未使用手动参考片段。' : '。');
       }
-      if (!response.ok) { say(body.error || '生成失败，请稍后再试', true); return; }
+      say('正在生成「' + button.textContent + '」……');
+      const body = await postNote({type, ...data});
       resultTitle.textContent = body.label || '生成结果';
+      resultRoute.textContent = routeText;
       output.value = body.text;
       result.hidden = false;
       say('已生成「' + (body.label || button.textContent) + '」，请核对修改后再复制。');
       result.scrollIntoView({behavior: 'smooth', block: 'start'});
-    } catch {
-      say('网络连接失败，请检查网络后再试', true);
+    } catch (error) {
+      say(error instanceof TypeError ? '网络连接失败，请检查网络后再试' : (error.message || '生成失败，请稍后再试'), true);
     } finally {
       busy = false;
       buttons.forEach(item => { item.disabled = false; });

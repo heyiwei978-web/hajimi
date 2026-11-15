@@ -84,6 +84,38 @@ test('note generator forwards only the clinical fields and returns plain text', 
   assert.doesNotMatch(calls[0].options.body, /fixture-owner|hajimi_session/);
 });
 
+test('classification chooses only a supplied template and does not send the manual excerpt', async t => {
+  const cookie = auth(t), calls = [];
+  const candidates = [{id: 4, caseTitle: '教学病例', chapterTitle: '手术记录', operation: '教学手术'}];
+  const reply = {choices: [{message: {content: JSON.stringify({route: 'template', candidateId: 4})}}]};
+  const r = res();
+  await createNoteHandler({fetchImpl: fakeFetch(calls, reply), env: ENV})(req(cookie,
+    {...BODY, action: 'classify', candidates, referenceText: '仅用于之后生成的参考片段'}), r);
+  assert.equal(r.code, 200);
+  assert.deepEqual(r.body, {route: 'template', candidateId: 4});
+  const sent = JSON.parse(calls[0].options.body);
+  assert.equal(sent.response_format.type, 'json_object');
+  assert.match(sent.messages[0].content, /资料不足|无法判断/);
+  assert.match(sent.messages[1].content, /教学病例/);
+  assert.match(sent.messages[1].content, /教学手术/);
+  assert.doesNotMatch(sent.messages[1].content, /仅用于之后生成的参考片段/);
+});
+
+test('classification never accepts an unknown candidate or malformed model output', async t => {
+  const cookie = auth(t), candidates = [{id: 1, caseTitle: '教学病例', chapterTitle: '手术记录'}];
+  for (const text of ['不是 JSON', '{"route":"template","candidateId":99}', '{"route":"template","candidateId":"1"}']) {
+    const r = res();
+    await createNoteHandler({fetchImpl: fakeFetch([], {choices: [{message: {content: text}}]}), env: ENV})(req(cookie,
+      {...BODY, action: 'classify', candidates}), r);
+    assert.deepEqual(r.body, {route: 'uncertain'});
+  }
+  const calls = [], r = res();
+  await createNoteHandler({fetchImpl: fakeFetch(calls), env: ENV})(req(cookie,
+    {...BODY, action: 'classify', candidates: [candidates[0], candidates[0]]}), r);
+  assert.equal(r.code, 400);
+  assert.equal(calls.length, 0);
+});
+
 test('note generator maps AI errors to readable messages', async t => {
   const cookie = auth(t);
   for (const [status, pattern] of [[401, /密钥/], [402, /余额/], [429, /频繁/], [500, /暂时不可用/]]) {
