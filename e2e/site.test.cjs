@@ -2599,6 +2599,20 @@ test('lab calculators default to Chinese report units and give the same result a
   }finally{await context.close();}
 });
 
+test('custom not-found page keeps navigation usable on mobile and desktop',async()=>{
+  for(const width of [390,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/404.html',{waitUntil:'networkidle'});
+      assert(await page.getByRole('heading',{name:'这个页面找不到了'}).isVisible());
+      assert.equal(await page.getByRole('link',{name:'返回首页'}).getAttribute('href'),'/');
+      assert.equal(await page.getByRole('link',{name:'搜索站内资料'}).getAttribute('href'),'/search');
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal page scroll');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('site-wide search finds every section, filters by section and links to the matching page',async()=>{
   for(const width of [390,1440]){
     const {page,context,errors}=await pageFor(width);

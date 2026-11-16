@@ -1,0 +1,13 @@
+*{box-sizing:border-box}
+html{background:#f5f7fa}
+body{min-height:100vh;min-height:100dvh;margin:0;padding:24px max(24px,env(safe-area-inset-right)) 24px max(24px,env(safe-area-inset-left));display:flex;align-items:center;justify-content:center;color:#0f1f33;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6}
+.not-found{width:min(100%,640px);padding:clamp(28px,6vw,60px);border:1px solid #e2e8ef;border-radius:20px;background:#fff;box-shadow:0 14px 32px -14px rgba(15,31,51,.18)}
+.brand{color:#135f9c;font-size:16px;font-weight:700;text-decoration:none}
+.code{margin:48px 0 8px;color:#56687a;font-size:14px;font-weight:700;letter-spacing:.06em}
+h1{margin:0;color:#0f1f33;font-size:clamp(28px,5vw,40px);line-height:1.25}
+.description{max-width:32em;margin:16px 0 28px;color:#475b70;font-size:16px}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.actions a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 18px;border:1px solid #135f9c;border-radius:9px;font-size:16px;font-weight:700;text-decoration:none}
+.primary{background:#135f9c;color:#fff}.secondary{background:#fff;color:#135f9c}
+.actions a:hover{filter:brightness(.94)}
+@media(max-width:380px){.actions a{width:100%}}

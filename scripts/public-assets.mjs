@@ -1,13 +1,13 @@
 // Public assets are an explicit allowlist. Clinical authoring sources, policy,
 // identity ledgers and audit artifacts remain in Git, never in dist/.
 export const PUBLIC_PAGES=[
-  'admin.html','classification.html','duty.html','duty-orders.html','labs.html','note.html','ecg.html',
+  '404.html','admin.html','classification.html','duty.html','duty-orders.html','labs.html','note.html','ecg.html',
   'password-hash.html','pathway.html','search.html','tools.html'
 ];
 export const PUBLIC_STYLES=[
   'accessibility.css','admin.css','case-workspace-preview.css','classification-home.css',
   'classification.css','cms.css','duty.css','duty-orders.css','labs.css','note.css','ecg.css','library-personal.css','pathway.css',
-  'design-system.css','site-search.css','styles.css','tools-page.css','tools-polish.css','ui-polish.css','workspace-design.css','private-gallery.css'
+  'design-system.css','not-found.css','site-search.css','styles.css','tools-page.css','tools-polish.css','ui-polish.css','workspace-design.css','private-gallery.css'
 ];
 export const PUBLIC_SCRIPTS=[
   'admin-content.js','admin.js','classification-data.js','classification-detail-v2-lower.js',
