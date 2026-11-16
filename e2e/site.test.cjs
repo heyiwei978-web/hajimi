@@ -2642,6 +2642,35 @@ test('liver scores preserve their thresholds across SI and US units and flag ext
   }
 });
 
+test('CKiD and Maddrey accept Chinese and US units without changing their formulas',async()=>{
+  for(const width of [390,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      const dlg=page.locator('#dlg');
+      for(const [tool,fields,resultText] of [
+        ['ckidu25',[['age','20'],['h','170'],['cr','88.4']],/86\.4 mL\/min/],
+        ['ckidbed',[['h','120'],['cr','88.4']],/49\.6 mL\/min/],
+        ['maddrey',[['pt','18'],['controlpt','12'],['bili','34.2']],/Maddrey DF 29\.6/]
+      ]){
+        await page.goto(base+'/tools?tool='+tool,{waitUntil:'networkidle'});
+        assert.equal(await dlg.locator('#sys').inputValue(),'si');
+        for(const [id,value] of fields)await dlg.locator('#'+id).fill(value);
+        await dlg.locator('#go').click();assert.match(await dlg.locator('#res').innerText(),resultText,tool);
+        const converted=tool==='maddrey'?'bili':'cr';
+        await dlg.locator('#sys').selectOption('us');
+        assert.equal(await dlg.locator('#'+converted).inputValue(),'');
+        assert.equal(await dlg.locator('#res').isHidden(),true);
+        await dlg.locator('#'+converted).fill(tool==='maddrey'?'2':'1');
+        await dlg.locator('#go').click();assert.match(await dlg.locator('#res').innerText(),resultText,tool);
+        await dlg.locator('#'+converted).fill(tool==='maddrey'?'34':'88.4');
+        await dlg.locator('#go').click();assert.match(await dlg.locator('#res').innerText(),/核对.*单位/,tool);
+      }
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal page scroll');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('site-wide search finds every section, filters by section and links to the matching page',async()=>{
   for(const width of [390,1440]){
     const {page,context,errors}=await pageFor(width);
