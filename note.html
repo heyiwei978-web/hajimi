@@ -47,7 +47,7 @@
     <label class="note-field note-wide">参考章节
       <select id="noteChapter" disabled><option value="">选择病例后查看</option></select>
     </label>
-    <p id="noteCaseStatus" class="note-tip" role="status">病例正文供本页查看；仅所选名称和你确认的参考片段会发送给 AI。</p>
+    <p id="noteCaseStatus" class="note-tip" role="status">适合常规模板时，模板片段会发送给 AI 作为写法参考；不适合时将单独生成，不使用参考片段。</p>
     <label class="note-field note-wide" id="noteReferenceWrap" hidden>教学病例原文
       <textarea id="noteReference" rows="8" readonly></textarea>
     </label>
@@ -127,7 +127,7 @@
     <h2>4. 生成文书</h2>
     <fieldset class="note-batch">
       <legend>整套生成</legend>
-      <p class="note-tip">勾选本次需要的文书，逐份生成并保存。每份均计入原有生成额度；遇到失败会暂停，可手动继续。</p>
+      <p class="note-tip">勾选本次需要的文书，逐份判断并生成。每份通常有一次识别请求和一次生成请求，均计入限流（每 10 分钟最多 20 次）；遇到失败会暂停，可手动继续。</p>
       <div class="note-batch-options">
         <label><input type="checkbox" data-batch-type="first" checked>首次病程记录</label>
         <label><input type="checkbox" data-batch-type="preop" checked>术前小结</label>
@@ -169,6 +169,7 @@
         <button type="button" id="noteClear" class="note-secondary">删除本份</button>
       </div>
     </div>
+    <p id="noteRoute" class="note-tip" role="status" hidden></p>
     <details id="noteFacts" class="note-details">
       <summary>核对本份文书的输入事实</summary>
       <p class="note-tip">以下为生成时的输入快照。文字匹配仅供对照，不判断医学正确性；阶段不适用的信息可能不写入本份文书。提示不随正文复制。</p>

@@ -13,6 +13,7 @@ globalThis.HajimiNoteDocuments = class {
     this.list = document.getElementById('noteDocumentList');
     this.result = document.getElementById('noteResult');
     this.title = document.getElementById('noteResultTitle');
+    this.route = document.getElementById('noteRoute');
     this.facts = document.getElementById('noteFactList');
     this.output.addEventListener('input', () => {
       const item = this.current();
@@ -55,9 +56,9 @@ globalThis.HajimiNoteDocuments = class {
     } catch { this.storageState(this.key, true); }
   }
 
-  put(type, input, text) {
+  put(type, input, text, route = '') {
     const id = HajimiNoteWorkflow.key(type, input);
-    const item = {id, type, input:{...input}, label:HajimiNoteWorkflow.title(type, input), text, stale:false};
+    const item = {id, type, input:{...input}, label:HajimiNoteWorkflow.title(type, input), text, route, stale:false};
     const index = this.items.findIndex(entry => entry.id === id);
     if (index < 0) this.items.push(item);
     else this.items[index] = item;
@@ -126,6 +127,8 @@ globalThis.HajimiNoteDocuments = class {
     this.output.value = item?.text || '';
     this.output.readOnly = this.busy;
     this.title.textContent = item ? item.label + (item.stale ? '（输入已变化，请核对）' : '') : '生成结果';
+    this.route.textContent = typeof item?.route === 'string' ? item.route : '';
+    this.route.hidden = !this.route.textContent;
     this.list.replaceChildren();
     for (const entry of this.items) {
       const button = document.createElement('button');
