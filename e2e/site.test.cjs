@@ -52,6 +52,12 @@ async function pageFor(width=1440, options={}) {
   page.on('pageerror',error=>errors.push(error.message));
   return {page, context, errors};
 }
+async function mockNote(page, handler, classify=()=>({route:'separate'})) {
+  return page.route('**/api/note-generate', route => {
+    const body=route.request().postDataJSON();
+    return body.action==='classify' ? route.fulfill({json:classify(body)}) : handler(route,body);
+  });
+}
 // Merged chapters hold several records; a "document" is a standalone chapter or one record inside a merged chapter.
 const DOCS='#caseWorkspace .case-file-reader > .record-book-section:not(.record-book-merged), #caseWorkspace .record-merged-part';
 const DOC_COPY=/^(复制本章节|复制这一份)$/;
@@ -72,10 +78,7 @@ test('note draft preserves edited output and manual selection, and reports copy 
     const {page,context,errors}=await pageFor(width);
     try{
       let requests=0;
-      await page.route('**/api/note-generate',route=>{
-        requests++;
-        return route.fulfill({json:route.request().postDataJSON().action==='classify'?{route:'separate'}:{label:'示例草稿',text:'虚构示例'}});
-      });
+      await mockNote(page,route=>{requests++;return route.fulfill({json:{label:'示例草稿',text:'虚构示例'}});});
       await page.goto(base+'/note',{waitUntil:'networkidle'});
       await page.locator('#notePreset').selectOption('1');
       const complaint=await page.locator('[name=complaint]').inputValue();
@@ -84,8 +87,11 @@ test('note draft preserves edited output and manual selection, and reports copy 
       await page.locator('[data-type=spec]').click();
       await page.locator('#noteResult').waitFor({state:'visible'});
       await page.locator('#noteOutput').fill('已编辑的示例');
-      page.once('dialog',dialog=>dialog.dismiss());
       await page.locator('[data-type=first]').click();
+      await page.waitForFunction(()=>document.querySelector('#noteDocumentList').children.length===2);
+      await page.locator('#noteDocumentList button').filter({hasText:'专科检查'}).click();
+      page.once('dialog',dialog=>dialog.dismiss());
+      await page.locator('[data-type=spec]').click();
       assert.equal(requests,2);
       assert.equal(await page.locator('#noteOutput').inputValue(),'已编辑的示例');
       await page.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{value:{writeText:()=>Promise.reject(new Error('denied'))}});document.execCommand=()=>false;});
@@ -102,11 +108,8 @@ test('note page exposes published cases and generates daily notes without sendin
     const {page,context,errors}=await pageFor(width);
     try{
       let sent;
-      await page.route('**/api/note-generate',route=>{
-        const request=route.request().postDataJSON();
-        if(request.action==='classify')return route.fulfill({json:request.candidates.length?{route:'template',candidateId:request.candidates[0].id}:{route:'separate'}});
-        sent=request;return route.fulfill({json:{label:'术后病程记录',text:'虚构示例草稿'}});
-      });
+      await mockNote(page,route=>{sent=route.request().postDataJSON();return route.fulfill({json:{label:'术后病程记录',text:'虚构示例草稿'}});},
+        body=>body.type==='caseChapter'&&body.candidates.length?{route:'template',candidateId:body.candidates[0].id}:{route:'separate'});
       await page.goto(base+'/note',{waitUntil:'networkidle'});
       const catalog=await (await page.request.get(base+'/note-cases.json')).json();
       assert.equal(await page.locator('#noteCase option').count(),catalog.length+1);
@@ -138,7 +141,6 @@ test('note page exposes published cases and generates daily notes without sendin
       assert(!JSON.stringify(sent).includes(reference));
       await page.locator('[name=referenceText]').fill('虚构参考格式');
       await page.locator('[name=operation]').fill('');
-      page.once('dialog',dialog=>dialog.accept());
       await page.locator('[data-type=caseChapter]').click();
       await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('已生成'));
       assert.equal(sent.type,'caseChapter');assert.equal(sent.referenceText,'虚构参考格式');
@@ -149,20 +151,16 @@ test('note page exposes published cases and generates daily notes without sendin
   }
 });
 
-test('note page routes standard examples through a matched template and special examples separately',async()=>{
+test('note matches standard templates and keeps per-document routing when special cases are generated separately',async()=>{
+  const {validateInput}=await import('../api/note-generate.js');
   for(const width of [390,1280]){
     const {page,context,errors}=await pageFor(width);
     try{
-      const sent=[];
-      await page.route('**/api/note-generate',route=>{
-        const request=route.request().postDataJSON();
-        if(request.action==='classify'){
-          const target=request.type==='preDaily'?'全膝关节置换':'股骨转子间骨折';
-          const candidate=request.candidates.find(item=>item.caseTitle===target);
-          assert.match(candidate.operation,request.type==='preDaily'?/膝关节置换/:/髓内钉/);
-          return route.fulfill({json:request.extra?{route:'separate'}:{route:'template',candidateId:candidate.id}});
-        }
-        sent.push(request);return route.fulfill({json:{label:'首次病程记录',text:'虚构示例草稿'}});
+      const sent=[], decisions=[];
+      await mockNote(page,(route,body)=>{sent.push(body);return route.fulfill({json:{text:'虚构教学文书正文'}});},body=>{
+        decisions.push(body);
+        const candidate=body.candidates.find(item=>item.caseTitle==='股骨转子间骨折');
+        return body.extra?{route:'separate'}:{route:'template',candidateId:candidate.id};
       });
       await page.goto(base+'/note',{waitUntil:'networkidle'});
       await page.locator('[name=complaint]').fill('虚构示例：摔伤后髋部疼痛');
@@ -170,55 +168,413 @@ test('note page routes standard examples through a matched template and special 
       await page.locator('[data-type=first]').click();
       await page.locator('#noteResult').waitFor({state:'visible'});
       assert.match(await page.locator('#noteRoute').innerText(),/已参考常规模板：股骨转子间骨折/);
+      assert.match(decisions[0].candidates.find(item=>item.caseTitle==='股骨转子间骨折').operation,/髓内钉/);
       assert.equal(sent[0].caseReference,'股骨转子间骨折');
       assert.equal(sent[0].chapterTitle,'首次病程记录');
       assert(sent[0].referenceText.length>0);
       assert.doesNotMatch(sent[0].referenceText,/姓名|住院号|床号/);
-      await page.locator('[name=extra]').fill('虚构示例：病程出现特殊情况');
+      assert.equal(validateInput(sent[0]).error,undefined,'automatically selected excerpt must pass server identity validation');
+      await page.locator('[name=extra]').fill('虚构示例：出现特殊情况');
       await page.locator('[name=referenceText]').fill('手动参考片段');
-      page.once('dialog',dialog=>dialog.accept());
-      await page.locator('[data-type=first]').click();
-      await page.waitForFunction(()=>document.querySelector('#noteRoute').textContent.includes('单独生成'));
+      await page.locator('[data-type=spec]').click();
+      await page.waitForFunction(()=>document.querySelector('#noteDocumentList').children.length===2);
+      assert.match(decisions[1].candidates.find(item=>item.caseTitle==='股骨转子间骨折').chapterTitle,/专科检查片段/);
       assert.equal(sent[1].referenceText,'');
       assert.equal(sent[1].caseReference,'');
       assert.match(await page.locator('#noteRoute').innerText(),/未使用手动参考片段/);
-      await page.locator('[name=extra]').fill('');
-      await page.locator('[name=referenceText]').fill('');
-      await page.locator('[name=complaint]').fill('虚构示例：右膝疼痛');
-      await page.locator('[name=diagnosis]').fill('右膝骨性关节炎');
-      await page.locator('[name=day]').fill('1');
-      page.once('dialog',dialog=>dialog.accept());
-      await page.locator('[data-type=preDaily]').click();
-      await page.waitForFunction(()=>document.querySelector('#noteRoute').textContent.includes('入院当日查房记录'));
-      assert.equal(sent[2].chapterTitle,'入院当日查房记录');
-      assert.equal(sent[2].day,'1');
+      await page.locator('#noteDocumentList button').filter({hasText:'首次病程记录'}).click();
+      assert.match(await page.locator('#noteRoute').innerText(),/已参考常规模板/);
+      await page.reload({waitUntil:'networkidle'});
+      assert.match(await page.locator('#noteRoute').innerText(),/已参考常规模板/);
+      await page.locator('#noteDocumentList button').filter({hasText:'专科检查'}).click();
+      assert.match(await page.locator('#noteRoute').innerText(),/单独生成/);
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
   }
 });
 
-test('note page stops if classification fails and preserves an existing draft',async()=>{
-  const {page,context}=await pageFor(390);
+test('note classification failures pause the batch and preserve the existing document for resume',async()=>{
+  const {page,context,errors}=await pageFor(390);
   try{
-    let failed=false, generated=0;
+    let fail=false, generated=0;
     await page.route('**/api/note-generate',route=>{
-      const request=route.request().postDataJSON();
-      if(request.action==='classify')return failed?route.fulfill({status:502,json:{error:'识别服务暂不可用'}}):route.fulfill({json:{route:'separate'}});
-      generated++;return route.fulfill({json:{label:'首次病程记录',text:'虚构示例草稿'}});
+      const body=route.request().postDataJSON();
+      if(body.action==='classify')return fail?route.fulfill({status:429,json:{error:'识别请求过于频繁'}}):route.fulfill({json:{route:'separate'}});
+      generated++;return route.fulfill({json:{text:'虚构教学文书正文'}});
     });
     await page.goto(base+'/note',{waitUntil:'networkidle'});
-    await page.locator('[name=complaint]').fill('虚构主诉');
-    await page.locator('[name=diagnosis]').fill('虚构诊断');
+    await page.locator('#notePreset').selectOption('0');
+    await page.locator('[data-type=spec]').click();
+    await page.locator('#noteResult').waitFor({state:'visible'});
+    await page.locator('#noteOutput').fill('已核对的旧文书');
+    fail=true;
+    await page.locator('#noteGenerateSet').click();
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('本套已暂停'));
+    assert.equal(generated,1);
+    assert.equal(await page.locator('#noteOutput').inputValue(),'已核对的旧文书');
+    assert.match(await page.locator('#noteResume').innerText(),/4 份/);
+    fail=false;
+    await page.locator('#noteResume').click();
+    await page.waitForFunction(()=>document.querySelector('#noteDocumentList').children.length===5&&document.querySelector('#noteForm').getAttribute('aria-busy')==='false');
+    assert.equal(generated,5);
+    await page.locator('#noteDocumentList button').filter({hasText:'专科检查'}).click();
+    assert.equal(await page.locator('#noteOutput').inputValue(),'已核对的旧文书');
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note template loading timeout keeps the previous document and restores controls',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    let match=false, generated=0,release,seen;
+    const requestSeen=new Promise(resolve=>{seen=resolve;});
+    const held=new Promise(resolve=>{release=resolve;});
+    await mockNote(page,(route)=>{generated++;return route.fulfill({json:{text:'已有虚构正文'}});},body=>{
+      const candidate=body.candidates.find(item=>item.caseTitle==='股骨转子间骨折');
+      return match?{route:'template',candidateId:candidate.id}:{route:'separate'};
+    });
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('[name=complaint]').fill('虚构示例：摔伤后髋部疼痛');
+    await page.locator('[name=diagnosis]').fill('右股骨转子间骨折');
     await page.locator('[data-type=first]').click();
     await page.locator('#noteResult').waitFor({state:'visible'});
-    await page.locator('#noteOutput').fill('已编辑的草稿');
-    failed=true;
-    page.once('dialog',dialog=>dialog.accept());
-    await page.locator('[data-type=first]').click();
-    await page.getByText('识别服务暂不可用').waitFor();
+    await page.locator('#noteOutput').fill('已编辑的旧文书');
+    await page.clock.install();
+    await page.route('**/records-*.json',async route=>{seen();await held;await route.abort().catch(()=>{});});
+    match=true;
+    await page.locator('[data-type=spec]').click();
+    await requestSeen;
+    await page.clock.fastForward(66000);
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('模板加载超时'));
+    release();
     assert.equal(generated,1);
-    assert.equal(await page.locator('#noteOutput').inputValue(),'已编辑的草稿');
+    assert.equal(await page.locator('#noteOutput').inputValue(),'已编辑的旧文书');
+    assert(await page.locator('[name=diagnosis]').isEnabled());
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note edits and reference selection survive reload; copying pastes only the full edited body',async()=>{
+  for(const width of [390,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await context.grantPermissions(['clipboard-read','clipboard-write']);
+      await mockNote(page,route=>route.fulfill({json:{label:'首次病程记录',text:'虚构教学病历正文'}}));
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      const catalog=await (await page.request.get(base+'/note-cases.json')).json();
+      const caseIndex=catalog.findIndex(item=>item.chapters.some(chapter=>chapter.hasBody));
+      await page.locator('#noteCase').selectOption(String(caseIndex));
+      const chapterIndex=catalog[caseIndex].chapters.findIndex(item=>item.hasBody);
+      await page.locator('#noteChapter').selectOption(String(chapterIndex));
+      await page.locator('#noteReferenceWrap').waitFor({state:'visible'});
+      await page.locator('[name=complaint]').fill('虚构测试：摔伤致右髋部疼痛3小时');
+      await page.locator('[name=diagnosis]').fill('右股骨颈骨折');
+      await page.locator('[name=referenceText]').fill('仅供测试的参考片段');
+      await page.locator('[data-type=first]').click();
+      await page.locator('#noteResult').waitFor({state:'visible'});
+      const edited='首次病程记录（虚构测试）\n\n一、病例特点\n摔伤致右髋部疼痛3小时，右股骨颈骨折。Hb 108 g/L，CRP > 10 mg/L，足趾活动存在。\n\n二、拟诊讨论\n结合受伤经过、局部体征与影像分析。\n\n三、诊疗计划\n1. 根据评估完善检查。\n2. 右下肢暂不负重。\n\n医师签名：';
+      await page.locator('#noteOutput').fill(edited);
+      await page.reload({waitUntil:'networkidle'});
+      assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+      assert.equal(await page.locator('#noteCase').inputValue(),String(caseIndex));
+      assert.equal(await page.locator('#noteChapter').inputValue(),String(chapterIndex));
+      assert.equal(await page.locator('[name=referenceText]').inputValue(),'仅供测试的参考片段');
+      assert.equal(await page.locator('[name=diagnosis]').inputValue(),'右股骨颈骨折');
+      await page.locator('#noteCopy').click();
+      assert.equal(await page.evaluate(()=>navigator.clipboard.readText()),edited);
+      // 使用真正的剪贴板粘贴到独立 textarea，核对编号、符号和所有换行。
+      await page.evaluate(()=>{const editor=document.createElement('textarea');editor.id='testTextEditor';editor.setAttribute('aria-label','测试文本编辑器');document.body.append(editor);});
+      await page.locator('#testTextEditor').focus();
+      await page.keyboard.press('Control+V');
+      assert.equal(await page.locator('#testTextEditor').inputValue(),edited);
+      assert.doesNotMatch(await page.locator('#testTextEditor').inputValue(),/医学审核提醒|本文为.*草稿/);
+      await page.locator('#testTextEditor').evaluate(element=>element.remove());
+      assert(await page.locator('#noteReview').isVisible());
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      if(process.env.NOTE_EVIDENCE_DIR){
+        fs.mkdirSync(process.env.NOTE_EVIDENCE_DIR,{recursive:true});
+        // 给整张结果卡留足高度，避免长卡截图时被吸顶导航遮挡。
+        await page.setViewportSize({width,height:1200});
+        await page.locator('#noteResult').evaluate(element=>element.scrollIntoView({block:'start'}));
+        await settle(page);
+        await page.locator('#noteResult').screenshot({path:path.join(process.env.NOTE_EVIDENCE_DIR,'note-'+width+'.png')});
+      }
+      await page.locator('#noteOutput').fill('');
+      await page.reload({waitUntil:'networkidle'});
+      assert(await page.locator('#noteResult').isHidden(),'deleting all text must not restore the previous body');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('note failures preserve edited content and restore controls, including a client deadline',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('#notePreset').selectOption('0');
+    await mockNote(page,route=>route.fulfill({json:{label:'手术记录',text:'原始生成正文'}}));
+    await page.locator('[data-type=op]').click();
+    await page.locator('#noteResult').waitFor({state:'visible'});
+    const edited='已编辑正文：未输血，未放置引流管。';
+    await page.locator('#noteOutput').fill(edited);
+    page.on('dialog',dialog=>dialog.accept());
+    for(const fulfill of [
+      {status:401,json:{error:'未登录'}}, {status:429,json:{error:'生成请求过于频繁'}},
+      {status:502,json:{error:'生成内容被截断'}}, {status:504,body:'upstream timeout'},
+      {status:200,body:'<html>bad gateway</html>'}, {status:200,json:{text:''}}, {status:200,json:null}
+    ]){
+      await mockNote(page,route=>route.fulfill(fulfill));
+      await page.locator('[data-type=op]').click();
+      await page.waitForFunction(()=>document.querySelector('#noteForm').getAttribute('aria-busy')==='false');
+      assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+      assert.equal(await page.locator('#noteOutput').getAttribute('readonly'),null);
+      assert(await page.locator('#noteStatus').evaluate(element=>element.classList.contains('note-error')));
+      assert(await page.locator('#noteClear').isEnabled());
+      assert(await page.locator('#noteChapter').isDisabled());
+    }
+    await mockNote(page,route=>route.abort('failed'));
+    await page.locator('[data-type=op]').click();
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('网络连接失败'));
+    assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+    // Playwright 虚拟时钟测试真实的 65 秒 deadline，不让回归等待 65 秒。
+    await page.clock.install();
+    let release,requestSeen;
+    const seen=new Promise(resolve=>{requestSeen=resolve;});
+    const held=new Promise(resolve=>{release=resolve;});
+    await mockNote(page,async route=>{requestSeen();await held;await route.fulfill({json:{label:'迟到结果',text:'不得覆盖原文'}}).catch(()=>{});});
+    await page.locator('[data-type=op]').click();
+    await seen;
+    assert(await page.locator('[name=diagnosis]').isDisabled());
+    assert(await page.locator('#noteClear').isDisabled());
+    assert.equal(await page.locator('#noteOutput').getAttribute('readonly'),'');
+    await page.clock.fastForward(66000);
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('等待超时'));
+    release();
+    assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+    assert(await page.locator('[name=diagnosis]').isEnabled());
+    assert(await page.locator('#noteClear').isEnabled());
+    // 响应头已到达但 JSON 正文流挂起，仍应正确提示超时而不是空正文。
+    await page.evaluate(()=>{
+      const originalFetch=window.fetch;
+      window.fetch=(url,options)=>url==='/api/note-generate'?Promise.resolve(new Response(new ReadableStream({
+        start(controller){
+          controller.enqueue(new TextEncoder().encode('{"text":"未完整传输'));
+          options.signal.addEventListener('abort',()=>controller.error(new DOMException('body aborted','AbortError')),{once:true});
+        }
+      }),{status:200,headers:{'Content-Type':'application/json'}})):originalFetch(url,options);
+    });
+    await page.locator('[data-type=op]').click();
+    await page.clock.fastForward(66000);
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('等待超时'));
+    assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+    assert(await page.locator('#noteClear').isEnabled());
+    await page.reload({waitUntil:'networkidle'});
+    assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note reports blocked session storage and selects the entire body when clipboard fails',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await context.addInitScript(()=>{
+      Object.defineProperty(window,'sessionStorage',{get(){throw new DOMException('blocked','SecurityError');}});
+      Object.defineProperty(navigator,'clipboard',{value:{writeText:()=>Promise.reject(new Error('blocked'))}});
+      document.execCommand=()=>false;
+    });
+    await mockNote(page,route=>route.fulfill({json:{label:'手术记录',text:'虚构正文\n未输血。\n医师签名：'}}));
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('#notePreset').selectOption('0');
+    await page.locator('[data-type=op]').click();
+    await page.locator('#noteResult').waitFor({state:'visible'});
+    assert(await page.locator('#noteStorageStatus').isVisible());
+    await page.locator('#noteOutput').fill('手动修改\n完整正文\n医师签名：');
+    await page.locator('#noteCopy').click();
+    assert.match(await page.locator('#noteStatus').innerText(),/复制失败/);
+    assert.deepEqual(await page.locator('#noteOutput').evaluate(element=>[element.selectionStart,element.selectionEnd,document.activeElement===element]),[0,'手动修改\n完整正文\n医师签名：'.length,true]);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note sets resume only unfinished documents after reload and preserve separate edits, facts and clipboard',async()=>{
+  for(const width of [390,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await context.grantPermissions(['clipboard-read','clipboard-write']);
+      const sent=[]; let fail=true;
+      await mockNote(page,route=>{
+        const body=route.request().postDataJSON();sent.push(body);
+        if(body.type==='preop'&&fail){fail=false;return route.fulfill({status:429,json:{error:'生成请求过于频繁，请稍后重试'}});}
+        return route.fulfill({json:{text:body.type+'（虚构测试）\n右股骨颈骨折。Hb 108 g/L，青霉素过敏。\n医师签名：'}});
+      });
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await page.locator('#notePreset').selectOption('0');
+      await page.locator('.note-details').filter({has:page.locator('[name=allergies]')}).locator('summary').click();
+      await page.locator('[name=allergies]').fill('青霉素过敏');
+      await page.locator('[name=checks]').fill('Hb 108 g/L');
+      await page.locator('#noteGenerateSet').click();
+      await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('本套已暂停'));
+      assert.deepEqual(sent.map(body=>body.type),['first','preop']);
+      const edited='首次病程记录（虚构测试）\nHb 108 g/L，青霉素过敏。\n1. 右下肢暂不负重。\n医师签名：';
+      await page.locator('#noteOutput').fill(edited);
+      await page.reload({waitUntil:'networkidle'});
+      assert.equal(sent.length,2,'refresh must not send an AI request');
+      assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+      await page.locator('#noteResume').click();
+      await page.waitForFunction(()=>document.querySelector('#noteDocumentList').children.length===4&&document.querySelector('#noteForm').getAttribute('aria-busy')==='false');
+      assert.deepEqual(sent.map(body=>body.type),['first','preop','preop','op','postop']);
+      for(const body of sent){assert.equal(body.diagnosis,sent[0].diagnosis);assert.equal(body.allergies,'青霉素过敏');assert.equal(body.checks,'Hb 108 g/L');assert(!JSON.stringify(body).includes(edited));}
+      await page.locator('#noteDocumentList').getByRole('button',{name:'首次病程记录',exact:true}).click();
+      assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+      await page.locator('#noteFacts summary').click();
+      assert.match(await page.locator('#noteFactList').innerText(),/Hb 108 g\/L/);
+      await page.locator('[name=diagnosis]').fill('右股骨颈骨折（输入已修改）');
+      assert.doesNotMatch(await page.locator('#noteFactList').innerText(),/输入已修改/,'review must show the generation snapshot');
+      await page.locator('#noteCopy').click();
+      assert.equal(await page.evaluate(()=>navigator.clipboard.readText()),edited);
+      await page.evaluate(()=>{const el=document.createElement('textarea');el.id='workflowPaste';document.body.append(el);});
+      await page.locator('#workflowPaste').focus();await page.keyboard.press('Control+V');
+      assert.equal(await page.locator('#workflowPaste').inputValue(),edited);
+      await page.locator('#workflowPaste').evaluate(el=>el.remove());
+      await page.reload({waitUntil:'networkidle'});
+      assert.equal(await page.locator('#noteDocumentList button').count(),4);
+      assert.equal(await page.locator('#noteOutput').inputValue(),edited);
+      if(process.env.NOTE_WORKFLOW_EVIDENCE_DIR){
+        fs.mkdirSync(process.env.NOTE_WORKFLOW_EVIDENCE_DIR,{recursive:true});
+        await page.locator('#noteFacts summary').click();
+        await page.setViewportSize({width,height:2400});
+        await page.locator('#noteResultTitle').click();
+        await page.locator('#noteResult').evaluate(element=>element.scrollIntoView({block:'start'}));await settle(page);
+        await page.locator('#noteResult').screenshot({path:path.join(process.env.NOTE_WORKFLOW_EVIDENCE_DIR,'workflow-'+width+'.png')});
+      }
+      for(const checkWidth of [320,390,768,1024,1280,1440]){
+        await page.setViewportSize({width:checkWidth,height:900});
+        assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),String(checkWidth));
+      }
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('note next day clears changes, keeps baseline and earlier documents, and supports cancel and full case reset',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    const sent=[];
+    await mockNote(page,route=>{const body=route.request().postDataJSON();sent.push(body);return route.fulfill({json:{text:'虚构：术后第'+body.day+'天正文\n'+body.daily}});});
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('#notePreset').selectOption('0');
+    await page.locator('[name=day]').fill('2');
+    await page.locator('[name=daily]').fill('第2天新结果 Hb 98 g/L。');
+    await page.locator('[data-type=postDaily]').click();
+    await page.locator('#noteResult').waitFor({state:'visible'});
+    await page.locator('#noteOutput').fill('第2天手动核对后的完整正文');
+    await page.locator('[name=day]').fill('3');
+    assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('hajimi-note-draft-v1')).day),'2','uncommitted day edits must not persist with old daily facts');
+    await page.reload({waitUntil:'networkidle'});
+    assert.equal(await page.locator('[name=day]').inputValue(),'2');
+    assert.equal(await page.locator('[name=daily]').inputValue(),'第2天新结果 Hb 98 g/L。');
+    page.once('dialog',d=>d.dismiss());
+    await page.locator('#noteNextDay').click();
+    assert.equal(await page.locator('[name=day]').inputValue(),'2');
+    assert.equal(await page.locator('[name=daily]').inputValue(),'第2天新结果 Hb 98 g/L。');
+    page.once('dialog',d=>d.accept());
+    await page.locator('#noteNextDay').click();
+    assert.equal(await page.locator('[name=day]').inputValue(),'3');
+    assert.equal(await page.locator('[name=daily]').inputValue(),'');
+    await page.locator('[name=daily]').fill('第3天新结果 Hb 101 g/L。');
+    await page.locator('[data-type=postDaily]').click();
+    await page.waitForFunction(()=>document.querySelector('#noteDocumentList').children.length===2);
+    assert.equal(sent[1].day,'3');assert.equal(sent[1].diagnosis,sent[0].diagnosis);
+    assert(!JSON.stringify(sent[1]).includes('98 g/L'));assert(!JSON.stringify(sent[1]).includes('手动核对'));
+    await page.locator('#noteDocumentList button').filter({hasText:'第2天'}).click();
+    assert.equal(await page.locator('#noteOutput').inputValue(),'第2天手动核对后的完整正文');
+    page.once('dialog',d=>d.dismiss());await page.locator('#noteNewCase').click();
+    assert.equal(await page.locator('#noteDocumentList button').count(),2);
+    page.once('dialog',d=>d.accept());await page.locator('#noteNewCase').click();
+    await page.reload({waitUntil:'networkidle'});
+    assert(await page.locator('#noteResult').isHidden());
+    assert.equal(await page.locator('[name=diagnosis]').inputValue(),'');
+    assert.equal(await page.locator('[name=daily]').inputValue(),'');
+    assert.equal(await page.locator('#noteDocumentList button').count(),0);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note batch validates all requests before sending and stopping retains an explicit resumable queue',async()=>{
+  const {page,context,errors}=await pageFor(1280);
+  try{
+    let count=0,release,seen;
+    const requestSeen=new Promise(resolve=>{seen=resolve;});
+    const held=new Promise(resolve=>{release=resolve;});
+    await mockNote(page,async route=>{count++;seen();await held;await route.fulfill({json:{text:'虚构第一份正文'}});});
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('[name=complaint]').fill('虚构右髋疼痛');
+    await page.locator('[name=diagnosis]').fill('右股骨颈骨折');
+    await page.locator('#noteGenerateSet').click();
+    assert.match(await page.locator('#noteStatus').innerText(),/手术方式/);assert.equal(count,0);
+    await page.locator('[name=operation]').fill('右侧人工股骨头置换术');
+    await page.locator('#noteGenerateSet').click();await requestSeen;
+    assert(await page.locator('[name=diagnosis]').isDisabled());
+    await page.locator('#noteStop').click();release();
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('已停止'));
+    assert.equal(count,1);assert.equal(await page.locator('#noteDocumentList button').count(),1);
+    assert.match(await page.locator('#noteResume').innerText(),/3 份/);
+    await page.reload({waitUntil:'networkidle'});assert.equal(count,1);
+    page.once('dialog',d=>d.dismiss());
+    await page.locator('[data-type=spec]').click();
+    assert.equal(count,1);
+    assert.match(await page.locator('#noteResume').innerText(),/3 份/,'canceling a new task preserves the pending queue');
+    page.once('dialog',d=>d.dismiss());
+    await page.locator('[name=dailyPhase]').selectOption('pre');
+    assert.equal(await page.locator('[name=dailyPhase]').inputValue(),'post');
+    assert.match(await page.locator('#noteResume').innerText(),/3 份/,'canceling a stage change also preserves the queue');
+    await page.locator('[name=diagnosis]').fill('新诊断');
+    await page.locator('#noteResume').click();
+    assert.match(await page.locator('#noteStatus').innerText(),/病情信息已变化/);assert.equal(count,1);
+    assert.equal(await page.locator('#noteOutput').inputValue(),'虚构第一份正文');
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note migrates the previous single result and does not resurrect it after deletion',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.evaluate(()=>{sessionStorage.removeItem('hajimi-note-documents-v1');sessionStorage.setItem('hajimi-note-result-v1',JSON.stringify({label:'旧版手术记录',text:'旧版本已编辑正文\n未输血。'}));});
+    await page.reload({waitUntil:'networkidle'});
+    assert.equal(await page.locator('#noteOutput').inputValue(),'旧版本已编辑正文\n未输血。');
+    page.once('dialog',d=>d.accept());await page.locator('#noteClear').click();
+    await page.reload({waitUntil:'networkidle'});
+    assert(await page.locator('#noteResult').isHidden());assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note protects partial facts during preset changes and isolates preoperative from postoperative daily input',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    let count=0;
+    await mockNote(page,route=>{count++;return route.fulfill({json:{text:'虚构病程正文'}});});
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('.note-details').filter({has:page.locator('[name=allergies]')}).locator('summary').click();
+    await page.locator('[name=allergies]').fill('青霉素过敏');
+    page.once('dialog',d=>d.dismiss());await page.locator('#notePreset').selectOption('0');
+    assert.equal(await page.locator('[name=allergies]').inputValue(),'青霉素过敏');
+    assert.equal(await page.locator('#notePreset').inputValue(),'');
+    page.once('dialog',d=>d.accept());await page.locator('#notePreset').selectOption('0');
+    assert.equal(await page.locator('[name=allergies]').inputValue(),'');
+    await page.locator('[name=day]').fill('2');
+    await page.locator('[name=daily]').fill('术后第2天新情况');
+    await page.locator('[data-type=preDaily]').click();
+    assert.match(await page.locator('#noteStatus').innerText(),/阶段与文书不符/);assert.equal(count,0);
+    page.once('dialog',d=>d.dismiss());await page.locator('[name=dailyPhase]').selectOption('pre');
+    assert.equal(await page.locator('[name=dailyPhase]').inputValue(),'post');
+    assert.equal(await page.locator('[name=daily]').inputValue(),'术后第2天新情况');
+    page.once('dialog',d=>d.accept());await page.locator('[name=dailyPhase]').selectOption('pre');
+    assert.equal(await page.locator('[name=day]').inputValue(),'');assert.equal(await page.locator('[name=daily]').inputValue(),'');
+    await page.locator('[name=day]').fill('3');await page.locator('[name=daily]').fill('住院第3天术前新情况');
+    await page.locator('[data-type=preDaily]').click();await page.locator('#noteResult').waitFor({state:'visible'});
+    assert.equal(count,1);assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
 
@@ -1668,7 +2024,7 @@ test('record pages: phone header matches other sections with a scrolling navigat
       const active=page.locator('.library-top-actions .library-active-link');
       const box=await active.boundingBox();
       assert(box&&box.width>0&&box.x>=0&&box.x+box.width<=width,'the current section is shown in the navigation');
-      assert.equal(await page.locator('.library-top-actions a').count(),9,'all main sections, including 检验解读');
+      assert.equal(await page.locator('.library-top-actions a').count(),10,'all main sections, including 检验解读 and AI 病历生成');
       assert.equal(await page.locator('#patientBtn').isVisible(),true);
       assert.equal(await page.locator('#libraryShell [data-auth-slot] [data-cms-login]').isVisible(),true);
       if(width<=650){
