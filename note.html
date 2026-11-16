@@ -30,7 +30,7 @@
 
   <section class="note-privacy" aria-label="隐私说明">
     <strong>仅供虚构教学示例，请勿输入真实患者信息</strong>
-    <span>示例内容会发送给第三方 AI 服务。系统会尝试识别部分身份信息，但不能保证识别完整；请勿输入真实患者的姓名、身份信息或病情。生成内容仅供教学，需由专业人员审核。</span>
+    <span>示例内容会发送给第三方 AI 服务。请勿输入真实患者病情、姓名、证件或住院号码、具体日期、医院名称和地址等信息。系统仅尝试识别部分常见格式，不能保证识别完整；生成内容仅供教学，需由专业人员审核。</span>
   </section>
 
   <p id="noteLogin" class="note-login" hidden>需要先<a href="/admin">登录管理入口</a>才能使用 AI 生成；登录后回到本页，本标签页已填写的草稿会保留。</p>
@@ -52,7 +52,7 @@
       <textarea id="noteReference" rows="8" readonly></textarea>
     </label>
     <label class="note-field note-wide">参考片段（可选，最多 1000 字）
-      <textarea name="referenceText" maxlength="1000" rows="4" placeholder="可从原文复制并编辑参考片段；请先删除姓名、住院号等身份信息。片段将发送给 AI。"></textarea>
+      <textarea name="referenceText" maxlength="1000" rows="4" placeholder="可复制并编辑虚构参考片段；请先删除姓名、号码、具体日期、医院名称及地址。片段将发送给 AI。"></textarea>
     </label>
     <label class="note-field note-wide">科室
       <select name="department"><option>骨科</option><option>普外科</option><option>肾内科</option><option>妇科</option></select>
@@ -86,7 +86,7 @@
         <textarea name="allergies" maxlength="200" rows="2" placeholder="填写已确认的过敏或限制；留空不等于无过敏"></textarea>
       </label>
       <label class="note-field">入院检查要点
-        <textarea name="checks" maxlength="400" rows="3" placeholder="保留原始数值、单位和检查时间；后续新结果写在当日变化中"></textarea>
+        <textarea name="checks" maxlength="400" rows="3" placeholder="填写虚构数值、单位和相对检查时间；后续新结果写在当日变化中"></textarea>
       </label>
     </details>
 

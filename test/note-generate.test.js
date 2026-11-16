@@ -74,6 +74,30 @@ test('identifier filtering catches spaced IDs, split phone numbers and unlabeled
   assert.equal(findIdentifier('中年女性，右髋部疼痛'), null);
 });
 
+test('note generation blocks common names, institutions and addresses before any AI call', async t => {
+  const cookie = auth(t), calls = [];
+  const handler = createNoteHandler({fetchImpl: fakeFetch(calls), env: ENV});
+  const blocked = [
+    ['张三，男，65岁，右膝痛3年', /患者姓名/],
+    ['李四 男 65岁', /患者姓名/],
+    ['王小明于2026-11-01入住XX市人民医院骨科', /医院/],
+    ['住 上海市徐汇区XX路1号', /地址/],
+    ['于XX市人民医院就诊', /医院/],
+    ['住址：某地', /地址/]
+  ];
+  for (const [value, expected] of blocked) {
+    const r = res();
+    await handler(req(cookie, {...BODY, history:value}), r);
+    assert.equal(r.code, 400, value);
+    assert.match(r.body.error, expected, value);
+  }
+  assert.equal(calls.length, 0);
+  for (const value of ['患者，男，65岁，因摔伤入院', '中年女性，右髋部疼痛', '住院3天后进行手术', '患者曾到当地医院就诊']) {
+    assert.equal(validateInput({...BODY, history:value}).error, undefined, value);
+  }
+  assert.equal(validateInput({...BODY, extra:'虚构教学手术，2026年10月12日09:00至10:30。'}).error, undefined);
+});
+
 test('note generator reports a missing key without calling out', async t => {
   const cookie = auth(t), calls = [];
   const r = res();
