@@ -2599,6 +2599,49 @@ test('lab calculators default to Chinese report units and give the same result a
   }finally{await context.close();}
 });
 
+test('liver scores preserve their thresholds across SI and US units and flag extreme inputs', async()=>{
+  for(const width of [390,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      await page.goto(base+'/tools?tool=childpugh',{waitUntil:'networkidle'});
+      const dlg=page.locator('#dlg');
+      assert.equal(await dlg.locator('#sys').inputValue(),'si');
+      await dlg.locator('#bili').fill('34');await dlg.locator('#alb').fill('35');await dlg.locator('#inr').fill('1.2');
+      await dlg.locator('#go').click();
+      assert.match(await dlg.locator('#res').innerText(),/Child-Pugh 6 分/);
+      await dlg.locator('#bili').fill('34.2');await dlg.locator('#go').click();
+      assert.match(await dlg.locator('#res').innerText(),/Child-Pugh 7 分/);
+      await dlg.locator('#sys').selectOption('us');
+      assert.equal(await dlg.locator('#res').isHidden(),true);
+      assert.equal(await dlg.locator('#bili').inputValue(),'');assert.equal(await dlg.locator('#alb').inputValue(),'');
+      assert.equal(await dlg.locator('#inr').inputValue(),'1.2');
+      await dlg.locator('#bili').fill('2');await dlg.locator('#alb').fill('3.5');await dlg.locator('#go').click();
+      assert.match(await dlg.locator('#res').innerText(),/Child-Pugh 7 分/);
+      await dlg.locator('#bili').fill('3');await dlg.locator('#alb').fill('2.8');await dlg.locator('#go').click();
+      assert.match(await dlg.locator('#res').innerText(),/Child-Pugh 7 分/);
+      await dlg.locator('#bili').fill('3.01');await dlg.locator('#alb').fill('2.79');await dlg.locator('#go').click();
+      assert.match(await dlg.locator('#res').innerText(),/Child-Pugh 9 分/);
+      await dlg.locator('#bili').fill('34');await dlg.locator('#alb').fill('35');await dlg.locator('#go').click();
+      assert.match(await dlg.locator('#res').innerText(),/核对.*单位/);
+      await dlg.locator('#close').click();
+
+      await page.goto(base+'/tools?tool=meld3',{waitUntil:'networkidle'});
+      assert.equal(await dlg.locator('#sys').inputValue(),'si');
+      for(const [id,value] of [['bili','34.2'],['alb','35'],['cr','88.4'],['na','135'],['inr','1.2']])await dlg.locator('#'+id).fill(value);
+      await dlg.locator('#go').click();assert.match(await dlg.locator('#res').innerText(),/MELD 3\.0 = 12/);
+      await dlg.locator('#sys').selectOption('us');
+      for(const id of ['bili','alb','cr'])assert.equal(await dlg.locator('#'+id).inputValue(),'');
+      assert.equal(await dlg.locator('#na').inputValue(),'135');
+      for(const [id,value] of [['bili','2'],['alb','3.5'],['cr','1']])await dlg.locator('#'+id).fill(value);
+      await dlg.locator('#go').click();assert.match(await dlg.locator('#res').innerText(),/MELD 3\.0 = 12/);
+      await dlg.locator('#alb').fill('35');await dlg.locator('#go').click();
+      assert.match(await dlg.locator('#res').innerText(),/核对.*单位/);
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal page scroll');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('site-wide search finds every section, filters by section and links to the matching page',async()=>{
   for(const width of [390,1440]){
     const {page,context,errors}=await pageFor(width);
