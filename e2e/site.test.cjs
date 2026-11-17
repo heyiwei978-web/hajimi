@@ -54,6 +54,7 @@ async function pageFor(width=1440, options={}) {
 }
 async function mockNote(page, handler, classify=()=>({route:'separate'})) {
   return page.route('**/api/note-generate', route => {
+    if (route.request().method()==='GET') return route.fulfill({json:{defaultModel:'fixture-default',models:[{id:'deepseek-flash',name:'DeepSeek Flash'},{id:'deepseek-v4-pro',name:'DeepSeek Pro'}]}});
     const body=route.request().postDataJSON();
     return body.action==='classify' ? route.fulfill({json:classify(body)}) : handler(route,body);
   });
@@ -2833,3 +2834,109 @@ test('admin dashboard lists recent sign-ins and failed attempts as plain text',a
   }
 });
 
+
+test('complete case framework selects DeepSeek, edits chapters and saves a private full record',async()=>{
+  for(const width of [390,1280]) {
+    const {page,context,errors}=await pageFor(width);
+    try {
+      await page.route('**/api/session',route=>route.fulfill({json:{authenticated:true}}));
+      const generated=[],records=new Map();let saves=0;
+      await mockNote(page,(route,body)=>{
+        generated.push(body);
+        return route.fulfill({json:{text:body.chapterTitle+'\n虚构教学正文，右侧 3*4 cm。\n医师签名：________',model:body.model}});
+      });
+      await page.route('**/api/note-cases*',route=>{
+        const url=new URL(route.request().url()),id=url.searchParams.get('id');
+        if(route.request().method()==='POST') {
+          const body=route.request().postDataJSON();saves++;
+          const record={...body,template:'__note_case__',published:false,completedAt:'2026-11-17T12:00:00Z'};
+          records.set(record.id,record);
+          return route.fulfill({json:{record,revision:'"saved-v1"',indexed:true}});
+        }
+        if(id)return route.fulfill({json:{record:records.get(id),revision:'"saved-v1"'}});
+        return route.fulfill({json:{items:[...records.values()].map(record=>({id:record.id,title:record.title,
+          diagnosis:record.facts.diagnosis,department:record.facts.department,sectionCount:record.sections.length,completedAt:record.completedAt}))}});
+      });
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await page.locator('#noteModel').selectOption('deepseek-flash');
+      await page.locator('[name=complaint]').fill('虚构教学主诉');
+      await page.locator('[name=diagnosis]').fill('虚构教学诊断');
+      await page.locator('#noteFrameMode').selectOption('medical');
+      await page.locator('#noteFrameStayDays').fill('1');
+      await page.locator('#noteFrameBuild').click();
+      assert.equal(await page.locator('#noteFrameDirectory button').count(),5);
+      await page.locator('#noteFrameSectionNotes').fill('仅用于入院的虚构要点');
+      await page.locator('#noteFrameGenerateMissing').click();
+      await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已生成 5 章'));
+      assert.equal(generated.length,5);
+      assert(generated.every(body=>body.model==='deepseek-flash'));
+      assert.equal(generated[0].sectionNotes,'仅用于入院的虚构要点');
+      assert(!JSON.stringify(generated.slice(1)).includes('仅用于入院的虚构要点'));
+      assert(await page.locator('#noteFrameComplete').isDisabled());
+      const manual='人工修改的虚构正文\n右侧 3*4 cm；> 5 mm\n医师签名：________';
+      for(let index=0;index<5;index++) {
+        await page.locator('#noteFrameDirectory button').nth(index).click();
+        if(index===0)await page.locator('#noteFrameOutput').fill(manual);
+        await page.locator('#noteFrameConfirmed').check();
+      }
+      await page.locator('#noteFrameTitle').fill('完整教学病历 <示例>');
+      await page.locator('#noteFrameFinalConfirm').check();
+      assert(await page.locator('#noteFrameComplete').isEnabled());
+      await page.locator('#noteFrameComplete').click();
+      await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('完整病历已保存到网站'));
+      assert.equal(saves,1);
+      const record=[...records.values()][0];assert.equal(record.sections[0].text,manual);
+      assert(record.sections.every(item=>item.confirmed));assert.equal(record.published,false);
+      assert.equal(await page.locator('.note-frame-saved-item').count(),1);
+      await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.__copiedCase=text;}}}));
+      await page.locator('#noteFrameCopy').click();
+      assert((await page.evaluate(()=>window.__copiedCase)).includes(manual));
+      assert((await page.evaluate(()=>window.__copiedCase)).includes('出院记录'));
+      await page.evaluate(()=>{sessionStorage.removeItem('hajimi-note-case-frame-v1');sessionStorage.removeItem('hajimi-note-draft-v1');});
+      await page.reload({waitUntil:'networkidle'});
+      await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已打开网站保存的整套病历'));
+      assert.equal(await page.locator('#noteFrameOutput').inputValue(),manual);
+      assert.equal(await page.locator('[name=diagnosis]').inputValue(),'虚构教学诊断');
+      assert.equal(generated.length,5,'opening a saved case never regenerates chapters');
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      assert.deepEqual(errors,[]);
+    } finally {await context.close();}
+  }
+});
+
+test('framework pauses failed generation, preserves edits and requires review after shared facts change',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try {
+    let fail=true,count=0;
+    await mockNote(page,(route,body)=>{
+      count++;
+      return fail&&count===2?route.fulfill({status:429,json:{error:'生成请求过于频繁，请约 10 分钟后再试'}}):
+        route.fulfill({json:{text:'虚构正文 '+body.chapterTitle,model:'fixture-default'}});
+    });
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('[name=complaint]').fill('虚构教学主诉');
+    await page.locator('[name=diagnosis]').fill('虚构教学诊断');
+    await page.locator('#noteFrameMode').selectOption('medical');
+    await page.locator('#noteFrameStayDays').fill('1');
+    await page.locator('#noteFrameBuild').click();
+    await page.locator('#noteFrameGenerateMissing').click();
+    await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('可稍后继续'));
+    assert.equal(count,2);
+    await page.locator('#noteFrameDirectory button').nth(0).click();
+    await page.locator('#noteFrameOutput').fill('保留人工编辑正文');
+    await page.locator('#noteFrameConfirmed').check();
+    await page.reload({waitUntil:'networkidle'});
+    assert.equal(count,2,'restoring does not resume AI calls');
+    assert.equal(await page.locator('#noteFrameOutput').inputValue(),'保留人工编辑正文');
+    fail=false;
+    await page.locator('#noteFrameGenerateMissing').click();
+    await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已生成 4 章'));
+    await page.locator('#noteFrameDirectory button').nth(0).click();
+    assert.equal(await page.locator('#noteFrameOutput').inputValue(),'保留人工编辑正文');
+    await page.locator('[name=diagnosis]').fill('修改后的虚构教学诊断');
+    assert.match(await page.locator('#noteFrameDirectory button').nth(0).textContent(),/输入已变化/);
+    assert.equal(await page.locator('#noteFrameConfirmed').isChecked(),false);
+    assert(await page.locator('#noteFrameComplete').isDisabled());
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});

@@ -26,7 +26,7 @@
   // 稍长于服务端 60 秒执行窗口，覆盖响应传输；超时不会清空已有正文。
   const REQUEST_TIMEOUT_MS = 65000;
   const DRAFT_KEY = 'hajimi-note-draft-v1';
-  const FIELD_NAMES = ['department', 'sex', 'age', 'complaint', 'history', 'diagnosis', 'secondary', 'operation', 'anesthesia', 'extra', 'extraScope', 'day', 'daily', 'dailyPhase', 'referenceText', 'allergies', 'checks', 'operativeFacts'];
+  const FIELD_NAMES = ['model', 'department', 'sex', 'age', 'complaint', 'history', 'diagnosis', 'secondary', 'operation', 'anesthesia', 'extra', 'extraScope', 'day', 'daily', 'dailyPhase', 'referenceText', 'allergies', 'checks', 'operativeFacts'];
   // 与 api/note-generate.js 中的身份信息识别保持一致。
   const GENERIC_NAME_WORDS = new Set(['老年', '中年', '青年', '男性', '女性', '高龄', '患儿', '儿童', '成年', '患者']);
   const NEEDS_OPERATION = new Set(['preop', 'op', 'postop', 'postDaily']);
@@ -169,6 +169,7 @@
     previousPreset = '';
     previousDay = '';
     documents.clearAll();
+    window.dispatchEvent(new Event('hajimi:note-case-reset'));
   }
 
   caseSelect.addEventListener('change', () => {
@@ -500,6 +501,7 @@
     operations.replaceChildren();
     caseStatus.textContent = '适合常规模板时，模板片段会发送给 AI 作为写法参考；不适合时将单独生成，不使用参考片段。';
     documents.clearAll();
+    window.dispatchEvent(new Event('hajimi:note-case-reset'));
     saveDraft();
     say('已清空本病例，可填写新的虚构教学病例。');
   });
@@ -556,6 +558,44 @@
   updateBatchControls();
   window.addEventListener('beforeunload', event => {
     if (busy) { event.preventDefault(); event.returnValue = ''; }
+  });
+
+  globalThis.HajimiNotePage = Object.freeze({
+    collect, check,
+    generateSection: (input, title) => postNote(input, title),
+    isBusy: () => busy,
+    lock() {
+      if (busy) throw new Error('当前有生成任务，请等待完成');
+      busy = true;
+      const controls = [...form.elements].map(element => [element,element.disabled]);
+      controls.forEach(([element]) => { element.disabled = true; });
+      const wasDisabled = clearButton.disabled;
+      clearButton.disabled = true;
+      form.setAttribute('aria-busy','true');
+      documents.setBusy(true);
+      return () => {
+        busy = false;
+        controls.forEach(([element,disabled]) => { element.disabled = disabled; });
+        clearButton.disabled = wasDisabled;
+        form.setAttribute('aria-busy','false');
+        documents.setBusy(false);
+      };
+    },
+    loadFacts(facts) {
+      for (const name of FIELD_NAMES) if (name !== 'model') form.elements[name].value = facts[name] || '';
+      form.elements.dailyPhase.value = 'post';
+      form.elements.extraScope.value = facts.extraScope || 'shared';
+      previousDay = ''; previousPhase = 'post'; previousCase = ''; previousPreset = '';
+      restoredReference = null;
+      referenceRequest++;
+      caseSelect.value = ''; preset.value = '';
+      chapterSelect.replaceChildren(new Option('选择病例后查看',''));
+      chapterSelect.disabled = true;
+      referenceWrap.hidden = true; reference.value = '';
+      operations.replaceChildren();
+      documents.clearAll();
+      saveDraft();
+    }
   });
 
   fetch('/api/session', {credentials: 'same-origin'})

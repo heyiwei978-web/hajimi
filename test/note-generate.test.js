@@ -335,7 +335,7 @@ test('same-origin, admin marker, JSON and byte limits still guard the AI before 
   let quotaCalls = 0;
   const handler = createNoteHandler({fetchImpl: fakeFetch(calls), env: ENV, quota: async () => { quotaCalls++; return {allowed: true}; }});
   for (const [mutate, code] of [
-    [r => { r.method = 'GET'; }, 405],
+    [r => { r.method = 'PATCH'; }, 405],
     [r => { r.headers.origin = 'https://other.test'; }, 403],
     [r => { r.headers['sec-fetch-site'] = 'cross-site'; }, 403],
     [r => { delete r.headers['x-hajimi-admin']; }, 403],
