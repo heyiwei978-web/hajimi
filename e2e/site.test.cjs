@@ -2899,6 +2899,8 @@ test('complete case framework selects DeepSeek, edits chapters and saves a priva
       assert.equal(await page.locator('#noteFrameOutput').inputValue(),manual);
       assert.equal(await page.locator('[name=diagnosis]').inputValue(),'虚构教学诊断');
       assert.equal(await page.locator('[name=extraScope]').inputValue(),'');
+      assert(await page.locator('#noteChapter').isDisabled());
+      assert(await page.locator('#noteFrameExtras input[value=anesthesiaConsult]').isDisabled());
       await page.locator('[data-type=spec]').click();
       await page.locator('#noteResult').waitFor({state:'visible'});
       await page.locator('#noteOutput').fill('未保存的单份文书编辑');
@@ -2989,6 +2991,28 @@ test('ambiguous first save offers a recovery link and restores the revision with
     await page.locator('#noteFrameComplete').click();
     await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('完整病历已保存到网站'));
     assert.equal(record.revision,'"saved-v1"');
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
+
+test('saved DeepSeek choice survives reference restoration before model discovery returns',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try {
+    await page.route('**/api/session',route=>route.fulfill({json:{authenticated:true}}));
+    await page.route('**/api/note-cases*',route=>route.fulfill({json:{items:[]}}));
+    await page.route('**/api/note-generate',async route=>{
+      await new Promise(resolve=>setTimeout(resolve,120));
+      return route.fulfill({json:{defaultModel:'fixture-default',models:[{id:'deepseek-flash',name:'Flash'}]}});
+    });
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    const catalog=await (await page.request.get(base+'/note-cases.json')).json();
+    await page.evaluate(item=>sessionStorage.setItem('hajimi-note-draft-v1',JSON.stringify({
+      model:'deepseek-flash',department:item.department,caseId:item.id,chapterId:item.chapters[0].id,
+      complaint:'虚构主诉',diagnosis:'虚构诊断',extraScope:'shared',dailyPhase:'post'
+    })),catalog[0]);
+    await page.reload({waitUntil:'networkidle'});
+    assert.equal(await page.locator('#noteModel').inputValue(),'deepseek-flash');
+    assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('hajimi-note-draft-v1')).model),'deepseek-flash');
     assert.deepEqual(errors,[]);
   } finally {await context.close();}
 });

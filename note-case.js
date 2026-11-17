@@ -140,6 +140,7 @@
       releasePage();
       root.setAttribute('aria-busy','false');
       render();
+      modeChanged();
       renderSaved();
     };
   }
@@ -261,6 +262,12 @@
       try {saved=JSON.parse(sessionStorage.getItem('hajimi-note-draft-v1')||'null')?.model||'';} catch {}
       const choice=previous||saved;
       if (data.models.some(item=>item.id===choice)) model.value=choice;
+      else if (choice) {
+        model.add(new Option('上次选择（当前不可用，请重新选择）：'+choice,choice));
+        model.value=choice;
+        status.textContent='上次选择的模型不在当前可用列表，请重新选择；尚未替换为默认模型。';
+        return;
+      }
       status.textContent='模型来自现有接口的可用列表；默认项沿用原配置。每次生成按当前选择执行。';
     } catch (error) {status.textContent=error.message+'；可继续使用原配置默认模型。';}
   }

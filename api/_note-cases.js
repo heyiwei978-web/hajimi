@@ -54,18 +54,25 @@ export function createNoteCaseRepository(user, storage = blob) {
       ||typeof item.title!=='string'||typeof item.completedAt!=='string')) throw new ContentError(503,'病历目录异常，已停止修改');
     return items;
   }
-  async function register(record) {
-    const metadata = {id:record.id,template:'__note_case_index__',published:false,title:record.title,
-      department:record.facts.department,diagnosis:record.facts.diagnosis,sectionCount:record.sections.length,completedAt:record.completedAt};
+  async function register(id) {
     for (let attempt=0;attempt<3;attempt++) {
+      // Read the index first, then the current record. The conditional index
+      // write rejects an older registration that races a newer index update.
       const current = await index.read(), items = indexItems(current);
-      if (!items.some(item=>item.id===record.id) && items.length>=500) throw new ContentError(413,'已保存病历达到 500 套上限');
+      const latest = await storeFor(id).read(), record = latest.data.cases[0];
+      if (!record || record.id!==id || record.template!=='__note_case__' || record.published!==false) throw new ContentError(503,'病历格式异常，目录未更新');
+      if (items.some(item=>item.id===id&&item.recordRevision===latest.revision)) return;
+      if (!items.some(item=>item.id===id) && items.length>=500) throw new ContentError(413,'已保存病历达到 500 套上限');
+      const metadata = {id,template:'__note_case_index__',published:false,title:record.title,
+        department:record.facts.department,diagnosis:record.facts.diagnosis,sectionCount:record.sections.length,
+        completedAt:record.completedAt,recordRevision:latest.revision};
       try {
-        await index.save({version:1,templateOverrides:{},cases:[metadata,...items.filter(item=>item.id!==record.id)]},
+        await index.save({version:1,templateOverrides:{},cases:[metadata,...items.filter(item=>item.id!==id)]},
           current.revision,user);
-        return;
+        if ((await storeFor(id).read()).revision===latest.revision) return;
       } catch (error) { if (error.status!==409 || attempt===2) throw error; }
     }
+    throw new ContentError(409,'病历仍在更新，目录同步待确认');
   }
   return {
     async list() { return indexItems(await index.read()).map(({id,title,department,diagnosis,sectionCount,completedAt})=>({id,title,department,diagnosis,sectionCount,completedAt})); },
@@ -81,7 +88,7 @@ export function createNoteCaseRepository(user, storage = blob) {
       if (current.data.cases.length>1 || current.data.cases.some(item=>item.id!==record.id||item.template!=='__note_case__'||item.published!==false)) throw new ContentError(503,'病历格式异常，已停止修改');
       const saved = await target.save({version:1,templateOverrides:{},cases:[record]},body.revision,user,'complete',current);
       let indexed = true;
-      try { await register(record); } catch { indexed = false; }
+      try { await register(record.id); } catch { indexed = false; }
       return {record,revision:saved.revision,indexed,...(!indexed ? {warning:'正文已保存，目录更新未完成；请保留本病历链接，稍后再次保存以更新目录'} : {})};
     }
   };

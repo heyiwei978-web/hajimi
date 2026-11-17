@@ -107,6 +107,11 @@
       for (const name of FIELD_NAMES) {
         const element = form.elements[name];
         if (!element || typeof saved[name] !== 'string') continue;
+        // Keep a saved model selected until authenticated discovery can verify it.
+        if (name === 'model' && saved[name] && saved[name].length <= 100
+          && ![...element.options].some(option => option.value === saved[name])) {
+          element.add(new Option('上次选择（待核实）：' + saved[name], saved[name]));
+        }
         const limit = Number(element.maxLength);
         element.value = limit > 0 ? saved[name].slice(0, limit) : saved[name];
         if (element.value.trim()) restored = true;
@@ -578,6 +583,7 @@
         busy = false;
         controls.forEach(([element,disabled]) => { element.disabled = disabled; });
         clearButton.disabled = wasDisabled;
+        chapterSelect.disabled = !caseSelect.value;
         form.setAttribute('aria-busy','false');
         documents.setBusy(false);
       };

@@ -170,3 +170,20 @@ test('model picker is authenticated and selected DeepSeek uses the same generati
   }
   assert.equal(calls.length,2);
 });
+
+test('an older completion cannot roll the directory metadata back after a newer save',async()=>{
+  const backend=storage(),get=backend.get.bind(backend),repo=createNoteCaseRepository('owner',backend);
+  let entered,release,hold=true;
+  const paused=new Promise(resolve=>{entered=resolve;}),resume=new Promise(resolve=>{release=resolve;});
+  backend.get=async(path,options)=>{
+    if(hold&&path.endsWith('/index.json')){hold=false;entered();await resume;}
+    return get(path,options);
+  };
+  const older=repo.save(body({title:'旧名称'}));
+  await paused;
+  const version=await repo.get(id);
+  await repo.save(body({revision:version.revision,title:'新名称'}));
+  release();await older;
+  assert.equal((await repo.get(id)).record.title,'新名称');
+  assert.equal((await repo.list())[0].title,'新名称');
+});
