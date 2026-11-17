@@ -2845,7 +2845,7 @@ test('complete case framework selects DeepSeek, edits chapters and saves a priva
         generated.push(body);
         return route.fulfill({json:{text:body.chapterTitle+'\n虚构教学正文，右侧 3*4 cm。\n医师签名：________',model:body.model}});
       });
-      await page.route('**/api/note-cases*',route=>{
+      await page.route('**/api/note-generate?resource=cases*',route=>{
         const url=new URL(route.request().url()),id=url.searchParams.get('id');
         if(route.request().method()==='POST') {
           const body=route.request().postDataJSON();saves++;
@@ -2957,7 +2957,7 @@ test('ambiguous first save offers a recovery link and restores the revision with
     await page.route('**/api/session',route=>route.fulfill({json:{authenticated:true}}));
     let record=null,lost=true;
     await mockNote(page,(route,body)=>route.fulfill({json:{text:'完整虚构正文 '+body.chapterTitle,model:'deepseek-flash'}}));
-    await page.route('**/api/note-cases*',route=>{
+    await page.route('**/api/note-generate?resource=cases*',route=>{
       if(route.request().method()==='POST') {
         const body=route.request().postDataJSON();
         if(record&&body.revision==='missing')return route.fulfill({status:409,json:{error:'已有更新'}});
@@ -2999,7 +2999,7 @@ test('saved DeepSeek choice survives reference restoration before model discover
   const {page,context,errors}=await pageFor(390);
   try {
     await page.route('**/api/session',route=>route.fulfill({json:{authenticated:true}}));
-    await page.route('**/api/note-cases*',route=>route.fulfill({json:{items:[]}}));
+    await page.route('**/api/note-generate?resource=cases*',route=>route.fulfill({json:{items:[]}}));
     await page.route('**/api/note-generate',async route=>{
       await new Promise(resolve=>setTimeout(resolve,120));
       return route.fulfill({json:{defaultModel:'fixture-default',models:[{id:'deepseek-flash',name:'Flash'}]}});

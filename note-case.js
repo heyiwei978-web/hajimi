@@ -195,7 +195,7 @@
     const token=++libraryRequest;
     get('noteFrameLibraryStatus').textContent='正在读取已保存病历……';
     try {
-      const data=await request('/api/note-cases');
+      const data=await request('/api/note-generate?resource=cases');
       if (token!==libraryRequest) return;
       if (!Array.isArray(data?.items)) throw new Error('病历目录格式异常');
       savedItems=data.items.filter(item=>typeof item.id==='string'&&typeof item.title==='string');
@@ -208,7 +208,7 @@
     if ((dirty||page.hasCaseDraft())&&!window.confirm('打开已保存病历会替换当前病情、框架草稿及单份文书；未保存的修改将被清空。确定继续吗？')) return;
     const release=lock();
     try {
-      const data=await request('/api/note-cases?id='+encodeURIComponent(id));
+      const data=await request('/api/note-generate?resource=cases&id='+encodeURIComponent(id));
       const next=hydrate(data.record,data.revision);
       page.loadFacts(next.facts);
       state=next;dirty=false;applyConfig(state.settings);persist();render();
@@ -225,7 +225,7 @@
     const release=lock();
     try {
       say('正在保存整套病历……');
-      const data=await request('/api/note-cases',{id:state.id,title:state.title,settings:state.settings,
+      const data=await request('/api/note-generate?resource=cases',{id:state.id,title:state.title,settings:state.settings,
         facts:state.facts,sections:state.sections,confirmed:true,revision:state.revision});
       if (typeof data?.revision!=='string'||data?.record?.id!==state.id) throw new Error('保存结果待确认，请通过病历链接核对');
       state.revision=data.revision;dirty=false;persist();
@@ -239,7 +239,7 @@
     if (!state||busy||page.isBusy()) return;
     const release=lock();
     try {
-      const data=await request('/api/note-cases?id='+encodeURIComponent(state.id));
+      const data=await request('/api/note-generate?resource=cases&id='+encodeURIComponent(state.id));
       const view=value=>JSON.stringify({title:value.title,settings:value.settings,facts:Core.facts(value.facts),
         sections:value.sections.map(item=>({id:item.id,text:item.text,notes:item.notes||'',model:item.model||''}))});
       if (typeof data.revision!=='string'||!data.record||view(data.record)!==view(state)) {

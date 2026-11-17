@@ -261,8 +261,16 @@ function aiConfig(env) {
   return {key, url: base.replace(/\/+$/, '') + '/chat/completions', model};
 }
 
-export function createNoteHandler({fetchImpl = globalThis.fetch, env = process.env, timeoutMs = 55000, quota = consumeNoteQuota, modelCatalog = createModelCatalog(fetchImpl)} = {}) {
+export function createNoteHandler({fetchImpl = globalThis.fetch, env = process.env, timeoutMs = 55000, quota = consumeNoteQuota, modelCatalog = createModelCatalog(fetchImpl), caseHandler = null} = {}) {
+  let privateCaseHandler = caseHandler;
   return async function handler(req, res) {
+    if (req.query?.resource === 'cases') {
+      if (!privateCaseHandler) {
+        const {createNoteCasesHandler} = await import('./_note-case-handler.js');
+        privateCaseHandler = createNoteCasesHandler();
+      }
+      return privateCaseHandler(req, res);
+    }
     if (!guardRequest(req, res, {methods: ['GET','POST'], admin: true, json: req.method === 'POST', bodyLimit: 16384})) return;
     if (req.method === 'GET') {
       const config = aiConfig(env);

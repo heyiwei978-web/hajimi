@@ -7,7 +7,7 @@ import {createSession} from '../api/_auth.js';
 import {createNoteHandler,validateInput,buildMessages} from '../api/note-generate.js';
 import {createModelCatalog} from '../api/_note-models.js';
 import {createNoteCaseRepository,validateCompletedCase} from '../api/_note-cases.js';
-import {createNoteCasesHandler} from '../api/note-cases.js';
+import {createNoteCasesHandler} from '../api/_note-case-handler.js';
 const Core=globalThis.HajimiNoteCaseCore;
 const id='11111111-1111-4111-8111-111111111111';
 const facts=Core.facts({department:'骨科',complaint:'虚构右髋部疼痛',diagnosis:'虚构教学诊断',operation:'虚构手术'});
@@ -186,4 +186,22 @@ test('an older completion cannot roll the directory metadata back after a newer 
   release();await older;
   assert.equal((await repo.get(id)).record.title,'新名称');
   assert.equal((await repo.list())[0].title,'新名称');
+});
+
+test('private case actions reuse the existing note endpoint without requiring AI configuration',async()=>{
+  let calls=0;
+  const handler=createNoteHandler({env:{},caseHandler:async(req,res)=>{calls++;return res.status(200).json({items:[]});}});
+  const req=request('','GET');req.query.resource='cases';
+  const res=response();await handler(req,res);
+  assert.equal(calls,1);assert.deepEqual(res.body,{items:[]});
+});
+
+test('the delegated private case route still rejects anonymous reads and writes before storage',async()=>{
+  let calls=0;
+  const handler=createNoteHandler({env:{},fetchImpl:async()=>{calls++;throw new Error('unexpected upstream call');}});
+  for(const method of ['GET','POST']) {
+    const req=request('',method,body());req.query.resource='cases';
+    const res=response();await handler(req,res);assert.equal(res.code,401);
+  }
+  assert.equal(calls,0);
 });
