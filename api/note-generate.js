@@ -39,12 +39,13 @@ const FIELDS = Object.freeze({
   allergies: 200, checks: 400, operativeFacts: 600, extraScope: 10, dailyPhase: 4
 });
 
-// 允许身份证号、手机号中出现空格或短横线，并补充「患者张三，男，65岁」这类
-// 没有“姓名：”标签的写法；老年、中年等通用称谓不算姓名。
+// 常见格式的补充识别只是辅助，不能保证识别所有身份信息。
 const IDENTIFIER_PATTERNS = [
   [/\d{6}[\s-]?\d{8}[\s-]?\d{3}[\dXx]/, '身份证号'],
   [/(?<!\d)1[3-9]\d[\s-]?\d{4}[\s-]?\d{4}(?!\d)/, '手机号'],
-  [/(姓名|住院号|病案号|门诊号|床号|身份证|医保号|就诊卡号|联系电话)/, '姓名、住院号等身份信息']
+  [/(姓名|住院号|病案号|门诊号|床号|身份证|医保号|就诊卡号|联系电话)/, '姓名、住院号等身份信息'],
+  [/(?:住址|居住地址|家庭地址|联系地址|地址)|(?:家住|居住于|住)[：: \t]*[^\r\n，,。；;]{1,40}(?:路|街|巷|弄|号|村|小区)/, '地址'],
+  [/[\u4e00-\u9fffA-Za-z0-9]{1,24}(?:省|市|区|县|州|大学|附属|人民|中医|中心|第一|第二|第三|第四)[\u4e00-\u9fffA-Za-z0-9]{0,16}医院/, '医院名称']
 ];
 const GENERIC_NAME_WORDS = new Set(['老年', '中年', '青年', '男性', '女性', '高龄', '患儿', '儿童', '成年', '患者']);
 
@@ -52,6 +53,9 @@ export function findIdentifier(text) {
   for (const [pattern, label] of IDENTIFIER_PATTERNS) if (pattern.test(text)) return label;
   const named = text.match(/(?:患者|病人)[：:]?\s*([\u4e00-\u9fa5]{2,4})(?=[，,。；;\s]*(?:男|女|男性|女性|\d{1,3}\s*岁))/);
   if (named && !GENERIC_NAME_WORDS.has(named[1].slice(0, 2))) return '患者姓名';
+  // 姓名开头且后接性别或年龄，不能跨行匹配分开的字段。
+  const leadingName = text.match(/(?:^|[\r\n])[ \t]*([\u4e00-\u9fa5]{2,4})[，,、:：;； \t]+(?:(?:男|女)(?:性)?(?=$|[，,、;； \t\d])|\d{1,3}[ \t]*岁)/m);
+  if (leadingName && !GENERIC_NAME_WORDS.has(leadingName[1].slice(0, 2))) return '患者姓名';
   return null;
 }
 

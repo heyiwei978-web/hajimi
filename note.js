@@ -73,8 +73,12 @@
     if (/\d{6}[\s-]?\d{8}[\s-]?\d{3}[\dXx]/.test(text)) return '身份证号';
     if (/(?<!\d)1[3-9]\d[\s-]?\d{4}[\s-]?\d{4}(?!\d)/.test(text)) return '手机号';
     if (/(姓名|住院号|病案号|门诊号|床号|身份证|医保号|就诊卡号|联系电话)/.test(text)) return '姓名、住院号等身份信息';
+    if (/(?:住址|居住地址|家庭地址|联系地址|地址)|(?:家住|居住于|住)[：: \t]*[^\r\n，,。；;]{1,40}(?:路|街|巷|弄|号|村|小区)/.test(text)) return '地址';
+    if (/[\u4e00-\u9fffA-Za-z0-9]{1,24}(?:省|市|区|县|州|大学|附属|人民|中医|中心|第一|第二|第三|第四)[\u4e00-\u9fffA-Za-z0-9]{0,16}医院/.test(text)) return '医院名称';
     const named = text.match(/(?:患者|病人)[：:]?\s*([\u4e00-\u9fa5]{2,4})(?=[，,。；;\s]*(?:男|女|男性|女性|\d{1,3}\s*岁))/);
     if (named && !GENERIC_NAME_WORDS.has(named[1].slice(0, 2))) return '患者姓名';
+    const leadingName = text.match(/(?:^|[\r\n])[ \t]*([\u4e00-\u9fa5]{2,4})[，,、:：;； \t]+(?:(?:男|女)(?:性)?(?=$|[，,、;； \t\d])|\d{1,3}[ \t]*岁)/m);
+    if (leadingName && !GENERIC_NAME_WORDS.has(leadingName[1].slice(0, 2))) return '患者姓名';
     return '';
   }
 

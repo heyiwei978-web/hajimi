@@ -103,6 +103,39 @@ test('note draft preserves edited output and manual selection, and reports copy 
   }
 });
 
+test('note page warns about third-party AI and blocks common identifiers before sending',async()=>{
+  for(const width of [390,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      let requests=0;
+      await page.route('**/api/note-generate',route=>{requests++;return route.fulfill({json:{label:'示例',text:'虚构示例'}});});
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      assert.match(await page.locator('.note-privacy').innerText(),/第三方 AI 服务/);
+      assert.match(await page.locator('.note-privacy').innerText(),/具体日期、医院名称和地址/);
+      await page.locator('[name=complaint]').fill('虚构病例：摔伤致右髋疼痛3小时');
+      await page.locator('[name=diagnosis]').fill('右股骨颈骨折');
+      for(const [value,reason] of [
+        ['张三，男，65岁，右膝痛3年',/患者姓名/],
+        ['李四 男 65岁',/患者姓名/],
+        ['王小明于2026-11-01入住XX市人民医院骨科',/医院名称/],
+        ['住 上海市徐汇区XX路1号',/地址/],
+        ['于XX市人民医院就诊',/医院名称/]
+      ]){
+        await page.locator('[name=history]').fill(value);
+        await page.locator('[data-type=spec]').click();
+        assert.match(await page.locator('#noteStatus').innerText(),reason);
+        assert.equal(requests,0,value);
+      }
+      await page.locator('[name=history]').fill('患者，男，65岁，住院3天后行手术。');
+      await page.locator('[data-type=spec]').click();
+      await page.locator('#noteResult').waitFor({state:'visible'});
+      assert.equal(requests,1);
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal page scroll');
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('note page exposes published cases and generates daily notes without sending case bodies',async()=>{
   for(const width of [390,1280]){
     const {page,context,errors}=await pageFor(width);
