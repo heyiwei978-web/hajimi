@@ -1,3 +1,7 @@
-# Migration status
+# 源码维护与发布状态
 
-GitHub direct editing is enabled. Production source migration is in progress.
+截至 2026-11-16，站点源码由 GitHub 仓库 `heyiwei978-web/hajimi` 维护，生产站点的发布流程为合并到 `main` 后由 Vercel 自动构建部署。先前“生产源码迁移进行中”的表述已不再反映当前工作流程。
+
+所有修改先从最新 `main` 建分支并提交 PR；完成适用的测试、审核和预览核验后，只有站点负责人明确授权合并该 PR 才能上线。具体步骤见 `AGENTS.md` 和 `docs/deployment-workflow.md`。
+
+本文件仅说明源码维护和发布方式，不代表已经核验当时的线上部署、域名或安全配置状态。
