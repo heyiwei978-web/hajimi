@@ -562,6 +562,7 @@
 
   globalThis.HajimiNotePage = Object.freeze({
     collect, check,
+    hasCaseDraft: () => documents.hasText() || hasCaseInput(),
     generateSection: (input, title) => postNote(input, title),
     isBusy: () => busy,
     lock() {
@@ -584,7 +585,7 @@
     loadFacts(facts) {
       for (const name of FIELD_NAMES) if (name !== 'model') form.elements[name].value = facts[name] || '';
       form.elements.dailyPhase.value = 'post';
-      form.elements.extraScope.value = facts.extraScope || 'shared';
+      form.elements.extraScope.value = facts.extraScope ?? 'shared';
       previousDay = ''; previousPhase = 'post'; previousCase = ''; previousPreset = '';
       restoredReference = null;
       referenceRequest++;

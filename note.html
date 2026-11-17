@@ -194,7 +194,8 @@
         <label class="note-frame-confirm"><input id="noteFrameFinalConfirm" type="checkbox">我已核对整套虚构教学病历，确认保存</label>
         <p id="noteFrameCompletionHint" class="note-tip"></p>
         <div class="note-batch-controls"><button type="button" id="noteFrameComplete" class="note-button" disabled>完成病历并保存到网站</button><button type="button" id="noteFrameCopy" class="note-button note-secondary" disabled>复制整套病历</button></div>
-        <a id="noteFrameSavedLink" hidden>打开已保存病历</a>
+        <button type="button" id="noteFrameVerifySave" class="note-button note-secondary" hidden>核对保存结果 / 恢复版本</button>
+        <a id="noteFrameSavedLink" target="_blank" rel="noopener" hidden>打开已保存病历</a>
       </fieldset>
       <details class="note-details"><summary>连续预览整套病历</summary><pre id="noteFramePreview" class="note-frame-preview"></pre></details>
     </div>

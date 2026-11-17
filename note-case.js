@@ -70,7 +70,7 @@
         confirmed:item.confirmed===true,stale:item.stale===true,factsKey:typeof item.factsKey==='string'?item.factsKey:signature(facts)};
     });
     return {id:record.id,title:record.title.slice(0,100),settings,facts,sections,revision,
-      active:definitions.some(item=>item.id===record.active)?record.active:definitions[0].id,finalConfirmed:false};
+      active:definitions.some(item=>item.id===record.active)?record.active:definitions[0].id,finalConfirmed:false,saveAttempted:record.saveAttempted===true};
   }
   function render({keepEditor=false}={}) {
     get('noteFrameWorkspace').hidden=!state;
@@ -110,7 +110,9 @@
     get('noteFrameGenerateMissing').disabled=busy||!missing;
     get('noteFramePreview').textContent=Core.combine(state.title,state.sections.map(item=>({...item,text:item.text||'【本章尚未完成】'})));
     const link=get('noteFrameSavedLink');
-    link.hidden=state.revision==='missing';
+    link.hidden=state.revision==='missing'&&!state.saveAttempted;
+    link.textContent=state.revision==='missing'?'打开链接核对本次保存结果':'打开已保存病历';
+    get('noteFrameVerifySave').hidden=!state.saveAttempted&&state.revision==='missing';
     link.href='/note?case='+encodeURIComponent(state.id);
   }
   async function request(url,body) {
@@ -202,7 +204,7 @@
   }
   async function openSaved(id) {
     if (busy||page.isBusy()) return;
-    if (dirty&&!window.confirm('打开已保存病历会替换当前框架草稿，确定继续吗？')) return;
+    if ((dirty||page.hasCaseDraft())&&!window.confirm('打开已保存病历会替换当前病情、框架草稿及单份文书；未保存的修改将被清空。确定继续吗？')) return;
     const release=lock();
     try {
       const data=await request('/api/note-cases?id='+encodeURIComponent(id));
@@ -218,6 +220,7 @@
     if (!state||busy||page.isBusy()) return;
     syncFacts();
     if (!state.sections.every(ready)||!state.finalConfirmed||!state.title.trim()) {say('请完成所有章节并逐章核对，再确认整套保存。',true);return;}
+    state.saveAttempted=true;persist();render();
     const release=lock();
     try {
       say('正在保存整套病历……');
@@ -227,6 +230,22 @@
       state.revision=data.revision;dirty=false;persist();
       const url=new URL(location.href);url.searchParams.set('case',state.id);history.replaceState(null,'',url);
       say(data.warning||'完整病历已保存到网站，仅本人登录后可见。');
+      await reloadSaved();
+    } catch (error) {say(error.message+' 当前编辑内容已保留。',true);}
+    finally {release();}
+  }
+  async function verifySave() {
+    if (!state||busy||page.isBusy()) return;
+    const release=lock();
+    try {
+      const data=await request('/api/note-cases?id='+encodeURIComponent(state.id));
+      const view=value=>JSON.stringify({title:value.title,settings:value.settings,facts:Core.facts(value.facts),
+        sections:value.sections.map(item=>({id:item.id,text:item.text,notes:item.notes||'',model:item.model||''}))});
+      if (typeof data.revision!=='string'||!data.record||view(data.record)!==view(state)) {
+        throw new Error('网站中的版本与当前编辑不同，未覆盖任何内容；请打开病历链接核对，或备份当前正文后从列表重新打开');
+      }
+      state.revision=data.revision;state.saveAttempted=true;dirty=false;persist();
+      say('已核实网站保存的正文与当前内容一致。可再次点击完成保存，补齐目录记录。');
       await reloadSaved();
     } catch (error) {say(error.message+' 当前编辑内容已保留。',true);}
     finally {release();}
@@ -287,6 +306,7 @@
   get('noteFrameTitle').addEventListener('input',()=>{if (!state||busy) return;state.title=get('noteFrameTitle').value;touch();render({keepEditor:true});});
   get('noteFrameFinalConfirm').addEventListener('change',()=>{if (!state||busy) return;state.finalConfirmed=get('noteFrameFinalConfirm').checked;persist();render({keepEditor:true});});
   get('noteFrameComplete').addEventListener('click',complete);
+  get('noteFrameVerifySave').addEventListener('click',verifySave);
   get('noteFrameCopy').addEventListener('click',async()=>{
     if (!state||!state.sections.every(ready)) return;
     const text=Core.combine(state.title,state.sections);

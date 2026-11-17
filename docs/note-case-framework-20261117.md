@@ -42,3 +42,5 @@
 
 官方模型发现文档：https://api-docs.deepseek.com/api/list-models/
 官方 Chat Completions 文档：https://api-docs.deepseek.com/api/create-chat-completion/
+
+独立技术复核发现并修复：打开已保存病历前同时确认原单份文书草稿；首次保存前提供 UUID 链接和“核对保存结果 / 恢复版本”，响应丢失时可只读比对服务端正文并恢复修订号，不以重试覆盖或静默丢弃当前编辑。

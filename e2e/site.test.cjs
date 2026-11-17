@@ -2861,6 +2861,7 @@ test('complete case framework selects DeepSeek, edits chapters and saves a priva
       await page.locator('#noteModel').selectOption('deepseek-flash');
       await page.locator('[name=complaint]').fill('虚构教学主诉');
       await page.locator('[name=diagnosis]').fill('虚构教学诊断');
+      await page.locator('[name=extraScope]').selectOption('');
       await page.locator('#noteFrameMode').selectOption('medical');
       await page.locator('#noteFrameStayDays').fill('1');
       await page.locator('#noteFrameBuild').click();
@@ -2897,7 +2898,14 @@ test('complete case framework selects DeepSeek, edits chapters and saves a priva
       await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已打开网站保存的整套病历'));
       assert.equal(await page.locator('#noteFrameOutput').inputValue(),manual);
       assert.equal(await page.locator('[name=diagnosis]').inputValue(),'虚构教学诊断');
-      assert.equal(generated.length,5,'opening a saved case never regenerates chapters');
+      assert.equal(await page.locator('[name=extraScope]').inputValue(),'');
+      await page.locator('[data-type=spec]').click();
+      await page.locator('#noteResult').waitFor({state:'visible'});
+      await page.locator('#noteOutput').fill('未保存的单份文书编辑');
+      page.once('dialog',dialog=>dialog.dismiss());
+      await page.locator('.note-frame-saved-item').click();
+      assert.equal(await page.locator('#noteOutput').inputValue(),'未保存的单份文书编辑');
+      assert.equal(generated.length,6,'opening a saved case never regenerates chapters');
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
       assert.deepEqual(errors,[]);
     } finally {await context.close();}
@@ -2937,6 +2945,50 @@ test('framework pauses failed generation, preserves edits and requires review af
     assert.match(await page.locator('#noteFrameDirectory button').nth(0).textContent(),/输入已变化/);
     assert.equal(await page.locator('#noteFrameConfirmed').isChecked(),false);
     assert(await page.locator('#noteFrameComplete').isDisabled());
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
+
+test('ambiguous first save offers a recovery link and restores the revision without overwriting edits',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try {
+    await page.route('**/api/session',route=>route.fulfill({json:{authenticated:true}}));
+    let record=null,lost=true;
+    await mockNote(page,(route,body)=>route.fulfill({json:{text:'完整虚构正文 '+body.chapterTitle,model:'deepseek-flash'}}));
+    await page.route('**/api/note-cases*',route=>{
+      if(route.request().method()==='POST') {
+        const body=route.request().postDataJSON();
+        if(record&&body.revision==='missing')return route.fulfill({status:409,json:{error:'已有更新'}});
+        record={...body,published:false};
+        if(lost){lost=false;return route.abort('failed');}
+        return route.fulfill({json:{record,revision:'"saved-v2"',indexed:true}});
+      }
+      if(new URL(route.request().url()).searchParams.has('id'))return route.fulfill({json:{record,revision:'"saved-v1"'}});
+      return route.fulfill({json:{items:[]}});
+    });
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('[name=complaint]').fill('虚构主诉');
+    await page.locator('[name=diagnosis]').fill('虚构诊断');
+    await page.locator('#noteFrameMode').selectOption('medical');
+    await page.locator('#noteFrameStayDays').fill('1');
+    await page.locator('#noteFrameBuild').click();
+    await page.locator('#noteFrameGenerateMissing').click();
+    await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已生成 5 章'));
+    for(let index=0;index<5;index++){
+      await page.locator('#noteFrameDirectory button').nth(index).click();
+      await page.locator('#noteFrameConfirmed').check();
+    }
+    await page.locator('#noteFrameFinalConfirm').check();
+    await page.locator('#noteFrameComplete').click();
+    await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('当前编辑内容已保留'));
+    assert(await page.locator('#noteFrameSavedLink').isVisible());
+    assert(await page.locator('#noteFrameVerifySave').isVisible());
+    assert.equal(await page.locator('#noteFrameSavedLink').getAttribute('target'),'_blank');
+    await page.locator('#noteFrameVerifySave').click();
+    await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已核实网站保存的正文'));
+    await page.locator('#noteFrameComplete').click();
+    await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('完整病历已保存到网站'));
+    assert.equal(record.revision,'"saved-v1"');
     assert.deepEqual(errors,[]);
   } finally {await context.close();}
 });
