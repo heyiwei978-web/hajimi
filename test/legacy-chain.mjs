@@ -10,10 +10,19 @@ export const LEGACY_COMMIT = '540efe1ea9ad2d2fafce0d007f31713605318646';
 const cwd = fileURLToPath(new URL('../', import.meta.url));
 const git = args => execFileSync('git', args, {cwd, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe']});
 let ready = false;
+const hasCommit = () => { try { git(['cat-file', '-e', LEGACY_COMMIT + '^{commit}']); return true; } catch { return false; } };
+const pause = ms => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+// npm test 会并行运行多个测试文件，它们可能同时拉取同一个提交；
+// 并发的 git fetch 会因浅克隆文件被改动而失败（"shallow file has changed"），这里重试并重新确认。
 function ensureCommit() {
   if (ready) return;
-  try { git(['cat-file', '-e', LEGACY_COMMIT + '^{commit}']); }
-  catch { git(['fetch', '--quiet', '--depth=1', 'origin', LEGACY_COMMIT]); }
+  for (let attempt = 0; !hasCommit(); attempt++) {
+    try { git(['fetch', '--quiet', '--depth=1', 'origin', LEGACY_COMMIT]); }
+    catch (error) {
+      if (attempt >= 8) throw error;
+      pause(200 + Math.floor(Math.random() * 400) * (attempt + 1));
+    }
+  }
   ready = true;
 }
 const cache = new Map();
