@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import {DIRECTORY_SCRIPTS, SCRIPT_DIRECTORY, sourcePath} from '../scripts/public-assets.mjs';
 
 // 目录约定（2026-11-18）：在用的页面脚本放在 js/，发布后网址仍是根路径（/note.js）。
-// 根目录只保留冻结的旧病历生成链（路径写在身份账本里）和医学源资料 record-quality-v2.js。
+// 根目录只保留路径写在身份账本里的 app.js、search-core.js、departments.js 和医学源资料 record-quality-v2.js（旧生成链已删除）。
 const root = new URL('../', import.meta.url);
 const index = JSON.parse(fs.readFileSync(new URL('content/clinical-library/source/index.json', root), 'utf8'));
 const FROZEN_ROOT = new Set([...index.retiredChain.map(item => item.path), 'record-quality-v2.js']);

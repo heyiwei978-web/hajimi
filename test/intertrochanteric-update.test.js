@@ -9,10 +9,11 @@ import {loadClinicalSource} from '../scripts/clinical-compiler.mjs';
 import {identityKey,metadataHash} from '../scripts/clinical-inventory.mjs';
 import {PUBLIC_FILES} from '../scripts/public-assets.mjs';
 import {sourcePath} from '../scripts/public-assets.mjs';
+import {legacyIndexHtml, readLegacy, readLegacySource} from './legacy-chain.mjs';
 
 const current=auditClinicalLibrary();
-const old=withoutRemoved(loadClinicalSource(fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),{
-  audit:true,readSource:file=>file==='record-intertrochanteric-v28.js'?'':fs.readFileSync(new URL('../'+sourcePath(file),import.meta.url),'utf8')
+const old=withoutRemoved(loadClinicalSource(legacyIndexHtml(),{
+  audit:true,readSource:file=>file==='record-intertrochanteric-v28.js'?'':readLegacySource(file)
 }),current.plan);
 const selected=current.plan.published.filter(entry=>entry.record.department==='骨科'&&entry.record.group==='股骨转子间骨折');
 

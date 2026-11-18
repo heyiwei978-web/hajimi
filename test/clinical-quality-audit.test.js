@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import test from 'node:test';
 import {loadClinicalSource} from '../scripts/clinical-compiler.mjs';
 import {auditClinicalRecords,BASELINE,TKA_REQUIRED} from '../scripts/clinical-audit-rules.mjs';
+import {legacyIndexHtml, readLegacy, readLegacySource} from './legacy-chain.mjs';
 
 const example = (short,sourceBody,more={}) => ({
   department:'骨科',group:'TKA',stage:'术后',short,sourceBody,...more
@@ -51,8 +52,8 @@ test('does not infer removal from a hypothetical operation or plan',()=>{
 });
 
 test('audits original site records without changing the baseline library',()=>{
-  const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
-  const records=loadClinicalSource(html).records;
+  const html=legacyIndexHtml();
+  const records=loadClinicalSource(html,{readSource:readLegacySource}).records;
   const originalLength=records.length;
   const result=auditClinicalRecords(records);
   assert.equal(records.length,originalLength);
