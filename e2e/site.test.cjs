@@ -808,13 +808,46 @@ test('reviewed intertrochanteric case exposes 30 consistent teaching chapters on
 test('homepage is usable without JavaScript and avoids loading clinical data', async()=>{
   const {page,context}=await pageFor(393,{javaScriptEnabled:false});
   try {await page.goto(base+'/');assert(await page.locator('#portalHome').isVisible());
-    assert.equal(await page.getByRole('link',{name:'病历模板',exact:true}).count(),1);
+    assert.equal(await page.getByRole('link',{name:'AI 病历生成',exact:true}).getAttribute('href'),'/note');
     assert.equal(await page.locator('script[src*="app.js"],script[src*="record-quality"],#libraryShell').count(),0);
-    assert.equal(await page.locator('.official-feature').count(),6);
-    assert.equal(await page.locator('a.card-classification[href="/classification"]').count(),1);
-    assert.equal(await page.locator('a.card-ecg[href="/ecg"]').count(),1);
-    assert.match(await page.locator('a.card-ecg p').innerText(),/心电图基础.*围手术期/);
+    assert.equal(await page.locator('.home-quick-grid a').count(),4);
+    assert.match(await page.locator('a.ws-row[href="/ecg"]').innerText(),/心电图基础.*围手术期/);
+    assert.equal(await page.getByRole('navigation',{name:'主导航'}).getByRole('link').count(),5);
   } finally {await context.close();}
+});
+
+test('workspace routes, mobile bottom tabs and browser-local case history', async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try {
+      await page.goto(base+'/library.html');
+      await page.waitForURL(base+'/');
+      const nav=page.getByRole('navigation',{name:'主导航'});
+      assert.deepEqual(await nav.getByRole('link').allTextContents(),['工作台','临床','资料','学习','我的']);
+      const bounds=await nav.boundingBox();
+      if(width<720) assert.ok(bounds.y>800&&Math.abs(bounds.y+bounds.height-900)<2,'tabs sit at the viewport bottom');
+      else assert.ok(bounds.x+bounds.width<215&&bounds.y<120,'desktop navigation is in the left rail');
+      for(const [label,route,title] of [['临床','clinical','临床'],['资料','materials','资料'],['学习','study','学习'],['我的','personal','我的'],['工作台','','个人工作台']]){
+        await nav.getByRole('link',{name:label,exact:true}).click();
+        await page.waitForURL(base+'/'+route);
+        assert.equal(await page.locator('h1').innerText(),title);
+        assert.equal(await nav.locator('[aria-current="page"]').innerText(),label);
+        assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth),'no viewport overflow: '+route);
+      }
+      await page.getByRole('link',{name:'AI 病历生成',exact:true}).click();
+      await page.waitForURL(base+'/note');
+      await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});
+      await page.locator('#favoriteDisease').click();
+      await page.goto(base+'/');
+      const resume=page.locator('[data-workstation-list="recent"] a[href="/bl/guke/TKA"]');
+      await resume.waitFor();
+      assert.match(await resume.innerText(),/全膝关节置换/);
+      await page.locator('a[href="/personal#favorites"]').click();
+      await page.waitForURL(base+'/personal#favorites');
+      await page.locator('[data-workstation-list="favorites"] a[href="/bl/guke/TKA"]').waitFor();
+      assert.deepEqual(errors,[]);
+    } finally {await context.close();}
+  }
 });
 
 test('ECG routes share the public layout, expose learning sections, case practice and report pages',async()=>{

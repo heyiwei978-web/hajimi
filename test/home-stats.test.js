@@ -1,26 +1,13 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
-import {DEPARTMENTS} from '../config/site-modules.mjs';
-import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
-import {compileCaseTemplates} from '../scripts/clinical-compiler.mjs';
 
-// The homepage figures are static markup; keep them tied to the real data so they
-// cannot silently drift when cases, departments or tools are added or removed.
-const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
-const stat=label=>{
-  const match=new RegExp('<strong>(\\d+)</strong><small>'+label+'</small>').exec(html);
-  assert(match,'homepage stat missing: '+label);
-  return Number(match[1]);
-};
+const read = file => fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
 
-test('homepage statistics match the published library, departments and tool catalogue',()=>{
-  const catalog=compileCaseTemplates(auditClinicalLibrary().plan.published);
-  const orthoStandard=catalog.items.filter(item=>item.department==='骨科'&&item.caseType==='standard').length;
-  // 首页显示全部科室的完整病历模板数（与病历模板页「完整病历模板」一致，不含通用记录组）。
-  assert.equal(stat('套病历模板'),catalog.items.filter(item=>item.caseType!=='utility').length);
-  assert.equal(Number(/<small>骨科标准模板<\/small>\s*<strong>(\d+)<\/strong>/.exec(html)?.[1]),orthoStandard);
-  assert.equal(stat('科室分类'),DEPARTMENTS.length);
-  const tools=new Set([...fs.readFileSync(new URL('../tools.html',import.meta.url),'utf8').matchAll(/data-tool="([^"]+)"/g)].map(m=>m[1]));
-  assert.equal(stat('临床工具'),tools.size);
+test('personal areas present an honest state before source material or exams are added', () => {
+  const sections = read('workstation-sections.html');
+  assert.match(sections, /<h2 id="ws-private-materials-title">个人资料库<\/h2><span class="ws-state">待接入<\/span>/);
+  assert.match(sections, /<h2 id="ws-exams-title">我的医学考试<\/h2><span class="ws-state">待接入<\/span>/);
+  assert.match(read('home.html'), /data-workstation-list="recent" data-limit="3"/);
+  assert.doesNotMatch(read('home.html'), /official-stats|clinical-scene/);
 });

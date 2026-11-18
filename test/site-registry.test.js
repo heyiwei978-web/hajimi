@@ -26,10 +26,11 @@ function regionSource(file, region) {
 
 const NAV_PATTERNS = {
   official: /<nav\b[^>]*aria-label="主导航"[^>]*>([\s\S]*?)<\/nav>/g,
+  workstation: /<nav\b[^>]*aria-label="主导航"[^>]*>([\s\S]*?)<\/nav>/g,
   tools: /<nav\b[^>]*aria-label="主导航"[^>]*>([\s\S]*?)<\/nav>/g,
   library: /<div class="top-actions library-top-actions">([\s\S]*?)<\/div>/g
 };
-const ACTIVE_CLASS = {official: 'active', tools: 'active', library: 'library-active-link'};
+const ACTIVE_CLASS = {official: 'active', workstation: 'active', tools: 'active', library: 'library-active-link'};
 
 function navLinks(surface) {
   const source = regionSource(surface.file, surface.region);
@@ -76,7 +77,7 @@ for (const surface of NAV_SURFACES) {
     const links = navLinks(surface);
     const expected = navModules(surface);
     assert.deepEqual(links.map(({href, label}) => ({href, label})),
-      expected.map(({href, label}) => ({href, label})), 'links, labels and order');
+      expected.map(({href, label, workspace}) => ({href, label: surface.variant === 'workstation' ? workspace : label})), 'links, labels and order');
     const active = links.filter(link => link.classes.includes(ACTIVE_CLASS[surface.variant]));
     if (surface.active === null) assert.equal(active.length, 0, 'no active entry');
     else assert.deepEqual(active.map(link => link.href), [MODULES.find(module => module.id === surface.active).href], 'one active entry');

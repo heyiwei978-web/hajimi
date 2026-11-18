@@ -1,4 +1,9 @@
 (() => {
+  // The generated reader file used to fall back to the homepage when opened directly.
+  if (location.pathname === '/library.html') {
+    location.replace('/' + location.search + location.hash);
+    return;
+  }
   const manifest=window.HAJIMI_MANIFEST,records=[],byId=new Map(),catalogs=new Map(),bodies=new Map();
   // 慢网络优化：页面一打开就同时开始下载后面要用的脚本和正文（<link rel=preload>），
   // 下面仍按原顺序逐个执行，执行顺序不变，只是不再一个下载完才开始下一个。

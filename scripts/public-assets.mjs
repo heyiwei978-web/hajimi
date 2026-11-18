@@ -5,7 +5,7 @@ export const PUBLIC_PAGES=[
   'password-hash.html','pathway.html','search.html','tools.html'
 ];
 export const PUBLIC_STYLES=[
-  'accessibility.css','admin.css','case-workspace-preview.css','classification-home.css',
+  'personal-workstation.css','accessibility.css','admin.css','case-workspace-preview.css','classification-home.css',
   'classification.css','cms.css','duty.css','duty-orders.css','labs.css','note.css','note-case.css','ecg.css','library-personal.css','pathway.css',
   'design-system.css','site-search.css','styles.css','tools-page.css','tools-polish.css','ui-polish.css','workspace-design.css','private-gallery.css'
 ];
