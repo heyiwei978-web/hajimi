@@ -30,7 +30,7 @@ export function textProblems(files = trackedFiles()) {
     if (!buffer.length) continue;
     const text = buffer.toString('utf8');
     if (buffer[0] === 0xef && buffer[1] === 0xbb && buffer[2] === 0xbf) out.push(`${file}：文件开头有 BOM，请存为无 BOM 的 UTF-8`);
-    if (text.includes('�')) out.push(`${file}：不是有效的 UTF-8`);
+    if (text.includes(String.fromCharCode(0xfffd))) out.push(`${file}：不是有效的 UTF-8`);
     if (text.includes('\r')) out.push(`${file}：使用了 Windows 换行（CRLF），请改为 LF`);
     if (!text.endsWith('\n')) out.push(`${file}：文件末尾缺少换行`);
     if (!file.endsWith('.md') && /^\t/m.test(text)) out.push(`${file}：用 Tab 缩进，请改为空格`);
@@ -63,7 +63,7 @@ const FORBIDDEN = [
   [/\beval\s*\(/, '不要用 eval（站点 CSP 也会拦截）'],
   [/\bnew\s+Function\s*\(/, '不要用 new Function（站点 CSP 也会拦截）'],
   [/\bdocument\.write(?:ln)?\s*\(/, '不要用 document.write'],
-  [/\bdebugger\s*;?/, '提交前删除 debugger'],
+  [new RegExp('\\bdebug' + 'ger\\b'), '提交前删除 debug' + 'ger 语句'],  // 拆开写，避免本文件匹配到自己
   [/\bset(?:Timeout|Interval)\s*\(\s*['"`]/, 'setTimeout/setInterval 不要传字符串'],
 ];
 export function forbiddenProblems(files = trackedFiles()) {
