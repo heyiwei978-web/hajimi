@@ -3,7 +3,7 @@
 .note-main{max-width:880px;width:calc(100% - 32px);margin:0 auto;padding:28px 0 calc(56px + env(safe-area-inset-bottom))}
 .note-kicker{margin:0 0 12px;color:var(--ws-blue,#135f9c);font-size:.75rem;font-weight:700;letter-spacing:.13em}
 .note-hero h1{margin:0;font-size:clamp(1.75rem,3.4vw,2.5rem);line-height:1.2;color:var(--ws-ink,#142c42)}
-.note-hero p:last-child{margin:10px 0 18px;font-size:1rem;line-height:1.8;color:var(--ws-muted,#526577)}
+.note-hero > p{margin:10px 0 18px;font-size:1rem;line-height:1.8;color:var(--ws-muted,#526577)}
 .note-privacy{display:block;margin:0 0 16px;padding:14px 16px;border:1px solid #f0d58c;border-left:4px solid #d39b18;border-radius:12px;background:#fff8e6;color:#5c4300;font-size:.9375rem;line-height:1.75}
 .note-privacy strong{display:block;margin-bottom:2px}
 .note-login{margin:0 0 16px;padding:12px 16px;border-radius:12px;background:#fdecec;color:#8a1f1f;line-height:1.7}

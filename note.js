@@ -26,7 +26,7 @@
   // 稍长于服务端 60 秒执行窗口，覆盖响应传输；超时不会清空已有正文。
   const REQUEST_TIMEOUT_MS = 65000;
   const DRAFT_KEY = 'hajimi-note-draft-v1';
-  const FIELD_NAMES = ['department', 'sex', 'age', 'complaint', 'history', 'diagnosis', 'secondary', 'operation', 'anesthesia', 'extra', 'extraScope', 'day', 'daily', 'dailyPhase', 'referenceText', 'allergies', 'checks', 'operativeFacts'];
+  const FIELD_NAMES = ['model', 'department', 'sex', 'age', 'complaint', 'history', 'diagnosis', 'secondary', 'operation', 'anesthesia', 'extra', 'extraScope', 'day', 'daily', 'dailyPhase', 'referenceText', 'allergies', 'checks', 'operativeFacts'];
   // 与 api/note-generate.js 中的身份信息识别保持一致。
   const GENERIC_NAME_WORDS = new Set(['老年', '中年', '青年', '男性', '女性', '高龄', '患儿', '儿童', '成年', '患者']);
   const NEEDS_OPERATION = new Set(['preop', 'op', 'postop', 'postDaily']);
@@ -52,6 +52,7 @@
   let busy = false;
   let previousCase = '';
   let suppressCaseConfirm = false;
+  let hasFrameDraft = () => false;
   let restoredReference = null;
   let previousDay = '', previousPhase = 'post', previousPreset = '', stopRequested = false;
   const batchChoices = [...form.querySelectorAll('[data-batch-type]')];
@@ -107,6 +108,11 @@
       for (const name of FIELD_NAMES) {
         const element = form.elements[name];
         if (!element || typeof saved[name] !== 'string') continue;
+        // Keep a saved model selected until authenticated discovery can verify it.
+        if (name === 'model' && saved[name] && saved[name].length <= 100
+          && ![...element.options].some(option => option.value === saved[name])) {
+          element.add(new Option('上次选择（待核实）：' + saved[name], saved[name]));
+        }
         const limit = Number(element.maxLength);
         element.value = limit > 0 ? saved[name].slice(0, limit) : saved[name];
         if (element.value.trim()) restored = true;
@@ -169,10 +175,11 @@
     previousPreset = '';
     previousDay = '';
     documents.clearAll();
+    window.dispatchEvent(new Event('hajimi:note-case-reset'));
   }
 
   caseSelect.addEventListener('change', () => {
-    const filled = hasCaseInput() || documents.hasText();
+    const filled = hasCaseDraft();
     if (!suppressCaseConfirm && filled
       && !window.confirm('切换参考病例会清空已填写的病情信息及本病例全部文书，确定继续吗？')) {
       caseSelect.value = previousCase;
@@ -227,7 +234,7 @@
     const item = preset.value === '' ? null : PRESETS[Number(preset.value)];
     operations.replaceChildren();
     if (!item) { previousPreset = ''; return; }
-    if ((documents.hasText() || hasCaseInput())
+    if (hasCaseDraft()
       && !window.confirm('切换常见病种会清空病情信息及本病例全部文书，确定继续吗？')) { preset.value = previousPreset; return; }
     clearCaseFields();
     if (caseSelect.value !== '') {
@@ -272,6 +279,10 @@
 
   function hasCaseInput() {
     return FIELD_NAMES.some(name => !['department', 'dailyPhase', 'extraScope'].includes(name) && form.elements[name].value.trim());
+  }
+
+  function hasCaseDraft() {
+    return hasCaseInput() || documents.hasText() || hasFrameDraft();
   }
 
   function check(data, type) {
@@ -327,15 +338,15 @@
     } finally { clearTimeout(timeout); }
   }
 
-  async function postNote(payload, label, classify = false) {
+  async function postNote(payload, label, classify = false, report = say) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     const started = Date.now();
     const action = classify ? '判断模板' : '生成';
     const requestBody = JSON.stringify(payload);
     if (new TextEncoder().encode(requestBody).length > MAX_REQUEST_BYTES) { clearTimeout(timeout); throw new Error('输入内容总长度超出限制，请缩短病情或参考片段。'); }
-    say('正在' + action + '「' + label + '」……');
-    const ticker = setInterval(() => say('正在' + action + '「' + label + '」，已等待 ' + Math.round((Date.now() - started) / 1000) + ' 秒……'), 1000);
+    report('正在' + action + '「' + label + '」……');
+    const ticker = setInterval(() => report('正在' + action + '「' + label + '」，已等待 ' + Math.round((Date.now() - started) / 1000) + ' 秒……'), 1000);
     try {
       const response = await fetch('/api/note-generate', {
         method:'POST', headers:{'Content-Type':'application/json', 'X-Hajimi-Admin':'1'},
@@ -500,6 +511,7 @@
     operations.replaceChildren();
     caseStatus.textContent = '适合常规模板时，模板片段会发送给 AI 作为写法参考；不适合时将单独生成，不使用参考片段。';
     documents.clearAll();
+    window.dispatchEvent(new Event('hajimi:note-case-reset'));
     saveDraft();
     say('已清空本病例，可填写新的虚构教学病例。');
   });
@@ -556,6 +568,47 @@
   updateBatchControls();
   window.addEventListener('beforeunload', event => {
     if (busy) { event.preventDefault(); event.returnValue = ''; }
+  });
+
+  globalThis.HajimiNotePage = Object.freeze({
+    collect, check,
+    hasCaseDraft,
+    setFrameDraftCheck(check) { hasFrameDraft = check; },
+    generateSection: (input, title, report) => postNote(input, title, false, report),
+    isBusy: () => busy,
+    lock() {
+      if (busy) throw new Error('当前有生成任务，请等待完成');
+      busy = true;
+      const controls = [...form.elements].map(element => [element,element.disabled]);
+      controls.forEach(([element]) => { element.disabled = true; });
+      const wasDisabled = clearButton.disabled;
+      clearButton.disabled = true;
+      form.setAttribute('aria-busy','true');
+      documents.setBusy(true);
+      return () => {
+        busy = false;
+        controls.forEach(([element,disabled]) => { element.disabled = disabled; });
+        clearButton.disabled = wasDisabled;
+        chapterSelect.disabled = !caseSelect.value;
+        form.setAttribute('aria-busy','false');
+        documents.setBusy(false);
+      };
+    },
+    loadFacts(facts) {
+      for (const name of FIELD_NAMES) if (name !== 'model') form.elements[name].value = facts[name] || '';
+      form.elements.dailyPhase.value = 'post';
+      form.elements.extraScope.value = facts.extraScope ?? 'shared';
+      previousDay = ''; previousPhase = 'post'; previousCase = ''; previousPreset = '';
+      restoredReference = null;
+      referenceRequest++;
+      caseSelect.value = ''; preset.value = '';
+      chapterSelect.replaceChildren(new Option('选择病例后查看',''));
+      chapterSelect.disabled = true;
+      referenceWrap.hidden = true; reference.value = '';
+      operations.replaceChildren();
+      documents.clearAll();
+      saveDraft();
+    }
   });
 
   fetch('/api/session', {credentials: 'same-origin'})

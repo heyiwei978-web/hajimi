@@ -1,5 +1,6 @@
 import {guardRequest} from './_security.js';
 import {consumeNoteQuota} from './_note-limit.js';
+import {createModelCatalog} from './_note-models.js';
 
 // AI 病历草稿生成（/note 页面使用）。
 // - 仅登录的管理员可用，防止他人消耗接口额度。
@@ -36,7 +37,7 @@ export const DOC_TYPES = Object.freeze({
 const FIELDS = Object.freeze({
   sex: 4, age: 3, complaint: 120, history: 600, diagnosis: 160, secondary: 300,
   operation: 160, anesthesia: 40, extra: 400, day: 3, daily: 600, department: 10, caseReference: 300, chapterTitle: 160, referenceText: 1000,
-  allergies: 200, checks: 400, operativeFacts: 600, extraScope: 10, dailyPhase: 4
+  allergies: 200, checks: 400, operativeFacts: 600, extraScope: 10, dailyPhase: 4, sectionNotes: 600
 });
 
 // 允许身份证号、手机号中出现空格或短横线，并补充「患者张三，男，65岁」这类
@@ -150,7 +151,15 @@ function chapterGuide(title) {
     [/术后.*(?:病程|查房)/, 'postDaily']
   ];
   const type = types.find(([pattern]) => pattern.test(title))?.[1];
-  return type ? DOC_TYPES[type].guide : isProcedureChapter(title) ? DOC_TYPES.op.guide : /查房/.test(title) ? ROUND_GUIDE : '';
+  if (type) return DOC_TYPES[type].guide;
+  if (/术前讨论/.test(title)) return '按时间、地点、主持、参加、记录、病例摘要、术前诊断、拟行手术、住院医师汇报、主治医师发言、麻醉医师发言、内科医师发言、护士长发言、主任总结组织。姓名和具体时间未提供时留待填写，不虚构人员参会或会诊结论；发言以讨论草稿表述，不将拟采取措施写成已经实施。';
+  if (/入院记录/.test(title)) return '按主诉、现病史、既往史、个人史及相关病史、体格检查、专科检查、辅助检查、初步诊断、诊疗计划、医师签名组织；不写患者身份标识，不把后续手术及恢复情况倒填至入院时。';
+  if (/出院记录/.test(title)) return '按入院情况、入院诊断、诊疗经过、出院诊断、出院情况、出院医嘱、医师签名组织。未经提供的实际住院日期、复查结果及出院指标不得虚构为已达到；诊疗经过只采用输入的实际信息，常规内容仍按补全规则写作。';
+  if (/会诊/.test(title)) return '按病情摘要、相关已知检查、诊疗计划、申请会诊原因、需要解决的问题、医师签名组织。会诊申请不能编造会诊结论；多学科会诊未提供实际意见时仅形成待核对的讨论草稿。';
+  if (/阶段小结|交接班|转科/.test(title)) return '按当前诊断、病情摘要、已知诊疗经过、目前病情、后续计划及需交接事项组织。保留实际信息的时间归属，不能将尚未实施的治疗写为已经完成。';
+  if (/输血/.test(title)) return '围绕输血指征、已提供的相关检查、拟采取或已实施的处理、观察及效果组织；明确区分计划与实施，不虚构血型、血制品种类或剂量、时间、核对过程和输血反应。';
+  if (/抢救/.test(title)) return '按已提供的病情变化、抢救时间、实际措施与经过、已知结果、后续计划组织；未提供的实施时间、药物剂量及抢救结局不得编造为事实。';
+  return isProcedureChapter(title) ? DOC_TYPES.op.guide : /查房/.test(title) ? ROUND_GUIDE : '';
 }
 
 export function isProcedureChapter(title) {
@@ -175,6 +184,7 @@ export function buildMessages({doc, input}) {
     const guide = chapterGuide(input.chapterTitle);
     if (guide) lines.push('所选章节结构要求：' + guide);
   }
+  if (input.sectionNotes) lines.push('仅适用于本份文书的已提供要点（按本章节阶段使用，不作为其他日期事实）：' + input.sectionNotes);
   if (input.history) lines.push('现病史要点：' + input.history);
   if (input.secondary) lines.push('其他诊断/合并症：' + input.secondary);
   if (input.allergies) lines.push('已确认的过敏及长期禁忌（必须保留，不得由常规处理覆盖）：' + input.allergies);
@@ -251,9 +261,23 @@ function aiConfig(env) {
   return {key, url: base.replace(/\/+$/, '') + '/chat/completions', model};
 }
 
-export function createNoteHandler({fetchImpl = globalThis.fetch, env = process.env, timeoutMs = 55000, quota = consumeNoteQuota} = {}) {
+export function createNoteHandler({fetchImpl = globalThis.fetch, env = process.env, timeoutMs = 55000, quota = consumeNoteQuota, modelCatalog = createModelCatalog(fetchImpl), caseHandler = null} = {}) {
+  let privateCaseHandler = caseHandler;
   return async function handler(req, res) {
-    if (!guardRequest(req, res, {methods: ['POST'], admin: true, json: true, bodyLimit: 16384})) return;
+    if (req.query?.resource === 'cases') {
+      if (!privateCaseHandler) {
+        const {createNoteCasesHandler} = await import('./_note-case-handler.js');
+        privateCaseHandler = createNoteCasesHandler();
+      }
+      return privateCaseHandler(req, res);
+    }
+    if (!guardRequest(req, res, {methods: ['GET','POST'], admin: true, json: req.method === 'POST', bodyLimit: 16384})) return;
+    if (req.method === 'GET') {
+      const config = aiConfig(env);
+      if (!config) return res.status(503).json({error:'AI 接口尚未配置，请设置 NOTE_AI_API_KEY'});
+      try { return res.status(200).json({defaultModel:config.model,models:await modelCatalog(config)}); }
+      catch { return res.status(503).json({error:'模型列表暂不可用，仍可使用原配置默认模型'}); }
+    }
     const checked = validateInput(req.body);
     if (checked.error) return res.status(400).json({error: checked.error});
     const classify = req.body.action === 'classify';
@@ -261,6 +285,16 @@ export function createNoteHandler({fetchImpl = globalThis.fetch, env = process.e
     if (classify && !candidates) return res.status(400).json({error:'模板候选格式错误，请刷新页面重试'});
     const config = aiConfig(env);
     if (!config) return res.status(503).json({error: 'AI 接口尚未配置，请在 Vercel 环境变量中设置 NOTE_AI_API_KEY'});
+    const requestedModel = req.body.model;
+    if (requestedModel !== undefined && (typeof requestedModel !== 'string' || requestedModel.length > 100
+      || (requestedModel && !/^deepseek-[a-zA-Z0-9._:-]{1,90}$/.test(requestedModel)))) return res.status(400).json({error:'模型选择无效'});
+    if (requestedModel && requestedModel !== config.model) {
+      let models;
+      try { models = await modelCatalog(config); }
+      catch { return res.status(503).json({error:'无法核实所选模型，请重试或选择原配置默认模型'}); }
+      if (!models.some(model => model.id === requestedModel)) return res.status(400).json({error:'所选 DeepSeek 模型当前不可用，请刷新模型列表'});
+      config.model = requestedModel;
+    }
     const limit = await quota(req);
     if (limit && limit.allowed === false) {
       const retryAfter = Math.max(1, Number(limit.retryAfter) || 60);
@@ -295,7 +329,7 @@ export function createNoteHandler({fetchImpl = globalThis.fetch, env = process.e
       if (classify) return res.status(200).json(classificationResult(text, candidates));
       const cleaned = stripMarkdown(text);
       if (!cleaned || /<\/?think>/i.test(cleaned)) return res.status(502).json({error: 'AI 没有返回有效的病历正文，请重试'});
-      return res.status(200).json({type: checked.type, label: checked.doc.label, text: cleaned});
+      return res.status(200).json({type: checked.type, label: checked.doc.label, text: cleaned, model:config.model});
     } catch (error) {
       const timedOut = controller.signal.aborted || error?.name === 'AbortError';
       return res.status(timedOut ? 504 : 502).json({error: timedOut ? '生成超时，请重试' : 'AI 接口连接失败，请稍后再试'});
