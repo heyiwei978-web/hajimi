@@ -146,6 +146,13 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 - 所有页面使用了 `viewport-fit=cover`，固定或吸顶/吸底元素要处理 `env(safe-area-inset-*)`。
 - 每次界面改动都要在手机（约 390px 宽）和电脑宽度下检查：无横向滚动、组件边界正常、搜索、病历预览/复制/打印、临床工具可用。
 - 打印样式由各模块维护，改布局时确认打印不受影响。
+- **样式防叠加（2026-11-18 起，测试强制）**：详见 `docs/interface-design.md`「样式防叠加规则」。
+  - 改样式就**直接修改原规则**，不要在文件末尾、其他文件或更高层再写一条去覆盖它。`test/css-layering.test.js` 会找出"写了也不生效"的声明并报错。
+  - 每个组件的样式只在一处：公共组件在 `theme.css`，页面独有的在该页面自己的样式文件。不要新增补丁式样式文件（`*-polish.css`、`*-fix.css`、`*-v2.css` 等）；样式文件清单固定在 `config/css-budget.json`。
+  - 删除页面元素时一并删除对应样式；没有元素会用到的规则会被测试拦下。
+  - `!important` 和直接写死的颜色只减不增（预算见 `config/css-budget.json`）；颜色用 `theme.css` 中的 `--ds-*` 变量。
+  - 确需突破预算或新增样式文件时，在 PR 中说明理由并同步修改 `config/css-budget.json`，由审核者确认。
+  - 本地自查：`node scripts/css-guard.mjs` 列出被覆盖和无人使用的规则。
 
 ## 9. Git、PR 与发布
 

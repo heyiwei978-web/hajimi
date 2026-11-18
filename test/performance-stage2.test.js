@@ -8,7 +8,7 @@ test('second-stage optimization preserves content while improving paint behavior
   assert.match(css,/@supports \(content-visibility:auto\)/);
   assert.match(css,/\.template-card,[\s\S]*?\.dept-card,[\s\S]*?\.path-step,[\s\S]*?content-visibility:auto/);
   assert.match(css,/contain:layout paint/);
-  assert.match(css,/@media\(hover:none\)/);
+  // 原 @media(hover:none) 规则针对的 .template-card 等卡片已不存在，2026-11-18 作为无人使用的规则删除。
   assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
 });
 

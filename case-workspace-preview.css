@@ -244,7 +244,7 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 .supplement-expand-head strong{display:block;font-size:1.2rem;color:#08333d}
 .supplement-expand-head span{display:block;margin-top:4px;color:#5d6f75;font-size:.92rem}
 .supplement-expand-dialog textarea{flex:1;width:100%;min-height:200px;padding:14px;border:1px solid #93b9c3;border-radius:12px;font:inherit;font-size:1.1rem;line-height:1.8;color:#2c3e44;resize:none}
-@media(max-width:600px){.supplement-expand-dialog{width:100vw;height:100dvh;max-width:none;border-radius:0;padding:14px max(14px,env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}}
+@media(max-width:600px){.supplement-expand-dialog{border-radius:0;padding:14px max(14px,env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}}
 @media print{.supplement-expand-dialog{display:none!important}}
 .supplement-expand-dialog,.supplement-expand-dialog *{box-sizing:border-box}
 .supplement-expand-dialog .btn{min-height:44px;padding:8px 18px;font-size:15px;border-radius:10px}
