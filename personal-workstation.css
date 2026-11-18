@@ -334,7 +334,8 @@ body { margin: 0; }
   .ws-panel { padding-inline: 13px; }
   .home-quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (max-width: 360px) {
+/* 手机竖屏两列太窄，科室说明会被拆成单字换行；520px 以下改为单列 */
+@media (max-width: 520px) {
   .home-quick-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media print {
