@@ -74,6 +74,13 @@ async function closeRecordDirectory(page){
   if(await summary.isVisible()&&await page.locator('#caseDirectoryPanel').evaluate(element=>element.open))await summary.click();
 }
 
+async function openNoteInputs(page, legacy=false) {
+  for (const selector of legacy ? ['#noteSharedInputs','#noteLegacyTools'] : ['#noteSharedInputs']) {
+    const fold=page.locator(selector);
+    if (!await fold.evaluate(element=>element.open)) await fold.locator(':scope > summary').click();
+  }
+}
+
 test('note draft preserves edited output and manual selection, and reports copy failure',async()=>{
   for(const width of [390,1280]){
     const {page,context,errors}=await pageFor(width);
@@ -81,6 +88,7 @@ test('note draft preserves edited output and manual selection, and reports copy 
       let requests=0;
       await mockNote(page,route=>{requests++;return route.fulfill({json:{label:'示例草稿',text:'虚构示例'}});});
       await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       await page.locator('#notePreset').selectOption('1');
       const complaint=await page.locator('[name=complaint]').inputValue();
       await page.locator('#notePreset').selectOption('');
@@ -112,6 +120,7 @@ test('note page exposes published cases and generates daily notes without sendin
       await mockNote(page,route=>{sent=route.request().postDataJSON();return route.fulfill({json:{label:'术后病程记录',text:'虚构示例草稿'}});},
         body=>body.type==='caseChapter'&&body.candidates.length?{route:'template',candidateId:body.candidates[0].id}:{route:'separate'});
       await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       const catalog=await (await page.request.get(base+'/note-cases.json')).json();
       assert.equal(await page.locator('#noteCase option').count(),catalog.length+1);
       const manifestFile=fs.readdirSync(path.join(root,'dist')).find(name=>/^library-manifest-.*\.js$/.test(name));
@@ -164,6 +173,7 @@ test('note matches standard templates and keeps per-document routing when specia
         return body.extra?{route:'separate'}:{route:'template',candidateId:candidate.id};
       });
       await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       await page.locator('[name=complaint]').fill('虚构示例：摔伤后髋部疼痛');
       await page.locator('[name=diagnosis]').fill('右股骨转子间骨折');
       await page.locator('[data-type=first]').click();
@@ -186,6 +196,7 @@ test('note matches standard templates and keeps per-document routing when specia
       await page.locator('#noteDocumentList button').filter({hasText:'首次病程记录'}).click();
       assert.match(await page.locator('#noteRoute').innerText(),/已参考常规模板/);
       await page.reload({waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       assert.match(await page.locator('#noteRoute').innerText(),/已参考常规模板/);
       await page.locator('#noteDocumentList button').filter({hasText:'专科检查'}).click();
       assert.match(await page.locator('#noteRoute').innerText(),/单独生成/);
@@ -205,6 +216,7 @@ test('note classification failures pause the batch and preserve the existing doc
       generated++;return route.fulfill({json:{text:'虚构教学文书正文'}});
     });
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.locator('#notePreset').selectOption('0');
     await page.locator('[data-type=spec]').click();
     await page.locator('#noteResult').waitFor({state:'visible'});
@@ -236,6 +248,7 @@ test('note template loading timeout keeps the previous document and restores con
       return match?{route:'template',candidateId:candidate.id}:{route:'separate'};
     });
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.locator('[name=complaint]').fill('虚构示例：摔伤后髋部疼痛');
     await page.locator('[name=diagnosis]').fill('右股骨转子间骨折');
     await page.locator('[data-type=first]').click();
@@ -263,6 +276,7 @@ test('note edits and reference selection survive reload; copying pastes only the
       await context.grantPermissions(['clipboard-read','clipboard-write']);
       await mockNote(page,route=>route.fulfill({json:{label:'首次病程记录',text:'虚构教学病历正文'}}));
       await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       const catalog=await (await page.request.get(base+'/note-cases.json')).json();
       const caseIndex=catalog.findIndex(item=>item.chapters.some(chapter=>chapter.hasBody));
       await page.locator('#noteCase').selectOption(String(caseIndex));
@@ -277,6 +291,7 @@ test('note edits and reference selection survive reload; copying pastes only the
       const edited='首次病程记录（虚构测试）\n\n一、病例特点\n摔伤致右髋部疼痛3小时，右股骨颈骨折。Hb 108 g/L，CRP > 10 mg/L，足趾活动存在。\n\n二、拟诊讨论\n结合受伤经过、局部体征与影像分析。\n\n三、诊疗计划\n1. 根据评估完善检查。\n2. 右下肢暂不负重。\n\n医师签名：';
       await page.locator('#noteOutput').fill(edited);
       await page.reload({waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       assert.equal(await page.locator('#noteOutput').inputValue(),edited);
       assert.equal(await page.locator('#noteCase').inputValue(),String(caseIndex));
       assert.equal(await page.locator('#noteChapter').inputValue(),String(chapterIndex));
@@ -303,6 +318,7 @@ test('note edits and reference selection survive reload; copying pastes only the
       }
       await page.locator('#noteOutput').fill('');
       await page.reload({waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       assert(await page.locator('#noteResult').isHidden(),'deleting all text must not restore the previous body');
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
@@ -313,6 +329,7 @@ test('note failures preserve edited content and restore controls, including a cl
   const {page,context,errors}=await pageFor(390);
   try{
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.locator('#notePreset').selectOption('0');
     await mockNote(page,route=>route.fulfill({json:{label:'手术记录',text:'原始生成正文'}}));
     await page.locator('[data-type=op]').click();
@@ -371,6 +388,7 @@ test('note failures preserve edited content and restore controls, including a cl
     assert.equal(await page.locator('#noteOutput').inputValue(),edited);
     assert(await page.locator('#noteClear').isEnabled());
     await page.reload({waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     assert.equal(await page.locator('#noteOutput').inputValue(),edited);
     assert.deepEqual(errors,[]);
   }finally{await context.close();}
@@ -386,6 +404,7 @@ test('note reports blocked session storage and selects the entire body when clip
     });
     await mockNote(page,route=>route.fulfill({json:{label:'手术记录',text:'虚构正文\n未输血。\n医师签名：'}}));
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.locator('#notePreset').selectOption('0');
     await page.locator('[data-type=op]').click();
     await page.locator('#noteResult').waitFor({state:'visible'});
@@ -410,6 +429,7 @@ test('note sets resume only unfinished documents after reload and preserve separ
         return route.fulfill({json:{text:body.type+'（虚构测试）\n右股骨颈骨折。Hb 108 g/L，青霉素过敏。\n医师签名：'}});
       });
       await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       await page.locator('#notePreset').selectOption('0');
       await page.locator('.note-details').filter({has:page.locator('[name=allergies]')}).locator('summary').click();
       await page.locator('[name=allergies]').fill('青霉素过敏');
@@ -420,6 +440,7 @@ test('note sets resume only unfinished documents after reload and preserve separ
       const edited='首次病程记录（虚构测试）\nHb 108 g/L，青霉素过敏。\n1. 右下肢暂不负重。\n医师签名：';
       await page.locator('#noteOutput').fill(edited);
       await page.reload({waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       assert.equal(sent.length,2,'refresh must not send an AI request');
       assert.equal(await page.locator('#noteOutput').inputValue(),edited);
       await page.locator('#noteResume').click();
@@ -439,6 +460,7 @@ test('note sets resume only unfinished documents after reload and preserve separ
       assert.equal(await page.locator('#workflowPaste').inputValue(),edited);
       await page.locator('#workflowPaste').evaluate(el=>el.remove());
       await page.reload({waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       assert.equal(await page.locator('#noteDocumentList button').count(),4);
       assert.equal(await page.locator('#noteOutput').inputValue(),edited);
       if(process.env.NOTE_WORKFLOW_EVIDENCE_DIR){
@@ -464,6 +486,7 @@ test('note next day clears changes, keeps baseline and earlier documents, and su
     const sent=[];
     await mockNote(page,route=>{const body=route.request().postDataJSON();sent.push(body);return route.fulfill({json:{text:'虚构：术后第'+body.day+'天正文\n'+body.daily}});});
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.locator('#notePreset').selectOption('0');
     await page.locator('[name=day]').fill('2');
     await page.locator('[name=daily]').fill('第2天新结果 Hb 98 g/L。');
@@ -473,6 +496,7 @@ test('note next day clears changes, keeps baseline and earlier documents, and su
     await page.locator('[name=day]').fill('3');
     assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('hajimi-note-draft-v1')).day),'2','uncommitted day edits must not persist with old daily facts');
     await page.reload({waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     assert.equal(await page.locator('[name=day]').inputValue(),'2');
     assert.equal(await page.locator('[name=daily]').inputValue(),'第2天新结果 Hb 98 g/L。');
     page.once('dialog',d=>d.dismiss());
@@ -494,6 +518,7 @@ test('note next day clears changes, keeps baseline and earlier documents, and su
     assert.equal(await page.locator('#noteDocumentList button').count(),2);
     page.once('dialog',d=>d.accept());await page.locator('#noteNewCase').click();
     await page.reload({waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     assert(await page.locator('#noteResult').isHidden());
     assert.equal(await page.locator('[name=diagnosis]').inputValue(),'');
     assert.equal(await page.locator('[name=daily]').inputValue(),'');
@@ -510,6 +535,7 @@ test('note batch validates all requests before sending and stopping retains an e
     const held=new Promise(resolve=>{release=resolve;});
     await mockNote(page,async route=>{count++;seen();await held;await route.fulfill({json:{text:'虚构第一份正文'}});});
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.locator('[name=complaint]').fill('虚构右髋疼痛');
     await page.locator('[name=diagnosis]').fill('右股骨颈骨折');
     await page.locator('#noteGenerateSet').click();
@@ -521,7 +547,8 @@ test('note batch validates all requests before sending and stopping retains an e
     await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('已停止'));
     assert.equal(count,1);assert.equal(await page.locator('#noteDocumentList button').count(),1);
     assert.match(await page.locator('#noteResume').innerText(),/3 份/);
-    await page.reload({waitUntil:'networkidle'});assert.equal(count,1);
+    await page.reload({waitUntil:'networkidle'});
+    await openNoteInputs(page,true);assert.equal(count,1);
     page.once('dialog',d=>d.dismiss());
     await page.locator('[data-type=spec]').click();
     assert.equal(count,1);
@@ -542,11 +569,14 @@ test('note migrates the previous single result and does not resurrect it after d
   const {page,context,errors}=await pageFor(390);
   try{
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.evaluate(()=>{sessionStorage.removeItem('hajimi-note-documents-v1');sessionStorage.setItem('hajimi-note-result-v1',JSON.stringify({label:'旧版手术记录',text:'旧版本已编辑正文\n未输血。'}));});
     await page.reload({waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     assert.equal(await page.locator('#noteOutput').inputValue(),'旧版本已编辑正文\n未输血。');
     page.once('dialog',d=>d.accept());await page.locator('#noteClear').click();
     await page.reload({waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     assert(await page.locator('#noteResult').isHidden());assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
@@ -557,6 +587,7 @@ test('note protects partial facts during preset changes and isolates preoperativ
     let count=0;
     await mockNote(page,route=>{count++;return route.fulfill({json:{text:'虚构病程正文'}});});
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.locator('.note-details').filter({has:page.locator('[name=allergies]')}).locator('summary').click();
     await page.locator('[name=allergies]').fill('青霉素过敏');
     page.once('dialog',d=>d.dismiss());await page.locator('#notePreset').selectOption('0');
@@ -2858,14 +2889,17 @@ test('complete case framework selects DeepSeek, edits chapters and saves a priva
           diagnosis:record.facts.diagnosis,department:record.facts.department,sectionCount:record.sections.length,completedAt:record.completedAt}))}});
       });
       await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await openNoteInputs(page);
       await page.locator('#noteModel').selectOption('deepseek-flash');
       await page.locator('[name=complaint]').fill('虚构教学主诉');
       await page.locator('[name=diagnosis]').fill('虚构教学诊断');
       await page.locator('[name=extraScope]').selectOption('');
+      await page.locator('#noteFrameSettings > summary').click();
       await page.locator('#noteFrameMode').selectOption('medical');
       await page.locator('#noteFrameStayDays').fill('1');
       await page.locator('#noteFrameBuild').click();
-      assert.equal(await page.locator('#noteFrameDirectory button').count(),5);
+      assert.equal(await page.locator('#noteFrameDirectory button[aria-expanded]').count(),5);
+      await page.locator('#noteFrameDirectory button[aria-expanded]').first().click();
       await page.locator('#noteFrameSectionNotes').fill('仅用于入院的虚构要点');
       await page.locator('#noteFrameGenerateMissing').click();
       await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已生成 5 章'));
@@ -2876,7 +2910,7 @@ test('complete case framework selects DeepSeek, edits chapters and saves a priva
       assert(await page.locator('#noteFrameComplete').isDisabled());
       const manual='人工修改的虚构正文\n右侧 3*4 cm；> 5 mm\n医师签名：________';
       for(let index=0;index<5;index++) {
-        await page.locator('#noteFrameDirectory button').nth(index).click();
+        await page.locator('#noteFrameDirectory button[aria-expanded]').nth(index).click();
         if(index===0)await page.locator('#noteFrameOutput').fill(manual);
         await page.locator('#noteFrameConfirmed').check();
       }
@@ -2901,10 +2935,12 @@ test('complete case framework selects DeepSeek, edits chapters and saves a priva
       assert.equal(await page.locator('[name=extraScope]').inputValue(),'');
       assert(await page.locator('#noteChapter').isDisabled());
       assert(await page.locator('#noteFrameExtras input[value=anesthesiaConsult]').isDisabled());
+      await openNoteInputs(page,true);
       await page.locator('[data-type=spec]').click();
       await page.locator('#noteResult').waitFor({state:'visible'});
       await page.locator('#noteOutput').fill('未保存的单份文书编辑');
       page.once('dialog',dialog=>dialog.dismiss());
+      await page.locator('.note-frame-library > summary').click();
       await page.locator('.note-frame-saved-item').click();
       assert.equal(await page.locator('#noteOutput').inputValue(),'未保存的单份文书编辑');
       assert.equal(generated.length,6,'opening a saved case never regenerates chapters');
@@ -2924,15 +2960,17 @@ test('framework pauses failed generation, preserves edits and requires review af
         route.fulfill({json:{text:'虚构正文 '+body.chapterTitle,model:'fixture-default'}});
     });
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page);
     await page.locator('[name=complaint]').fill('虚构教学主诉');
     await page.locator('[name=diagnosis]').fill('虚构教学诊断');
+    await page.locator('#noteFrameSettings > summary').click();
     await page.locator('#noteFrameMode').selectOption('medical');
     await page.locator('#noteFrameStayDays').fill('1');
     await page.locator('#noteFrameBuild').click();
     await page.locator('#noteFrameGenerateMissing').click();
     await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('可稍后继续'));
     assert.equal(count,2);
-    await page.locator('#noteFrameDirectory button').nth(0).click();
+    await page.locator('#noteFrameDirectory button[aria-expanded]').nth(0).click();
     await page.locator('#noteFrameOutput').fill('保留人工编辑正文');
     await page.locator('#noteFrameConfirmed').check();
     await page.reload({waitUntil:'networkidle'});
@@ -2941,10 +2979,11 @@ test('framework pauses failed generation, preserves edits and requires review af
     fail=false;
     await page.locator('#noteFrameGenerateMissing').click();
     await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已生成 4 章'));
-    await page.locator('#noteFrameDirectory button').nth(0).click();
+    await page.locator('#noteFrameDirectory button[aria-expanded]').nth(0).click();
     assert.equal(await page.locator('#noteFrameOutput').inputValue(),'保留人工编辑正文');
+    await openNoteInputs(page);
     await page.locator('[name=diagnosis]').fill('修改后的虚构教学诊断');
-    assert.match(await page.locator('#noteFrameDirectory button').nth(0).textContent(),/输入已变化/);
+    assert.match(await page.locator('#noteFrameDirectory button[aria-expanded]').nth(0).textContent(),/输入已变化/);
     assert.equal(await page.locator('#noteFrameConfirmed').isChecked(),false);
     assert(await page.locator('#noteFrameComplete').isDisabled());
     assert.deepEqual(errors,[]);
@@ -2969,15 +3008,17 @@ test('ambiguous first save offers a recovery link and restores the revision with
       return route.fulfill({json:{items:[]}});
     });
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page);
     await page.locator('[name=complaint]').fill('虚构主诉');
     await page.locator('[name=diagnosis]').fill('虚构诊断');
+    await page.locator('#noteFrameSettings > summary').click();
     await page.locator('#noteFrameMode').selectOption('medical');
     await page.locator('#noteFrameStayDays').fill('1');
     await page.locator('#noteFrameBuild').click();
     await page.locator('#noteFrameGenerateMissing').click();
     await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已生成 5 章'));
     for(let index=0;index<5;index++){
-      await page.locator('#noteFrameDirectory button').nth(index).click();
+      await page.locator('#noteFrameDirectory button[aria-expanded]').nth(index).click();
       await page.locator('#noteFrameConfirmed').check();
     }
     await page.locator('#noteFrameFinalConfirm').check();
@@ -3005,6 +3046,7 @@ test('saved DeepSeek choice survives reference restoration before model discover
       return route.fulfill({json:{defaultModel:'fixture-default',models:[{id:'deepseek-flash',name:'Flash'}]}});
     });
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page);
     const catalog=await (await page.request.get(base+'/note-cases.json')).json();
     await page.evaluate(item=>sessionStorage.setItem('hajimi-note-draft-v1',JSON.stringify({
       model:'deepseek-flash',department:item.department,caseId:item.id,chapterId:item.chapters[0].id,
@@ -3015,4 +3057,52 @@ test('saved DeepSeek choice survives reference restoration before model discover
     assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('hajimi-note-draft-v1')).model),'deepseek-flash');
     assert.deepEqual(errors,[]);
   } finally {await context.close();}
+});
+
+test('note opens on a complete checklist with a direct DeepSeek action in every row',async()=>{
+  for (const width of [390,1280]) {
+    const {page,context,errors}=await pageFor(width);
+    try {
+      const requests=[];
+      await mockNote(page,(route,body)=>{
+        requests.push(body);
+        return route.fulfill({json:{text:'虚构的入院文书',model:'deepseek-flash'}});
+      });
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      const rows=page.locator('#noteFrameDirectory .note-frame-row');
+      assert.equal(await rows.count(),26);
+      assert.equal(await rows.getByRole('button',{name:/用 DeepSeek 生成/}).count(),26);
+      assert.match(await rows.first().innerText(),/入院记录[\s\S]*待完善/);
+      assert.match(await rows.last().innerText(),/出院记录/);
+      assert(!/知情同意书|医患沟通/.test(await page.locator('#noteFrameDirectory').innerText()));
+      assert(!await page.locator('[name=complaint]').isVisible());
+      assert.equal(requests.length,0);
+      const admission=rows.first(), deepSeek=admission.getByRole('button',{name:'用 DeepSeek 生成：入院记录'});
+      await deepSeek.click();
+      await page.locator('[name=complaint]').waitFor({state:'visible'});
+      assert(await page.locator('[name=complaint]').evaluate(node=>document.activeElement===node));
+      assert.equal(requests.length,0);
+      await page.locator('[name=complaint]').fill('虚构主诉');
+      await page.locator('[name=diagnosis]').fill('虚构诊断');
+      await page.locator('.note-back-to-checklist').click();
+      await admission.locator('#noteFrameSectionNotes').fill('虚构入院要点');
+      await deepSeek.click();
+      await admission.getByRole('button',{name:'用 DeepSeek 重生成：入院记录'}).waitFor({state:'visible'});
+      assert.equal(requests.length,1);
+      assert.equal(requests[0].chapterTitle,'入院记录');
+      assert.equal(requests[0].sectionNotes,'虚构入院要点');
+      assert.equal(await admission.locator('#noteFrameOutput').inputValue(),'虚构的入院文书');
+      await admission.locator('#noteFrameConfirmed').check();
+      assert.match(await admission.innerText(),/已核对/);
+      assert.match(await rows.nth(1).innerText(),/待完善/);
+      await page.locator('#noteFrameSettings > summary').click();
+      await page.locator('#noteFramePostDays').fill('2');
+      await page.locator('#noteFrameBuild').click();
+      assert.equal(await rows.count(),14);
+      assert.match(await admission.innerText(),/已核对/);
+      assert.equal(await admission.locator('#noteFrameOutput').inputValue(),'虚构的入院文书');
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      assert.deepEqual(errors,[]);
+    } finally {await context.close();}
+  }
 });

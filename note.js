@@ -333,15 +333,15 @@
     } finally { clearTimeout(timeout); }
   }
 
-  async function postNote(payload, label, classify = false) {
+  async function postNote(payload, label, classify = false, report = say) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     const started = Date.now();
     const action = classify ? '判断模板' : '生成';
     const requestBody = JSON.stringify(payload);
     if (new TextEncoder().encode(requestBody).length > MAX_REQUEST_BYTES) { clearTimeout(timeout); throw new Error('输入内容总长度超出限制，请缩短病情或参考片段。'); }
-    say('正在' + action + '「' + label + '」……');
-    const ticker = setInterval(() => say('正在' + action + '「' + label + '」，已等待 ' + Math.round((Date.now() - started) / 1000) + ' 秒……'), 1000);
+    report('正在' + action + '「' + label + '」……');
+    const ticker = setInterval(() => report('正在' + action + '「' + label + '」，已等待 ' + Math.round((Date.now() - started) / 1000) + ' 秒……'), 1000);
     try {
       const response = await fetch('/api/note-generate', {
         method:'POST', headers:{'Content-Type':'application/json', 'X-Hajimi-Admin':'1'},
@@ -568,7 +568,7 @@
   globalThis.HajimiNotePage = Object.freeze({
     collect, check,
     hasCaseDraft: () => documents.hasText() || hasCaseInput(),
-    generateSection: (input, title) => postNote(input, title),
+    generateSection: (input, title, report) => postNote(input, title, false, report),
     isBusy: () => busy,
     lock() {
       if (busy) throw new Error('当前有生成任务，请等待完成');
