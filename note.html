@@ -26,6 +26,7 @@
   <section class="note-hero">
     <h1>完整病历框架</h1>
     <p>填写一次共用病情，按清单逐项填写或用 DeepSeek 生成。</p>
+    <a id="noteOpenLegacy" class="note-inline-link" href="#noteLegacyTools">打开原有 AI 病历生成</a>
   </section>
 
   <section class="note-privacy" aria-label="隐私说明">
@@ -189,24 +190,41 @@
     </details>
     <p id="noteFrameStatus" class="note-status" role="status" aria-live="polite"></p>
     <div id="noteFrameWorkspace" hidden>
+      <div class="note-frame-toolbar">
+        <div class="note-frame-filters" role="group" aria-label="筛选病历文书">
+          <button type="button" class="note-button note-secondary" data-frame-filter="all" aria-pressed="true">全部</button>
+          <button type="button" class="note-button note-secondary" data-frame-filter="missing" aria-pressed="false">待填写</button>
+          <button type="button" class="note-button note-secondary" data-frame-filter="review" aria-pressed="false">待核对</button>
+        </div>
+        <div class="note-frame-shortcuts">
+          <button type="button" id="noteFrameNext" class="note-button note-secondary">下一项未完成</button>
+          <a class="note-inline-link" href="#noteFrameCompletion">跳到整套保存 ↓</a>
+        </div>
+      </div>
+      <p id="noteFrameFilterEmpty" class="note-tip" role="status" hidden></p>
       <div id="noteFrameDirectory" class="note-frame-directory"></div>
       <div id="noteFrameEditor" class="note-frame-editor" hidden>
         <label class="note-field"><span id="noteFrameNotesLabel">本章补充要点</span><textarea id="noteFrameSectionNotes" maxlength="600" rows="3"></textarea></label>
         <label class="note-field">本章正文<textarea id="noteFrameOutput" rows="12" maxlength="16000" spellcheck="false"></textarea></label>
         <label class="note-frame-confirm"><input id="noteFrameConfirmed" type="checkbox">我已核对本章内容</label>
         <p id="noteFrameSectionModel" class="note-tip" hidden></p>
+        <div class="note-frame-shortcuts">
+          <button type="button" id="noteFrameCopySection" class="note-button note-secondary" disabled>复制本章</button>
+          <button type="button" id="noteFrameConfirmNext" class="note-button note-secondary" disabled>核对完成，继续下一项</button>
+        </div>
         <p id="noteFrameEditorStatus" class="note-status" hidden></p>
       </div>
       <div class="note-batch-controls note-frame-batch">
         <button type="button" id="noteFrameGenerateMissing" class="note-button note-secondary">批量生成空白文书</button>
         <button type="button" id="noteFrameStop" class="note-button note-secondary" hidden>完成本章后停止</button>
       </div>
-      <fieldset class="note-frame-completion"><legend>病历完成设置</legend>
+      <fieldset id="noteFrameCompletion" class="note-frame-completion"><legend>病历完成设置</legend>
         <label class="note-field">保存名称<input id="noteFrameTitle" maxlength="100" autocomplete="off" placeholder="例如：右股骨颈骨折完整教学病历"></label>
         <label class="note-frame-confirm"><input id="noteFrameFinalConfirm" type="checkbox">我已核对整套虚构教学病历，确认保存</label>
         <p id="noteFrameCompletionHint" class="note-tip"></p>
         <div class="note-batch-controls"><button type="button" id="noteFrameComplete" class="note-button" disabled>完成病历并保存到网站</button><button type="button" id="noteFrameCopy" class="note-button note-secondary" disabled>复制整套病历</button></div>
         <button type="button" id="noteFrameVerifySave" class="note-button note-secondary" hidden>核对保存结果 / 恢复版本</button>
+        <p id="noteFrameSaveStatus" class="note-status" hidden></p>
         <a id="noteFrameSavedLink" target="_blank" rel="noopener" hidden>打开已保存病历</a>
       </fieldset>
       <details class="note-details"><summary>连续预览整套病历</summary><pre id="noteFramePreview" class="note-frame-preview"></pre></details>

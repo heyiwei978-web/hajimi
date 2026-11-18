@@ -6,6 +6,8 @@
   const model = get('noteModel'), form = get('noteForm');
   const directory = get('noteFrameDirectory'), editor = get('noteFrameEditor');
   const rows = new Map();
+  const filters = [...root.querySelectorAll('[data-frame-filter]')];
+  let filter = 'all';
   let displayedSections, displayedSection, generatingId = '', feedbackId = '';
   let state = null, dirty = false, busy = false, stop = false, savedItems = [], libraryRequest = 0;
   const signature = facts => JSON.stringify(Core.facts(facts));
@@ -33,6 +35,7 @@
   function touch() {
     dirty = true;
     state.finalConfirmed = false;
+    get('noteFrameSaveStatus').hidden=true;
     persist();
   }
   function ready(section) {
@@ -107,6 +110,62 @@
     };
   }
 
+  function matchesFilter(section) {
+    if (filter==='missing') return !section.text.trim();
+    if (filter==='review') return !!section.text.trim() && !ready(section);
+    return true;
+  }
+
+  function selectSection(id, {jump=false}={}) {
+    state.active=id;
+    if (hasFrameWork()) persist();
+    render();
+    if (!id) return;
+    get('noteFrameSectionNotes').focus({preventScroll:true});
+    if (jump) rows.get(id).row.scrollIntoView({block:'start'});
+  }
+
+  function nextIncomplete() {
+    const start=state.sections.findIndex(section=>section.id===state.active)+1;
+    const index=state.sections.findIndex((section,position)=>position>=start&&!ready(section));
+    return index<0 ? state.sections.find(section=>!ready(section)) : state.sections[index];
+  }
+
+  function continueChecklist() {
+    const next=nextIncomplete();
+    if (next) {
+      if (!matchesFilter(next)) filter='all';
+      selectSection(next.id,{jump:true});
+      return;
+    }
+    get('noteFrameFinalConfirm').focus({preventScroll:true});
+    get('noteFrameCompletion').scrollIntoView({block:'start'});
+  }
+
+  function renderFilters() {
+    const missing=state.sections.filter(section=>!section.text.trim()).length;
+    const review=state.sections.filter(section=>section.text.trim()&&!ready(section)).length;
+    const labels={all:'全部 '+state.sections.length,missing:'待填写 '+missing,review:'待核对 '+review};
+    filters.forEach(button=>{
+      button.textContent=labels[button.dataset.frameFilter];
+      button.setAttribute('aria-pressed',String(filter===button.dataset.frameFilter));
+    });
+    let visible=0;
+    for (const section of state.sections) {
+      const item=rows.get(section.id);
+      item.row.hidden=!matchesFilter(section)&&section.id!==state.active;
+      if (!item.row.hidden) visible++;
+    }
+    for (const list of directory.querySelectorAll('.note-frame-stage')) {
+      list.hidden=!list.querySelector('.note-frame-row:not([hidden])');
+      list.previousElementSibling.hidden=list.hidden;
+    }
+    const empty=get('noteFrameFilterEmpty');
+    empty.hidden=visible!==0;
+    empty.textContent=visible?'':'当前没有此类文书。';
+    return missing;
+  }
+
   function renderRows() {
     if (displayedSections !== state.sections) {
       // Keep a single editor and move it to the selected row.
@@ -147,11 +206,7 @@
         edit.setAttribute('aria-controls',editor.id);
         edit.addEventListener('click',()=>{
           if (busy) return;
-          const opening = state.active !== section.id;
-          state.active = opening ? section.id : '';
-          if (hasFrameWork()) persist();
-          render();
-          if (opening) get('noteFrameSectionNotes').focus({preventScroll:true});
+          selectSection(state.active===section.id?'':section.id);
         });
         const generateButton = document.createElement('button');
         generateButton.type = 'button';
@@ -189,13 +244,14 @@
     get('noteFrameWorkspace').hidden=!state;
     if (!state) return;
     const section=current(), completed=state.sections.filter(ready).length;
-    const missing=state.sections.filter(item=>!item.text.trim()).length;
     get('noteFrameProgress').textContent='已核对 '+completed+' / '+state.sections.length+' 项';
     const {mode,preDays,postDays,stayDays}=state.settings;
     get('noteFrameSettingsSummary').textContent=mode==='surgery'
       ? '手术 · 住院第 '+preDays+' 天手术 · 术后 '+postDays+' 天'
       : '非手术 · 住院 '+stayDays+' 天';
     renderRows();
+    const missing=renderFilters();
+    get('noteFrameNext').disabled=busy||completed===state.sections.length;
     editor.hidden=!section;
     if (section && editor.parentElement!==rows.get(section.id).row) rows.get(section.id).row.append(editor);
     if (section && (!keepEditor || displayedSection!==section)) {
@@ -207,6 +263,8 @@
     get('noteFrameOutput').readOnly=busy;
     get('noteFrameConfirmed').checked=!!section?.confirmed;
     get('noteFrameConfirmed').disabled=busy||!section?.text.trim();
+    get('noteFrameConfirmNext').disabled=get('noteFrameConfirmed').disabled;
+    get('noteFrameCopySection').disabled=get('noteFrameConfirmed').disabled;
     get('noteFrameNotesLabel').textContent=section?.day ? '本日病程要点 / 当日变化' : '本章补充要点';
     get('noteFrameSectionNotes').placeholder=section?.day
       ? '填写本日症状、查体、检查结果或处理变化'
@@ -354,13 +412,21 @@
       const next=hydrate(data.record,data.revision);
       next.active ||= next.sections[0].id;
       page.loadFacts(next.facts);
-      state=next;dirty=false;applyConfig(state.settings);persist();render();
+      state=next;dirty=false;filter='all';get('noteFrameSaveStatus').hidden=true;applyConfig(state.settings);persist();render();
       const url=new URL(location.href);url.searchParams.set('case',state.id);history.replaceState(null,'',url);
       say('已打开网站保存的整套病历，可连续阅读、复制或继续编辑。');
       get('noteFrameHeading').focus();
     } catch (error) {say(error.message,true);}
     finally {release();}
   }
+  function saveFeedback(message,error=false) {
+    say(message,error);
+    const status=get('noteFrameSaveStatus');
+    status.textContent=message;
+    status.hidden=false;
+    status.classList.toggle('note-error',error);
+  }
+
   async function complete() {
     if (!state||busy||page.isBusy()) return;
     syncFacts();
@@ -368,15 +434,15 @@
     state.saveAttempted=true;persist();render();
     const release=lock();
     try {
-      say('正在保存整套病历……');
+      saveFeedback('正在保存整套病历……');
       const data=await request('/api/note-generate?resource=cases',{id:state.id,title:state.title,settings:state.settings,
         facts:state.facts,sections:state.sections,confirmed:true,revision:state.revision});
       if (typeof data?.revision!=='string'||data?.record?.id!==state.id) throw new Error('保存结果待确认，请通过病历链接核对');
       state.revision=data.revision;dirty=false;persist();
       const url=new URL(location.href);url.searchParams.set('case',state.id);history.replaceState(null,'',url);
-      say(data.warning||'完整病历已保存到网站，仅本人登录后可见。');
+      saveFeedback(data.warning||'完整病历已保存到网站，仅本人登录后可见。');
       await reloadSaved();
-    } catch (error) {say(error.message+' 当前编辑内容已保留。',true);}
+    } catch (error) {saveFeedback(error.message+' 当前编辑内容已保留。',true);}
     finally {release();}
   }
   async function verifySave() {
@@ -390,9 +456,9 @@
         throw new Error('网站中的版本与当前编辑不同，未覆盖任何内容；请打开病历链接核对，或备份当前正文后从列表重新打开');
       }
       state.revision=data.revision;state.saveAttempted=true;dirty=false;persist();
-      say('已核实网站保存的正文与当前内容一致。可再次点击完成保存，补齐目录记录。');
+      saveFeedback('已核实网站保存的正文与当前内容一致。可再次点击完成保存，补齐目录记录。');
       await reloadSaved();
-    } catch (error) {say(error.message+' 当前编辑内容已保留。',true);}
+    } catch (error) {saveFeedback(error.message+' 当前编辑内容已保留。',true);}
     finally {release();}
   }
   async function loadModels() {
@@ -416,6 +482,20 @@
     } catch (error) {status.textContent=error.message+'；可继续使用原配置默认模型。';}
   }
   page.setFrameDraftCheck(hasFrameWork);
+  filters.forEach(button=>button.addEventListener('click',()=>{
+    filter=button.dataset.frameFilter;
+    if (current()&&!matchesFilter(current())) selectSection('');
+    else render({keepEditor:true});
+  }));
+  get('noteFrameNext').addEventListener('click',continueChecklist);
+  get('noteOpenLegacy').addEventListener('click',event=>{
+    event.preventDefault();
+    get('noteSharedInputs').open=true;
+    get('noteLegacyTools').open=true;
+    const summary=get('noteLegacyTools').querySelector('summary');
+    summary.focus({preventScroll:true});
+    summary.scrollIntoView({block:'start'});
+  });
   Core.optional.forEach(item=>{
     const label=document.createElement('label'),input=document.createElement('input');
     input.type='checkbox';input.value=item.id;if (item.surgery) input.dataset.surgery='true';
@@ -448,6 +528,7 @@
         dirty=true;
         state.finalConfirmed=false;
       }
+      filter='all';get('noteFrameSaveStatus').hidden=true;
       persist();render();
       get('noteFrameSettings').open=false;
       get('noteFrameHeading').focus();
@@ -472,11 +553,23 @@
     if (section.text.trim()) section.stale=true;
     touch();render({keepEditor:true});
   });
-  get('noteFrameConfirmed').addEventListener('change',()=>{
+  function confirmSection(confirmed) {
     if (!state||busy) return;
-    const section=current();section.confirmed=get('noteFrameConfirmed').checked;
+    const section=current();section.confirmed=confirmed;
     if (section.confirmed) {section.stale=false;section.factsKey=signature(state.facts);}
     touch();render({keepEditor:true});
+  }
+  get('noteFrameConfirmed').addEventListener('change',()=>confirmSection(get('noteFrameConfirmed').checked));
+  get('noteFrameConfirmNext').addEventListener('click',()=>{
+    if (busy||!current()?.text.trim()) return;
+    confirmSection(true);
+    continueChecklist();
+  });
+  get('noteFrameCopySection').addEventListener('click',async()=>{
+    const section=current();
+    if (busy||!section?.text.trim()) return;
+    try {await navigator.clipboard.writeText(section.text);say('已复制本章正文。',false,section.id);}
+    catch {say('复制失败，请选中正文后使用系统复制。',true,section.id);}
   });
   get('noteFrameTitle').addEventListener('input',()=>{if (!state||busy) return;state.title=get('noteFrameTitle').value;touch();render({keepEditor:true});});
   get('noteFrameFinalConfirm').addEventListener('change',()=>{if (!state||busy) return;state.finalConfirmed=get('noteFrameFinalConfirm').checked;persist();render({keepEditor:true});});
@@ -492,7 +585,7 @@
   get('noteFrameSearch').addEventListener('input',renderSaved);
   form.addEventListener('input',syncFacts);form.addEventListener('change',syncFacts);
   window.addEventListener('hajimi:note-case-reset',()=>{
-    state=emptyDraft(state.settings);dirty=false;
+    state=emptyDraft(state.settings);dirty=false;filter='all';get('noteFrameSaveStatus').hidden=true;
     try {sessionStorage.removeItem(key);} catch {}
     applyConfig(state.settings);render();
     say('已清空当前框架草稿，可以开始新病历。');

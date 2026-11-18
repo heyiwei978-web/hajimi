@@ -3132,3 +3132,41 @@ test('switching a preset or reference confirms before clearing manually entered 
     assert.deepEqual(errors,[]);
   } finally {await context.close();}
 });
+
+test('checklist filters and review shortcuts keep the original AI generator accessible',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try {
+    const requests=[];
+    await mockNote(page,(route,body)=>{
+      requests.push(body);
+      return route.fulfill({json:{text:'虚构教学正文',model:'deepseek-flash'}});
+    });
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('#noteOpenLegacy').click();
+    assert(await page.locator('[data-type=spec]').isVisible());
+    await page.locator('[name=complaint]').fill('虚构主诉');
+    await page.locator('[name=diagnosis]').fill('虚构诊断');
+    await page.locator('.note-back-to-checklist').click();
+    const review=page.locator('[data-frame-filter=review]');
+    await review.click();
+    assert(await page.locator('#noteFrameFilterEmpty').isVisible());
+    await page.locator('[data-frame-filter=missing]').click();
+    await page.getByRole('button',{name:'用 DeepSeek 生成：入院记录',exact:true}).click();
+    await page.getByRole('button',{name:'用 DeepSeek 重生成：入院记录',exact:true}).waitFor();
+    await review.click();
+    assert.equal(await page.locator('.note-frame-row:visible').count(),1);
+    assert.equal(requests.length,1);
+    await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{
+      configurable:true,value:{writeText:async text=>{window.__copiedChapter=text;}}
+    }));
+    await page.locator('#noteFrameCopySection').click();
+    assert.equal(await page.evaluate(()=>window.__copiedChapter),'虚构教学正文');
+    await page.locator('#noteFrameConfirmNext').click();
+    assert.equal(await page.locator('[data-frame-filter=all]').getAttribute('aria-pressed'),'true');
+    assert.equal(await page.locator('.note-frame-row.is-open').getAttribute('data-section'),'first');
+    assert.match(await page.locator('#noteFrameProgress').textContent(),/已核对 1/);
+    assert.equal(requests.length,1,'review does not call AI');
+    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});

@@ -58,3 +58,12 @@
   .note-shared,.note-frame-settings,.note-frame-progress,.note-frame-directory,.note-frame-editor,.note-frame-batch,.note-frame-completion,.note-frame-library { display:none; }
   .note-frame-preview { max-height:none;overflow:visible; }
 }
+
+.note-inline-link { display:inline-flex; align-items:center; min-height:44px; font-size:.875rem; font-weight:650; }
+.note-hero > .note-inline-link { margin:-10px 0 8px; }
+.note-frame-toolbar { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px 16px; margin:16px 0 8px; }
+.note-frame-filters,.note-frame-shortcuts { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.note-frame-filters .note-button,.note-frame-shortcuts .note-button { min-height:44px; padding:8px 12px; font-size:.875rem; }
+.note-frame-filters .note-button[aria-pressed=true] { background:#e5f1fa; color:#123c64; border-color:#7aa2c4; }
+.note-frame-row,.note-frame-completion,#noteLegacyTools > summary { scroll-margin-top:calc(var(--site-header-height,72px) + 12px); }
+@media print { .note-frame-toolbar,.note-hero > .note-inline-link { display:none; } }
