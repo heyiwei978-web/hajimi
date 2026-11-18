@@ -12,7 +12,7 @@ export const PUBLIC_STYLES=[
 export const PUBLIC_SCRIPTS=[
   'admin-content.js','admin.js','classification-data.js','classification-detail-v2-lower.js',
   'classification-detail-v2-upper.js','classification-detail-v2-pelvis-foot.js',
-  'classification-treatment.js','classification.js','cms-core.js','duty.js','duty-orders.js','labs-data.js','labs.js','note-case-core.js','note-workflow.js','note-documents.js','note.js','note-case.js','home.js',
+  'classification-treatment.js','classification.js','cms-core.js','duty.js','error-report.js','duty-orders.js','labs-data.js','labs.js','note-case-core.js','note-workflow.js','note-documents.js','note.js','note-case.js','home.js',
   'image-upload.js','library-loader.js','library-personal.js','library-ui.js','comorbidity-modules.js','special-exams.js',
   'password-hash.js','pathway-official.js','pathway.js','route-shell.js','search-core.js','site-search.js','tools-page.js','workspace.js','private-gallery.js'
 ];

@@ -1,3 +1,4 @@
+import {withMonitoring} from './_monitoring.js';
 import {guardRequest} from './_security.js';
 import {readSession} from './_auth.js';
 import {ContentError} from './_content-store.js';
@@ -23,4 +24,4 @@ export function createDutyOrdersHandler(store=dutyOrdersStore){return async func
     return res.status(error instanceof ContentError?error.status:503).json({error:error instanceof ContentError?error.message:'资料服务暂不可用，请稍后重试'});
   }
 };}
-export default createDutyOrdersHandler();
+export default withMonitoring('duty-orders', createDutyOrdersHandler());

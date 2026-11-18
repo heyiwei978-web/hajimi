@@ -67,8 +67,8 @@
     status.querySelector('strong').textContent=auth?'已登录 · '+(user||'admin'):'未登录管理后台';
     status.querySelector('small').textContent=auth?'可维护模板、案例和备份':'登录后显示管理工具';
     renderSecurity(null);
-    renderLoginLog(null);
-    if(auth){loadDashboard();window.HAJIMI_PRIVATE_GALLERY.load();loadSecurity();loadLoginLog();}
+    renderLoginLog(null);renderErrorLog(null);
+    if(auth){loadDashboard();window.HAJIMI_PRIVATE_GALLERY.load();loadSecurity();loadLoginLog();loadErrorLog();}
   }
   // Login record: who signed in from where, and recent failed attempts. Text only.
   const LOGIN_PREVIEW=5;
@@ -118,6 +118,48 @@
   }
   document.getElementById('refreshLoginLog').onclick=loadLoginLog;
   document.getElementById('loginLogMore').onclick=()=>{loginLogExpanded=true;renderLoginLog(loginLogData);};
+  // Error record: front-end script errors from visitors and API 5xx, merged by fingerprint. Text only.
+  const ERROR_PREVIEW=8,ERROR_KIND={error:'页面脚本报错',rejection:'未处理的异步错误',resource:'资源加载失败',server:'接口服务器错误'};
+  let errorLogData=null,errorLogExpanded=false;
+  function errorRow(item){
+    const row=document.createElement('li'),mark=document.createElement('strong'),text=document.createElement('span'),detail=document.createElement('small');
+    const last=new Date(item.last),where=[item.file?item.file+(item.line?':'+item.line+(item.column?':'+item.column:''):''):'',item.page&&item.kind!=='server'?'页面 '+item.page:''].filter(Boolean).join(' · ');
+    row.className='is-warning';
+    mark.textContent=ERROR_KIND[item.kind]||'报错';
+    text.textContent=String(item.message||'');
+    detail.textContent=['共 '+(Number(item.count)||1)+' 次','最近 '+(Number.isNaN(last.getTime())?String(item.last):last.toLocaleString('zh-CN',{hour12:false})),where,deviceLabel(item.agent)].filter(Boolean).join(' · ');
+    text.append(document.createElement('br'),detail);row.append(mark,text);
+    return row;
+  }
+  function renderErrorLog(data){
+    errorLogData=data;
+    const status=document.getElementById('errorLogStatus'),list=document.getElementById('errorLogList'),more=document.getElementById('errorLogMore'),clear=document.getElementById('clearErrorLog');
+    list.replaceChildren();more.hidden=true;clear.hidden=true;
+    if(!data){status.textContent='正在加载错误记录…';return;}
+    const entries=Array.isArray(data.entries)?data.entries:[];
+    const dayAgo=Date.now()-86400000,recent=entries.filter(item=>new Date(item.last).getTime()>=dayAgo).length;
+    status.textContent=entries.length?'共 '+entries.length+' 种报错；最近 24 小时出现过 '+recent+' 种。':'暂无错误记录。';
+    list.append(...(errorLogExpanded?entries:entries.slice(0,ERROR_PREVIEW)).map(errorRow));
+    more.hidden=errorLogExpanded||entries.length<=ERROR_PREVIEW;
+    more.textContent='显示全部 '+entries.length+' 种报错';
+    clear.hidden=!entries.length;
+  }
+  async function loadErrorLog(){
+    const generation=epoch,button=document.getElementById('refreshErrorLog');
+    errorLogExpanded=false;renderErrorLog(null);button.disabled=true;
+    try{const data=await json('/api/login-log?feed=errors',{cache:'no-store'});if(generation===epoch)renderErrorLog(data);}
+    catch(ex){if(generation===epoch)document.getElementById('errorLogStatus').textContent=ex.message||'错误记录暂时无法读取。';}
+    finally{button.disabled=false;}
+  }
+  document.getElementById('refreshErrorLog').onclick=loadErrorLog;
+  document.getElementById('errorLogMore').onclick=()=>{errorLogExpanded=true;renderErrorLog(errorLogData);};
+  document.getElementById('clearErrorLog').onclick=async()=>{
+    if(!confirm('确定清空全部错误记录吗？清空后无法恢复。'))return;
+    const button=document.getElementById('clearErrorLog');button.disabled=true;
+    try{renderErrorLog(await json('/api/login-log?feed=errors',{method:'DELETE'}));}
+    catch(ex){document.getElementById('errorLogStatus').textContent=ex.message||'清空失败，请稍后重试。';}
+    finally{button.disabled=false;}
+  };
   // Login self-check: the server reports how the login is configured (never any value).
   function renderSecurity(checks){
     const panel=document.getElementById('securityCheck'),list=document.getElementById('securityCheckList');

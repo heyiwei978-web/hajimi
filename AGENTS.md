@@ -133,7 +133,8 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 
 - **绝不提交**：密码、哈希、会话密钥、Token、`.env`、Cookie、Vercel 环境变量的值、真实患者信息或未脱敏图片。敏感配置只存于 Vercel Environment Variables（`HAJIMI_ADMIN_USER`、`HAJIMI_SESSION_SECRET`、`HAJIMI_ADMIN_PASSWORD_HASH` 等，只写变量名）。
 - 不放宽 `vercel.json` 的安全响应头、CSP、`routes` 拦截规则；如确需修改，在 PR 中单独说明理由。
-- 接口约定（见 `FIREWALL.md`）：写操作要求同源 Origin / Fetch Metadata 和管理请求标识；请求体有大小上限；图片只接受 JPG/PNG/WebP 并校验文件签名；未发布案例和私人图库仅管理员可见；私人图库与公开 CMS 数据完全隔离。改 `api/` 时保持这些边界，并补充对应测试。
+- 接口约定（见 `FIREWALL.md`）：写操作要求同源 Origin / Fetch Metadata 和管理请求标识（唯一例外是前端报错上报 `/api/login-log?feed=errors` 的 POST，其限制见 `FIREWALL.md`，不得放宽，也不得照此新增其他公开写入接口）；请求体有大小上限；图片只接受 JPG/PNG/WebP 并校验文件签名；未发布案例和私人图库仅管理员可见；私人图库与公开 CMS 数据完全隔离。改 `api/` 时保持这些边界，并补充对应测试。
+- 错误记录：前端报错和接口 5xx 记入 `/admin`「错误记录」（`api/_monitoring.js`）。新接口的默认导出用 `withMonitoring('接口名', handler)` 包住；上报内容不得包含页面正文、输入内容、查询参数或患者信息。
 - 浏览器存储：收藏/字号等偏好只存标识，不存患者信息或正文；值班草稿只存 `sessionStorage`。
 - 不要在测试或脚本中登录生产后台、写生产 Blob 或访问生产私有数据。测试使用随机密钥、虚构凭据、合成数据和内存存储。
 

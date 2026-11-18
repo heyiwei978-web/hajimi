@@ -2,7 +2,7 @@ import {isAdmin,requirePostHeader} from './_auth.js';
 
 const writes = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
-function sameOrigin(req) {
+export function sameOrigin(req) {
   // Browsers that send Fetch Metadata must report a same-origin request (or a direct,
   // user-initiated one). A sibling subdomain ("same-site") is treated like any other site.
   const site = req.headers['sec-fetch-site'];

@@ -139,6 +139,15 @@
       <p class="admin-security-note">记录登录的时间、大致地区、网络地址和设备，不记录密码和输入的用户名。保留最近 50 次成功登录和 100 次失败尝试。发现不是自己的登录，请立即更换密码和 HAJIMI_SESSION_SECRET 并重新部署。</p>
     </section>
 
+    <section id="errorLog" class="admin-guide admin-security admin-login-log" aria-labelledby="errorLogTitle">
+      <div class="admin-card-head"><div><span>仅管理员可见</span><h2 id="errorLogTitle">错误记录</h2></div><button id="refreshErrorLog" class="admin-secondary" type="button">刷新</button></div>
+      <p id="errorLogStatus" role="status" aria-live="polite">正在加载错误记录…</p>
+      <ul id="errorLogList" class="admin-login-log-list" aria-labelledby="errorLogTitle"></ul>
+      <button id="errorLogMore" class="admin-secondary" type="button" hidden>显示全部</button>
+      <button id="clearErrorLog" class="admin-secondary" type="button" hidden>问题已处理，清空记录</button>
+      <p class="admin-security-note">访客页面脚本的报错和接口的服务器错误会记在这里，相同的报错合并计数，保留最近 100 种。只记录报错文字、出错文件、页面路径、浏览器和大致国家，不记录页面内容、输入内容和网址里的查询参数。</p>
+    </section>
+
     <section id="securityCheck" class="admin-guide admin-security" aria-labelledby="securityCheckTitle" hidden>
       <div class="admin-card-head"><div><span>仅管理员可见</span><h2 id="securityCheckTitle">登录安全自检</h2></div></div>
       <p id="securityCheckSummary" role="status" aria-live="polite"></p>

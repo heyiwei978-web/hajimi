@@ -1,3 +1,4 @@
+import {withMonitoring} from './_monitoring.js';
 import {createSession,verifyPassword} from './_auth.js';
 import {guardRequest} from './_security.js';
 import {checkLoginThrottle,recordLoginFailure,clearLoginFailures} from './_rate-limit.js';
@@ -30,4 +31,4 @@ export function createLoginHandler({log = loginLog} = {}) { return async functio
   res.setHeader('Set-Cookie','hajimi_session='+encodeURIComponent(token)+'; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800');
   return res.status(200).json({ok:true,user:username});
 }; }
-export default createLoginHandler();
+export default withMonitoring('login', createLoginHandler());

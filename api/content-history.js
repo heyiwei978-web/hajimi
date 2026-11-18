@@ -1,3 +1,4 @@
+import {withMonitoring} from './_monitoring.js';
 import {guardRequest} from './_security.js';
 import {readSession} from './_auth.js';
 import {contentStore,ContentError} from './_content-store.js';
@@ -11,4 +12,4 @@ export function createHistoryHandler(store=contentStore){return async function h
     return res.status(200).json({revision:current.revision,updatedAt:current.updatedAt||null,history:current.history});
   }catch(error){return res.status(error instanceof ContentError?error.status:503).json({error:error instanceof ContentError?error.message:'备份服务暂不可用，请稍后重试'});}
 };}
-export default createHistoryHandler();
+export default withMonitoring('content-history', createHistoryHandler());

@@ -1,3 +1,4 @@
+import {withMonitoring} from './_monitoring.js';
 import {guardRequest} from './_security.js';
 import {consumeNoteQuota} from './_note-limit.js';
 import {createModelCatalog} from './_note-models.js';
@@ -339,4 +340,4 @@ export function createNoteHandler({fetchImpl = globalThis.fetch, env = process.e
   };
 }
 
-export default createNoteHandler();
+export default withMonitoring('note-generate', createNoteHandler());
