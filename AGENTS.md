@@ -154,6 +154,7 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
   - `!important` 和直接写死的颜色只减不增（预算见 `config/css-budget.json`）；颜色用 `theme.css` 中的 `--ds-*` 变量。
   - 确需突破预算或新增样式文件时，在 PR 中说明理由并同步修改 `config/css-budget.json`，由审核者确认。
   - 本地自查：`node scripts/css-guard.mjs` 列出被覆盖和无人使用的规则。
+- **代码规范（2026-11-18 起，测试强制）**：见 `docs/code-style.md`。UTF-8、LF、空格缩进、无行尾空格；禁止 `eval`、`new Function`、`document.write`、`debugger`、页面脚本和接口里的 `console.log`；`innerHTML`/`insertAdjacentHTML` 只减不增（`config/code-budget.json`）。提交前运行 `npm run lint`。
 
 ## 9. Git、PR 与发布
 

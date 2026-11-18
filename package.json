@@ -5,6 +5,7 @@
   },
   "scripts": {
     "test": "node --test test/*.test.js",
+    "lint": "node scripts/code-style.mjs && node scripts/css-guard.mjs",
     "audit:clinical": "node scripts/audit-clinical-library.mjs",
     "build": "node scripts/build-home.mjs",
     "sync:nav": "node scripts/navigation-build.mjs",

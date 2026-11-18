@@ -57,7 +57,7 @@ main:focus{outline:none}
   .official-nav-right{min-width:0;gap:12px}
   .official-search{border:1px solid var(--ws-line);border-radius:8px;background:#fff;font-size:.875rem;min-height:40px}
   #libraryShell .library-topbar{border-color:var(--ws-line);backdrop-filter:none}
-  
+
   #libraryShell .library-top-actions .text-action{color:var(--ws-muted)}
   #libraryShell .library-header-tools .patient-action{background:var(--ws-soft);border-color:var(--ws-line);color:var(--ws-blue);border-radius:10px}
 
@@ -92,7 +92,7 @@ main:focus{outline:none}
   #libraryShell .controls-section,.library-root-page #libraryShell .controls-section{margin:0 0 24px;padding:20px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);background:#fff;box-shadow:none}
   #libraryShell .controls-section h2{font-size:1.0625rem;margin:0 0 14px;line-height:1.5}
   #libraryShell .searchbox,.library-root-page #libraryShell .searchbox{height:52px;border:1px solid #a9d8de;border-radius:10px;background:#fff;box-shadow:none}
-  
+
   #libraryShell .searchbox input{font-size:1rem;color:var(--ws-ink)}
   #libraryShell .searchbox kbd{flex-shrink:0;white-space:nowrap;font-size:12px;padding:3px 6px}
   #libraryShell .filter-row{gap:12px}
@@ -270,7 +270,7 @@ main:focus{outline:none}
 
 @media screen and (max-width:1180px){
   .official-nav-right{display:none}
-  
+
   .library-department-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .ortho-disease-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
@@ -283,7 +283,7 @@ main:focus{outline:none}
   .official-nav .official-links,.tools-page .nav nav{flex:0 0 100%;order:3;width:100%;max-width:100%;gap:24px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;min-height:48px}
   .official-nav .official-links::-webkit-scrollbar,.tools-page .nav nav::-webkit-scrollbar{display:none}
   .official-nav .official-links a,.tools-page .nav nav a{flex-shrink:0;min-height:48px;font-size:.9375rem}
-  
+
 }
 @media screen and (max-width:900px){
 
@@ -318,7 +318,7 @@ main:focus{outline:none}
   .tools-page .card p{grid-column:2;font-size:.9375rem;line-height:1.6}
   .tools-page .card .bottom{grid-column:2;margin-top:8px;padding-top:6px;align-items:center}
   .tools-page .bottom button,.tools-page .openext{min-height:40px}
-  
+
   .official-nav .official-links,.tools-page .nav nav{gap:22px}
 
   /* 手机首屏优先给搜索：标题收成一行，隐藏英文眉题与介绍段 */
@@ -391,7 +391,7 @@ main:focus{outline:none}
   .pathway-hero{padding:22px}
   .pathway-hero h1{font-size:2rem;line-height:1.4}
   .pathway-hero-metrics div{min-width:0}
-  
+
   /* 临床路径：手机上四个数字一行排开、两个按钮并排，更快进入路径正文。 */
   .pathway-hero-metrics{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
   .pathway-hero-metrics div{min-height:0;padding:10px 4px;align-items:center;text-align:center}
@@ -739,7 +739,7 @@ main:focus{outline:none}
 
 /* ---------- 统一内容宽度：与顶栏同一列（电脑宽度） ---------- */
 @media screen and (min-width:1101px){
-  
+
   .class-page:not(.ecg-page) .class-shell{width:min(1280px,calc(100% - 48px))}
   .library-root-page #libraryShell .page{max-width:1328px}
   .library-root-page #libraryShell .content{width:min(1280px,calc(100% - 48px))}

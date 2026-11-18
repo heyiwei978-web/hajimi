@@ -1,0 +1,17 @@
+{
+  "_说明": "直接拼接 HTML（innerHTML/outerHTML 赋值、insertAdjacentHTML）的处数，按文件只减不增；新代码请用 textContent 和 DOM 方法。确需增加时在 PR 中说明理由并同步修改本文件。见 docs/code-style.md。",
+  "htmlSinks": {
+    "app.js": 5,
+    "departments.js": 12,
+    "js/classification.js": 6,
+    "js/cms-core.js": 4,
+    "js/comorbidity-modules.js": 3,
+    "js/ecg-calipers.js": 1,
+    "js/ecg.js": 25,
+    "js/library-ui.js": 1,
+    "js/pathway.js": 3,
+    "js/site-search.js": 1,
+    "js/tools-page.js": 4,
+    "scripts/clinical-compiler.mjs": 1
+  }
+}
