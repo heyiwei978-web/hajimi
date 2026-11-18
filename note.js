@@ -52,6 +52,7 @@
   let busy = false;
   let previousCase = '';
   let suppressCaseConfirm = false;
+  let hasFrameDraft = () => false;
   let restoredReference = null;
   let previousDay = '', previousPhase = 'post', previousPreset = '', stopRequested = false;
   const batchChoices = [...form.querySelectorAll('[data-batch-type]')];
@@ -178,7 +179,7 @@
   }
 
   caseSelect.addEventListener('change', () => {
-    const filled = hasCaseInput() || documents.hasText();
+    const filled = hasCaseDraft();
     if (!suppressCaseConfirm && filled
       && !window.confirm('切换参考病例会清空已填写的病情信息及本病例全部文书，确定继续吗？')) {
       caseSelect.value = previousCase;
@@ -233,7 +234,7 @@
     const item = preset.value === '' ? null : PRESETS[Number(preset.value)];
     operations.replaceChildren();
     if (!item) { previousPreset = ''; return; }
-    if ((documents.hasText() || hasCaseInput())
+    if (hasCaseDraft()
       && !window.confirm('切换常见病种会清空病情信息及本病例全部文书，确定继续吗？')) { preset.value = previousPreset; return; }
     clearCaseFields();
     if (caseSelect.value !== '') {
@@ -278,6 +279,10 @@
 
   function hasCaseInput() {
     return FIELD_NAMES.some(name => !['department', 'dailyPhase', 'extraScope'].includes(name) && form.elements[name].value.trim());
+  }
+
+  function hasCaseDraft() {
+    return hasCaseInput() || documents.hasText() || hasFrameDraft();
   }
 
   function check(data, type) {
@@ -567,7 +572,8 @@
 
   globalThis.HajimiNotePage = Object.freeze({
     collect, check,
-    hasCaseDraft: () => documents.hasText() || hasCaseInput(),
+    hasCaseDraft,
+    setFrameDraftCheck(check) { hasFrameDraft = check; },
     generateSection: (input, title, report) => postNote(input, title, false, report),
     isBusy: () => busy,
     lock() {

@@ -88,7 +88,7 @@
   }
   function hasFrameWork() {
     return !!state && (state.revision !== 'missing' || state.saveAttempted
-      || state.sections.some(section => section.text.trim() || section.notes.trim()));
+      || state.title !== defaultTitle(state.facts) || state.sections.some(section => section.text.trim() || section.notes.trim()));
   }
 
   function defaultTitle(facts) {
@@ -415,6 +415,7 @@
       status.textContent='模型来自现有接口的可用列表；默认项沿用原配置。每次生成按当前选择执行。';
     } catch (error) {status.textContent=error.message+'；可继续使用原配置默认模型。';}
   }
+  page.setFrameDraftCheck(hasFrameWork);
   Core.optional.forEach(item=>{
     const label=document.createElement('label'),input=document.createElement('input');
     input.type='checkbox';input.value=item.id;if (item.surgery) input.dataset.surgery='true';

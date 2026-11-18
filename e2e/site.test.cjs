@@ -3112,3 +3112,23 @@ test('note opens on a complete checklist with a direct DeepSeek action in every 
     } finally {await context.close();}
   }
 });
+
+test('switching a preset or reference confirms before clearing manually entered checklist text',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try {
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteFrameSection(page,0);
+    await page.locator('#noteFrameOutput').fill('手动填写的虚构入院记录');
+    await openNoteInputs(page,true);
+    assert.equal(await page.locator('[name=complaint]').inputValue(),'');
+    const prompts=[];
+    page.on('dialog',dialog=>{prompts.push(dialog.message());return dialog.dismiss();});
+    await page.locator('#notePreset').selectOption('0');
+    await page.locator('#noteCase').selectOption('0');
+    assert.equal(prompts.length,2);
+    assert.match(prompts[0],/切换常见病种/);
+    assert.match(prompts[1],/切换参考病例/);
+    assert.equal(await page.locator('#noteFrameOutput').inputValue(),'手动填写的虚构入院记录');
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
