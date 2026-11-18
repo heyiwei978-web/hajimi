@@ -137,6 +137,7 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 - 错误记录：前端报错和接口 5xx 记入 `/admin`「错误记录」（`api/_monitoring.js`）。新接口的默认导出用 `withMonitoring('接口名', handler)` 包住；上报内容不得包含页面正文、输入内容、查询参数或患者信息。
 - 浏览器存储：收藏/字号等偏好只存标识，不存患者信息或正文；值班草稿只存 `sessionStorage`。
 - 不要在测试或脚本中登录生产后台、写生产 Blob 或访问生产私有数据。测试使用随机密钥、虚构凭据、合成数据和内存存储。
+- 异地备份：`.github/workflows/blob-backup.yml` 每周把 Blob 数据加密备份为 Actions 构件（`docs/backup.md`）。这是负责人授权的例外，只在 GitHub Actions 中用仓库 Secrets 运行；AI 助手不得在会话中运行备份或恢复脚本访问生产数据，恢复只由负责人手动执行。不要上传未加密的备份。
 
 ## 8. 界面与前端规范
 
