@@ -928,7 +928,12 @@ test('ECG routes share the public layout, expose learning sections, case practic
       assert.match(await page.locator('#ecg-oncall').innerText(),/术后气促/);
       assert.match(await page.locator('#ecg-oncall').innerText(),/术后心悸/);
       assert.equal(requests.filter(url=>/^\/(?:api\/|catalog-|records-|app-runtime-|department-runtime-)/.test(url)).length,0,'ECG remains independent of private administration and clinical-record loading');
-      for(const route of ['/','/classification','/pathway','/tools','/duty']){
+      for(const route of ['/','/clinical']){
+        await page.goto(base+route,{waitUntil:'networkidle'});
+        await page.getByRole('main').locator('a[href="/ecg"]').click();
+        await page.waitForURL(base+'/ecg');
+      }
+      for(const route of ['/classification','/pathway','/tools','/duty']){
         await page.goto(base+route,{waitUntil:'networkidle'});
         assert.equal(await page.locator('header nav a[href="/ecg"]').count(),1,'public ECG navigation on '+route);
       }
