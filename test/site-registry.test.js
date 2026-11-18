@@ -137,16 +137,16 @@ test('mobile navigation order guard still holds', () => {
   // The 4th official navigation entry is hidden by a generic rule and restored
   // by an equal-specificity override. Removing the override, or reordering the
   // registry, changes what phones see; this test makes that coupling explicit.
-  const styles = read('styles.css'), polish = read('ui-polish.css');
-  if (/\.global-links a:nth-child\(4\)\{display:none\}/.test(styles)) {
-    assert.match(polish, /\.official-nav \.official-links a\{display:flex/, 'official navigation restores every entry');
+  // ui-polish.css was merged into the end of styles.css (2026-11-18); the
+  // restoring override must still come after the generic hiding rule.
+  const styles = read('styles.css');
+  const hide = styles.search(/\.global-links a:nth-child\(4\)\{display:none\}/);
+  if (hide >= 0) {
+    const restore = styles.search(/\.official-nav \.official-links a\{display:flex/);
+    assert.ok(restore > hide, 'official navigation restores every entry after the generic rule');
   }
   const official = NAV_SURFACES.filter(surface => surface.variant === 'official');
   for (const surface of official) {
-    for (const stylesheet of ['styles.css', 'ui-polish.css']) {
-      assert.match(readPage(surface.file), new RegExp(`href="/${stylesheet}\\?`), `${surface.file} loads ${stylesheet}`);
-    }
-    const page = readPage(surface.file);
-    assert.ok(page.indexOf('/styles.css?') < page.indexOf('/ui-polish.css?'), `${surface.file} loads ui-polish.css after styles.css`);
+    assert.match(readPage(surface.file), /href="\/styles\.css\?/, `${surface.file} loads styles.css`);
   }
 });

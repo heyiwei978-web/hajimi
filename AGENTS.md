@@ -54,7 +54,7 @@ PR 描述里写明：执行工具 / 模型（可以多个）、改动类型（�
 | `record-*.js`、`ortho-*.js`、`orthopedic-expansion-*.js`、`ideal-*.js`、`tka-special-cases.js` | 已退役的旧生成链脚本，冻结不改（见第 6.3 节） |
 | `ecg-*.js` | 心电图资料与功能，构建时由 `scripts/ecg-compiler.mjs` 编译成带哈希的包 |
 | `classification-*.js` | 疾病分型资料与治疗方案 |
-| `*.css` | 样式；`workspace-design.css` 是最后加载的公共界面样式，管理设计变量 |
+| `*.css` | 样式；公共样式只有两层：`styles.css`（基础）和 `theme.css`（公共界面层，管理设计变量），页面专属样式放在两者之间或 `theme.css` 之后，见 `docs/interface-design.md` |
 | `config/site-modules.mjs` | **站点模块注册表**：栏目、科室、所有主导航位置的唯一来源 |
 | `scripts/` | 构建、编译、审核脚本（不发布） |
 | `content/clinical-library/` | 病历身份账本、修订记录与正文源数据（见第 6 节） |
@@ -86,7 +86,7 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 
 - **导航**：所有页面的主导航链接由 `scripts/navigation-build.mjs` 按 `config/site-modules.mjs` 在构建时生成。
   - 增删改栏目、改导航顺序、改当前项 → 只改注册表，不要手改各页面的导航链接。
-  - 导航顺序也是界面约定：`styles.css` 在 640px 以下隐藏第 4 个导航项，`ui-polish.css` 再为官方导航恢复；调整顺序要在手机宽度下验证。
+  - 导航顺序也是界面约定：`styles.css` 在 640px 以下隐藏第 4 个导航项，`styles.css` 后部的规则（原 `ui-polish.css`）再为官方导航恢复；调整顺序要在手机宽度下验证。
   - 注册表的 `routes` 要与 `vercel.json` 的 rewrites 保持一致；新增路由两处都要改。
 - **科室**：科室卡片、路由元数据、分型列表由 `scripts/department-build.mjs` 依据注册表的 `DEPARTMENTS` 生成。
 - **发布白名单**：`scripts/public-assets.mjs` 是公开文件的显式白名单。新增要公开的页面、样式或脚本，必须加入对应列表，否则不会进入 `dist/`。病历源脚本、`config/`、`scripts/`、`docs/`、`content/` 和所有 `.md` 都不得公开。

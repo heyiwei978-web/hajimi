@@ -21,6 +21,8 @@ body.ecg-page{
 .ecg-page .class-section-head h2,.ecg-page .class-content-section h2{font-size:24px;line-height:1.5;margin:8px 0 12px}
 .ecg-page .class-section-head p{font-size:17px;color:var(--ws-muted)}
 .ecg-page .class-dept-card,.ecg-page .class-disease-card,.ecg-page .class-content-section{border-color:var(--ws-line);border-radius:var(--ws-radius);min-width:0}
+/* ecg.css 加载在 theme.css 之后；保留公共层的卡片悬停边框 */
+@media screen and (hover:hover) and (pointer:fine){.ecg-page .class-disease-card:hover{border-color:var(--ds-line-strong)}}
 .ecg-page .class-dept-card{min-height:230px;padding:22px}
 .ecg-page .class-dept-card.is-ready{border-top-color:var(--ws-blue)}
 .ecg-page .class-dept-symbol{background:var(--ws-soft);color:var(--ws-blue);margin:16px 0 8px}

@@ -107,3 +107,31 @@ V5 首页使用墨绿，其余栏目使用蓝色，全站主色不一致。本�
 - **结果**：规则 2,965 → 2,586，声明 9,896 → 8,295，样式总量约 318 KB → 276 KB；`styles.css` 73 KB → 48 KB。
 - **核对**：构建后，用浏览器读取 21 个页面全部元素（含 `::before`/`::after`）的最终计算样式，在手机 390px、电脑 1280px 和打印三种情况下，与改动前逐项比对，完全一致。
 - **注意**：管理员在后台写入的自定义 HTML 若用到上述旧类名，将不再有样式；目前未发现这种情况。
+
+## 样式精简：公共样式合并为两层（2026-11-18）
+
+原来每个页面先后叠加 `styles.css → ui-polish.css → accessibility.css → workspace-design.css → design-system.css` 五层公共样式。现在合并为两层，外观不变：
+
+- **`styles.css`**：基础样式，末尾接原 `ui-polish.css`。
+- **`theme.css`**：公共界面层，依次为原 `accessibility.css`、`workspace-design.css`、`design-system.css`，管理设计变量（`--ds-*`、`--ws-*`）。
+- 本节之前提到的 `workspace-design.css`、`design-system.css`，现在都指 `theme.css` 中对应的部分。
+
+各页面样式的加载顺序：
+
+| 页面 | 顺序 |
+| --- | --- |
+| 病历库（`index.html`） | cms → styles → library-personal → case-workspace-preview → theme |
+| 管理后台 | cms → admin → private-gallery → styles → theme |
+| 疾病分型 | styles → classification → theme |
+| 心电图 | styles → classification → theme → ecg |
+| 值班 / 密码页 | styles → duty → theme |
+| 值班医嘱 | styles → duty → theme → duty-orders |
+| 临床路径 | styles → pathway → theme |
+| 检验 | styles → labs → theme |
+| 搜索 | styles → theme → site-search |
+| AI 病历 | styles → theme → note → note-case |
+| 临床工具 | tools-page → tools-polish → theme |
+
+**新增页面样式**：要被公共界面层统一覆盖的，放在 `theme.css` 之前；要覆盖公共界面层的，放在 `theme.css` 之后。
+
+**核对方法**：按原顺序和新顺序分别构建，读取 21 个页面全部元素的最终计算样式，在手机、电脑和打印三种情况下逐项比对，0 处不同。调整顺序后可能冲突的规则，即层叠优先级相同、选择器共用类名、取值不同的规则，逐条人工核对：只有心电图卡片悬停边框一处会受影响，已在 `ecg.css` 中补回，并用鼠标悬停实测与改前一致。
