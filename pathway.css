@@ -169,11 +169,10 @@ body.pathway-page{margin:0;background:var(--pw-bg);color:var(--pw-ink)}
 
 /* Pathway reading hierarchy and a bounded directory on small screens. */
 @media screen{
-  .pathway-hero p{font-size:16px;line-height:1.8}
-  .pathway-note,.pathway-title-card p{font-size:14px;line-height:1.75}
-  .pathway-nav-item{font-size:14px;min-height:44px}.pathway-nav-item small{font-size:12px}
+
+  .pathway-nav-item small{font-size:12px}
   .pathway-nav-group>span,.pathway-side-head span{font-size:12px;color:#5d6f75}
-  .pathway-panel ul,.pathway-copy{font-size:16px;line-height:1.85}
+  
   .pathway-panel h4{font-size:18px}
   .path-step-columns strong{font-size:14px}.path-step-columns p{font-size:15px;line-height:1.8}
   .variance-card p,.variance-example p,.patient-path>div p{font-size:14px;line-height:1.8}
