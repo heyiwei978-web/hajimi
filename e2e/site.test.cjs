@@ -81,6 +81,11 @@ async function openNoteInputs(page, legacy=false) {
   }
 }
 
+async function openNoteFrameSection(page, index) {
+  const toggle=page.locator('#noteFrameDirectory button[aria-expanded]').nth(index);
+  if (await toggle.getAttribute('aria-expanded')==='false') await toggle.click();
+}
+
 test('note draft preserves edited output and manual selection, and reports copy failure',async()=>{
   for(const width of [390,1280]){
     const {page,context,errors}=await pageFor(width);
@@ -548,7 +553,8 @@ test('note batch validates all requests before sending and stopping retains an e
     assert.equal(count,1);assert.equal(await page.locator('#noteDocumentList button').count(),1);
     assert.match(await page.locator('#noteResume').innerText(),/3 份/);
     await page.reload({waitUntil:'networkidle'});
-    await openNoteInputs(page,true);assert.equal(count,1);
+    await openNoteInputs(page,true);
+    assert.equal(count,1);
     page.once('dialog',d=>d.dismiss());
     await page.locator('[data-type=spec]').click();
     assert.equal(count,1);
@@ -2899,7 +2905,7 @@ test('complete case framework selects DeepSeek, edits chapters and saves a priva
       await page.locator('#noteFrameStayDays').fill('1');
       await page.locator('#noteFrameBuild').click();
       assert.equal(await page.locator('#noteFrameDirectory button[aria-expanded]').count(),5);
-      await page.locator('#noteFrameDirectory button[aria-expanded]').first().click();
+      await openNoteFrameSection(page,0);
       await page.locator('#noteFrameSectionNotes').fill('仅用于入院的虚构要点');
       await page.locator('#noteFrameGenerateMissing').click();
       await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已生成 5 章'));
@@ -2910,7 +2916,7 @@ test('complete case framework selects DeepSeek, edits chapters and saves a priva
       assert(await page.locator('#noteFrameComplete').isDisabled());
       const manual='人工修改的虚构正文\n右侧 3*4 cm；> 5 mm\n医师签名：________';
       for(let index=0;index<5;index++) {
-        await page.locator('#noteFrameDirectory button[aria-expanded]').nth(index).click();
+        await openNoteFrameSection(page,index);
         if(index===0)await page.locator('#noteFrameOutput').fill(manual);
         await page.locator('#noteFrameConfirmed').check();
       }
@@ -2970,7 +2976,7 @@ test('framework pauses failed generation, preserves edits and requires review af
     await page.locator('#noteFrameGenerateMissing').click();
     await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('可稍后继续'));
     assert.equal(count,2);
-    await page.locator('#noteFrameDirectory button[aria-expanded]').nth(0).click();
+    await openNoteFrameSection(page,0);
     await page.locator('#noteFrameOutput').fill('保留人工编辑正文');
     await page.locator('#noteFrameConfirmed').check();
     await page.reload({waitUntil:'networkidle'});
@@ -2979,11 +2985,11 @@ test('framework pauses failed generation, preserves edits and requires review af
     fail=false;
     await page.locator('#noteFrameGenerateMissing').click();
     await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已生成 4 章'));
-    await page.locator('#noteFrameDirectory button[aria-expanded]').nth(0).click();
+    await openNoteFrameSection(page,0);
     assert.equal(await page.locator('#noteFrameOutput').inputValue(),'保留人工编辑正文');
     await openNoteInputs(page);
     await page.locator('[name=diagnosis]').fill('修改后的虚构教学诊断');
-    assert.match(await page.locator('#noteFrameDirectory button[aria-expanded]').nth(0).textContent(),/输入已变化/);
+    assert.match(await page.locator('#noteFrameDirectory .note-frame-row-status').first().textContent(),/输入已变化/);
     assert.equal(await page.locator('#noteFrameConfirmed').isChecked(),false);
     assert(await page.locator('#noteFrameComplete').isDisabled());
     assert.deepEqual(errors,[]);
@@ -3018,7 +3024,7 @@ test('ambiguous first save offers a recovery link and restores the revision with
     await page.locator('#noteFrameGenerateMissing').click();
     await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已生成 5 章'));
     for(let index=0;index<5;index++){
-      await page.locator('#noteFrameDirectory button[aria-expanded]').nth(index).click();
+      await openNoteFrameSection(page,index);
       await page.locator('#noteFrameConfirmed').check();
     }
     await page.locator('#noteFrameFinalConfirm').check();

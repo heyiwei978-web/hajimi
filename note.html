@@ -30,7 +30,7 @@
 
   <section class="note-privacy" aria-label="隐私说明">
     <strong>仅供虚构教学示例，请勿输入真实患者信息</strong>
-    <span>示例内容会发送给第三方 AI 服务。系统会尝试识别部分身份信息，但不能保证识别完整；请勿输入真实患者的姓名、身份信息或病情。生成内容仅供教学，需由专业人员审核。</span>
+    <span>示例内容会发送给第三方 AI 服务。请勿输入真实患者身份或病情，生成后请逐项核对。</span>
   </section>
 
   <p id="noteLogin" class="note-login" hidden>需要先<a href="/admin">登录管理入口</a>才能使用 AI 生成；登录后回到本页，本标签页已填写的草稿会保留。</p>
@@ -195,7 +195,7 @@
         <label class="note-field">本章正文<textarea id="noteFrameOutput" rows="12" maxlength="16000" spellcheck="false"></textarea></label>
         <label class="note-frame-confirm"><input id="noteFrameConfirmed" type="checkbox">我已核对本章内容</label>
         <p id="noteFrameSectionModel" class="note-tip" hidden></p>
-        <p id="noteFrameEditorStatus" class="note-status" role="status" hidden></p>
+        <p id="noteFrameEditorStatus" class="note-status" hidden></p>
       </div>
       <div class="note-batch-controls note-frame-batch">
         <button type="button" id="noteFrameGenerateMissing" class="note-button note-secondary">批量生成空白文书</button>
