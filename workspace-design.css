@@ -1,8 +1,8 @@
 /* Shared interface, 2026-10-10. Clinical text and print typography are unchanged. */
 :root{
-  --ws-ink:#142c42;--ws-text:#293f50;--ws-muted:#526577;--ws-blue:#135f9c;
-  --ws-blue-hover:#0d497c;--ws-soft:#edf4fa;--ws-bg:#f5f7fa;--ws-line:#dce4eb;
-  --ws-radius:16px;--ws-shadow:0 5px 20px rgba(20,44,66,.045);
+  --ws-ink:#08333d;--ws-text:#2c3e44;--ws-muted:#5d6f75;--ws-blue:#11697a;
+  --ws-blue-hover:#0c5564;--ws-soft:#eef7f8;--ws-bg:#f5f8f8;--ws-line:#dfe7e9;
+  --ws-radius:16px;--ws-shadow:0 5px 20px rgba(8,51,61,.045);
   --h-ink:var(--ws-ink);--h-text:var(--ws-text);--h-muted:var(--ws-muted);
   --h-line:var(--ws-line);--h-bg:var(--ws-bg);--h-blue:var(--ws-blue)
 }
@@ -43,8 +43,8 @@
   .official-lead{font-size:1.0625rem;line-height:1.85;color:var(--ws-muted);max-width:38em;margin:18px 0 0}
   .home-search{margin:24px 0 0}
   .home-search label{display:block;margin-bottom:9px;font-size:.9375rem;font-weight:650;color:var(--ws-ink)}
-  .home-search-field{display:flex;align-items:center;gap:10px;padding:7px 8px 7px 16px;border:1px solid #bbcddd;border-radius:12px;background:#fff;box-shadow:var(--ws-shadow)}
-  .home-search-field:focus-within{border-color:var(--ws-blue);box-shadow:0 0 0 3px #135f9c12}
+  .home-search-field{display:flex;align-items:center;gap:10px;padding:7px 8px 7px 16px;border:1px solid #a9d8de;border-radius:12px;background:#fff;box-shadow:var(--ws-shadow)}
+  .home-search-field:focus-within{border-color:var(--ws-blue);box-shadow:0 0 0 3px #11697a12}
   .home-search-field svg{width:21px;height:21px;flex-shrink:0;fill:none;stroke:var(--ws-muted);stroke-width:1.7}
   .home-search-field input{min-width:0;width:100%;border:0;background:transparent;font-size:1rem;color:var(--ws-ink);min-height:40px;outline-offset:1px}
   .home-search-field button{min-height:44px;flex-shrink:0;border:0;border-radius:8px;padding:0 17px;background:var(--ws-blue);color:#fff;font-size:1rem;font-weight:650;cursor:pointer}
@@ -62,7 +62,7 @@
   .home-quick-heading>a{font-size:.875rem;color:var(--ws-blue);white-space:nowrap;text-decoration:none}
   .home-quick-grid{display:grid;gap:10px}
   .home-quick-grid>a{display:grid;grid-template-columns:42px minmax(0,1fr) 16px;align-items:center;gap:13px;padding:13px 14px;border:1px solid var(--ws-line);border-radius:12px;text-decoration:none;color:var(--ws-ink);min-width:0;background:#fff}
-  .home-quick-grid>a:hover{border-color:#9fbdd4;background:var(--ws-soft)}
+  .home-quick-grid>a:hover{border-color:#9ac0ca;background:var(--ws-soft)}
   .home-department-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:10px;background:var(--ws-soft);color:var(--ws-blue);font-size:1.125rem;font-weight:750}
   .home-quick-grid strong{display:block;font-size:1.125rem;line-height:1.4}
   .home-quick-grid small{display:block;font-size:.8125rem;line-height:1.6;color:var(--ws-muted);margin-top:3px}
@@ -70,15 +70,15 @@
   .home-quick-pathway{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;margin-top:14px;padding:12px 0 0;border-top:1px solid var(--ws-line);text-decoration:none;font-size:.9375rem;color:var(--ws-blue);font-weight:650}
   .official-feature-grid{max-width:none;margin:28px 0 0;padding:0;gap:16px}
   .official-feature{min-height:230px;padding:24px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);background:#fff;box-shadow:none;transform:none}
-  .official-feature:hover{transform:none;border-color:#9fbdd4;box-shadow:var(--ws-shadow)}
+  .official-feature:hover{transform:none;border-color:#9ac0ca;box-shadow:var(--ws-shadow)}
   .official-feature .feature-art{display:none}
   .feature-icon{width:42px;height:42px;border-radius:11px;box-shadow:none;font-size:1.125rem}
   .feature-eyebrow{margin-top:16px;font-size:.75rem;color:var(--ws-muted)}
   .official-feature h2{font-size:1.375rem;line-height:1.45;margin:5px 0 8px}
   .official-feature p{font-size:.9375rem;line-height:1.8;color:var(--ws-muted);margin:0 0 18px;max-width:none}
   .feature-enter{margin-top:auto;font-size:.875rem;font-weight:650;color:var(--ws-blue)}
-  .pathway-home-banner{max-width:none;margin:24px 0 0;padding:24px;border:1px solid #c9dce8;border-radius:var(--ws-radius);background:#edf5fa;box-shadow:none;gap:20px}
-  .pathway-home-banner:hover{background:#e8f2f8}
+  .pathway-home-banner{max-width:none;margin:24px 0 0;padding:24px;border:1px solid #c6dee4;border-radius:var(--ws-radius);background:#eef7f8;box-shadow:none;gap:20px}
+  .pathway-home-banner:hover{background:#eef7f8}
   .pathway-home-icon{background:var(--ws-blue);border-radius:12px}
   .pathway-home-copy>span{color:var(--ws-blue);font-size:12px}
   .pathway-home-copy h2{font-size:1.375rem;color:var(--ws-ink)}
@@ -106,7 +106,7 @@
   #libraryShell .patient-strip[hidden]{display:none}
   #libraryShell .controls-section,.library-root-page #libraryShell .controls-section{margin:0 0 24px;padding:20px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);background:#fff;box-shadow:none}
   #libraryShell .controls-section h2{font-size:1.0625rem;margin:0 0 14px;line-height:1.5}
-  #libraryShell .searchbox,.library-root-page #libraryShell .searchbox{height:52px;border:1px solid #bdcddd;border-radius:10px;background:#fff;box-shadow:none}
+  #libraryShell .searchbox,.library-root-page #libraryShell .searchbox{height:52px;border:1px solid #a9d8de;border-radius:10px;background:#fff;box-shadow:none}
   #libraryShell .searchbox:focus-within{border-color:var(--ws-blue)}
   #libraryShell .searchbox input{font-size:1rem;color:var(--ws-ink)}
   #libraryShell .searchbox kbd{flex-shrink:0;white-space:nowrap;font-size:12px;padding:3px 6px}
@@ -117,7 +117,7 @@
   #libraryShell .result-head{gap:12px;align-items:center;margin-bottom:16px;padding:0;flex-wrap:wrap}
   #libraryShell .result-head h2{font-size:1.375rem;line-height:1.5;min-width:0}
   #libraryShell .result-head>div{font-size:.8125rem;color:var(--ws-muted);flex-wrap:wrap}
-  #libraryShell .stat-line{border-radius:8px;background:#eaf0f5;color:var(--ws-muted);font-size:.8125rem}
+  #libraryShell .stat-line{border-radius:8px;background:#eef7f8;color:var(--ws-muted);font-size:.8125rem}
   .library-overview{grid-template-columns:minmax(0,1.1fr) minmax(320px,1fr);align-items:center;gap:28px;padding:24px;margin:0 0 24px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);background:#fff;color:var(--ws-ink);box-shadow:none}
   .library-overview-copy>span{color:var(--ws-blue);font-size:12px}
   .library-overview h2{color:var(--ws-ink);font-size:1.5rem;line-height:1.55;letter-spacing:0}
@@ -136,7 +136,7 @@
   .library-department-grid+.library-overview{margin:24px 0 0}
   .library-department-card{min-width:0;min-height:278px;padding:22px;border-radius:var(--ws-radius);border-color:var(--ws-line);background:#fff;box-shadow:none;display:flex;flex-direction:column}
   .library-department-card:before{display:none}
-  .library-department-card:hover{transform:none;border-color:#9fbdd4;box-shadow:var(--ws-shadow)}
+  .library-department-card:hover{transform:none;border-color:#9ac0ca;box-shadow:var(--ws-shadow)}
   .department-icon{background:var(--ws-soft);box-shadow:none}
   .department-eyebrow{font-size:12px;color:var(--ws-muted);overflow-wrap:anywhere}
   .library-department-card .department-card-top{margin-top:16px;gap:8px;flex-wrap:wrap}
@@ -178,7 +178,7 @@
   .ortho-category-head>strong{font-size:.8125rem;color:var(--ws-muted)}
   .ortho-disease-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
   .ortho-disease-card,.project-card,.case-search-card{padding:22px;border-color:var(--ws-line);border-radius:13px;background:#fff;box-shadow:none;min-width:0}
-  .ortho-disease-card:hover,.project-card:hover,.case-search-card:hover{transform:none;border-color:#9fbdd4;box-shadow:var(--ws-shadow)}
+  .ortho-disease-card:hover,.project-card:hover,.case-search-card:hover{transform:none;border-color:#9ac0ca;box-shadow:var(--ws-shadow)}
   .ortho-card-top,.project-card-top{gap:10px;flex-wrap:wrap;font-size:.8125rem;line-height:1.7;color:var(--ws-muted)}
   .ortho-card-top strong{font-size:.8125rem;color:var(--ws-muted)}
   .ortho-disease-card h3,.project-card h3,.case-search-card h3{font-size:1.3125rem;line-height:1.55;margin:14px 0 9px;color:var(--ws-ink)}
@@ -192,20 +192,20 @@
   .case-search-card-bottom b{color:var(--ws-blue)}
 
   /* Quiet paper and a strong current-directory state support sustained reading. */
-  .record-book-hero{padding:28px;border-radius:var(--ws-radius);background:#163b58;box-shadow:none}
+  .record-book-hero{padding:28px;border-radius:var(--ws-radius);background:#02404b;box-shadow:none}
   .record-book-hero h2{font-size:2rem;line-height:1.4;color:#fff}
-  .record-book-hero p{color:#e0ebf3;font-size:1rem;line-height:1.8}
+  .record-book-hero p{color:#d5ecef;font-size:1rem;line-height:1.8}
   .record-book-hero-stats div{box-shadow:none}
   #libraryShell .record-book-hero .btn.primary{background:#fff;color:var(--ws-blue);border-color:#fff}
-  #libraryShell .record-book-hero .btn.ghost{background:transparent;color:#fff;border-color:#9fb5c6}
-  .source-template-note{padding:14px 18px;border-radius:10px;font-size:.9375rem;line-height:1.8;background:#edf4fa;border-color:#cddfea;color:var(--ws-text)}
+  #libraryShell .record-book-hero .btn.ghost{background:transparent;color:#fff;border-color:#9db7be}
+  .source-template-note{padding:14px 18px;border-radius:10px;font-size:.9375rem;line-height:1.8;background:#eef7f8;border-color:#dfe7e9;color:var(--ws-text)}
   .case-file-sidebar{border-color:var(--ws-line)!important;border-radius:var(--ws-radius)!important;background:#fff}
   .case-file-sidebar .record-book-toc-head{background:#fff;padding:20px;border-color:var(--ws-line)}
   .case-file-sidebar .record-book-toc-head h3{font-size:1.25rem;color:var(--ws-ink)}
   .case-nav-family h4{color:var(--ws-blue)}
   .case-nav-group[open]{background:#fff;border-color:var(--ws-line)}
   .case-file-sidebar .case-nav-item.is-current{background:var(--ws-soft);color:var(--ws-blue);box-shadow:inset 3px 0 var(--ws-blue)}
-  .case-file-sidebar .case-nav-item:hover{background:#f4f8fb}
+  .case-file-sidebar .case-nav-item:hover{background:#f5f8f8}
   .case-file-tools,.case-file-bottom-nav{border-color:var(--ws-line);border-radius:13px;box-shadow:none}
   .case-file-tools strong,.case-file-bottom-nav strong{color:var(--ws-ink)}
   .case-file-tools small{color:var(--ws-muted)}
@@ -213,12 +213,12 @@
   .record-book-section-head{background:#f8fafc;border-color:var(--ws-line)}
   .record-chapter-no{background:var(--ws-blue)}
   .record-chapter-title>span{font-size:.8125rem;color:var(--ws-muted)}
-  .record-book-body,.case-workspace .record-book-body,.record-paper{font-size:1.125rem;line-height:1.9;color:#253542;letter-spacing:0}
+  .record-book-body,.case-workspace .record-book-body,.record-paper{font-size:1.125rem;line-height:1.9;color:#08333d;letter-spacing:0}
   .record-book-body{padding:26px 30px}
   .special-case-library-head{border-color:var(--ws-line);background:#fff;border-radius:var(--ws-radius)}
   .special-case-book{border-color:var(--ws-line);border-radius:var(--ws-radius)}
   .modal,.cms-edit-dialog,.cms-case-dialog{border-radius:var(--ws-radius)}
-  .modal::backdrop,.cms-edit-dialog::backdrop,.cms-case-dialog::backdrop{background:#122b4666;backdrop-filter:none}
+  .modal::backdrop,.cms-edit-dialog::backdrop,.cms-case-dialog::backdrop{background:#08333d66;backdrop-filter:none}
 
   /* Clinical tools, pathway content, duty forms and management share the same rhythm. */
   .tools-page .main,.pathway-shell,.duty-main,.admin-main{width:min(1280px,calc(100% - 48px));max-width:1280px;margin:0 auto;padding:32px 0 64px}
@@ -230,7 +230,7 @@
   .tools-page .notice{margin-bottom:24px}
   .tools-page .notice strong,.tools-page .notice span{font-size:.9375rem;color:var(--ws-muted)}
   .tools-page .formula-toolbar{margin:0 0 28px;gap:12px}
-  .tools-page .formula-search{height:52px;min-width:0;border-color:#bdcddd;border-radius:10px}
+  .tools-page .formula-search{height:52px;min-width:0;border-color:#a9d8de;border-radius:10px}
   .tools-page .formula-search input{font-size:1rem;min-width:0}
   .tools-page #formulaCount{font-size:.875rem}
   .tools-page .section{margin-bottom:32px}
@@ -239,7 +239,7 @@
   .tools-page .sectionhead p{font-size:.875rem;color:var(--ws-muted)}
   .tools-page .grid{gap:16px}
   .tools-page .card{padding:22px;min-height:216px;border-color:var(--ws-line);border-radius:var(--ws-radius);box-shadow:none}
-  .tools-page .card:hover{transform:none;border-color:#9fbdd4;box-shadow:var(--ws-shadow)}
+  .tools-page .card:hover{transform:none;border-color:#9ac0ca;box-shadow:var(--ws-shadow)}
   .tools-page .icon{background:var(--ws-soft);color:var(--ws-blue);font-size:.75rem}
   .tools-page .card h3{font-size:1.25rem;line-height:1.5;color:var(--ws-ink)}
   .tools-page .card p{font-size:1rem;line-height:1.8;color:var(--ws-muted)}
@@ -252,7 +252,7 @@
   .tools-page .result{background:var(--ws-soft)}
   .tools-page .tool-jump{display:flex;flex-wrap:wrap;gap:8px;margin:-12px 0 28px}
   .tools-page .tool-jump a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:6px 14px;border:1px solid var(--ws-line);border-radius:999px;background:#fff;color:var(--ws-ink);font-size:.9375rem;font-weight:600;text-decoration:none;white-space:nowrap}
-  .tools-page .tool-jump a:hover{border-color:#9fbdd4;color:var(--ws-blue)}
+  .tools-page .tool-jump a:hover{border-color:#9ac0ca;color:var(--ws-blue)}
   .tools-page .tool-jump a[hidden]{display:none}
   .tools-page .tool-jump small{color:var(--ws-muted);font-size:.8125rem;font-weight:600}
   .tools-page .section{scroll-margin-top:calc(var(--site-header-height,72px) + 16px)}
@@ -281,7 +281,7 @@
   .duty-card-head p,.duty-task-form label,.duty-notes label{font-size:.9375rem;color:var(--ws-muted);line-height:1.8}
   .duty-link-grid a{background:#fff;border-color:var(--ws-line);border-radius:12px;color:var(--ws-blue)}
   .duty-link-grid span{color:var(--ws-muted);font-size:.9375rem}
-  .admin-tool-card.primary{border-color:#b7cfe1;background:#f4f8fb}
+  .admin-tool-card.primary{border-color:#a9d8de;background:#f5f8f8}
   .admin-primary{background:var(--ws-blue);border-color:var(--ws-blue)}
   .admin-secondary{color:var(--ws-blue);border-color:var(--ws-line)}
 }
@@ -463,7 +463,7 @@
 @media screen{
   .clinical-icon{display:inline-block;vertical-align:middle;flex-shrink:0;width:20px;height:20px}
   .case-search-card:focus-visible{outline:3px solid var(--ws-blue);outline-offset:3px}
-  .case-search-card .search-hit{background:#fff0b3;color:#18354b;border-radius:3px;font:inherit}
+  .case-search-card .search-hit{background:#fff0b3;color:#08333d;border-radius:3px;font:inherit}
   .case-search-card-top .case-search-code{color:var(--ws-blue);font-weight:750;font-variant-numeric:tabular-nums}
   .case-search-card-bottom{margin-top:auto}
   .case-search-card-bottom b{display:inline-flex;align-items:center;gap:5px}
@@ -491,8 +491,8 @@
   .record-book-body,.case-workspace .record-book-body,.record-paper,
   .case-file-sidebar .case-nav-item b,.record-book-toc a>b,.special-case-toc a b{font-size:var(--clinical-font-size,18px)}
   .case-file-sidebar .case-nav-item{border:1px solid transparent}
-  .case-file-sidebar .case-nav-item.is-current{border-color:#a7c6de;background:#eaf3fa;box-shadow:inset 4px 0 var(--ws-blue)}
-  .case-file-sidebar .case-nav-item>.case-nav-current-label{display:none;grid-column:2;justify-self:start;margin:0;padding:2px 6px;border:0;border-radius:4px;background:#d8e9f6;color:var(--ws-blue);font-size:.75rem;line-height:1.5;font-weight:650}
+  .case-file-sidebar .case-nav-item.is-current{border-color:#a2c9d3;background:#eef7f8;box-shadow:inset 4px 0 var(--ws-blue)}
+  .case-file-sidebar .case-nav-item>.case-nav-current-label{display:none;grid-column:2;justify-self:start;margin:0;padding:2px 6px;border:0;border-radius:4px;background:#d5ecef;color:var(--ws-blue);font-size:.75rem;line-height:1.5;font-weight:650}
   .case-file-sidebar .case-nav-item.is-current>.case-nav-current-label{display:block}
 }
 @media screen and (max-width:640px){
@@ -545,24 +545,24 @@
   #libraryShell .library-top-actions{order:3;flex:0 0 100%;width:100%;margin-left:0;display:flex;justify-content:flex-start;gap:22px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;min-height:48px}
   #libraryShell .library-top-actions::-webkit-scrollbar{display:none}
   #libraryShell .library-top-actions .text-action,#libraryShell .library-top-actions .library-active-link{display:flex;align-items:center;flex-shrink:0;min-height:48px;padding:0 1px;font-size:.9375rem;font-weight:600;white-space:nowrap}
-  #libraryShell .library-top-actions .library-active-link{color:var(--ws-blue,#1d6fe8)}
+  #libraryShell .library-top-actions .library-active-link{color:var(--ws-blue,#03849a)}
   #libraryShell .library-top-actions .library-active-link:after{height:3px;border-radius:0}
 }
 
 /* 全站统一免责声明（心电图页沿用自有页脚） */
 @media screen{
-  .site-disclaimer{max-width:1180px;margin:24px auto 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--ws-line,#dde6ef);color:var(--ws-muted,#5b6b7c);font-size:.8125rem;line-height:1.7;text-align:center}
+  .site-disclaimer{max-width:1180px;margin:24px auto 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--ws-line,#dfe7e9);color:var(--ws-muted,#5d6f75);font-size:.8125rem;line-height:1.7;text-align:center}
 }
 @media print{.site-disclaimer{display:none}}
 
 /* 合并章节：章内每份记录一个小标题，可单独复制 */
 @media screen{
-  .record-merged-part+.record-merged-part{border-top:1px dashed var(--ws-line,#dde6ef)}
+  .record-merged-part+.record-merged-part{border-top:1px dashed var(--ws-line,#dfe7e9)}
   .record-merged-part-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding:16px 22px 0}
-  .record-merged-part-head h4{margin:0;font-size:1rem;font-weight:700;color:var(--ws-blue,#135f9c)}
+  .record-merged-part-head h4{margin:0;font-size:1rem;font-weight:700;color:var(--ws-blue,#11697a)}
   .record-merged-part-actions{display:flex;gap:8px}
   .record-merged-part-actions .btn{min-height:40px;padding:0 12px;font-size:.875rem}
-  .case-nav-count{font-style:normal;font-weight:500;font-size:.75rem;color:var(--ws-muted,#526577);margin-left:4px}
+  .case-nav-count{font-style:normal;font-weight:500;font-size:.75rem;color:var(--ws-muted,#5d6f75);margin-left:4px}
 }
 @media screen and (max-width:640px){
   .record-merged-part-head{padding:14px 14px 0}
