@@ -1,3 +1,4 @@
+import {withMonitoring} from './_monitoring.js';
 import {guardRequest} from './_security.js';
 import {isAdmin,readSession} from './_auth.js';
 import {contentStore,ContentError} from './_content-store.js';
@@ -13,4 +14,4 @@ export function createContentHandler(store=contentStore){return async function h
     return res.status(200).json(await store.save(req.body,req.body.revision,readSession(req).u));
   }catch(error){return res.status(error instanceof ContentError?error.status:503).json({error:error instanceof ContentError?error.message:'资料服务暂不可用，请稍后重试'});}
 };}
-export default createContentHandler();
+export default withMonitoring('content', createContentHandler());

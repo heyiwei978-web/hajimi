@@ -1,3 +1,4 @@
+import {withMonitoring} from './_monitoring.js';
 import {guardRequest} from './_security.js';
 import {loginLog} from './_login-log.js';
 
@@ -10,4 +11,4 @@ export function createLoginLogHandler(log = loginLog) {
     catch { return res.status(503).json({error: '登录记录暂时无法读取，请稍后重试'}); }
   };
 }
-export default createLoginLogHandler();
+export default withMonitoring('login-log', createLoginLogHandler());

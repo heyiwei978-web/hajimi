@@ -1,3 +1,4 @@
+import {withMonitoring} from './_monitoring.js';
 import {blob as blobClient} from './_blob-auth.js';
 import {guardRequest} from './_security.js';
 import {isAdmin} from './_auth.js';
@@ -44,4 +45,4 @@ export function createImageHandler({store = contentStore, blob = blobClient, now
   };
 }
 
-export default createImageHandler();
+export default withMonitoring('image', createImageHandler());

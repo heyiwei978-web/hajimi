@@ -1,4 +1,5 @@
 import {readFileSync, writeFileSync, mkdirSync, rmSync, copyFileSync} from 'node:fs';
+import {writeErrorReporter} from './error-reporter.mjs';
 import {fileURLToPath} from 'node:url';
 import {compileClinicalSite} from './clinical-compiler.mjs';
 import {compileEcg} from './ecg-compiler.mjs';
@@ -93,6 +94,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     writeBuiltDepartmentPages(directory);
     writeWorkspaceSections(directory, readFileSync(new URL('home.html',directory), 'utf8'),
       readFileSync(new URL('../workstation-sections.html',import.meta.url), 'utf8'), manifest);
+    writeErrorReporter(directory);
     writeAssetVersions(directory);
     assertPublicResources(directory,JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8')),manifest);
     console.log('Built lightweight homepage and clinical library in dist/');

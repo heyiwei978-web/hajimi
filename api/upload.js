@@ -1,3 +1,4 @@
+import {withMonitoring} from './_monitoring.js';
 import crypto from 'node:crypto';
 import {blob} from './_blob-auth.js';
 import {guardRequest} from './_security.js';
@@ -8,7 +9,7 @@ function matchesImage(buffer, type) {
   return buffer.length >= 12 && buffer.subarray(0,4).toString() === 'RIFF' && buffer.subarray(8,12).toString() === 'WEBP';
 }
 
-export default async function handler(req,res) {
+async function handler(req,res) {
   // Includes base64 overhead and stays below Vercel's function request-size ceiling.
   if (!guardRequest(req,res,{methods:['POST'],admin:true,json:true,bodyLimit:4400000})) return;
   const {type, data} = req.body;
@@ -29,3 +30,4 @@ export default async function handler(req,res) {
     return res.status(503).json({error:'图片保存失败，请稍后重试'});
   }
 }
+export default withMonitoring('upload', handler);
