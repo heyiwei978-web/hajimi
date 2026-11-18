@@ -2,10 +2,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 import {loadClinicalSource} from '../scripts/clinical-compiler.mjs';
-const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8').replace('<script defer src="/record-tka-complete-v31.js?v=20261025-tka14"></script>','').replace('<script defer src="/record-tha-complete-v32.js?v=20261025-tha1"></script>','');
+import {legacyIndexHtml, readLegacy, readLegacySource} from './legacy-chain.mjs';
+const html=legacyIndexHtml().replace('<script defer src="/record-tka-complete-v31.js?v=20261025-tka14"></script>','').replace('<script defer src="/record-tha-complete-v32.js?v=20261025-tha1"></script>','');
 const tag='<script defer src="/record-operative-reality-v29.js?v=20261024-reviewed1"></script>';
-const before=loadClinicalSource(html.replace(tag,''),{audit:true});
-const after=loadClinicalSource(html,{audit:true});
+const before=loadClinicalSource(html.replace(tag,''),{audit:true,readSource:readLegacySource});
+const after=loadClinicalSource(html,{audit:true,readSource:readLegacySource});
 test('reviewed operative pass changes only the four named teaching operations; newer case, withdrawn sources and special cases stay identical',()=>{
  const expected=new Set(['TKA','THA','胫骨平台骨折','踝关节三踝骨折']);const changed=[];
  assert.equal(after.records.length,before.records.length);

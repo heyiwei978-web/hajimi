@@ -48,10 +48,9 @@ PR 描述里写明：执行工具 / 模型（可以多个）、改动类型（�
 | 位置 | 作用 |
 | --- | --- |
 | `*.html`（根目录） | 各栏目页面源文件 |
-| `index.html` | 首页区块 + 完整病历库源页面；其中病历相关 `<script>` 是**已退役**的旧生成链（见第 6.3 节） |
+| `index.html` | 首页区块 + 完整病历库源页面（旧生成链的 `<script>` 已于 2026-11-18 删除，见第 6.3 节） |
 | `home.html` | **由构建生成**（取自 `index.html` 首页区块），不要手改 |
 | `content/clinical-library/source/` | **病历正文源数据**：每个科室一个目录、每个病种一个 JSON 文件；`index.json` 记录全部记录顺序；`legacy-rendered.json` 只供身份账本核对 |
-| `record-*.js`、`ortho-*.js`、`orthopedic-expansion-*.js`、`ideal-*.js`、`tka-special-cases.js` | 已退役的旧生成链脚本，冻结不改（见第 6.3 节） |
 | `js/` | 在用的页面脚本源文件（2026-11-18 起）；构建时发布到站点根路径，网址不变（`/note.js`）。清单在 `scripts/public-assets.mjs` 的 `DIRECTORY_SCRIPTS` |
 | `js/ecg-*.js` | 心电图资料与功能，构建时由 `scripts/ecg-compiler.mjs` 编译成带哈希的包 |
 | `js/classification-*.js` | 疾病分型资料与治疗方案 |
@@ -65,7 +64,7 @@ PR 描述里写明：执行工具 / 模型（可以多个）、改动类型（�
 | `security/`、`FIREWALL.md` | 防火墙规则定义与防护说明 |
 | `dist/` | 构建产物，已在 `.gitignore`，不要提交 |
 
-**根目录约定**：已退役的病历生成链脚本留在根目录、内容冻结——`baseline.json` 与 `source/index.json` 的 `retiredChain` 按文件名记录了它们的哈希，测试会检查不变。新增的页面脚本放在 `js/`、样式放在根目录，并加入发布白名单（脚本同时登记到 `DIRECTORY_SCRIPTS`，`test/js-directory.test.js` 会拦下根目录新增的 `.js`）；根目录的 `.js` 只剩冻结的旧生成链和仍在用的 `app.js`、`search-core.js`、`departments.js`（它们的路径写在身份账本里，不能移动）；不要再新增"补丁式"脚本（运行时注入样式或改 DOM 修正别处问题），直接改对应模块。`record-quality-v2.js` 未被引用，但属于医学源资料，未经医学授权不删除。
+**根目录约定**：已退役的旧病历生成链（`record-*.js`、`ortho-*.js`、`orthopedic-expansion-*.js`、`ideal-*.js`、`tka-special-cases.js` 共 48 个）于 2026-11-18 经负责人确认删除，测试会阻止恢复；核对历次医学修订的测试改为通过 `test/legacy-chain.mjs` 从删除前的提交读取它们。`baseline.json` 与 `source/index.json` 的 `retiredChain` 作为历史记录原样保留，不要编辑。新增的页面脚本放在 `js/`、样式放在根目录，并加入发布白名单（脚本同时登记到 `DIRECTORY_SCRIPTS`，`test/js-directory.test.js` 会拦下根目录新增的 `.js`）；根目录的 `.js` 只剩仍在用的 `app.js`、`search-core.js`、`departments.js`（路径写在身份账本里，不能移动）和医学源资料 `record-quality-v2.js`；不要再新增"补丁式"脚本（运行时注入样式或改 DOM 修正别处问题），直接改对应模块。`record-quality-v2.js` 未被引用，但属于医学源资料，未经医学授权不删除。
 
 ## 4. 构建、测试与本地预览
 
@@ -120,7 +119,7 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 - 修改正文：直接编辑对应病种 JSON 里那一条记录的字段（通常是 `sourceBody`），**不增删字段、不改字段顺序、不移动记录**；然后按第 6.2 节流程预览、由负责人授权、追加修订批次。未经授权的正文改动会让构建失败（「propose and authorize a content revision」）。
 - **新增病种**：只能用 `npm run clinical:new` 建立模板（按现有完整病例的章节结构），再填写正文、走第 6.2 节授权，详见 `docs/new-disease-workflow.md`。不要手写新病种的 JSON 结构或手改 `index.json`。构建拒绝发布仍含 `【待填写】` 的记录。
 - `index.json` 的 `sequence` 决定全部记录的顺序，不要手改；`legacy-rendered.json` 只为旧账本核对保留，不是显示内容，不要编辑。
-- 旧生成链（`index.html` 里的病历脚本和根目录 `record-*.js` 等）**已退役并冻结**：不要再新增修订脚本，也不要修改这些文件，测试会检查其哈希。`search-core.js`、`app.js`、`departments.js` 虽曾在链中执行，但仍是在用的页面代码（由负责当前任务的开发助手维护），不在冻结范围。`scripts/clinical-source-export.mjs` 只用于当初的一次性迁移，源数据存在时拒绝运行。
+- 旧生成链（原 `index.html` 里的病历脚本和根目录 `record-*.js` 等）已于 2026-11-18 删除：不要恢复，也不要再新增修订脚本。需要查看旧版本时用 `test/legacy-chain.mjs`（从删除前的提交 `540efe1` 读取）或 Git 历史。`search-core.js`、`app.js`、`departments.js` 虽曾在链中执行，但仍是在用的页面代码，保留在根目录。原一次性迁移脚本 `scripts/clinical-source-export.mjs` 依赖旧生成链，已一并删除。
 - 不要在 `index.html` 里加入与病历无关的 `<script>`。
 
 ### 6.4 写作与安全原则
