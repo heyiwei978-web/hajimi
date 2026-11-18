@@ -93,17 +93,17 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 /* Use the same reading size and measured header offset as the library shell. */
 @media screen{
  .case-search-card h3,.case-search-card p{overflow-wrap:anywhere}
- .case-search-card p{font-size:16px;line-height:1.75}
+ 
  .case-search-card-top,.case-search-card-bottom small{font-size:14px}
  .case-search-card-bottom b{font-size:16px}
  .case-nav-family h4,.case-nav-group summary{font-size:16px}
  .case-file-sidebar .case-nav-item{min-height:50px;padding:11px 10px;line-height:1.6}
- .case-file-sidebar .case-nav-item b{font-size:17px;font-weight:650}
+ .case-file-sidebar .case-nav-item b{font-weight:650}
  .case-file-sidebar .case-nav-item span{font-size:13px}
  .case-nav-group summary small,.case-file-tools small{font-size:14px}
  .case-file-sidebar nav{max-height:none;overflow:visible;scrollbar-gutter:auto}
  .case-workspace,.case-file-reader,.case-file-reader>.record-book-section{scroll-margin-top:calc(var(--site-header-height,62px) + 16px)}
- .case-workspace .record-book-body{font-size:18px;line-height:1.85}
+ 
  .case-workspace .record-chapter-title h3{font-size:20px;line-height:1.5}
 }
 @media print{

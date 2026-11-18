@@ -2,7 +2,7 @@
 :root{
   --h-font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC",sans-serif;
   --h-serif:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","SimSun",serif;
-  --h-ink:#14252b;--h-text:#08333d;--h-muted:#697b80;--h-line:#dfe7e9;--h-bg:#f5f8f8;--h-blue:#047b90;--site-header-height:62px
+  --site-header-height:62px
 }
 html{font-family:var(--h-font);text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
 body,button,input,select,textarea{font-family:var(--h-font)}
@@ -24,27 +24,6 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .library-brand-copy small,.library-brand-copy em{color:#899a9e}
 
 /* homepage */
-.official-home{font-family:var(--h-font);background:var(--h-bg);color:var(--h-ink)}
-.official-hero{min-height:430px;grid-template-columns:minmax(0,1.08fr) minmax(390px,.78fr);gap:26px;padding:56px max(5vw,52px) 64px;background:linear-gradient(90deg,#fff 0%,#f5f8f8 55%,#eef7f8 100%)}
-.official-kicker{margin-bottom:16px;font-size:12px;font-weight:700;letter-spacing:.18em}
-.official-hero h1{font-size:clamp(48px,4.5vw,70px);line-height:1.08;letter-spacing:-.045em;font-weight:700}
-.official-lead{max-width:680px;margin-top:22px;font-size:18px;line-height:1.68;color:#4e646a}
-.official-hero-actions{margin-top:26px}
-.official-cta{height:48px;min-width:184px;border-radius:10px;font-size:15px;font-weight:650}
-.official-cta.primary{box-shadow:0 8px 20px rgba(4,123,144,.16)}
-.official-cta.secondary{box-shadow:none;background:rgba(255,255,255,.82)}
-.official-meta{margin-top:17px;font-size:12px;color:#5d6f75;flex-wrap:wrap;row-gap:6px}
-.clinical-scene{height:310px;min-width:390px;transform:scale(.95);transform-origin:right center}
-.official-feature-grid{max-width:1320px;margin:-22px auto 0;padding:0 28px;gap:12px}
-.official-feature{min-height:295px;border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(44,62,68,.055)}
-.official-feature:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(44,62,68,.08)}
-.feature-icon{width:44px;height:44px;border-radius:12px;font-size:19px}
-.feature-eyebrow{margin-top:13px}
-.official-feature h2{font-size:22px;font-weight:700}
-.official-feature p{font-size:14px;line-height:1.75}
-.official-stats{max-width:1264px;margin-top:16px;padding:12px 22px;border-radius:14px;box-shadow:none;border-color:#dfe7e9}
-.official-stats>div{min-height:62px}
-.official-footer{margin-top:22px}
 
 /* library */
 #libraryShell{background:var(--h-bg)}
@@ -161,42 +140,14 @@ body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 @media print{body{background:#fff!important}.record-book-body,.record-paper{font-family:"SimSun","Songti SC",serif;font-size:12pt;line-height:1.75;color:#000}.record-book-section{border:0!important}}
 
-
 /* homepage clinical pathway feature */
-.pathway-home-banner{
-  max-width:1264px;
-  margin:14px auto 0;
-  min-height:132px;
-  display:grid;
-  grid-template-columns:64px minmax(0,1fr) auto;
-  gap:20px;
-  align-items:center;
-  padding:22px 24px;
-  border:1px solid #d5ecef;
-  border-radius:16px;
-  background:linear-gradient(135deg,#f5f8f8 0%,#eef7f8 100%);
-  color:#14252b;
-  text-decoration:none;
-}
-.pathway-home-banner:hover{border-color:#a9d8de;background:linear-gradient(135deg,#f5f8f8 0%,#eef7f8 100%)}
-.pathway-home-icon{
-  width:58px;height:58px;display:grid;place-items:center;border-radius:14px;
-  background:#2c3e44;color:#fff;font-size:15px;font-weight:800;letter-spacing:.08em
-}
-.pathway-home-copy>span{font-size:12px;font-weight:700;letter-spacing:.13em;color:#3f9baa}
-.pathway-home-copy h2{margin:5px 0 4px;font-size:22px;letter-spacing:-.02em}
-.pathway-home-copy p{margin:0;max-width:800px;color:#5d6f75;font-size:14px;line-height:1.65}
-.pathway-home-meta{display:flex;gap:18px;align-items:center}
-.pathway-home-meta strong{font-size:28px;color:#2c3e44}
-.pathway-home-meta strong small{display:block;margin-top:3px;font-size:12px;color:#768a8f;font-weight:600}
-.pathway-home-meta b{padding:12px 16px;border-radius:9px;background:#2c3e44;color:#fff;font-size:14px}
+
 @media(max-width:760px){
   .pathway-home-banner{margin:12px 13px 0;grid-template-columns:48px 1fr;padding:18px;gap:13px}
   .pathway-home-icon{width:46px;height:46px;border-radius:11px;font-size:12px}
   .pathway-home-meta{grid-column:1/-1;justify-content:space-between}
   .pathway-home-copy h2{font-size:20px}
 }
-
 
 /* 2026-10-08: definitive mobile homepage overflow fix */
 @media(max-width:900px){
@@ -299,7 +250,6 @@ body.admin-page{font-family:var(--h-font);background:var(--h-bg)}
   .scene-screen{height:172px}
 }
 
-
 /* 2026-10-08: rendering and navigation performance pass */
 html{
   scrollbar-gutter:stable;
@@ -349,7 +299,6 @@ button,a,[role="button"]{
   }
 }
 
-
 /* 2026-10-08: second-stage paint and motion optimization */
 @supports (content-visibility:auto){
   .template-card,
@@ -390,25 +339,18 @@ button,a,[role="button"]{
 
 /* Readable controls and compact mobile navigation. Screen rules preserve printing. */
 @media screen{
-  .feature-eyebrow,.feature-enter,.official-stats small,.official-footer{font-size:12px}
-  .official-footer small{font-size:12px}
-  .feature-art{pointer-events:none}
-  .library-department-card p,.project-card p{font-size:16px;line-height:1.75}
-  .library-department-card small,.project-card-top,.project-stage-chips span{font-size:14px}
-  .library-department-card .department-card-open,.project-open{font-size:14px}
-  #libraryShell .searchbox input,#libraryShell .filter-row select{font-size:16px;min-width:0}
-  #libraryShell .filter-row label{flex-shrink:0;white-space:nowrap;font-size:13px}
+
+  #libraryShell .searchbox input,#libraryShell .filter-row select{min-width:0}
+  #libraryShell .filter-row label{flex-shrink:0;white-space:nowrap;}
   #libraryShell .nav-item{font-size:16px;min-height:48px;display:flex;align-items:center}
   #libraryShell .btn,.record-chapter-actions button{min-height:42px;font-size:14px}
   .record-book-hero p,.intro-note{font-size:15px;line-height:1.8}
-  .ortho-jump a{font-size:16px;min-height:48px}
-  .ortho-disease-card h3{font-size:21px;line-height:1.5}
-  .ortho-disease-card p{font-size:16px}
-  .ortho-stage-chips span{font-size:14px}
+  .ortho-jump a{min-height:48px}
+
   .record-book-toc a,.special-case-toc a{min-height:50px}
-  .record-book-toc a>b,.special-case-toc a b{font-size:17px}
+  
   .special-case-toc>div b{font-size:17px}
-  .record-book-body,.record-paper{font-size:18px;overflow-wrap:anywhere}
+  .record-book-body,.record-paper{overflow-wrap:anywhere}
   .record-back-toc{font-size:16px;min-height:44px;padding:8px 0}
   .form-grid input,.form-grid select,.form-grid textarea{font-size:16px;min-height:44px;min-width:0}
   .form-grid label{font-size:14px;min-width:0}
@@ -430,7 +372,7 @@ button,a,[role="button"]{
   .record-book-toc a{grid-template-columns:24px minmax(0,1fr) auto}
 }
 @media screen and (max-width:640px){
-  .official-nav-inner{padding:10px 16px 0;gap:6px}
+  
   .official-links{gap:22px}
   #libraryShell .brandline{min-width:0;flex:1;gap:6px}
   #libraryShell .library-brand{min-width:0}
@@ -438,13 +380,8 @@ button,a,[role="button"]{
   #libraryShell .library-brand-copy strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #libraryShell .library-top-actions{gap:8px;flex-shrink:0}
   #libraryShell .patient-action,#libraryShell [data-auth-slot]{white-space:nowrap}
-  .official-hero h1 span{display:block}
-  .official-hero{gap:18px;padding-top:32px}
-  .official-hero h1{font-size:clamp(32px,10vw,40px);line-height:1.2}
-  .clinical-scene{height:175px}
-  .official-feature{min-height:245px}
-  .official-feature p{max-width:28em}
-  .ortho-disease-card{padding:16px;min-height:160px}
+
+  .ortho-disease-card{min-height:160px}
   .record-chapter-actions{padding-left:0;display:flex;flex-wrap:wrap;gap:8px}
   .record-book-body,.record-paper{line-height:1.85}
   .record-book-section,.ortho-category{scroll-margin-top:78px}

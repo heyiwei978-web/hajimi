@@ -1,5 +1,5 @@
 /* Clinical tools visual polish — 2026-10-08 */
-:root{--h-font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC",sans-serif;--h-ink:#14252b;--h-text:#08333d;--h-muted:#697b80;--h-line:#dfe7e9;--h-bg:#f5f8f8;--h-blue:#047b90}
+:root{--h-font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC",sans-serif;}
 html,body{font-family:var(--h-font);text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;background:var(--h-bg);color:var(--h-text)}
 button,input,select{font-family:var(--h-font)}:focus-visible{outline:3px solid rgba(4,123,144,.24);outline-offset:2px}
 .nav{height:62px;background:rgba(255,255,255,.94);border-bottom:1px solid #dfe7e9;box-shadow:none}
