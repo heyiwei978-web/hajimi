@@ -8,7 +8,7 @@ import {test} from 'node:test';
 // prediction would reintroduce the layout shift it exists to remove.
 function load(){
   const context={window:{}};
-  runInNewContext(readFileSync(new URL('../route-shell.js',import.meta.url),'utf8'),context,{filename:'route-shell.js'});
+  runInNewContext(readFileSync(new URL('../js/route-shell.js',import.meta.url),'utf8'),context,{filename:'route-shell.js'});
   return context.window.HAJIMI_ROUTE_SHELL.classesFor;
 }
 
@@ -44,7 +44,7 @@ test('ECG routes get their final layout classes before scripts run',()=>{
 
 test('the class names it predicts are the ones the page scripts actually toggle',()=>{
   const departments=readFileSync(new URL('../departments.js',import.meta.url),'utf8');
-  const ecg=readFileSync(new URL('../ecg.js',import.meta.url),'utf8');
+  const ecg=readFileSync(new URL('../js/ecg.js',import.meta.url),'utf8');
   for(const name of ['department-no-sidebar','library-root-page','disease-book-page'])assert.match(departments,new RegExp("'"+name+"'"));
   for(const name of ['ecg-subpage','ecg-atlas-list','ecg-entry-page'])assert.match(ecg,new RegExp("'"+name+"'"));
   // Department slugs must stay in sync with the router.

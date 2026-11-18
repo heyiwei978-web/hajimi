@@ -121,7 +121,7 @@ test('构建时把上报脚本注入每个页面 head 最前面，且只注入�
 });
 
 test('前端上报脚本不读取页面内容、输入、存储或 Cookie', () => {
-  const source = fs.readFileSync(new URL('../error-report.js', import.meta.url), 'utf8').replace(/^\s*\/\/.*$/gm, '');
+  const source = fs.readFileSync(new URL('../js/error-report.js', import.meta.url), 'utf8').replace(/^\s*\/\/.*$/gm, '');
   for (const forbidden of ['innerText', 'innerHTML', 'textContent', '.value', 'document.cookie', 'localStorage', 'sessionStorage', 'location.search', 'location.hash']) {
     assert.ok(!source.includes(forbidden), forbidden);
   }

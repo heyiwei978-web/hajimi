@@ -3,7 +3,7 @@ import {writeErrorReporter} from './error-reporter.mjs';
 import {fileURLToPath} from 'node:url';
 import {compileClinicalSite} from './clinical-compiler.mjs';
 import {compileEcg} from './ecg-compiler.mjs';
-import {PUBLIC_FILES} from './public-assets.mjs';
+import {PUBLIC_FILES, sourcePath} from './public-assets.mjs';
 import {assertPublicResources} from './public-resources.mjs';
 import {MODULES, SITE_BRAND} from '../config/site-modules.mjs';
 import {renderWorkspaceNav, writeBuiltNavigation} from './navigation-build.mjs';
@@ -73,7 +73,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     // page as index.html, and keep the complete library at a separate path.
     rmSync(directory,{recursive:true,force:true});
     mkdirSync(directory,{recursive:true});
-    for(const file of PUBLIC_FILES)copyFileSync(new URL('../'+file,import.meta.url),new URL(file,directory));
+    for(const file of PUBLIC_FILES)copyFileSync(new URL('../'+sourcePath(file),import.meta.url),new URL(file,directory));
     writeFileSync(new URL('home.html',directory),output);
     writeFileSync(new URL('index.html',directory),output);
     const {manifest,publication}=compileClinicalSite(readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);

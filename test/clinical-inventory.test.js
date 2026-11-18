@@ -9,6 +9,7 @@ import {auditClinicalLibrary} from '../scripts/audit-clinical-library.mjs';
 import {createInventory,planClinicalPublication,recordFromIdentity,sha256} from '../scripts/clinical-inventory.mjs';
 import {compileClinicalSite} from '../scripts/clinical-compiler.mjs';
 import {PUBLIC_FILES} from '../scripts/public-assets.mjs';
+import {sourcePath} from '../scripts/public-assets.mjs';
 
 const current=auditClinicalLibrary();
 const commit=current.inventory.baseline.sourceCommit;
@@ -90,7 +91,7 @@ test('public compilation retains exact payloads while excluding authoring source
   const nonOrtho=current.source.records.find(r=>r.department==='普外科');
   assert(!router.includes(nonOrtho.sourceBody.slice(0,120)),'medical seed text must exist only in its lazy body resource');
   assert.doesNotThrow(()=>new vm.Script(router));
-  for(const name of PUBLIC_FILES)assert(fs.existsSync(new URL('../'+name,import.meta.url)),name);
+  for(const name of PUBLIC_FILES)assert(fs.existsSync(new URL('../'+sourcePath(name),import.meta.url)),name);
   for(const name of ['app.js','departments.js','ideal-cases.js','record-quality-v3.js','record-course-v27.js','tka-special-cases.js'])assert(!PUBLIC_FILES.includes(name),name);
   assert(!PUBLIC_FILES.some(name=>name.startsWith('content/')));
 });

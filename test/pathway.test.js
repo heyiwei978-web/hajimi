@@ -5,8 +5,8 @@ import vm from 'node:vm';
 
 test('orthopedic pathway center has the national ERAS library and responsive shell',()=>{
   const html=fs.readFileSync(new URL('../pathway.html',import.meta.url),'utf8');
-  const navJs=fs.readFileSync(new URL('../pathway.js',import.meta.url),'utf8');
-  const officialJs=fs.readFileSync(new URL('../pathway-official.js',import.meta.url),'utf8');
+  const navJs=fs.readFileSync(new URL('../js/pathway.js',import.meta.url),'utf8');
+  const officialJs=fs.readFileSync(new URL('../js/pathway-official.js',import.meta.url),'utf8');
   const css=fs.readFileSync(new URL('../pathway.css',import.meta.url),'utf8');
 
   assert.doesNotThrow(()=>new Function(navJs));
@@ -45,7 +45,7 @@ test('main site and completed orthopedic records link to the pathway center',()=
   assert.match(index,/href="\/pathway">临床路径/);
   assert.match(departments,/查看临床路径/);
   for(const key of ['tka','tha','fnf','intertroch','pilon','trimalleolar','acdf','lumbarFusion']) assert.match(departments,new RegExp("'"+key+"'"));
-  assert.match(fs.readFileSync(new URL('../pathway.js',import.meta.url),'utf8'),/URLSearchParams\(location\.search\)/);
+  assert.match(fs.readFileSync(new URL('../js/pathway.js',import.meta.url),'utf8'),/URLSearchParams\(location\.search\)/);
   assert(vercel.rewrites.some(entry=>entry.source==='/pathway'&&entry.destination==='/pathway.html'));
   assert(vercel.rewrites.some(entry=>entry.source==='/pathway/'&&entry.destination==='/pathway.html'));
 });

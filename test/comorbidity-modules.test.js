@@ -16,7 +16,7 @@ function element(extra={}){
 }
 
 function fixture(){
-  const source=fs.readFileSync(new URL('../comorbidity-modules.js',import.meta.url),'utf8');
+  const source=fs.readFileSync(new URL('../js/comorbidity-modules.js',import.meta.url),'utf8');
   const context={window:{},navigator:{clipboard:{writeText:async value=>{context.copied=value;}}}};
   vm.runInNewContext(source,context);
   const m=context.window.HAJIMI_COMORBIDITIES;
@@ -193,7 +193,7 @@ test('workup templates insert only the condition name and leave blanks; full cop
 });
 
 test('original eight-condition text is unchanged',()=>{
-  const source=fs.readFileSync(new URL('../comorbidity-modules.js',import.meta.url),'utf8');
+  const source=fs.readFileSync(new URL('../js/comorbidity-modules.js',import.meta.url),'utf8');
   const data=source.split('\n').slice(0,53).join('\n')+'\n';
   assert.equal(crypto.createHash('sha256').update(data).digest('hex'),'1a4dc7dda37da09fe013ead422c72cd0004504a4f8c09d6ef6489259eaa4d073');
 });

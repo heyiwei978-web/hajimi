@@ -201,7 +201,7 @@ test('salted scrypt admin password hash is preferred and legacy SHA-256 still wo
 });
 
 test('browser-generated PBKDF2 hash (password-hash.js) is accepted by the login check', async () => {
-  await import('../password-hash.js');
+  await import('../js/password-hash.js');
   const hash = await globalThis.hajimiMakePasswordHash('a long admin password');
   assert.match(hash,/^pbkdf2\$600000\$[A-Za-z0-9_-]{22}\$[A-Za-z0-9_-]{43}$/);
   assert.equal(verifyPassword('a long admin password',{HAJIMI_ADMIN_PASSWORD_HASH:hash}),true);

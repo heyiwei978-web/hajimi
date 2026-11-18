@@ -103,7 +103,7 @@ test('favorites and recent visits no longer offer withdrawn disease links',()=>{
     recent:[{department:'骨科',group:'椎管内神经鞘瘤'}]};
   const context={window:{HAJIMI_MANIFEST:{withdrawnGroups:expectedGroups.map(group=>({department:'骨科',group}))},addEventListener(){}},
     document:{getElementById(){return null;}},localStorage:{getItem(){return JSON.stringify(saved);},setItem(key,value){saved=JSON.parse(value);}}};
-  vm.runInNewContext(fs.readFileSync(new URL('../library-personal.js',import.meta.url),'utf8'),context);
+  vm.runInNewContext(fs.readFileSync(new URL('../js/library-personal.js',import.meta.url),'utf8'),context);
   context.window.HAJIMI_PERSONAL.remember('骨科','THA');
   assert.deepEqual(saved.favorites,[{department:'骨科',group:'TKA'}]);
   assert.deepEqual(saved.recent,[{department:'骨科',group:'THA'}]);
