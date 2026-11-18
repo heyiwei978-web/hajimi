@@ -22,7 +22,7 @@
 
 ## 安全边界
 
-`/api/client-error` 的 POST 是全站唯一不需要登录的写入接口，限制见 `FIREWALL.md`。查看（GET）和清空（DELETE）需要管理员登录。建议在 Vercel Firewall 中另外启用 `hajimi-client-error-limit` 规则，即每个 IP 每分钟 30 次。
+`/api/login-log?feed=errors` 的 POST 是全站唯一不需要登录的写入接口，限制见 `FIREWALL.md`。查看（GET）和清空（DELETE）需要管理员登录。建议在 Vercel Firewall 中另外启用 `hajimi-client-error-limit` 规则，即每个 IP 每分钟 30 次。
 
 ## 处理流程
 

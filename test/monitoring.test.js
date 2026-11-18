@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {createMonitor, normalizeReport, withMonitoring, LIMITS} from '../api/_monitoring.js';
-import {createClientErrorHandler, REPORT_BODY_LIMIT} from '../api/client-error.js';
+import {createClientErrorHandler, REPORT_BODY_LIMIT} from '../api/_client-error.js';
 import {injectReporter, REPORTER_TAG} from '../scripts/error-reporter.mjs';
 import {PUBLIC_SCRIPTS} from '../scripts/public-assets.mjs';
 
@@ -24,7 +24,7 @@ function response() {
 }
 const report = (extra = {}) => ({kind: 'error', message: 'TypeError: x is undefined', file: '/app.js', line: 3, column: 9, page: '/bl/guke', ...extra});
 const post = (body, headers = {}) => ({
-  method: 'POST', url: '/api/client-error', body,
+  method: 'POST', url: '/api/login-log?feed=errors', body,
   headers: {host: 'wdyxzl.icu', origin: 'https://wdyxzl.icu', 'x-forwarded-proto': 'https', 'sec-fetch-site': 'same-origin',
     'content-type': 'application/json', 'x-hajimi-report': '1', 'x-forwarded-for': '203.0.113.9', ...headers}
 });
@@ -88,11 +88,11 @@ test('查看和清空错误记录需要管理员登录', async () => {
   const handler = createClientErrorHandler(createMonitor({storage: memoryStorage()}));
   for (const method of ['GET', 'DELETE']) {
     const res = response();
-    await handler({method, url: '/api/client-error', headers: {host: 'wdyxzl.icu', 'x-hajimi-admin': '1'}}, res);
+    await handler({method, url: '/api/login-log?feed=errors', headers: {host: 'wdyxzl.icu', 'x-hajimi-admin': '1'}}, res);
     assert.equal(res.statusCode, 401, method);
   }
   const res = response();
-  await handler({method: 'PUT', url: '/api/client-error', headers: {}}, res);
+  await handler({method: 'PUT', url: '/api/login-log?feed=errors', headers: {}}, res);
   assert.equal(res.statusCode, 405);
 });
 
@@ -126,5 +126,11 @@ test('前端上报脚本不读取页面内容、输入、存储或 Cookie', () =
     assert.ok(!source.includes(forbidden), forbidden);
   }
   assert.match(source, /MAX_PER_PAGE = 5/);
-  assert.match(source, /'\/api\/client-error'/);
+  assert.match(source, /'\/api\/login-log\?feed=errors'/);
+});
+
+// Vercel 免费版每次部署最多 12 个函数；错误记录因此与登录记录共用 /api/login-log。
+test('函数数量不超过 Vercel 免费版上限 12 个', () => {
+  const functions = fs.readdirSync(new URL('../api/', import.meta.url)).filter(file => file.endsWith('.js') && !file.startsWith('_'));
+  assert.ok(functions.length <= 12, `api/ 下有 ${functions.length} 个函数，超过 12 个会导致部署失败：${functions.join(', ')}`);
 });

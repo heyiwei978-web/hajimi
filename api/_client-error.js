@@ -1,7 +1,7 @@
 import {guardRequest, sameOrigin} from './_security.js';
 import {monitor, normalizeReport} from './_monitoring.js';
 
-// /api/client-error
+// /api/login-log?feed=errors（由 login-log.js 分发；原计划的独立接口会超出 Vercel 免费版 12 个函数的上限）
 //   POST（公开）：前端 error-report.js 上报本站脚本的报错摘要。这是唯一不需要登录的写入接口，
 //                 因此单独设限：只接受同源请求和 X-Hajimi-Report 标识、JSON 正文不超过 2 KB、
 //                 字段逐项校验清理、同一网络地址 10 分钟内最多 20 次；任何不合格的请求都不写入。

@@ -147,7 +147,7 @@
   async function loadErrorLog(){
     const generation=epoch,button=document.getElementById('refreshErrorLog');
     errorLogExpanded=false;renderErrorLog(null);button.disabled=true;
-    try{const data=await json('/api/client-error',{cache:'no-store'});if(generation===epoch)renderErrorLog(data);}
+    try{const data=await json('/api/login-log?feed=errors',{cache:'no-store'});if(generation===epoch)renderErrorLog(data);}
     catch(ex){if(generation===epoch)document.getElementById('errorLogStatus').textContent=ex.message||'错误记录暂时无法读取。';}
     finally{button.disabled=false;}
   }
@@ -156,7 +156,7 @@
   document.getElementById('clearErrorLog').onclick=async()=>{
     if(!confirm('确定清空全部错误记录吗？清空后无法恢复。'))return;
     const button=document.getElementById('clearErrorLog');button.disabled=true;
-    try{renderErrorLog(await json('/api/client-error',{method:'DELETE'}));}
+    try{renderErrorLog(await json('/api/login-log?feed=errors',{method:'DELETE'}));}
     catch(ex){document.getElementById('errorLogStatus').textContent=ex.message||'清空失败，请稍后重试。';}
     finally{button.disabled=false;}
   };

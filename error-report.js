@@ -1,4 +1,4 @@
-// 前端报错上报（2026-11-18）。构建时由 scripts/error-reporter.mjs 注入所有页面 <head> 的最前面。
+// 前端报错上报（2026-11-18），发送到 /api/login-log?feed=errors。构建时由 scripts/error-reporter.mjs 注入所有页面 <head> 的最前面。
 // 只上报本站脚本的报错摘要：报错文字、出错文件路径和行列号、当前页面路径。
 // 不读取页面内容、输入框、存储和 Cookie；地址只取路径部分，去掉 ?查询 和 #片段；
 // 报错文字里 6 位以上的连续数字会被替换掉，避免带出编号类信息。服务端还会再清理一遍。
@@ -23,7 +23,7 @@
     if (seen[key]) return;
     seen[key] = 1; sent++;
     try {
-      fetch('/api/client-error', {
+      fetch('/api/login-log?feed=errors', {
         method: 'POST', keepalive: true, credentials: 'same-origin',
         headers: {'Content-Type': 'application/json', 'X-Hajimi-Report': '1'},
         body: JSON.stringify(entry)

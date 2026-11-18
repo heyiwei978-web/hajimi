@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
 // 错误记录（2026-11-18）。两类来源：
-//   - 前端：error-report.js 把本站脚本的报错摘要发到 /api/client-error（公开写入，限制见该文件）。
+//   - 前端：error-report.js 把本站脚本的报错摘要发到 /api/login-log?feed=errors（公开写入，限制见该文件）。
 //   - 服务端：withMonitoring() 包住各接口，接口返回 5xx 或抛出异常时记录一条。
 // 相同的报错合并为一条并累计次数，只保留最近 MAX_ENTRIES 条，存放在私有 Blob，
 // 只有已登录的管理员能在 /admin「错误记录」中查看和清空。
