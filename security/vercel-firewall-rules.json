@@ -119,12 +119,12 @@
             {
               "type": "path",
               "op": "eq",
-              "value": "/api/logout"
+              "value": "/api/session"
             },
             {
               "type": "method",
               "op": "eq",
-              "value": "POST"
+              "value": "DELETE"
             }
           ]
         }

@@ -35,7 +35,7 @@
 | --- | --- | --- | --- |
 | hajimi-login-limit | Path = `/api/login` 且 Method = POST | 10 次 / 60 秒 | Deny |
 | hajimi-upload-limit | Path = `/api/upload` 且 Method = POST | 30 次 / 60 秒 | Deny |
-| hajimi-admin-write-limit | `/api/content` + PUT，`/api/duty-orders` + PUT/POST，或 `/api/logout` + POST | 合计 60 次 / 60 秒 | Deny |
+| hajimi-admin-write-limit | `/api/content` + PUT，`/api/duty-orders` + PUT/POST，或 `/api/session` + DELETE（退出登录） | 合计 60 次 / 60 秒 | Deny |
 | hajimi-audit-limit | `/api/ortho-audit-runtime` + GET | 3 次 / 60 秒 | Deny |
 | hajimi-client-error-limit | Path = `/api/login-log` 且 Method = POST（该接口只有报错上报使用 POST） | 30 次 / 60 秒 | Deny |
 | hajimi-block-scanner-paths | Path 匹配 JSON 中的正则：WordPress、phpMyAdmin、Git 和环境文件探测 | 直接拦截 | Deny |

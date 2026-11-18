@@ -7,10 +7,9 @@ import {guardRequest} from '../api/_security.js';
 import login,{createLoginHandler} from '../api/login.js';
 import {createLoginLog,describeRequest,LIMITS} from '../api/_login-log.js';
 import {createLoginLogHandler} from '../api/login-log.js';
-import logout from '../api/logout.js';
 import session from '../api/session.js';
-import content from '../api/content.js';
-import history from '../api/content-history.js';
+import content,{createContentApi} from '../api/content.js';
+import {createHistoryHandler} from '../api/_content-history.js';
 import upload from '../api/upload.js';
 import image,{createImageHandler} from '../api/image.js';
 
@@ -81,10 +80,12 @@ test('expired, tampered, extra-part and malformed-cookie sessions are rejected',
 
 test('cross-site requests and spoofed origins cannot perform admin writes', async t => {
   const cookie = adminEnvironment(t);
-  for (const handler of [login,logout,content,history,upload]) {
+  const history = createHistoryHandler();
+  const writes = [[login,'POST'],[session,'DELETE'],[content,'PUT'],[history,'POST'],[upload,'POST']];
+  for (const [handler,method] of writes) {
     for (const headers of [{origin:'https://attacker.example'},{origin:'null'},{'sec-fetch-site':'cross-site'},{origin:'https://wdyxzl.icu.attacker.example'}]) {
       const res = response();
-      await handler(request({method:handler === content ? 'PUT' : 'POST',headers:{cookie,...headers}}),res);
+      await handler(request({method,headers:{cookie,...headers}}),res);
       assert.equal(res.code,403);
       assert.equal(res.headers['set-cookie'],undefined);
     }
@@ -115,6 +116,35 @@ test('public session remains readable while admin writes require authentication'
     const denied = response(); await handler(request({method,headers:{cookie:''}}),denied);
     assert.equal(denied.code,401);
   }
+});
+
+test('logout is DELETE /api/session: clears the cookie, needs the admin marker, and POST is refused', async t => {
+  const cookie = adminEnvironment(t);
+  const res = response();
+  await session(request({method:'DELETE',headers:{cookie,origin:'https://wdyxzl.icu'}}),res);
+  assert.equal(res.code,200); assert.deepEqual(res.body,{ok:true});
+  assert.match(res.headers['set-cookie'],/^hajimi_session=; Path=\/; HttpOnly; Secure; SameSite=Strict; Max-Age=0$/);
+  const unmarked = response();
+  await session(request({method:'DELETE',headers:{cookie,'x-hajimi-admin':undefined}}),unmarked);
+  assert.equal(unmarked.code,403); assert.equal(unmarked.headers['set-cookie'],undefined);
+  const post = response();
+  await session(request({method:'POST',headers:{cookie}}),post);
+  assert.equal(post.code,405); assert.equal(post.headers.allow,'GET, DELETE');
+});
+
+test('/api/content?feed=history reaches the admin-only history handler; other requests reach content', async t => {
+  const anonymous = response();
+  await content(request({method:'GET',query:{feed:'history'},headers:{cookie:''}}),anonymous);
+  assert.equal(anonymous.code,401, 'history stays admin-only behind the shared function');
+  const restore = response();
+  await content(request({method:'POST',query:{feed:'history'},headers:{cookie:''}}),restore);
+  assert.equal(restore.code,401);
+  const calls = [];
+  const api = createContentApi((req,res) => calls.push('content'),(req,res) => calls.push('history'));
+  for (const req of [{query:{feed:'history'}},{url:'/api/content?feed=history&id=x'},{query:{}},{url:'/api/content'},{query:{feed:'other'}},{query:{feed:['history','x']}}]) api(req,response());
+  assert.deepEqual(calls,['history','history','content','content','content','content']);
+  assert.equal(fs.readdirSync(new URL('../api/', import.meta.url)).filter(file => /^(logout|content-history)\.js$/.test(file)).length,0,
+    'merged endpoints must not come back as separate functions');
 });
 
 test('valid same-origin admin JSON passes the guard; wrong method and oversized writes do not', t => {

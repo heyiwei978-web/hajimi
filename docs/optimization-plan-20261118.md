@@ -24,7 +24,8 @@
 
 - 证据：`api/` 下有 12 个不带 `_` 前缀的入口文件；`api/login-log.js`、`api/_client-error.js` 的注释已经说明为此把错误上报合进了登录记录接口。现在再增加任何接口都会导致部署失败。
 - `api/logout.js` 只有一行，压缩写法，并且**没有用 `withMonitoring` 包住**，不符合第 7 节「新接口默认导出用 `withMonitoring` 包住」的约定。
-- 方案：把退出登录合进 `api/session.js`（`DELETE /api/session`），把 `api/content-history.js` 合进 `api/content.js`（`?history=` 分发，沿用 `login-log` 的写法），可以腾出 2 个名额。前端 `cms-core.js`、`admin*.js` 同步改调用路径，旧路径保留一个版本周期再删除。
+- 方案：把退出登录合进 `api/session.js`（`DELETE /api/session`），把 `api/content-history.js` 合进 `api/content.js`（`?feed=history` 分发，沿用 `login-log` 的写法），可以腾出 2 个名额。前端 `cms-core.js`、`admin.js` 同步改调用路径。旧路径不保留：保留旧文件就腾不出名额；页面和脚本随同一次部署更新，只有部署时正好开着的旧页面点「退出」或看备份会失败，刷新即可恢复。
+- 状态：已实施（分支 `claude/cool-bell-pgtjgs`），函数数量 12 → 10。`security/vercel-firewall-rules.json` 与 `FIREWALL.md` 的写操作限流条件已从 `/api/logout` + POST 改为 `/api/session` + DELETE；如果 Vercel 控制台已经应用过该规则，需要负责人同步修改。
 - 验证：`test/security*.test.js` 补退出与历史接口的同源、方法、未登录用例；e2e 登录/退出流程。
 
 ### P0-2 管理会话无法单独作废

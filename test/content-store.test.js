@@ -3,7 +3,7 @@ import test from 'node:test';
 import {BlobPreconditionFailedError} from '@vercel/blob';
 import {createContentStore} from '../api/_content-store.js';
 import {createContentHandler} from '../api/content.js';
-import {createHistoryHandler} from '../api/content-history.js';
+import {createHistoryHandler} from '../api/_content-history.js';
 
 const path='cms/content.json';
 const original={version:1,templateOverrides:{sample:{body:'Original record'}},cases:[{id:'c1',template:'sample',published:true},{id:'c2',template:'sample',published:false}]};
