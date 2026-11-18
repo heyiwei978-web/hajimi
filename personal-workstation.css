@@ -2,11 +2,11 @@
   color-scheme: light;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   background: #f5f8f7;
-  color: #172b28;
-  --ws-muted: #4e625e;
-  --ws-line: #dce7e3;
-  --ws-teal: #086e63;
-  --ws-teal-soft: #e9f5f1;
+  color: #14252b;
+  --ws-muted: #4d6166;
+  --ws-line: #dfe7e9;
+  --ws-teal: #11697a;
+  --ws-teal-soft: #eef7f8;
   --ws-surface: #fff;
   --ws-radius: 14px;
   --ws-scroll-margin: calc(98px + env(safe-area-inset-top));
@@ -71,7 +71,7 @@ body { margin: 0; }
   place-items: center;
   width: 40px;
   height: 40px;
-  border: 1px solid #b6d7d0;
+  border: 1px solid #a9d8de;
   border-radius: 11px;
   color: var(--ws-teal);
   background: var(--ws-teal-soft);
@@ -110,10 +110,10 @@ body { margin: 0; }
   padding: 0 2px;
   border: none;
   background: transparent;
-  color: #172b28;
+  color: #14252b;
   border-radius: 4px;
 }
-.home-search input::placeholder { color: #546863; }
+.home-search input::placeholder { color: #5d6f75; }
 .home-search button {
   flex: none;
   min-height: 40px;
@@ -144,12 +144,12 @@ body { margin: 0; }
   min-height: 48px;
   padding: 0 14px;
   border-radius: 9px;
-  color: #314a45;
+  color: #32494e;
   font-size: 15px;
   font-weight: 650;
 }
 .ws-nav a[aria-current] {
-  background: #d6ebe5;
+  background: #d5ecef;
   color: var(--ws-teal);
   box-shadow: inset 3px 0 var(--ws-teal);
 }
@@ -192,7 +192,7 @@ body { margin: 0; }
   font-weight: 680;
 }
 .workstation .ws-button-primary { background: var(--ws-teal); color: #fff; }
-.workstation .ws-button-primary:hover { background: #045b52; }
+.workstation .ws-button-primary:hover { background: #0c5564; }
 .ws-columns {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
@@ -208,7 +208,7 @@ body { margin: 0; }
   border-radius: var(--ws-radius);
   background: var(--ws-surface);
 }
-.ws-accent { background: #f8fcfa; border-color: #c7e1d8; }
+.ws-accent { background: #f8fcfa; border-color: #c5e0e7; }
 .ws-panel-heading { min-height: 58px; padding: 8px 0; }
 .ws-panel-heading h2 { margin: 0; font-weight: 720; font-size: 18px; line-height: 1.4; }
 .workstation .ws-text-link {
@@ -258,10 +258,10 @@ body { margin: 0; }
 .ws-panel-note { margin: 0; padding: 0 0 18px; }
 .ws-saved ul { list-style: none; margin: 0; padding: 0; }
 .ws-state {
-  background: #e9f2ef;
+  background: #eef7f8;
   border-radius: 6px;
   padding: 4px 8px;
-  color: #33514b;
+  color: #374f54;
   font-size: 12px;
 }
 .home-quick-grid {

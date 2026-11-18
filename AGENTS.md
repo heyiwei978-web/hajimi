@@ -139,7 +139,7 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 
 ## 8. 界面与前端规范
 
-- 参考 `docs/interface-design.md`：移动端优先、单列起步；统一蓝白配色、卡片、按钮、标题和间距；手机导航在自身区域横向滚动。
+- 参考 `docs/interface-design.md`：移动端优先、单列起步；统一青岚配色（见 `docs/interface-design.md`）、卡片、按钮、标题和间距；手机导航在自身区域横向滚动。
 - 病历阅读字号 18/20/22px 三档，目录、正文、预览同步；字号与高亮只改显示，不影响复制和打印。
 - 无障碍基线（不得倒退）：每页 `lang="zh-CN"`、跳到主内容链接、全局 `:focus-visible` 焦点框、`prefers-reduced-motion` 全局降级、表单都有 label、提示信息用 `role="status"`/`aria-live`、破坏性操作先确认。
 - 不禁止缩放（不写 `user-scalable=no` / `maximum-scale=1`），不用 `transition: all`，不用可点击的 `<div>`/`<span>` 代替按钮或链接。

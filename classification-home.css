@@ -11,8 +11,8 @@
 @media screen and (max-width:500px){
   .official-home .official-feature-grid{grid-template-columns:1fr}
 }
-.official-home .official-feature.card-classification{border-top:3px solid #3d83bf}
-.official-home .card-classification .class-icon{background:#e9f4ff;color:#1e6dae;font-size:17px;font-weight:800}
-.official-home .card-classification .feature-enter{color:#1c6cae}
+.official-home .official-feature.card-classification{border-top:3px solid #078da4}
+.official-home .card-classification .class-icon{background:#eef7f8;color:#05768a;font-size:17px;font-weight:800}
+.official-home .card-classification .feature-enter{color:#0a7588}
 .official-home .official-feature.card-ecg{border-top:3px solid var(--ws-blue)}
 .official-home .home-quick-panel .home-quick-pathway + .home-quick-pathway{margin-top:8px}
