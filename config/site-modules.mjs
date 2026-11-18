@@ -8,7 +8,7 @@
 // executed by scripts/clinical-compiler.mjs as part of the clinical record chain.
 //
 // Navigation order is a UI contract, not only data. styles.css hides the 4th
-// `.global-links` item below 640px and ui-polish.css restores it for official
+// `.global-links` item below 640px and a later rule in styles.css (formerly ui-polish.css) restores it for official
 // navigation bars; reordering MODULES changes which entry is affected on phones.
 
 // The build renders every official/tools header brand from these values

@@ -5,9 +5,9 @@ export const PUBLIC_PAGES=[
   'password-hash.html','pathway.html','search.html','tools.html'
 ];
 export const PUBLIC_STYLES=[
-  'personal-workstation.css','accessibility.css','admin.css','case-workspace-preview.css',
+  'personal-workstation.css','admin.css','case-workspace-preview.css',
   'classification.css','cms.css','duty.css','duty-orders.css','labs.css','note.css','note-case.css','ecg.css','library-personal.css','pathway.css',
-  'design-system.css','site-search.css','styles.css','tools-page.css','tools-polish.css','ui-polish.css','workspace-design.css','private-gallery.css'
+  'site-search.css','styles.css','theme.css','tools-page.css','tools-polish.css','private-gallery.css'
 ];
 export const PUBLIC_SCRIPTS=[
   'admin-content.js','admin.js','classification-data.js','classification-detail-v2-lower.js',

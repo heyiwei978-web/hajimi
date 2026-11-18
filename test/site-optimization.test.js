@@ -17,7 +17,7 @@ test('main application external scripts are deferred but keep source order',()=>
 });
 
 test('long medical-record and pathway pages use safe offscreen rendering optimization',()=>{
-  const css=fs.readFileSync(new URL('../ui-polish.css',import.meta.url),'utf8');
+  const css=fs.readFileSync(new URL('../styles.css',import.meta.url),'utf8');
   assert.match(css,/rendering and navigation performance pass/);
   assert.match(css,/\.record-book-section[^\{]*,[\s\S]*?\.pathway-section[^\{]*,[\s\S]*?\.ortho-category\{[\s\S]*?scroll-margin-top:84px/);
   assert.match(css,/@supports \(content-visibility:auto\)/);

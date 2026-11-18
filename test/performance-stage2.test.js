@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import test from 'node:test';
 
 test('second-stage optimization preserves content while improving paint behavior',()=>{
-  const css=fs.readFileSync(new URL('../ui-polish.css',import.meta.url),'utf8');
+  const css=fs.readFileSync(new URL('../styles.css',import.meta.url),'utf8');
   assert.match(css,/second-stage paint and motion optimization/);
   assert.match(css,/@supports \(content-visibility:auto\)/);
   assert.match(css,/\.template-card,[\s\S]*?\.dept-card,[\s\S]*?\.path-step,[\s\S]*?content-visibility:auto/);
