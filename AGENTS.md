@@ -52,8 +52,9 @@ PR 描述里写明：执行工具 / 模型（可以多个）、改动类型（�
 | `home.html` | **由构建生成**（取自 `index.html` 首页区块），不要手改 |
 | `content/clinical-library/source/` | **病历正文源数据**：每个科室一个目录、每个病种一个 JSON 文件；`index.json` 记录全部记录顺序；`legacy-rendered.json` 只供身份账本核对 |
 | `record-*.js`、`ortho-*.js`、`orthopedic-expansion-*.js`、`ideal-*.js`、`tka-special-cases.js` | 已退役的旧生成链脚本，冻结不改（见第 6.3 节） |
-| `ecg-*.js` | 心电图资料与功能，构建时由 `scripts/ecg-compiler.mjs` 编译成带哈希的包 |
-| `classification-*.js` | 疾病分型资料与治疗方案 |
+| `js/` | 在用的页面脚本源文件（2026-11-18 起）；构建时发布到站点根路径，网址不变（`/note.js`）。清单在 `scripts/public-assets.mjs` 的 `DIRECTORY_SCRIPTS` |
+| `js/ecg-*.js` | 心电图资料与功能，构建时由 `scripts/ecg-compiler.mjs` 编译成带哈希的包 |
+| `js/classification-*.js` | 疾病分型资料与治疗方案 |
 | `*.css` | 样式；公共样式只有两层：`styles.css`（基础）和 `theme.css`（公共界面层，管理设计变量），页面专属样式放在两者之间或 `theme.css` 之后，见 `docs/interface-design.md` |
 | `config/site-modules.mjs` | **站点模块注册表**：栏目、科室、所有主导航位置的唯一来源 |
 | `scripts/` | 构建、编译、审核脚本（不发布） |
@@ -64,7 +65,7 @@ PR 描述里写明：执行工具 / 模型（可以多个）、改动类型（�
 | `security/`、`FIREWALL.md` | 防火墙规则定义与防护说明 |
 | `dist/` | 构建产物，已在 `.gitignore`，不要提交 |
 
-**根目录约定**：已退役的病历生成链脚本留在根目录、内容冻结——`baseline.json` 与 `source/index.json` 的 `retiredChain` 按文件名记录了它们的哈希，测试会检查不变。新增的页面脚本、样式也放在根目录并加入发布白名单；不要再新增"补丁式"脚本（运行时注入样式或改 DOM 修正别处问题），直接改对应模块。`record-quality-v2.js` 未被引用，但属于医学源资料，未经医学授权不删除。
+**根目录约定**：已退役的病历生成链脚本留在根目录、内容冻结——`baseline.json` 与 `source/index.json` 的 `retiredChain` 按文件名记录了它们的哈希，测试会检查不变。新增的页面脚本放在 `js/`、样式放在根目录，并加入发布白名单（脚本同时登记到 `DIRECTORY_SCRIPTS`，`test/js-directory.test.js` 会拦下根目录新增的 `.js`）；根目录的 `.js` 只剩冻结的旧生成链和仍在用的 `app.js`、`search-core.js`、`departments.js`（它们的路径写在身份账本里，不能移动）；不要再新增"补丁式"脚本（运行时注入样式或改 DOM 修正别处问题），直接改对应模块。`record-quality-v2.js` 未被引用，但属于医学源资料，未经医学授权不删除。
 
 ## 4. 构建、测试与本地预览
 

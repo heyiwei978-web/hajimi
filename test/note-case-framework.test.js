@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {randomBytes} from 'node:crypto';
 import {BlobPreconditionFailedError} from '@vercel/blob';
-import '../note-case-core.js';
+import '../js/note-case-core.js';
 import {createSession} from '../api/_auth.js';
 import {createNoteHandler,validateInput,buildMessages} from '../api/note-generate.js';
 import {createModelCatalog} from '../api/_note-models.js';

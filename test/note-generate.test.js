@@ -6,8 +6,9 @@ import {PUBLIC_FILES} from '../scripts/public-assets.mjs';
 import {MODULES, NAV_SURFACES} from '../config/site-modules.mjs';
 import {createSession} from '../api/_auth.js';
 import {createNoteHandler, validateInput, buildMessages, findIdentifier, stripMarkdown, DOC_TYPES} from '../api/note-generate.js';
+import {sourcePath} from '../scripts/public-assets.mjs';
 
-const read = file => fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+const read = file => fs.readFileSync(new URL('../'+sourcePath(file), import.meta.url), 'utf8');
 function res() {
   return {code: 200, headers: {}, setHeader(k, v) { this.headers[k.toLowerCase()] = v; },
     status(n) { this.code = n; return this; }, json(b) { this.body = b; return this; }};
@@ -220,8 +221,8 @@ test('note page is published, routed and part of the main navigation', () => {
   const page = read('note.html');
   assert.doesNotMatch(page, /<script>(?!<)|\son[a-z]+=/i);
   assert.match(page, /<a class="active" href="\/note" aria-current="page">AI 病历生成<\/a>/);
-  assert.doesNotMatch(read('note.js'), /localStorage/);
-  assert.match(read('note.js'), /sessionStorage/);
+  assert.doesNotMatch(read('js/note.js'), /localStorage/);
+  assert.match(read('js/note.js'), /sessionStorage/);
   assert.match(read('tools.html'), /href="\/note"/);
 });
 

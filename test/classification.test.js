@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 import {test} from 'node:test';
+import {sourcePath} from '../scripts/public-assets.mjs';
 const files=[
  'classification-data.js',
  'classification-detail-v2-lower.js',
@@ -10,7 +11,7 @@ const files=[
 ];
 function catalog(){
  const context={window:{}};
- for(const f of files)runInNewContext(readFileSync(new URL('../'+f,import.meta.url),'utf8'),context,{filename:f});
+ for(const f of files)runInNewContext(readFileSync(new URL('../'+sourcePath(f),import.meta.url),'utf8'),context,{filename:f});
  return {data:context.window.HAJIMI_CLASSIFICATION_DATA,details:context.window.HAJIMI_CLASSIFICATION_DETAILS};
 }
 test('17 orthopedic disease dossiers each have detailed fracture morphology, differentiators and references',()=>{

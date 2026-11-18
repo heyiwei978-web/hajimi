@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import '../note-workflow.js';
+import '../js/note-workflow.js';
 import {validateInput, buildMessages, chapterDailyPhase} from '../api/note-generate.js';
 
 const workflow = globalThis.HajimiNoteWorkflow;

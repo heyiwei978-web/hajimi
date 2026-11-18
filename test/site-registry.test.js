@@ -112,7 +112,7 @@ test('department lists elsewhere in the site agree with the registry', () => {
     DEPARTMENTS.map(({name, slug}) => ({name, slug})), 'department router list');
 
   const context = {window: {}};
-  vm.runInNewContext(renderClassificationDepartments(read('classification-data.js')), context, {filename: 'classification-data.js'});
+  vm.runInNewContext(renderClassificationDepartments(read('js/classification-data.js')), context, {filename: 'classification-data.js'});
   // JSON round trip: objects created inside the vm belong to another realm.
   const classification = JSON.parse(JSON.stringify(context.window.HAJIMI_CLASSIFICATION_DATA.departments));
   assert.deepEqual(classification.map(({id, name, ready}) => ({id, name, ready})),

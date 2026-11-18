@@ -9,8 +9,9 @@ import {promisify} from 'node:util';
 import {fileURLToPath} from 'node:url';
 import {DEPARTMENTS} from '../config/site-modules.mjs';
 import {renderHomeDepartments,renderRouterDepartments,renderClassificationDepartments} from '../scripts/department-build.mjs';
+import {sourcePath} from '../scripts/public-assets.mjs';
 
-const read = file => fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
+const read = file => fs.readFileSync(new URL('../'+sourcePath(file),import.meta.url),'utf8');
 const clone = () => structuredClone(DEPARTMENTS);
 function routerRows(source) {
   const literal = /const departments=(\[[\s\S]*?\]);/.exec(source)[1];
@@ -25,7 +26,7 @@ function classificationRows(source) {
 test('department projections preserve every byte with current registry data', () => {
   for (const file of ['index.html','home.html']) assert.equal(renderHomeDepartments(read(file)),read(file));
   assert.equal(renderRouterDepartments(read('departments.js')),read('departments.js'));
-  assert.equal(renderClassificationDepartments(read('classification-data.js')),read('classification-data.js'));
+  assert.equal(renderClassificationDepartments(read('js/classification-data.js')),read('js/classification-data.js'));
 });
 
 test('each context uses its own registry text without changing classification entries', () => {
@@ -33,8 +34,8 @@ test('each context uses its own registry text without changing classification en
   departments[0].presentation = {homeIcon:'示',homeDescription:'合成首页说明',recordsDescription:'合成病历目录说明',classificationDescription:'合成分型目录说明'};
   assert.match(renderHomeDepartments(read('index.html'),departments),/合成首页说明/);
   assert.equal(routerRows(renderRouterDepartments(read('departments.js'),departments))[0].desc,'合成病历目录说明');
-  const before = classificationRows(read('classification-data.js'));
-  const after = classificationRows(renderClassificationDepartments(read('classification-data.js'),departments));
+  const before = classificationRows(read('js/classification-data.js'));
+  const after = classificationRows(renderClassificationDepartments(read('js/classification-data.js'),departments));
   assert.equal(after.departments[0].description,'合成分型目录说明');
   assert.deepEqual(after.entries,before.entries);
 });
@@ -47,18 +48,18 @@ test('presentation values are escaped for HTML and JavaScript contexts', () => {
   const home = renderHomeDepartments(read('index.html'),departments);
   assert.ok(home.includes('测试&#39;&lt;script&gt;&amp;'));
   assert.equal(routerRows(renderRouterDepartments(read('departments.js'),departments))[0].desc,value);
-  assert.equal(classificationRows(renderClassificationDepartments(read('classification-data.js'),departments)).departments[0].description,value);
+  assert.equal(classificationRows(renderClassificationDepartments(read('js/classification-data.js'),departments)).departments[0].description,value);
 });
 
 test('missing, duplicated or malformed projection targets stop the build', () => {
   assert.throws(() => renderHomeDepartments(read('index.html').replace('class="home-quick-grid"','class="other-grid"')), /Expected one homepage/);
   assert.throws(() => renderRouterDepartments(read('departments.js')+read('departments.js')), /Expected one router/);
-  assert.throws(() => renderClassificationDepartments(read('classification-data.js').replace('"departments":','"other":')), /Expected one classification/);
+  assert.throws(() => renderClassificationDepartments(read('js/classification-data.js').replace('"departments":','"other":')), /Expected one classification/);
   const departments = clone();
   delete departments[0].presentation.homeIcon;
   assert.throws(() => renderHomeDepartments(read('index.html'),departments), /presentation missing/);
   departments[0].classification = 'ready';
-  assert.throws(() => renderClassificationDepartments(read('classification-data.js'),departments), /must be boolean/);
+  assert.throws(() => renderClassificationDepartments(read('js/classification-data.js'),departments), /must be boolean/);
 });
 
 test('home visibility does not remove clinical routes or classification placeholders', () => {
@@ -66,7 +67,7 @@ test('home visibility does not remove clinical routes or classification placehol
   const home = renderHomeDepartments(read('index.html'),departments);
   assert.equal([...home.matchAll(/href="\/bl\/guke"><span class="home-department-icon"/g)].length,0);
   assert.equal(routerRows(renderRouterDepartments(read('departments.js'),departments)).length,4);
-  const classification = classificationRows(renderClassificationDepartments(read('classification-data.js'),departments));
+  const classification = classificationRows(renderClassificationDepartments(read('js/classification-data.js'),departments));
   assert.equal(classification.departments.length,4);assert.equal(classification.departments[0].ready,false);
 });
 
@@ -89,7 +90,7 @@ test('normal build projects registry metadata into home, router and classificati
   for (const entry of fs.readdirSync(root,{withFileTypes:true})) {
     const from = path.join(root,entry.name),to = path.join(folder,entry.name);
     if (entry.isFile() && (/\.(?:html|js|css)$/.test(entry.name)||['package.json','vercel.json'].includes(entry.name))) fs.copyFileSync(from,to);
-    else if (entry.isDirectory() && ['scripts','config','content'].includes(entry.name)) copy(from,to);
+    else if (entry.isDirectory() && ['scripts','config','content','js'].includes(entry.name)) copy(from,to);
   }
   const build = () => promisify(execFile)(process.execPath,['scripts/build-home.mjs'],{cwd:folder,timeout:60000,maxBuffer:1024*1024});
   function outputs(directory,prefix='') {

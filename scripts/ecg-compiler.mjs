@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {sourcePath} from './public-assets.mjs';
 import vm from 'node:vm';
 import {createHash} from 'node:crypto';
 
@@ -10,7 +11,7 @@ const root=new URL('../',import.meta.url);
 export const ECG_SOURCES=['ecg-data.js','ecg-cases-data.js','ecg-basics-data.js','ecg-periop-data.js','ecg-book-data.js','ecg-book-data-2.js','ecg-book-data-3.js','ecg-book-data-4.js','ecg-book-data-5.js','ecg-waveforms.js','ecg-calculators.js','ecg-classic.js'];
 const RUNTIME=['ecg-search.js','ecg-calipers.js','ecg.js'];
 
-export function loadEcg(read=file=>fs.readFileSync(new URL(file,root),'utf8')){
+export function loadEcg(read=file=>fs.readFileSync(new URL(sourcePath(file),root),'utf8')){
   const context={window:{}};
   vm.createContext(context);
   for(const file of ECG_SOURCES)vm.runInContext(read(file),context,{filename:file,timeout:10000});
@@ -67,7 +68,7 @@ export function validateEcg(window){
 
 const digest=text=>createHash('sha256').update(text).digest('hex').slice(0,20);
 
-export function compileEcg(directory,read=file=>fs.readFileSync(new URL(file,root),'utf8')){
+export function compileEcg(directory,read=file=>fs.readFileSync(new URL(sourcePath(file),root),'utf8')){
   const window=loadEcg(read),errors=validateEcg(window);
   if(errors.length)throw new Error('ECG build failed:\n'+errors.join('\n'));
   // JSON.parse of a string literal is parsed faster than an equivalent object literal.

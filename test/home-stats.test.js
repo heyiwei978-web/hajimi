@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
+import {sourcePath} from '../scripts/public-assets.mjs';
 
-const read = file => fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+const read = file => fs.readFileSync(new URL('../'+sourcePath(file), import.meta.url), 'utf8');
 
 test('personal areas present an honest state before source material or exams are added', () => {
   const sections = read('workstation-sections.html');

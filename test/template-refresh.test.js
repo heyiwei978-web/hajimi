@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import test from 'node:test';
 
 const departments=fs.readFileSync(new URL('../departments.js',import.meta.url),'utf8');
-const cms=fs.readFileSync(new URL('../cms-core.js',import.meta.url),'utf8');
+const cms=fs.readFileSync(new URL('../js/cms-core.js',import.meta.url),'utf8');
 const start=departments.indexOf("    window.addEventListener('hajimi:templates-changed',");
 const listener=departments.slice(start,departments.indexOf("    window.addEventListener('hajimi:cms-ready',"));
 

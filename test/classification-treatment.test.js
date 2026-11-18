@@ -2,10 +2,11 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 import {test} from 'node:test';
+import {sourcePath} from '../scripts/public-assets.mjs';
 function catalog(){
  const context={window:{}};
  for(const file of ['classification-data.js','classification-detail-v2-lower.js','classification-detail-v2-upper.js','classification-detail-v2-pelvis-foot.js','classification-treatment.js'])
-  runInNewContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context,{filename:file});
+  runInNewContext(readFileSync(new URL('../'+sourcePath(file),import.meta.url),'utf8'),context,{filename:file});
  return context.window;
 }
 test('every published morphology has treatment considerations with no missing or legacy codes',()=>{

@@ -1,5 +1,5 @@
 import {createHash} from 'node:crypto';
-import '../note-case-core.js';
+import '../js/note-case-core.js';
 import {blob} from './_blob-auth.js';
 import {ContentError,createContentStore} from './_content-store.js';
 import {findIdentifier,validateInput} from './note-generate.js';

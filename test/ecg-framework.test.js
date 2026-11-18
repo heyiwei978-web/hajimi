@@ -6,9 +6,10 @@ import {pathToFileURL} from 'node:url';
 import {runInNewContext} from 'node:vm';
 import {test} from 'node:test';
 import {loadEcg,validateEcg,compileEcg,ECG_SOURCES} from '../scripts/ecg-compiler.mjs';
+import {sourcePath} from '../scripts/public-assets.mjs';
 
-const read=file=>readFileSync(new URL('../'+file,import.meta.url),'utf8');
-function withSearch(){const window=loadEcg();runInNewContext(read('ecg-search.js'),{window});return window;}
+const read=file=>readFileSync(new URL('../'+sourcePath(file),import.meta.url),'utf8');
+function withSearch(){const window=loadEcg();runInNewContext(read('js/ecg-search.js'),{window});return window;}
 
 test('merged ECG data passes build validation: unique slugs, existing sketches, categories and cross-links',()=>{
   assert.deepEqual(validateEcg(loadEcg()),[]);
@@ -95,7 +96,7 @@ test('search highlighting escapes markup before marking matches',()=>{
 });
 
 test('caliper readings convert sketch units to milliseconds and rate',()=>{
-  const window={};runInNewContext(read('ecg-calipers.js'),{window,document:{}});
+  const window={};runInNewContext(read('js/ecg-calipers.js'),{window,document:{}});
   const plain=value=>JSON.parse(JSON.stringify(value));
   assert.deepEqual(plain(window.HAJIMI_ECG_CALIPERS.reading(250,410)),{ms:800,rate:75});
   assert.deepEqual(plain(window.HAJIMI_ECG_CALIPERS.reading(410,250)),{ms:800,rate:75});
