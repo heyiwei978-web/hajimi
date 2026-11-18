@@ -21,3 +21,13 @@ test('js/ 下的文件与登记清单一一对应', () => {
   for (const file of DIRECTORY_SCRIPTS) assert.equal(sourcePath(file), SCRIPT_DIRECTORY + file);
   assert.equal(sourcePath('app.js'), 'app.js', 'frozen and root runtime files resolve to the root');
 });
+
+test('接口代码里引用的本地文件都存在（移动脚本后不留断链）', () => {
+  const api = new URL('api/', root);
+  for (const file of fs.readdirSync(api).filter(name => name.endsWith('.js'))) {
+    const source = fs.readFileSync(new URL(file, api), 'utf8');
+    for (const [, spec] of source.matchAll(/(?:import|from)\s*\(?\s*['"](\.{1,2}\/[^'"]+)['"]/g)) {
+      assert.ok(fs.existsSync(new URL(spec, new URL(file, api))), `api/${file} 引用的 ${spec} 不存在`);
+    }
+  }
+});
