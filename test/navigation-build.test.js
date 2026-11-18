@@ -100,7 +100,6 @@ test('normal build consumes registry changes from a clean copy without exposing 
     assert.equal(comparable(html.replaceAll(label, '心电图')), comparable(before.get(name).toString('utf8')),
       name + ' only changes the navigation label');
   }
-  assert.deepEqual(changed.sort(), ['admin.html', 'classification.html', 'duty-orders.html', 'duty.html', 'ecg.html', 'home.html',
-    'index.html', 'labs.html', 'library.html', 'note.html', 'pathway.html', 'search.html', 'site-search-data.js', 'tools.html'].sort());
-  assert.equal(occurrences, 14, 'thirteen registered ECG links plus the lightweight homepage alias');
+  assert.deepEqual(changed.sort(), ['admin.html', 'classification.html', 'duty-orders.html', 'duty.html', 'ecg.html', 'labs.html', 'library.html', 'note.html', 'pathway.html', 'search.html', 'site-search-data.js', 'tools.html'].sort());
+  assert.equal(occurrences, 11, 'legacy navigation links follow the registered label');
 });

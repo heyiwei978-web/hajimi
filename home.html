@@ -3,163 +3,86 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f6f8fb">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231d67d8%22/%3E%3Cpath d=%22M10 8v16m12-16v16M10 16h12%22 stroke=%22white%22 stroke-width=%223.5%22/%3E%3C/svg%3E">
+<meta name="theme-color" content="#f5f8f7">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%228%22%20fill%3D%22%2308766a%22%2F%3E%3Cg%20transform%3D%22translate(4%204)%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.65%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%206c-2.5-1.7-6-2.2-9-1v13c3-1.2%206.5-1%209%201%202.5-2%206-2.2%209-1V5c-3-1.2-6.5-.7-9%201v13M15%2011h3m-1.5-1.5v3%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <title>哈基米工作站</title>
-<link rel="stylesheet" href="/styles.css?v=20261030-ui1">
-<link rel="stylesheet" href="/cms.css?v=20261030-ui1">
-<link rel="stylesheet" href="/ui-polish.css?v=20261011-jump1">
-<link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
-<link rel="stylesheet" href="/workspace-design.css?v=20261030-ui1">
-<link rel="stylesheet" href="/classification-home.css?v=20261011-ecg1">
-<link rel="stylesheet" href="/design-system.css?v=20261108-ds1">
+<link rel="stylesheet" href="/personal-workstation.css?v=1">
 </head>
-<body class="portal-mode">
-<a class="skip-link" href="#homeContent">跳到主要内容</a>
-<div id="portalHome" class="portal-home official-home">
-<header class="global-nav official-nav">
-  <div class="global-nav-inner official-nav-inner">
-    <a class="global-brand official-brand" href="/"><span class="official-brand-mark" aria-hidden="true">H</span><span class="official-brand-text"><strong>哈基米工作站</strong><small>hajimi Clinical Workspace</small></span></a>
-    <nav class="global-links official-links" aria-label="主导航">
-      <a class="active" href="/" aria-current="page">首页</a>
-      <a href="/bl">病历模板</a>
-      <a href="/classification">疾病分型</a>
-      <a href="/ecg">心电图</a>
-      <a href="/labs">检验解读</a>
-      <a href="/pathway">临床路径</a>
-      <a href="/duty">值班资料</a>
-      <a href="/tools">临床工具</a>
-      <a href="/note">AI 病历生成</a>
-      <a href="/admin">管理入口</a>
-    </nav>
-    <div class="official-nav-right"><a class="official-search" href="/search" aria-label="全站搜索"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span>搜索资料</span></a>
-      <span class="official-auth" data-auth-slot></span></div>
-  </div>
-</header>
-
-<main id="homeContent" class="official-main">
-  <section class="official-hero">
-    <div class="official-hero-bg" aria-hidden="true">
-      <span class="bg-orb bg-orb-a"></span>
-      <span class="bg-orb bg-orb-b"></span>
-    </div>
-    <div class="official-hero-copy">
-      <p class="official-kicker">HAJIMI CLINICAL WORKSPACE</p>
-      <h1>临床资料，<span>一个入口。</span></h1>
-      <p class="official-lead">病历模板、疾病分型、心电图、临床路径、值班资料和常用临床工具统一整理，打开即用，持续更新。</p>
-      <form class="home-search" action="/search" method="get" role="search">
-        <label for="homeSearch">搜索全站资料</label>
-        <div class="home-search-field">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg>
-          <input id="homeSearch" enterkeyhint="search" autocomplete="off" spellcheck="false" name="q" type="search" placeholder="疾病、化验、心电图、工具" required>
-          <button type="submit">搜索 <span aria-hidden="true">→</span></button>
-        </div>
-      </form>
-      <div class="official-hero-actions">
-        <a class="official-cta primary" href="/bl"><span class="cta-icon">▣</span>进入病历模板 <b>→</b></a>
-        <a class="official-cta secondary" href="/tools"><span class="cta-icon">⌘</span>打开临床工具 <b>→</b></a>
-      </div>
-    </div>
-
-    <div class="clinical-scene" aria-hidden="true">
-      <div class="scene-glass"></div>
-      <div class="scene-laptop">
-        <div class="scene-screen">
-          <div class="screen-top"><span>哈基米工作站</span><i></i></div>
-          <div class="screen-layout">
-            <div class="screen-side">
-              <span></span><span></span><span></span><span></span><span></span>
-            </div>
-            <div class="screen-body">
-              <small>骨科标准模板</small>
-              <strong>9</strong>
-              <div class="screen-chips"><b>关节置换</b><b>创伤骨科</b><b>康复记录</b></div>
-              <div class="screen-cards"><i></i><i></i><i></i><i></i></div>
-            </div>
-          </div>
-        </div>
-        <div class="scene-base"></div>
-      </div>
-      <div class="scene-stethoscope"><span></span><b></b></div>
-      <div class="scene-books"><span>Orthopedics</span><span>Trauma</span><span>Arthroplasty</span></div>
-    </div>
-    <aside class="home-quick-panel" aria-labelledby="homeQuickTitle">
-      <div class="home-quick-heading"><span>病历模板</span><h2 id="homeQuickTitle">从科室开始</h2><a href="/bl">全部科室 →</a></div>
-      <div class="home-quick-grid">
-        <a href="/bl/guke"><span class="home-department-icon" aria-hidden="true">骨</span><div><strong>骨科</strong><small>创伤 · 关节置换</small></div><b aria-hidden="true">↗</b></a>
-        <a href="/bl/puwai"><span class="home-department-icon" aria-hidden="true">外</span><div><strong>普外科</strong><small>腹部外科 · 外科病历</small></div><b aria-hidden="true">↗</b></a>
-        <a href="/bl/shennei"><span class="home-department-icon" aria-hidden="true">肾</span><div><strong>肾内科</strong><small>肾功能 · 内科记录</small></div><b aria-hidden="true">↗</b></a>
-        <a href="/bl/fuke"><span class="home-department-icon" aria-hidden="true">妇</span><div><strong>妇科</strong><small>妇科疾病 · 围手术期</small></div><b aria-hidden="true">↗</b></a>
-      </div>
-      <a class="home-quick-pathway" href="/classification"><span>疾病分型与手术指征 · 按科室浏览</span><b aria-hidden="true">→</b></a>
-      <a class="home-quick-pathway" href="/pathway"><span>骨科临床路径中心</span><b aria-hidden="true">→</b></a>
-    </aside>
-  </section>
-
-  <section class="official-feature-grid" aria-label="主要功能">
-    <a class="official-feature card-records" href="/bl">
-      <div class="feature-icon blue">▤</div>
-      <div class="feature-copy"><span class="feature-eyebrow">核心资料</span><h2>病历模板</h2><p>各类病历书写模板，按科室、疾病/术式和住院阶段整理。</p></div>
-      <div class="feature-art records-art"><i></i><i></i><i></i></div>
-      <div class="feature-enter">进入 <span>→</span></div>
-    </a>
-    <a class="official-feature card-classification" href="/classification">
-      <div class="feature-icon class-icon" aria-hidden="true">骨</div>
-      <div class="feature-copy"><span class="feature-eyebrow">循证资料</span><h2>疾病分型</h2><p>按科室、疾病与分型逐级查阅影像特征、手术指征和原始医学依据。</p></div>
-      <div class="feature-art classification-art" aria-hidden="true"><i></i><i></i><i></i></div>
-      <div class="feature-enter">进入 <span>→</span></div>
-    </a>
-    <a class="official-feature card-ecg" href="/ecg">
-      <div class="feature-icon blue" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h5l3-7 4 14 3-7h5"/></svg></div>
-      <div class="feature-copy"><span class="feature-eyebrow">学习与查阅</span><h2>心电图</h2><p>从心电图基础、病例判读到围手术期评估，附床旁计算工具。</p></div>
-      <div class="feature-enter">进入 <span>→</span></div>
-    </a>
-    <a class="official-feature card-duty" href="/duty">
-      <div class="feature-icon green">▦</div>
-      <div class="feature-copy"><span class="feature-eyebrow">值班工作台</span><h2>值班资料</h2><p>交班清单、待办复评提醒与病历、路径、工具快捷入口。</p></div>
-      <div class="feature-art duty-art"><i></i><b></b><b></b><b></b></div>
-      <div class="feature-enter">进入 <span>→</span></div>
-    </a>
-    <a class="official-feature card-departments" href="/bl">
-      <div class="feature-icon purple">▥</div>
-      <div class="feature-copy"><span class="feature-eyebrow">多科室</span><h2>其他科室</h2><p>普外科、肾内科、妇科等与骨科同级管理，便于持续扩展。</p></div>
-      <div class="feature-art hospital-art"><div class="hospital-main">＋</div><i></i><i></i></div>
-      <div class="feature-enter">进入 <span>→</span></div>
-    </a>
-    <a class="official-feature card-tools" href="/tools">
-      <div class="feature-icon orange">⌘</div>
-      <div class="feature-copy"><span class="feature-eyebrow">临床计算</span><h2>临床工具</h2><p>常用医学公式、风险评分与床旁计算，集中调用提高效率。</p></div>
-      <div class="feature-art tools-art"><span>BMI</span><span>eGFR</span><span>Wells</span></div>
-      <div class="feature-enter">进入 <span>→</span></div>
-    </a>
-  </section>
-
-  <a class="pathway-home-banner" href="/pathway">
-    <div class="pathway-home-icon">CP</div>
-    <div class="pathway-home-copy">
-      <span>ORTHOPAEDIC CLINICAL PATHWAYS</span>
-      <h2>骨科临床路径中心</h2>
-      <p>从准入、术前准备、手术日到术后康复、出院、变异与质控，建立骨科标准诊疗时间轴，覆盖关节置换、创伤和脊柱等术式。</p>
-    </div>
-    <div class="pathway-home-meta">
-      <strong>12 <small>条国家路径</small></strong>
-      <b>进入路径中心 →</b>
-    </div>
+<body>
+<a class="ws-skip" href="#homeContent">跳到主要内容</a>
+<div id="portalHome" class="workstation">
+<header class="ws-header">
+  <a class="ws-brand" href="/" aria-label="哈基米工作站首页"><span class="ws-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-2.5-1.7-6-2.2-9-1v13c3-1.2 6.5-1 9 1 2.5-2 6-2.2 9-1V5c-3-1.2-6.5-.7-9 1v13M15 11h3m-1.5-1.5v3"/></svg></span><span><strong>哈基米工作站</strong><small>个人医学工作台</small></span></a>
+  <form class="home-search" action="/search" method="get" role="search">
+    <label class="ws-visually-hidden" for="homeSearch">搜索全站资料</label>
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+    <input id="homeSearch" enterkeyhint="search" autocomplete="off" name="q" type="search" placeholder="搜索病种、心电图、检验和工具" required>
+    <button type="submit">搜索</button>
+  </form>
+  <a class="ws-account" href="/personal">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></svg>
+    <span>个人空间</span>
   </a>
-
-  <section class="official-stats" aria-label="工作站概览">
-    <div><span class="stat-icon blue">▤</span><strong>14</strong><small>套病历模板</small></div>
-    <div><span class="stat-icon green">▦</span><strong>4</strong><small>科室分类</small></div>
-    <div><span class="stat-icon purple">◆</span><strong>83</strong><small>临床工具</small></div>
-    <div><span class="stat-icon orange">●</span><strong class="stat-text">持续更新</strong><small>不断完善中</small></div>
-  </section>
-
-  <footer class="official-footer">
-    <span></span><p>哈基米工作站</p><i>专注临床 · 汇聚资料 · 提高效率</i><span></span>
-  </footer>
-  <p class="site-disclaimer" role="note">本站为教学示例与临床参考资料，仅供参考，不替代医生的临床判断。</p>
+</header>
+<aside class="ws-rail">
+  <nav class="ws-nav" aria-label="主导航">
+    <a class="active" href="/" aria-current="page"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l-2 0l9 -9l9 9l-2 0M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1 -1v-7M9 20v-6h6v6"/></svg><span>工作台</span></a><a href="/clinical"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h-2v5a5 5 0 0 0 10 0V4h-2m-3 10v3a4 4 0 0 0 8 0v-2"/><circle cx="17" cy="12" r="3"/></svg><span>临床</span></a><a href="/materials"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14m-9 -3c3.3 -1.5 6.3 -1.5 9 0c2.7 -1.5 5.7 -1.5 9 0V5c-3.3 -1.5 -6.3 -1.5 -9 0c-2.7 -1.5 -5.7 -1.5 -9 0z"/></svg><span>资料</span></a><a href="/study"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 9l-10 -5l-10 5l10 5l10 -5v6M6 11v6a6 3 0 0 0 12 0v-6"/></svg><span>学习</span></a><a href="/personal"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></svg><span>我的</span></a>
+  </nav>
+</aside>
+<main id="homeContent" class="ws-main" tabindex="-1">
+  <div class="ws-heading">
+    <div><h1>个人工作台</h1><p>临床记录、医学资料与个人学习</p></div>
+    <a class="ws-button ws-button-primary" href="/note"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>AI 病历生成</a>
+  </div>
+  <div class="ws-columns">
+    <div class="ws-stack">
+      <section class="ws-panel" aria-labelledby="ws-resume-title">
+        <div class="ws-panel-heading"><h2 id="ws-resume-title">继续使用</h2><a class="ws-text-link" href="/personal">访问记录</a></div>
+        <div class="ws-saved" data-workstation-list="recent" data-limit="3">
+          <div class="ws-empty"><p>打开病种后，可从这里继续阅读。</p><a class="ws-text-link" href="/bl">浏览病历模板 <span aria-hidden="true">→</span></a></div>
+        </div>
+      </section>
+      <section class="ws-panel" aria-labelledby="ws-common-title">
+        <div class="ws-panel-heading"><h2 id="ws-common-title">常用内容</h2><a class="ws-text-link" href="/clinical">查看临床栏目</a></div>
+        <div class="ws-rows">
+          <a class="ws-row" href="/classification"><span><strong>疾病分型</strong><small>影像特征、分型与手术指征</small></span><b aria-hidden="true">›</b></a>
+          <a class="ws-row" href="/ecg"><span><strong>心电图</strong><small>心电图基础、图谱与围手术期评估</small></span><b aria-hidden="true">›</b></a>
+          <a class="ws-row" href="/tools"><span><strong>临床工具</strong><small>常用评分、计算器与医学公式</small></span><b aria-hidden="true">›</b></a>
+        </div>
+      </section>
+      <section class="ws-panel" aria-labelledby="ws-dept-title">
+        <div class="ws-panel-heading"><h2 id="ws-dept-title">科室病历</h2><a class="ws-text-link" href="/bl">全部科室</a></div>
+        <div class="home-quick-grid">
+          <a href="/bl/guke"><span class="home-department-icon" aria-hidden="true">骨</span><div><strong>骨科</strong><small>创伤 · 关节置换</small></div><b aria-hidden="true">↗</b></a>
+          <a href="/bl/puwai"><span class="home-department-icon" aria-hidden="true">外</span><div><strong>普外科</strong><small>腹部外科 · 外科病历</small></div><b aria-hidden="true">↗</b></a>
+          <a href="/bl/shennei"><span class="home-department-icon" aria-hidden="true">肾</span><div><strong>肾内科</strong><small>肾功能 · 内科记录</small></div><b aria-hidden="true">↗</b></a>
+          <a href="/bl/fuke"><span class="home-department-icon" aria-hidden="true">妇</span><div><strong>妇科</strong><small>妇科疾病 · 围手术期</small></div><b aria-hidden="true">↗</b></a>
+        </div>
+        <a class="home-quick-pathway ws-text-link" href="/pathway">骨科临床路径中心 <span aria-hidden="true">→</span></a>
+      </section>
+    </div>
+    <div class="ws-stack">
+      <section class="ws-panel ws-accent" aria-labelledby="ws-ai-title">
+        <div class="ws-panel-heading"><h2 id="ws-ai-title">临床快捷操作</h2></div>
+        <a class="ws-row" href="/note"><span><strong>生成与核对病历</strong><small>DeepSeek · 整份生成与逐项生成</small></span><b aria-hidden="true">›</b></a>
+        <a class="ws-row" href="/duty"><span><strong>值班资料</strong><small>交班清单和床旁入口</small></span><b aria-hidden="true">›</b></a>
+      </section>
+      <section class="ws-panel" aria-labelledby="ws-learning-title">
+        <div class="ws-panel-heading"><h2 id="ws-learning-title">学习</h2><a class="ws-text-link" href="/study">进入学习</a></div>
+        <a class="ws-row" href="/ecg/quiz"><span><strong>心电图病例练习</strong><small>使用现有病例复习判读要点</small></span><b aria-hidden="true">›</b></a>
+        <p class="ws-status-line">个人医学考试资料待接入</p>
+      </section>
+      <section class="ws-panel" aria-labelledby="ws-links-title">
+        <div class="ws-panel-heading"><h2 id="ws-links-title">资料与收藏</h2></div>
+        <a class="ws-row" href="/materials"><span><strong>资料</strong><small>查找已发布的站内医学内容</small></span><b aria-hidden="true">›</b></a>
+        <a class="ws-row" href="/personal#favorites"><span><strong>我的收藏</strong><small>快速打开已收藏的病种</small></span><b aria-hidden="true">›</b></a>
+      </section>
+    </div>
+  </div>
+  <footer class="ws-footer">哈基米工作站 · 教学示例与临床参考</footer>
 </main>
 </div>
-<script defer src="/workspace.js?v=20261009-layout1"></script>
+<script defer src="/library-personal.js?v=1"></script>
+<script defer src="/workstation-cases.js?v=1"></script>
 <script defer src="/home.js?v=20261009-quality1"></script>
 </body></html>

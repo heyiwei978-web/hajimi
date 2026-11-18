@@ -49,6 +49,8 @@
     if(button){const active={department:button.dataset.department,group:button.dataset.group},selected=current.favorites.some(item=>same(item,active));button.textContent=selected?'★ 已收藏':'☆ 收藏病种';button.setAttribute('aria-pressed',String(selected));}
   }
   window.HAJIMI_PERSONAL={
+    snapshot(){return structuredClone(read());},
+    label,
     mount(){read();refresh();},
     remember(department,group){const item={department,group};if(!clean([item]).length)return;const current=read();write({...current,recent:[item,...current.recent.filter(value=>!same(value,item))].slice(0,12)});},
     bindFavorite(button,department,group){

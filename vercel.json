@@ -5,6 +5,38 @@
       "destination": "/home.html"
     },
     {
+      "source": "/clinical",
+      "destination": "/clinical.html"
+    },
+    {
+      "source": "/clinical/",
+      "destination": "/clinical.html"
+    },
+    {
+      "source": "/materials",
+      "destination": "/materials.html"
+    },
+    {
+      "source": "/materials/",
+      "destination": "/materials.html"
+    },
+    {
+      "source": "/study",
+      "destination": "/study.html"
+    },
+    {
+      "source": "/study/",
+      "destination": "/study.html"
+    },
+    {
+      "source": "/personal",
+      "destination": "/personal.html"
+    },
+    {
+      "source": "/personal/",
+      "destination": "/personal.html"
+    },
+    {
       "source": "/admin",
       "destination": "/admin.html"
     },
