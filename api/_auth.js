@@ -17,10 +17,19 @@ function sign(value, secret) {
   return crypto.createHmac('sha256', secret).update(value).digest('base64url');
 }
 
+// 会话版本号（可选）：HAJIMI_SESSION_VERSION 写进每个新会话。修改这个变量并重新部署，
+// 之前签发的所有会话立即失效，不用更换签名密钥。未设置时与旧会话（不带版本号）兼容，
+// 所以上线本功能不会让已登录的管理员掉线。
+function sessionVersion() {
+  const value = process.env.HAJIMI_SESSION_VERSION;
+  return typeof value === 'string' ? value.trim() : '';
+}
+
 export function createSession(user) {
   const secret = sessionSecret();
   if (!secret) throw new Error('Session signing is not configured');
-  const payload = Buffer.from(JSON.stringify({u: user, exp: Date.now() + 604800000})).toString('base64url');
+  const version = sessionVersion();
+  const payload = Buffer.from(JSON.stringify({u: user, exp: Date.now() + 604800000, ...(version ? {v: version} : {})})).toString('base64url');
   return payload + '.' + sign(payload, secret);
 }
 
@@ -36,6 +45,7 @@ export function readSession(req) {
     if (!crypto.timingSafeEqual(Buffer.from(sign(payload, secret)), Buffer.from(signature))) return null;
     const data = JSON.parse(Buffer.from(payload, 'base64url').toString());
     if (data.u !== (process.env.HAJIMI_ADMIN_USER || 'admin') || !Number.isFinite(data.exp) || Date.now() >= data.exp) return null;
+    if ((data.v === undefined ? '' : data.v) !== sessionVersion()) return null;
     return data;
   } catch { return null; }
 }

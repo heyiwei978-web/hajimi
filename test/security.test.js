@@ -69,6 +69,33 @@ test('missing signing secret rejects an empty-key forgery and prevents new sessi
   assert.equal(res.headers['set-cookie'],undefined);
 });
 
+test('HAJIMI_SESSION_VERSION revokes every earlier session without rotating the signing secret', t => {
+  const previous = process.env.HAJIMI_SESSION_VERSION;
+  t.after(() => { if (previous === undefined) delete process.env.HAJIMI_SESSION_VERSION; else process.env.HAJIMI_SESSION_VERSION = previous; });
+  delete process.env.HAJIMI_SESSION_VERSION;
+  const legacy = adminEnvironment(t);
+  const read = cookie => readSession(request({headers:{cookie}}));
+  assert.ok(read(legacy), 'without a version, existing sessions keep working after deploy');
+  assert.equal(JSON.parse(Buffer.from(legacy.slice('hajimi_session='.length).split('.')[0],'base64url')).v, undefined);
+
+  process.env.HAJIMI_SESSION_VERSION = '20261119';
+  assert.equal(read(legacy), null, 'setting a version for the first time logs out older sessions');
+  const current = 'hajimi_session=' + createSession('test-admin');
+  assert.equal(read(current).v, '20261119');
+
+  process.env.HAJIMI_SESSION_VERSION = ' 20261119 ';
+  assert.ok(read(current), 'surrounding whitespace in the variable is ignored');
+
+  process.env.HAJIMI_SESSION_VERSION = '20261120';
+  assert.equal(read(current), null, 'changing the version logs out every session signed under the old one');
+
+  delete process.env.HAJIMI_SESSION_VERSION;
+  assert.equal(read(current), null, 'removing the version does not revive versioned sessions');
+  const forgedPayload = Buffer.from(JSON.stringify({u:'test-admin',exp:Date.now()+60000,v:''})).toString('base64url');
+  const forged = 'hajimi_session='+forgedPayload+'.'+crypto.createHmac('sha256','wrong-secret').update(forgedPayload).digest('base64url');
+  assert.equal(read(forged), null);
+});
+
 test('expired, tampered, extra-part and malformed-cookie sessions are rejected', t => {
   const cookie = adminEnvironment(t);
   const valid = cookie.slice('hajimi_session='.length);
