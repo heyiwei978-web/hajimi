@@ -23,7 +23,7 @@
 - 推荐：`HAJIMI_ADMIN_PASSWORD_HASH`，加盐哈希。最简单的方式是打开网站的 `/admin/password` 页面，在浏览器内生成 PBKDF2-SHA256（60 万次迭代）校验码，密码不会离开本机；也可在本地运行 `node scripts/hash-password.mjs` 生成 scrypt 哈希（密码至少 12 个字符）。填入 Vercel 后重新部署，再删除旧的 `HAJIMI_ADMIN_PASSWORD_SHA256`。
 - 兼容：未设置上述变量时，仍使用 `HAJIMI_ADMIN_PASSWORD_SHA256`（无盐 SHA-256，泄露后易被离线破解，建议尽快替换）。
 
-会话密钥应使用至少 32 字节的随机值。会话有效期 7 天，“退出”只清除当前浏览器的 Cookie；如怀疑会话被盗用，修改（或首次设置）`HAJIMI_SESSION_VERSION` 并重新部署，即可让所有已签发会话立即失效，不必更换签名密钥；值可以是任意不含敏感信息的短文本，例如日期 `20261119`。更换 `HAJIMI_SESSION_SECRET` 同样会让全部会话失效。敏感值只在 Vercel Environment Variables 中安全填写，不提交到 GitHub。
+会话密钥应使用至少 32 字节的随机值。会话有效期 12 小时，管理操作或打开管理页面时自动续期（签发超过 30 分钟才换发），但从登录起最长 7 天，到期必须重新登录；本规则上线前签发的旧格式会话一律无效，需要重新登录一次。“退出”只清除当前浏览器的 Cookie；如怀疑会话被盗用，修改（或首次设置）`HAJIMI_SESSION_VERSION` 并重新部署，即可让所有已签发会话立即失效，不必更换签名密钥；值可以是任意不含敏感信息的短文本，例如日期 `20261119`。更换 `HAJIMI_SESSION_SECRET` 同样会让全部会话失效。敏感值只在 Vercel Environment Variables 中安全填写，不提交到 GitHub。
 
 ## Vercel 边缘防火墙：需要单独启用
 
