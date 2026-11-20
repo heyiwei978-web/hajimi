@@ -23,22 +23,35 @@ test('build validation reports broken related links, unknown sketches and insecu
   assert.match(errors,/reference must use https/);
 });
 
-test('compiler publishes one hashed bundle and rewrites ecg.html to load it',()=>{
+test('compiler publishes a hashed shell and a hashed data bundle and rewrites ecg.html to load them',()=>{
   const directory=mkdtempSync(join(tmpdir(),'ecg-'));
   try{
     const result=compileEcg(pathToFileURL(directory+'/'));
     assert.match(result.name,/^ecg-[0-9a-f]{20}\.js$/);
+    assert.match(result.dataName,/^ecg-data-[0-9a-f]{20}\.js$/);
     assert.equal(result.entries,94);
     const html=readFileSync(join(directory,'ecg.html'),'utf8');
-    assert.match(html,new RegExp('src="/assets/'+result.name+'"'));
+    assert.match(html,new RegExp('<script defer src="/assets/'+result.name+'"></script>'));
+    // The data bundle is not a page script: route-shell.js or ecg.js loads it from the meta.
+    assert.match(html,new RegExp('<meta name="hajimi-ecg-data" content="/assets/'+result.dataName+'">\n</head>'));
+    assert(!html.includes('<script defer src="/assets/'+result.dataName),'data bundle must not block the /ecg home page');
     for(const file of ECG_SOURCES)assert(!html.includes('/'+file+'?'),file+' should be bundled');
-    const bundle=readFileSync(join(directory,'assets',result.name),'utf8');
-    const window={};runInNewContext(bundle.replace(/\n;\n\(\(\)=>\{\n  'use strict';\n  const data=window\.HAJIMI_ECG_DATA,app[\s\S]*$/,''),{window,document:{}});
-    assert.equal(window.HAJIMI_ECG_DATA.entries.length,94);
-    assert.equal(typeof window.HAJIMI_ECG_SEARCH.create,'function');
-    assert.equal(typeof window.HAJIMI_ECG_CALIPERS.reading,'function');
-    // The same input always yields the same file name, so the immutable cache is safe.
-    assert.equal(compileEcg(pathToFileURL(directory+'/')).name,result.name);
+    // The data bundle defines the data, sketches and classic drawings without needing the shell.
+    const dataWindow={};runInNewContext(readFileSync(join(directory,'assets',result.dataName),'utf8'),{window:dataWindow});
+    assert.equal(dataWindow.HAJIMI_ECG_DATA.entries.length,94);
+    assert.equal(typeof dataWindow.HAJIMI_ECG_WAVEFORMS.render,'function');
+    assert.equal(typeof dataWindow.HAJIMI_ECG_CLASSIC.render,'function');
+    // The shell holds no ECG data; its helpers work before the data arrives.
+    const shell=readFileSync(join(directory,'assets',result.name),'utf8');
+    assert(!shell.includes('HAJIMI_ECG_DATA=JSON.parse'),'shell must not embed the data');
+    assert(shell.length*3<readFileSync(join(directory,'assets',result.dataName),'utf8').length,'shell is a small fraction of the data');
+    const shellWindow={};runInNewContext(shell,{window:shellWindow,document:{getElementById:()=>null}});
+    assert.equal(typeof shellWindow.HAJIMI_ECG_SEARCH.create,'function');
+    assert.equal(typeof shellWindow.HAJIMI_ECG_CALIPERS.reading,'function');
+    assert.equal(typeof shellWindow.HAJIMI_ECG_CALCULATORS,'object');
+    // The same input always yields the same file names, so the immutable cache is safe.
+    const again=compileEcg(pathToFileURL(directory+'/'));
+    assert.equal(again.name,result.name);assert.equal(again.dataName,result.dataName);
   }finally{rmSync(directory,{recursive:true,force:true});}
 });
 

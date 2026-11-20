@@ -99,6 +99,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     assertPublicResources(directory,JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8')),manifest);
     console.log('Built lightweight homepage and clinical library in dist/');
     console.log('Built site search index ('+search.documents.length+' entries)');
-    console.log('Built ECG bundle assets/'+ecg.name+' ('+ecg.entries+' entries, '+Math.round(ecg.bytes/1024)+' KB)');
+    console.log('Built ECG shell assets/'+ecg.name+' ('+Math.round(ecg.bytes/1024)+' KB) and data assets/'+ecg.dataName+' ('+ecg.entries+' entries, '+Math.round(ecg.dataBytes/1024)+' KB)');
   }
 }
