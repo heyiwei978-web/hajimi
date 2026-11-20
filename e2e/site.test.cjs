@@ -987,6 +987,41 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
   }
 });
 
+test('record library cards are real links: href deep links, in-page navigation on click or Enter, new tab with Ctrl',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await page.goto(base+'/bl',{waitUntil:'networkidle'});
+    assert.equal(await page.locator('[role="button"].department-card,[role="button"].ortho-disease-card,[role="button"].disease-card,[role="button"].case-search-card,article.department-card').count(),0,'no clickable non-link cards');
+    const dept=page.locator('a.library-department-card[href="/bl/puwai"]');
+    assert.equal(await dept.count(),1);
+    await page.evaluate(()=>{window.__libraryMarker=1;});
+    await dept.click();await page.waitForURL(base+'/bl/puwai');
+    assert.equal(await page.evaluate(()=>window.__libraryMarker),1,'plain click stays in the page');
+    const disease=page.locator('a.disease-card').first();
+    assert.match(await disease.getAttribute('href'),/^\/bl\/puwai\/[^/]+$/);
+    // Ctrl/⌘-click opens the card's own URL in a new tab and leaves this page alone.
+    const href=await disease.getAttribute('href');
+    const popup=context.waitForEvent('page');
+    await disease.click({modifiers:[process.platform==='darwin'?'Meta':'Control']});
+    const opened=await popup;await opened.waitForLoadState('domcontentloaded');
+    assert.equal(new URL(opened.url()).pathname,new URL(base+href).pathname);
+    await opened.close();
+    assert.equal(new URL(page.url()).pathname,'/bl/puwai');
+    // Keyboard: Tab focus + Enter follows the link in-page.
+    await disease.focus();await page.keyboard.press('Enter');
+    await page.waitForURL(url=>url.pathname===new URL(base+href).pathname);
+    assert.equal(await page.evaluate(()=>window.__libraryMarker),1);
+    // Orthopaedic index and search results use links too.
+    await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
+    const ortho=page.locator('a.ortho-disease-card[href^="/bl/guke/"]');
+    assert((await ortho.count())>0);
+    await page.goto(base+'/bl?q=%E8%82%9D%E8%84%93%E8%82%BF',{waitUntil:'networkidle'});
+    await page.locator('a.case-search-card').first().waitFor();
+    assert.match(await page.locator('a.case-search-card').first().getAttribute('href'),/^\/bl\/puwai\//);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('ECG framework navigates in-page, searches the whole section from the keyboard and measures sketches with calipers',async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width);
