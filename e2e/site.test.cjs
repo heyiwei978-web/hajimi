@@ -50,6 +50,8 @@ async function pageFor(width=1440, options={}) {
   const page = await context.newPage();
   const errors=[];
   page.on('pageerror',error=>errors.push(error.message));
+  // vercel.json 的 CSP 已加到每个响应上：被拦下的内联样式、脚本等只出现在控制台，这里一并当作页面错误。
+  page.on('console',message=>{if(message.type()==='error'&&/Content Security Policy/i.test(message.text()))errors.push('CSP: '+message.text());});
   return {page, context, errors};
 }
 async function mockNote(page, handler, classify=()=>({route:'separate'})) {
