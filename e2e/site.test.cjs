@@ -1361,6 +1361,8 @@ test('every original orthopedic disease now explains fracture-line morphology an
   ];
   for(const [id,n,code,feature] of cases){
    await page.goto(base+'/classification/guke/'+id,{waitUntil:'domcontentloaded'});
+   // 逐型详情按需加载（P1-3），渲染在 DOMContentLoaded 之后完成。
+   await page.locator('#class-types').waitFor();
    const cards=page.locator('.class-type-detailed');
    const actual=await cards.count();
    if(actual!==n){
