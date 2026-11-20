@@ -6,7 +6,7 @@ import {pathToFileURL} from 'node:url';
 import {runInNewContext} from 'node:vm';
 import {test} from 'node:test';
 import {loadEcg,validateEcg,compileEcg,ECG_SOURCES} from '../scripts/ecg-compiler.mjs';
-import {sourcePath} from '../scripts/public-assets.mjs';
+import {sourcePath,PUBLIC_FILES} from '../scripts/public-assets.mjs';
 
 const read=file=>readFileSync(new URL('../'+sourcePath(file),import.meta.url),'utf8');
 function withSearch(){const window=loadEcg();runInNewContext(read('js/ecg-search.js'),{window});return window;}
@@ -40,6 +40,14 @@ test('compiler publishes one hashed bundle and rewrites ecg.html to load it',()=
     // The same input always yields the same file name, so the immutable cache is safe.
     assert.equal(compileEcg(pathToFileURL(directory+'/')).name,result.name);
   }finally{rmSync(directory,{recursive:true,force:true});}
+});
+
+test('ECG source files are compiled into the bundle and not published on their own; /search keeps ecg-search.js',()=>{
+  const compileOnly=[...ECG_SOURCES,'ecg-calipers.js','ecg.js'];
+  for(const file of compileOnly)assert(!PUBLIC_FILES.includes(file),file+' is only an input of the ECG bundle');
+  assert(PUBLIC_FILES.includes('ecg-search.js'),'/search loads ecg-search.js directly');
+  assert.match(read('search.html'),/<script defer src="\/ecg-search\.js\?/);
+  for(const file of compileOnly)assert(!read('search.html').includes('/'+file+'?'),file+' must not be loaded by /search');
 });
 
 test('hashed assets are served with an immutable cache policy',()=>{
