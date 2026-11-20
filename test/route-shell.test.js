@@ -57,3 +57,29 @@ test('the library and ECG pages load it synchronously at the top of <body>',()=>
   const compiler=readFileSync(new URL('../scripts/clinical-compiler.mjs',import.meta.url),'utf8');
   assert.match(compiler,/replace\('<body>','<body>\\n<script src="\/route-shell\.js\?v=[^"]+"><\/script>'\)/);
 });
+
+// 2026-11-20（P1-3）：心电图资料包在 <body> 开头开始下载，首页除外。
+test('route-shell starts the ECG data download on every /ecg route except the home page',()=>{
+  const context={window:{}};
+  runInNewContext(readFileSync(new URL('../js/route-shell.js',import.meta.url),'utf8'),context,{filename:'route-shell.js'});
+  const {needsEcgData,preloadEcgData}=context.window.HAJIMI_ROUTE_SHELL;
+  for(const path of ['/ecg','/ecg/','/ecg.html','/','/bl/guke','/classification'])assert.equal(needsEcgData(path),false,path);
+  for(const path of ['/ecg/basics','/ecg/atlas','/ecg/atlas/arrhythmia/af','/ecg/classic/practice','/ecg/tools'])assert.equal(needsEcgData(path),true,path);
+  const appended=[];
+  const doc=meta=>({
+    getElementById:()=>null,
+    querySelector:()=>meta?{getAttribute:()=>meta}:null,
+    createElement:()=>({attrs:{},setAttribute(key,value){this.attrs[key]=value;}}),
+    head:{appendChild:node=>appended.push(node)}
+  });
+  assert.equal(preloadEcgData(doc('/assets/ecg-data-x.js'),'/ecg'),null,'home renders without the data');
+  const script=preloadEcgData(doc('/assets/ecg-data-x.js'),'/ecg/atlas');
+  assert.equal(script.src,'/assets/ecg-data-x.js');assert.equal(script.async,true);assert.equal(script.id,'ecgDataScript');
+  assert.equal(appended.length,1);
+  script.onerror();assert.equal(script.attrs['data-state'],'error','ecg.js can tell a failed download from a pending one');
+  assert.equal(preloadEcgData(doc(null),'/ecg/atlas'),null,'unbuilt source pages have no meta and load the data themselves');
+  // ecg.js waits for exactly this element.
+  const ecg=readFileSync(new URL('../js/ecg.js',import.meta.url),'utf8');
+  assert.match(ecg,/getElementById\('ecgDataScript'\)/);assert.match(ecg,/dataset\.state==='error'/);
+  assert.match(ecg,/meta\[name="hajimi-ecg-data"\]/);
+});

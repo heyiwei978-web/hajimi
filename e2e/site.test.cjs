@@ -987,6 +987,28 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
   }
 });
 
+test('ECG data bundle: a failed download shows a message, and a search typed before the data arrives still answers',async()=>{
+  const {page,context,errors}=await pageFor(375);
+  try{
+    // Direct landing on a data page while the data bundle is unreachable.
+    await context.route(/\/assets\/ecg-data-[0-9a-f]{20}\.js$/,route=>route.abort());
+    await page.goto(base+'/ecg/atlas',{waitUntil:'networkidle'});
+    await page.waitForFunction(()=>document.getElementById('ecgApp').textContent.includes('暂时无法加载'));
+    await context.unroute(/\/assets\/ecg-data-[0-9a-f]{20}\.js$/);
+    // The home page renders without the data; the search waits for it instead of failing.
+    let release;const held=new Promise(resolve=>{release=resolve;});
+    await context.route(/\/assets\/ecg-data-[0-9a-f]{20}\.js$/,async route=>{await held;await route.continue();});
+    await page.goto(base+'/ecg',{waitUntil:'domcontentloaded'});
+    await page.locator('#ecgApp .ecg-entry-grid').waitFor();
+    await page.locator('#ecgGlobalSearch').fill('房颤');
+    assert(await page.locator('#ecgGlobalResults').isHidden(),'no results before the data arrives');
+    release();
+    await page.locator('#ecgGlobalResults [role="option"]').first().waitFor();
+    assert.match(await page.locator('#ecgGlobalResults').innerText(),/心房颤动/);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('ECG framework navigates in-page, searches the whole section from the keyboard and measures sketches with calipers',async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width);
@@ -994,8 +1016,11 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
       const scripts=[];page.on('request',request=>{if(request.resourceType()==='script')scripts.push(new URL(request.url()).pathname);});
       await page.goto(base+'/ecg',{waitUntil:'networkidle'});
       const bundle=scripts.filter(item=>/^\/assets\/ecg-[0-9a-f]{20}\.js$/.test(item));
-      assert.equal(bundle.length,1,'one hashed ECG bundle');
-      assert.equal(scripts.filter(item=>/\/ecg-(?:data|book-data)/.test(item)).length,0,'source data files are bundled');
+      assert.equal(bundle.length,1,'one hashed ECG shell bundle');
+      assert.equal(scripts.filter(item=>/^\/ecg-(?:data|book-data)/.test(item)).length,0,'source data files are bundled');
+      // P1-3：资料包单独成包，首页最多在空闲时预取一次，之后的站内跳转不再下载。
+      assert(scripts.filter(item=>/^\/assets\/ecg-data-[0-9a-f]{20}\.js$/.test(item)).length<=1,'the data bundle is fetched at most once');
+      const fetched=scripts.length;
       // In-section links render without another document load or data download.
       await page.evaluate(()=>{window.__ecgMarker=1;});
       await page.locator('#ecgApp a[href="/ecg/atlas"]').first().click();
@@ -1003,6 +1028,7 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
       assert.equal(await page.locator('h1').innerText(),'图谱库');
       assert.equal(await page.evaluate(()=>window.__ecgMarker),1,'no full page reload');
       assert(await page.locator('#ecgGlobalSearchForm').isHidden(),'atlas uses its own filter');
+      assert(scripts.slice(fetched).every(item=>/^\/assets\/ecg-data-[0-9a-f]{20}\.js$/.test(item)),'in-section navigation loads nothing but (at most) the data bundle');
       await page.locator('a[href="/ecg/atlas/pulmonary"]').first().click();
       await page.locator('a[href="/ecg/atlas/pulmonary/pulmonary-embolism"]').click();
       await page.waitForURL(base+'/ecg/atlas/pulmonary/pulmonary-embolism');
@@ -1018,7 +1044,8 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
       await page.goBack();await settle(page);await page.goBack();await settle(page);
       assert.equal(await page.locator('h1').innerText(),'心电图');
       assert.equal(await page.locator('#ecgReviewFooter').innerText().then(text=>/参考文献：见各栏目及词条/.test(text)),true,'footer metadata resets');
-      assert.equal(scripts.filter(item=>item.startsWith('/assets/ecg-')).length,1,'bundle downloaded once');
+      assert.equal(scripts.filter(item=>/^\/assets\/ecg-[0-9a-f]{20}\.js$/.test(item)).length,1,'shell bundle downloaded once');
+      assert.equal(scripts.filter(item=>/^\/assets\/ecg-data-[0-9a-f]{20}\.js$/.test(item)).length,1,'data bundle downloaded once');
       // Global search: "/" focuses, results span long-form pages, keyboard opens the result.
       await page.keyboard.press('/');
       assert.equal(await page.evaluate(()=>document.activeElement.id),'ecgGlobalSearch');
