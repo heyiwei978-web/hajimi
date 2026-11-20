@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import {createMemoryLimiter} from './_memory-limit.js';
 
 // 错误记录（2026-11-18）。两类来源：
 //   - 前端：error-report.js 把本站脚本的报错摘要发到 /api/login-log?feed=errors（公开写入，限制见该文件）。
@@ -10,7 +11,10 @@ import crypto from 'node:crypto';
 // 报错文字里 6 位以上的连续数字替换为 #，避免带出编号类信息。
 // @vercel/blob 在运行时才动态加载，未安装依赖的环境（本地单测）可注入内存存储。
 const PATHNAME = 'monitoring/errors.json';
-export const LIMITS = Object.freeze({entries: 100, message: 300, path: 200, reportsPerWindow: 20, windowMs: 10 * 60 * 1000});
+// dedupeMs：同一实例内，同一种前端报错在此时间内只写一次存储，其余次数先在内存累加，下次写入时并入。
+// dailyReports：全站每天（UTC）最多写入的前端上报条数，超过后当天只丢弃、不写存储。
+export const LIMITS = Object.freeze({entries: 100, message: 300, path: 200, reportsPerWindow: 20, windowMs: 10 * 60 * 1000,
+  dedupeMs: 10 * 60 * 1000, dailyReports: 300, recentKinds: 500});
 export const KINDS = new Set(['error', 'rejection', 'resource', 'server']);
 
 const header = (req, name) => {
@@ -60,26 +64,31 @@ export function createMonitor({storage, now = () => new Date(), pathname = PATHN
     await s.put(name, JSON.stringify(value), {access: 'private', allowOverwrite: true, contentType: 'application/json; charset=utf-8'});
     return true;
   }
+  const entriesOf = document => (Array.isArray(document?.entries) ? document.entries.filter(isEntry) : []).slice(0, LIMITS.entries);
   async function read() {
-    const document = await readJson(pathname);
-    const entries = Array.isArray(document?.entries) ? document.entries.filter(isEntry) : [];
-    return {entries: entries.slice(0, LIMITS.entries)};
+    return {entries: entriesOf(await readJson(pathname))};
   }
   // 尽力而为：记录失败不能影响正常请求。
-  async function record(entry, req) {
+  // extra：内存中尚未写入的同类次数；daily：计入并受全站每日上限约束（只用于公开的前端上报）。
+  async function record(entry, req, {extra = 0, daily = false} = {}) {
     try {
-      const at = now().toISOString();
+      const date = now();
+      const at = date.toISOString(), day = at.slice(0, 10);
       const item = {...entry, id: fingerprint(entry)};
-      const {entries} = await read();
+      const document = await readJson(pathname);
+      const entries = entriesOf(document);
+      const dayWrites = document?.day === day ? Number(document.dayWrites) || 0 : 0;
+      if (daily && dayWrites >= LIMITS.dailyReports) return false;
       const existing = entries.find(e => e.id === item.id);
+      const added = 1 + Math.max(0, Math.floor(Number(extra) || 0));
       const merged = existing
-        ? {...existing, page: item.page || existing.page, count: (Number(existing.count) || 1) + 1, last: at}
-        : {...item, count: 1, first: at, last: at};
+        ? {...existing, page: item.page || existing.page, count: (Number(existing.count) || 1) + added, last: at}
+        : {...item, count: added, first: at, last: at};
       merged.agent = clean(header(req, 'user-agent'), 200);
       merged.country = clean(header(req, 'x-vercel-ip-country'), 8);
       const next = [merged, ...entries.filter(e => e.id !== item.id)]
         .sort((a, b) => String(b.last).localeCompare(String(a.last))).slice(0, LIMITS.entries);
-      return await writeJson(pathname, {version: 1, entries: next});
+      return await writeJson(pathname, {version: 1, entries: next, day, dayWrites: dayWrites + (daily ? 1 : 0)});
     } catch { return false; }
   }
   async function clear() {
@@ -98,7 +107,29 @@ export function createMonitor({storage, now = () => new Date(), pathname = PATHN
       return await writeJson(name, {windowStart: same ? Number(state.windowStart) : nowMs, count: count + 1});
     } catch { return false; }
   }
-  return {read, record, clear, allowReport};
+  // 公开上报的入口，按花费从低到高检查，能在内存里拦下的就不碰存储：
+  //   1. 同一种报错在 dedupeMs 内已写过 → 只在内存累加次数；
+  //   2. 同一网络地址在本实例的窗口内已达上限 → 丢弃；
+  //   3. 存储中的网络地址计数（allowReport）→ 4. 写入（record，受全站每日上限约束）。
+  const recent = new Map();
+  const ipMemory = createMemoryLimiter({windowMs: LIMITS.windowMs, now: () => now().getTime()});
+  async function accept(entry, req) {
+    const nowMs = now().getTime(), id = fingerprint(entry);
+    const seen = recent.get(id);
+    if (seen && nowMs - seen.at < LIMITS.dedupeMs) { seen.pending += 1; return false; }
+    const ip = (header(req, 'x-forwarded-for').split(',')[0] || 'unknown').trim().slice(0, 128);
+    const ipKey = crypto.createHash('sha256').update(ip).digest('hex');
+    if (ipMemory.count(ipKey, nowMs) >= LIMITS.reportsPerWindow) return false;
+    ipMemory.add(ipKey, nowMs);
+    // 在任何 await 之前登记，同一实例里的并发重复上报也会被合并。
+    const extra = seen ? seen.pending : 0;
+    recent.delete(id);
+    recent.set(id, {at: nowMs, pending: 0});
+    while (recent.size > LIMITS.recentKinds) recent.delete(recent.keys().next().value);
+    if (!(await allowReport(req))) { recent.get(id).pending += extra; return false; }
+    return record(entry, req, {extra, daily: true});
+  }
+  return {read, record, clear, allowReport, accept};
 }
 
 export const monitor = createMonitor();
