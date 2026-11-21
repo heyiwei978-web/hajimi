@@ -3,7 +3,7 @@
   "files": {
     "admin.css": {
       "important": 1,
-      "colorLiterals": 58
+      "colorLiterals": 46
     },
     "case-workspace-preview.css": {
       "important": 15,
@@ -11,7 +11,7 @@
     },
     "classification.css": {
       "important": 3,
-      "colorLiterals": 135
+      "colorLiterals": 58
     },
     "cms.css": {
       "important": 3,
@@ -27,11 +27,11 @@
     },
     "ecg.css": {
       "important": 10,
-      "colorLiterals": 81
+      "colorLiterals": 62
     },
     "labs.css": {
       "important": 1,
-      "colorLiterals": 76
+      "colorLiterals": 29
     },
     "library-personal.css": {
       "important": 1,
@@ -47,7 +47,7 @@
     },
     "pathway.css": {
       "important": 2,
-      "colorLiterals": 95
+      "colorLiterals": 61
     },
     "personal-workstation.css": {
       "important": 0,
@@ -59,7 +59,7 @@
     },
     "site-search.css": {
       "important": 0,
-      "colorLiterals": 45
+      "colorLiterals": 21
     },
     "styles.css": {
       "important": 74,
@@ -67,7 +67,7 @@
     },
     "theme.css": {
       "important": 8,
-      "colorLiterals": 106
+      "colorLiterals": 74
     },
     "tools-page.css": {
       "important": 2,

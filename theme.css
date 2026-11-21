@@ -3,14 +3,14 @@
 
 /* ===== 以下原为 accessibility.css ===== */
 .patient-strip[hidden]{display:none!important}
-.skip-link{position:fixed;top:10px;left:16px;z-index:3000;padding:10px 16px;border:2px solid #047b90;border-radius:8px;background:#fff;color:#0c5564;font-size:16px;font-weight:700;text-decoration:none;transform:translateY(-160%)}
+.skip-link{position:fixed;top:10px;left:16px;z-index:3000;padding:10px 16px;border:2px solid #047b90;border-radius:8px;background:#fff;color:var(--ds-blue-strong);font-size:16px;font-weight:700;text-decoration:none;transform:translateY(-160%)}
 .skip-link:focus{transform:none;outline:3px solid #047b90;outline-offset:2px}
 button:focus-visible,a:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #047b90;outline-offset:3px}
 main:focus{outline:none}
 .search-more{display:flex;justify-content:center;padding:20px 0;gap:12px;align-items:center}
-.search-more span{font-size:14px;color:#5d6f75}
+.search-more span{font-size:14px;color:var(--ds-muted)}
 .template-grid.search-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}
-.search-results .card{display:flex;flex-direction:column;min-width:0;padding:20px;border:1px solid #dfe7e9;border-radius:14px;background:#fff}
+.search-results .card{display:flex;flex-direction:column;min-width:0;padding:20px;border:1px solid var(--ds-line);border-radius:14px;background:#fff}
 .search-results .card h3{font-size:17px;overflow-wrap:anywhere}
 .search-results .card p{font-size:14px;line-height:1.75;margin-bottom:16px;overflow-wrap:anywhere}
 .search-results .tag{font-size:12px}
@@ -20,10 +20,10 @@ main:focus{outline:none}
 @media(max-width:640px){.search-more{flex-wrap:wrap}}
 @media print{.skip-link,.search-more{display:none!important}}
 @media screen{
-  .ortho-card-top,.department-card-top,.record-chapter-title>span,.record-book-toc-head p,.record-book-toc a>span,.feature-eyebrow{color:#5d6f75}
-  .top,.source-tag,.bottom>a:not(.openext),.sectionhead p,#formulaCount{color:#5d6f75}
+  .ortho-card-top,.department-card-top,.record-chapter-title>span,.record-book-toc-head p,.record-book-toc a>span,.feature-eyebrow{color:var(--ds-muted)}
+  .top,.source-tag,.bottom>a:not(.openext),.sectionhead p,#formulaCount{color:var(--ds-muted)}
 }
-.library-loading{padding:24px;border:1px solid #dfe7e9;border-radius:12px;background:#fff;color:#5d6f75;font-size:15px}
+.library-loading{padding:24px;border:1px solid var(--ds-line);border-radius:12px;background:#fff;color:var(--ds-muted);font-size:15px}
 @media print{.library-loading{display:none!important}}
 
 /* ===== 以下原为 workspace-design.css ===== */
@@ -91,7 +91,7 @@ main:focus{outline:none}
   #libraryShell .patient-strip[hidden]{display:none}
   #libraryShell .controls-section,.library-root-page #libraryShell .controls-section{margin:0 0 24px;padding:20px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);background:#fff;box-shadow:none}
   #libraryShell .controls-section h2{font-size:1.0625rem;margin:0 0 14px;line-height:1.5}
-  #libraryShell .searchbox,.library-root-page #libraryShell .searchbox{height:52px;border:1px solid #a9d8de;border-radius:10px;background:#fff;box-shadow:none}
+  #libraryShell .searchbox,.library-root-page #libraryShell .searchbox{height:52px;border:1px solid var(--ds-line-strong);border-radius:10px;background:#fff;box-shadow:none}
 
   #libraryShell .searchbox input{font-size:1rem;color:var(--ws-ink)}
   #libraryShell .searchbox kbd{flex-shrink:0;white-space:nowrap;font-size:12px;padding:3px 6px}
@@ -102,7 +102,7 @@ main:focus{outline:none}
   #libraryShell .result-head{gap:12px;align-items:center;margin-bottom:16px;padding:0;flex-wrap:wrap}
   #libraryShell .result-head h2{font-size:1.375rem;line-height:1.5;min-width:0}
   #libraryShell .result-head>div{font-size:.8125rem;color:var(--ws-muted);flex-wrap:wrap}
-  #libraryShell .stat-line{border-radius:8px;background:#eef7f8;color:var(--ws-muted);font-size:.8125rem}
+  #libraryShell .stat-line{border-radius:8px;background:var(--ds-blue-50);color:var(--ws-muted);font-size:.8125rem}
   .library-overview{grid-template-columns:minmax(0,1.1fr) minmax(320px,1fr);align-items:center;gap:28px;padding:24px;margin:0 0 24px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);background:#fff;color:var(--ws-ink);}
   .library-overview-copy>span{color:var(--ws-blue);font-size:12px}
   .library-overview h2{color:var(--ws-ink);font-size:1.5rem;line-height:1.55;letter-spacing:0}
@@ -176,18 +176,18 @@ main:focus{outline:none}
   /* Quiet paper and a strong current-directory state support sustained reading. */
   .record-book-hero{padding:28px;border-radius:var(--ws-radius);background:#02404b;box-shadow:none}
   .record-book-hero h2{font-size:2rem;line-height:1.4;color:#fff}
-  .record-book-hero p{color:#d5ecef;font-size:1rem;line-height:1.8}
+  .record-book-hero p{color:var(--ds-blue-100);font-size:1rem;line-height:1.8}
   .record-book-hero-stats div{box-shadow:none}
   #libraryShell .record-book-hero .btn.primary{background:#fff;color:var(--ws-blue);border-color:#fff}
   #libraryShell .record-book-hero .btn.ghost{background:transparent;color:#fff;border-color:#9db7be}
-  .source-template-note{padding:14px 18px;border-radius:10px;font-size:.9375rem;line-height:1.8;background:#eef7f8;border-color:#dfe7e9;color:var(--ws-text)}
+  .source-template-note{padding:14px 18px;border-radius:10px;font-size:.9375rem;line-height:1.8;background:var(--ds-blue-50);border-color:var(--ds-line);color:var(--ws-text)}
   .case-file-sidebar{border-color:var(--ws-line)!important;border-radius:var(--ws-radius)!important;background:#fff}
   .case-file-sidebar .record-book-toc-head{background:#fff;padding:20px;border-color:var(--ws-line)}
   .case-file-sidebar .record-book-toc-head h3{font-size:1.25rem;color:var(--ws-ink)}
   .case-nav-family h4{color:var(--ws-blue)}
   .case-nav-group[open]{background:#fff;border-color:var(--ws-line)}
   .case-file-sidebar .case-nav-item.is-current{color:var(--ws-blue);}
-  .case-file-sidebar .case-nav-item:hover{background:#f5f8f8}
+  .case-file-sidebar .case-nav-item:hover{background:var(--ds-bg)}
   .case-file-tools,.case-file-bottom-nav{border-color:var(--ws-line);border-radius:13px;box-shadow:none}
   .case-file-tools strong,.case-file-bottom-nav strong{color:var(--ws-ink)}
   .case-file-tools small{color:var(--ws-muted)}
@@ -212,7 +212,7 @@ main:focus{outline:none}
   .tools-page .notice{margin-bottom:24px}
   .tools-page .notice strong,.tools-page .notice span{font-size:.9375rem;color:var(--ws-muted)}
   .tools-page .formula-toolbar{margin:0 0 28px;gap:12px}
-  .tools-page .formula-search{height:52px;min-width:0;border-color:#a9d8de;border-radius:10px}
+  .tools-page .formula-search{height:52px;min-width:0;border-color:var(--ds-line-strong);border-radius:10px}
   .tools-page .formula-search input{font-size:1rem;min-width:0}
   .tools-page #formulaCount{font-size:.875rem}
   .tools-page .section{margin-bottom:32px}
@@ -263,7 +263,7 @@ main:focus{outline:none}
   .duty-card-head p,.duty-task-form label,.duty-notes label{font-size:.9375rem;color:var(--ws-muted);line-height:1.8}
   .duty-link-grid a{background:#fff;border-color:var(--ws-line);border-radius:12px;color:var(--ws-blue)}
   .duty-link-grid span{color:var(--ws-muted);font-size:.9375rem}
-  .admin-tool-card.primary{border-color:#a9d8de;background:#f5f8f8}
+  .admin-tool-card.primary{border-color:var(--ds-line-strong);background:var(--ds-bg)}
   .admin-primary{background:var(--ws-blue);border-color:var(--ws-blue)}
   .admin-secondary{color:var(--ws-blue);border-color:var(--ws-line)}
 }
@@ -437,8 +437,8 @@ main:focus{outline:none}
   .record-book-body,.case-workspace .record-book-body,.record-paper,
   .case-file-sidebar .case-nav-item b,.record-book-toc a>b,.special-case-toc a b{font-size:var(--clinical-font-size,18px)}
   .case-file-sidebar .case-nav-item{border:1px solid transparent}
-  .case-file-sidebar .case-nav-item.is-current{border-color:#a2c9d3;background:#eef7f8;box-shadow:inset 4px 0 var(--ws-blue)}
-  .case-file-sidebar .case-nav-item>.case-nav-current-label{display:none;grid-column:2;justify-self:start;margin:0;padding:2px 6px;border:0;border-radius:4px;background:#d5ecef;color:var(--ws-blue);font-size:.75rem;line-height:1.5;font-weight:650}
+  .case-file-sidebar .case-nav-item.is-current{border-color:#a2c9d3;background:var(--ds-blue-50);box-shadow:inset 4px 0 var(--ws-blue)}
+  .case-file-sidebar .case-nav-item>.case-nav-current-label{display:none;grid-column:2;justify-self:start;margin:0;padding:2px 6px;border:0;border-radius:4px;background:var(--ds-blue-100);color:var(--ws-blue);font-size:.75rem;line-height:1.5;font-weight:650}
   .case-file-sidebar .case-nav-item.is-current>.case-nav-current-label{display:block}
 }
 @media screen and (max-width:640px){
@@ -497,18 +497,18 @@ main:focus{outline:none}
 
 /* 全站统一免责声明（心电图页沿用自有页脚） */
 @media screen{
-  .site-disclaimer{max-width:1180px;margin:24px auto 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--ws-line,#dfe7e9);font-size:.8125rem;line-height:1.7;text-align:center}
+  .site-disclaimer{max-width:1180px;margin:24px auto 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--ws-line,var(--ds-line));font-size:.8125rem;line-height:1.7;text-align:center}
 }
 @media print{.site-disclaimer{display:none}}
 
 /* 合并章节：章内每份记录一个小标题，可单独复制 */
 @media screen{
-  .record-merged-part+.record-merged-part{border-top:1px dashed var(--ws-line,#dfe7e9)}
+  .record-merged-part+.record-merged-part{border-top:1px dashed var(--ws-line,var(--ds-line))}
   .record-merged-part-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding:16px 22px 0}
-  .record-merged-part-head h4{margin:0;font-size:1rem;font-weight:700;color:var(--ws-blue,#11697a)}
+  .record-merged-part-head h4{margin:0;font-size:1rem;font-weight:700;color:var(--ws-blue,var(--ds-blue))}
   .record-merged-part-actions{display:flex;gap:8px}
   .record-merged-part-actions .btn{min-height:40px;padding:0 12px;font-size:.875rem}
-  .case-nav-count{font-style:normal;font-weight:500;font-size:.75rem;color:var(--ws-muted,#5d6f75);margin-left:4px}
+  .case-nav-count{font-style:normal;font-weight:500;font-size:.75rem;color:var(--ws-muted,var(--ds-muted));margin-left:4px}
 }
 @media screen and (max-width:640px){
   .record-merged-part-head{padding:14px 14px 0}
@@ -649,7 +649,7 @@ main:focus{outline:none}
   body,.official-home,body.duty-page,body.pathway-page,body.admin-page,body.class-page,body.tools-page,body.labs-page,#libraryShell,#libraryShell .page{background-color:var(--ds-bg)}
   :where(h1,h2,h3){letter-spacing:-.01em}
   :where(h1){letter-spacing:-.022em}
-  ::selection{background:#d5ecef;color:var(--ds-ink)}
+  ::selection{background:var(--ds-blue-100);color:var(--ds-ink)}
 
   /* ---------- 顶栏：半透明磨砂（Apple / Vercel） ---------- */
   .official-nav,.tools-page .nav,#libraryShell .library-topbar{
@@ -662,7 +662,7 @@ main:focus{outline:none}
     }
   }
   .official-brand-mark,.library-brand-mark{
-    background:linear-gradient(145deg,#0b7e92 0%,#11697a 55%,#0c5564 100%);
+    background:linear-gradient(145deg,#0b7e92 0%,var(--ds-blue) 55%,var(--ds-blue-strong) 100%);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 1px 2px rgba(20,37,43,.18)
   }
 
@@ -698,7 +698,7 @@ main:focus{outline:none}
     .tools-page .card:hover,.admin-tool-card:hover,.pathway-home-banner:hover{
       transform:translateY(-2px);box-shadow:var(--ds-shadow-md);border-color:var(--ds-line-strong)
     }
-    .home-quick-grid>a:hover{border-color:var(--ds-line-strong);background:#f5f8f8;box-shadow:var(--ds-shadow-sm)}
+    .home-quick-grid>a:hover{border-color:var(--ds-line-strong);background:var(--ds-bg);box-shadow:var(--ds-shadow-sm)}
   }
   /* 卡片里的「进入 →」箭头随悬停右移 */
   .feature-enter,.department-card-open,.class-dept-foot a,.ortho-disease-card .disease-open{transition:transform .2s var(--ds-ease)}
@@ -707,13 +707,13 @@ main:focus{outline:none}
   .btn,.official-cta,.home-search-field button,.orders-action{transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease,transform .1s ease}
   .btn:active,.official-cta:active,.home-search-field button:active{transform:translateY(1px)}
   .official-cta.primary,.home-search-field button,.orders-locked .btn.primary,.duty-task-form .btn.primary,.duty-note-actions .btn.primary,.orders-dialog-actions .btn.primary{
-    background:linear-gradient(180deg,#11697a 0%,#11697a 100%);border-color:#0c5564;color:#fff;
+    background:linear-gradient(180deg,var(--ds-blue) 0%,var(--ds-blue) 100%);border-color:var(--ds-blue-strong);color:#fff;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 1px 2px rgba(20,37,43,.16)
   }
   .official-cta.primary:hover,.home-search-field button:hover,.orders-locked .btn.primary:hover,.duty-task-form .btn.primary:hover,.duty-note-actions .btn.primary:hover,.orders-dialog-actions .btn.primary:hover{
-    background:linear-gradient(180deg,#11697a 0%,#0c5564 100%)
+    background:linear-gradient(180deg,var(--ds-blue) 0%,var(--ds-blue-strong) 100%)
   }
-  .official-cta.secondary:hover,.btn.ghost:hover{background-color:#f5f8f8;border-color:var(--ds-line-strong)}
+  .official-cta.secondary:hover,.btn.ghost:hover{background-color:var(--ds-bg);border-color:var(--ds-line-strong)}
 
   /* ---------- 搜索框：统一焦点环 ---------- */
   .home-search-field,#libraryShell .searchbox,.orders-search-field,.ecg-global-field,.tools-page .formula-search{transition:border-color .15s ease,box-shadow .15s ease}
