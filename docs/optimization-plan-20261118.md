@@ -156,15 +156,46 @@
 | P1-3 心电图拆包 | #148 | 已提交；首页 1600 → 746 ms（慢速 4G），直接打开子页面持平 |
 | P1-4 写死颜色改用变量 | #153 | 已提交；7 个文件减少 245 处；`!important` 未处理 |
 | P2-1 CSP 去掉 style-src 'unsafe-inline' | #146 | 已提交 |
-| P2-2 压缩写法源文件排版 | — | **暂缓**，见下 |
+| P2-2 压缩写法源文件排版 | #157、#158 | `app.js` 已排版（切分标记改为忽略空白），并删除不会执行的视图；`tools-page.js`、`ecg.js` 仍未排版，见下 |
 | P2-3 卡片改为链接 | #149 | 已提交 |
 | P2-4 减少 innerHTML | #152 | 已提交；减少 5 处 |
 | P2-5 测试与文档整理 | #150 | 已提交；另修复一个时序不稳的 e2e 用例 |
 
-**P2-2 暂缓的原因**：剩下的压缩写法集中在 `app.js`、`js/tools-page.js`、`js/ecg.js`，直接排版会破坏现有依赖：
+**P2-2 原先暂缓的原因**（`app.js` 已在 #157 中解决）：剩下的压缩写法集中在 `app.js`、`js/tools-page.js`、`js/ecg.js`，直接排版会破坏现有依赖：
 
 - `scripts/clinical-compiler.mjs` 和 `scripts/clinical-source.mjs` 用 `app.js` 中的固定文本（如 `const templates=makeTemplates();`、`function patient(){`）切片并渲染病历正文，身份账本审核还会从历史提交读取 `app.js`；
 - `test/labs-audit.test.js` 用正则从 `js/tools-page.js` 源码中提取计算公式进行医学审核断言；
 - `js/ecg.js` 正被 #148 修改。
 
 建议先把这些「按源码文本匹配」的地方改成按函数或数据结构访问（单独 PR，测试断言不变），等 #148 合并后，再做只改格式的排版。
+
+## 六、第二轮实施（2026-11-21）
+
+| 项目 | PR | 结果 |
+| --- | --- | --- |
+| 分型页提前开始下载详情 | #147（追加提交） | `classification.js` 改为 async；同时修复一个「目录资料晚到就报错」的竞态。慢速 4G 下目录/病种页仍比 main 慢约 70 ms，要彻底消除需按路由改写到不同 HTML |
+| 心电图首页「指向即预取」 | 未提交 | 实测无收益：空闲预取本来就在首页显示后立刻开始，剩余等待是 142 KB 的下载本身 |
+| 案例图片 ETag/304 | #154 | 缓存时长不变，过期后未变的图片返回 304 |
+| 性能基线脚本 | #155 | `npm run perf:baseline`，基线见 `docs/perf-baseline-20261121.md` |
+| 布局偏移（CLS） | #156 | `/classification`、`/labs` 由 0.119~0.139 降为 0 |
+| `app.js` 排版 | #157 | 语法树与排版前相同，病历产物逐字节相同 |
+| 删除 `app.js` 死代码 | #158（叠加在 #157 上） | 浏览器覆盖率核实；同时删除只服务于这些视图的样式 |
+| 写死颜色第二批 | #159 | 10 个文件，又减少 229 处 |
+| `!important` | #160 | 只去掉 1 处经实测多余的；其余大多服务于交互状态，静态比较无法证明安全 |
+| 病历库脚本合包 | 不做 | 9 个脚本共约 32 KB（gzip），在 HTTP/2 下并行下载；合包反而会破坏跨页缓存 |
+
+仍未处理：`js/tools-page.js` 排版（医学审核测试按源码文本提取公式）；`js/ecg.js` 排版（待 #148 合并）；心电图词条页和 `/note` 的布局偏移；公共样式按页拆分（各页只用到 `styles.css` 的 6%~11%，待相关 PR 合并后评估）。
+
+### 需要负责人在 Vercel / GitHub 操作的事项
+
+| # | 在哪里 | 做什么 | 关联 |
+| --- | --- | --- | --- |
+| 1 | Vercel → 项目 → Firewall | 按 `security/vercel-firewall-rules.json` 新建速率限制规则：`hajimi-login-limit`（`/api/login` POST，10 次/60 秒）、`hajimi-upload-limit`（`/api/upload` POST，30 次/60 秒）、`hajimi-admin-write-limit`（`/api/content` PUT、`/api/duty-orders` PUT/POST、`/api/session` DELETE，合计 60 次/60 秒）、`hajimi-client-error-limit`（`/api/login-log` POST，30 次/60 秒），以及扫描路径拦截规则 `hajimi-block-scanner-paths`。按 IP 计数，超限动作为 Deny | P0-3、#141、#143 |
+| 2 | Vercel → Firewall | 如果 `hajimi-admin-write-limit` 已应用过：在 #141 合并后，把其中的 `/api/logout` + POST 条件改为 `/api/session` + DELETE。`hajimi-audit-limit` 指向的 `/api/ortho-audit-runtime` 已不存在，可以不建 | #141 |
+| 3 | Vercel → 项目 → Settings → Environment Variables | 可选：需要让所有已登录会话立即失效时，新增或修改 `HAJIMI_SESSION_VERSION`（例如 `20261121`）并重新部署。平时不用设置 | #142 |
+| 4 | Vercel → 项目 → Settings → Environment Variables | 核对 `/admin` 页面「安全自检」中的三项：密码使用加盐哈希、`HAJIMI_SESSION_SECRET` 不少于 32 个字符、`HAJIMI_ADMIN_USER` 不是 `admin` | 现有 |
+| 5 | Vercel 预览部署 | 逐个 PR 打开预览核对（各 PR 描述中「待预览部署核对」一项）。重点：#145 的缓存响应头，#146 的 CSP 与 `/admin/password` 外观，#148 的心电图首页与词条页，#149 的卡片中键/Ctrl 点击 | 各 PR |
+| 6 | Vercel → Deployments | 每合并一个 PR，确认生产部署为 READY，并检查 `wdyxzl.icu` 上的改动已生效（AGENTS.md 第 9 节） | 全部 |
+| 7 | GitHub → Actions → Offsite data backup | #151 合并后点「Run workflow」手动运行一次，确认备份任务成功、`cleanup-rate-state` 任务日志显示「已删除 N 个」 | #151 |
+| 8 | GitHub → Settings → Secrets | 确认 `BLOB_READ_WRITE_TOKEN`、`BACKUP_PASSPHRASE` 已设置（每周备份和限流文件清理都依赖它们） | #151 |
+| 9 | GitHub → Pull requests | 按顺序审核、合并：#141 与 #142 在 `api/session.js` 有一处冲突；#158 叠加在 #157 上；#158 与 #149 在 `styles.css` 第 5 行冲突。后合并的那个由 AI 负责更新 | 全部 |
