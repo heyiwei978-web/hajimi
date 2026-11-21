@@ -649,15 +649,6 @@ function filtered() {
 function escapeHtml(s) {
   return s.replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[c]);
 }
-function projectCategory(g) {
-  if (g === 'TKA' || g === 'THA' || g === '人工股骨头置换') return '关节置换';
-  if (g === '通用场景') return '围手术期';
-  return '创伤骨科';
-}
-function templateCard(t) {
-  const title = state.group === 'all' ? t.name : t.short;
-  return `<article class="card"><div class="tags">${t.department ? `<span class="tag">${escapeHtml(t.department)}</span>` : ''}<span class="tag stage">${t.stage}</span><span class="tag">${t.type}</span></div><h3>${title}</h3><p>${t.desc}</p><div class="card-actions"><button class="btn ghost preview" aria-label="预览：${escapeHtml(title)}" data-index="${templates.indexOf(t)}">预览</button><button class="btn primary copy" aria-label="复制：${escapeHtml(title)}" data-index="${templates.indexOf(t)}">复制</button></div></article>`;
-}
 function bindTemplateActions() {
   const ready = async (button, action) => {
     const record = templates[+button.dataset.index];
@@ -674,74 +665,10 @@ function bindTemplateActions() {
   $$('.preview').forEach(button => (button.onclick = () => ready(button, openPreview)));
   $$('.copy').forEach(button => (button.onclick = () => ready(button, record => copyText(generate(record)))));
 }
-function renderProjectOverview(list) {
-  const po = [...groups, '通用场景'];
-  const cards = po
-    .map(g => {
-      const items = list.filter(t => t.group === g);
-      if (!items.length) return '';
-      const chips = ['入院', '术前', '术中', '术后']
-        .map(s => {
-          const n = items.filter(t => t.stage === s).length;
-          return n ? `<span>${s} ${n}</span>` : '';
-        })
-        .join('');
-      return `<article class="project-card" data-project="${g}" role="button" tabindex="0"><div class="project-card-top"><span class="project-kind">${projectCategory(g)}</span><strong>${items.length} 份</strong></div><h3>${labelFor(g)}</h3><p>点击进入后按入院、术前、术中、术后分类浏览相关记录。</p><div class="project-stage-chips">${chips}</div><div class="project-open">打开项目 <span>→</span></div></article>`;
-    })
-    .join('');
-  $('#templateGrid').innerHTML = `<div class="project-grid">${cards}</div>`;
-  const pcs = $$('.project-card');
-  pcs.forEach(c => {
-    const o = () => selectGroup(c.dataset.project);
-    c.onclick = o;
-    c.onkeydown = e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        o();
-      }
-    };
-  });
-  return pcs.length;
-}
-function renderGroupView(list) {
-  const sec = ['入院', '术前', '术中', '术后']
-    .map(stage => {
-      const items = list.filter(t => t.stage === stage);
-      if (!items.length) return '';
-      return `<section class="stage-section"><div class="stage-section-head"><div><span class="stage-dot"></span><h3>${stage}</h3></div><span>${items.length} 份</span></div><div class="stage-template-list">${items.map(templateCard).join('')}</div></section>`;
-    })
-    .join('');
-  $('#templateGrid').innerHTML =
-    `<div class="group-toolbar"><button id="backProjects" class="btn ghost">← 返回全部项目</button><span>当前按入院、术前、术中、术后分类</span></div>${sec}`;
-  const back = $('#backProjects');
-  if (back) back.onclick = () => selectGroup('all');
-  bindTemplateActions();
-}
-function render() {
-  if (!window.HAJIMI_LIBRARY_READY) return;
-  const list = filtered();
-  $('#templateCount').textContent = templates.length;
-  $('#allCount').textContent = templates.length;
-  if (state.group === 'all' && !state.q.trim()) {
-    const n = renderProjectOverview(list);
-    $('#resultTitle').textContent = '全部项目';
-    $('#resultCount').textContent = `${n} 个项目 · ${list.length} 份模板`;
-    $('#emptyState').hidden = n > 0;
-    return;
-  }
-  if (state.group === 'all') {
-    $('#resultTitle').textContent = '搜索结果';
-    $('#resultCount').textContent = `${list.length} 份`;
-    $('#templateGrid').innerHTML = list.map(templateCard).join('');
-    $('#emptyState').hidden = list.length > 0;
-    bindTemplateActions();
-    return;
-  }
-  $('#resultTitle').textContent = labelFor(state.group);
-  $('#resultCount').textContent = `${list.length} 份`;
-  renderGroupView(list);
-  $('#emptyState').hidden = list.length > 0;
-}
+// 病历库的渲染由 departments.js 接管：它在设置 HAJIMI_LIBRARY_READY 之前就把 render 换成自己的实现，
+// 这里只保留一个占位声明，供上面的事件处理器按名字调用、并让 departments.js 可以重新赋值。
+// 原先的项目卡片视图（renderProjectOverview 等）永远不会执行，已于 2026-11-21 删除。
+function render() {}
 function openPreview(t) {
   state.activeTemplate = t;
   window.HAJIMI_PERSONAL?.remember(t.department, t.group);
