@@ -1,10 +1,11 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {createHash} from 'node:crypto';
+import {APP_MARKERS,markerIndex} from './clinical-source.mjs';
 import {planClinicalPublication} from './clinical-inventory.mjs';
 import {DEPARTMENTS} from '../config/site-modules.mjs';
 import {renderRouterDepartments} from './department-build.mjs';
-import {hasClinicalJsonSource,loadClinicalJsonSource,APP_MARKERS,markerIndex} from './clinical-source.mjs';
+import {hasClinicalJsonSource,loadClinicalJsonSource} from './clinical-source.mjs';
 const root=new URL('../',import.meta.url);
 const digest=value=>createHash('sha256').update(value).digest('hex').slice(0,20);
 
