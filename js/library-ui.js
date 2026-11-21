@@ -33,11 +33,33 @@ SOFTWARE.
     next: '<path d="M9 6l6 6l-6 6"/>'
   };
   const icon = name => '<svg class="clinical-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + (paths[name] || '') + '</svg>';
+  // 字号控件用 DOM 方法生成（2026-11-21，优化方案 P2-4），结构与原 HTML 字符串逐字一致。
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const element = (name, attributes = {}, text = '') => {
+    const node = document.createElement(name);
+    for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
+    if (text) node.textContent = text;
+    return node;
+  };
+  function iconNode(name) {
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    for (const [key, value] of [['class', 'clinical-icon'], ['width', '20'], ['height', '20'], ['viewBox', '0 0 24 24'], ['fill', 'none'], ['stroke', 'currentColor'], ['stroke-width', '2'], ['stroke-linecap', 'round'], ['stroke-linejoin', 'round'], ['aria-hidden', 'true'], ['focusable', 'false']]) svg.setAttribute(key, value);
+    for (const [, d] of (paths[name] || '').matchAll(/d="([^"]*)"/g)) {
+      const path = document.createElementNS(SVG_NS, 'path');
+      path.setAttribute('d', d);
+      svg.appendChild(path);
+    }
+    return svg;
+  }
   function controls() {
-    return '<div class="reading-font-controls" role="group" aria-label="病历字号">' +
-      '<span class="reading-font-label">' + icon('typography') + '字号</span>' +
-      sizes.map(size => '<button type="button" data-reading-font="' + size + '" aria-label="病历字号 ' + size + ' 像素" aria-pressed="' + (size === fontSize) + '">' + size + '</button>').join('') +
-      '<small class="reading-font-note"' + (persistent ? ' hidden' : '') + '>仅本页生效</small></div>';
+    const group = element('div', {class: 'reading-font-controls', role: 'group', 'aria-label': '病历字号'});
+    const label = element('span', {class: 'reading-font-label'});
+    label.append(iconNode('typography'), '字号');
+    group.append(label, ...sizes.map(size => element('button', {type: 'button', 'data-reading-font': String(size), 'aria-label': '病历字号 ' + size + ' 像素', 'aria-pressed': String(size === fontSize)}, String(size))));
+    const note = element('small', {class: 'reading-font-note'}, '仅本页生效');
+    if (persistent) note.hidden = true;
+    group.append(note);
+    return group;
   }
   function apply() {
     document.documentElement.style.setProperty('--clinical-font-size', fontSize + 'px');
@@ -47,7 +69,7 @@ SOFTWARE.
     document.querySelectorAll('.reading-font-note').forEach(note => { note.hidden = persistent; });
   }
   function mount() {
-    document.querySelectorAll('.reading-font-slot:empty').forEach(slot => { slot.innerHTML = controls(); });
+    document.querySelectorAll('.reading-font-slot:empty').forEach(slot => { slot.replaceChildren(controls()); });
     apply();
   }
   window.HAJIMI_UI = {icon, mount};

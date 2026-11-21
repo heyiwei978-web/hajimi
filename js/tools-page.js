@@ -284,8 +284,8 @@ function newsScore(){
  return s;
 }
 function bind(k){
- const clear=$('#clear');if(clear)clear.onclick=()=>{$$('#dlg input').forEach(x=>{if(x.type==='checkbox')x.checked=false;else if(!x.hasAttribute('value'))x.value=''});const r=$('#res');if(r){r.hidden=true;r.innerHTML=''}};
- const unit=$('#sys');if(unit)unit.addEventListener('change',()=>{$$('#dbody .unit').forEach(x=>{x.textContent=x.dataset[unit.value]});const r=$('#res');if(r){r.hidden=true;r.innerHTML=''}});
+ const clear=$('#clear');if(clear)clear.onclick=()=>{$$('#dlg input').forEach(x=>{if(x.type==='checkbox')x.checked=false;else if(!x.hasAttribute('value'))x.value=''});const r=$('#res');if(r){r.hidden=true;r.replaceChildren()}};
+ const unit=$('#sys');if(unit)unit.addEventListener('change',()=>{$$('#dbody .unit').forEach(x=>{x.textContent=x.dataset[unit.value]});const r=$('#res');if(r){r.hidden=true;r.replaceChildren()}});
  const go=$('#go');if(!go)return;
  if(EXTRA[k]){if(clear)clear.addEventListener('click',()=>$$('#dbody select').forEach(x=>{x.value='';}));go.onclick=()=>{const missing=$$('#dbody select').filter(x=>x.value==='');if(missing.length)return result('<strong>请完成所有选择项</strong><span>还有 '+missing.length+' 项未选择：'+missing.map(x=>x.closest('label').firstChild.textContent).join('、')+'。</span>');EXTRA[k].calc();};return;}
  if(k==='bmi')go.onclick=()=>{if(!allPositive('#h','#w'))return result('<strong>请完整输入</strong>');const v=num('#w')/Math.pow(num('#h')/100,2),c=v<18.5?'偏低':v<25?'健康体重':v<30?'超重':v<35?'肥胖 I 级':v<40?'肥胖 II 级':'肥胖 III 级';result('<strong>'+v.toFixed(1)+' kg/m²</strong><span>CDC成人分类：'+c+'。BMI是筛查指标。</span>')};
