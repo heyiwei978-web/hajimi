@@ -144,3 +144,5 @@ body.class-page{margin:0;background:var(--cl-bg);color:var(--cl-ink);font-family
  .class-clinical-guide{padding:15px}
  .class-type-detailed .class-type-part p{font-size:14px;line-height:1.9}
 }
+/* 载入提示先占满一屏，渲染后页脚不会从可视区被推开（布局偏移 CLS，2026-11-21） */
+.class-loading{min-height:100vh}
