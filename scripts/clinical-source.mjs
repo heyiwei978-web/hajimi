@@ -8,6 +8,9 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {createHash} from 'node:crypto';
 import {DEPARTMENTS} from '../config/site-modules.mjs';
+// app.js 中的切分标记按「忽略空白」查找：既适用于当前（已排版）的 app.js，也适用于身份账本审核从历史提交读取的压缩写法。
+export const APP_MARKERS=Object.freeze({types:/const types\s*=/,templates:/const templates\s*=\s*makeTemplates\(\);/,patient:/function patient\(\)\s*\{/,render:/\nfunction render\(/});
+export function markerIndex(text,pattern,from=0){const match=pattern.exec(text.slice(from));return match?from+match.index:-1;}
 
 const root=new URL('../',import.meta.url);
 export const CLINICAL_SOURCE_DIR='content/clinical-library/source/';
@@ -44,15 +47,15 @@ function renderRecords(records,readSource){
   context.window=context;
   vm.createContext(context);
   context.__records=records;
-  const app=readSource('app.js'),start=app.indexOf('const types =');
-  const stop=app.indexOf('function patient(){');
+  const app=readSource('app.js'),start=markerIndex(app,APP_MARKERS.types);
+  const stop=markerIndex(app,APP_MARKERS.patient);
   if(start<0||stop<start)throw new Error('Clinical source: app.js render markers missing');
   // Same slice the published runtime uses: helpers and generators, with
   // `templates` bound to the flat records.
   const tail=app.slice(stop);
-  const end=tail.indexOf('\nfunction render(');
+  const end=markerIndex(tail,APP_MARKERS.render);
   vm.runInContext(readSource('search-core.js'),context,{filename:'search-core.js',timeout:10000});
-  vm.runInContext('const traumaGroups=[];const groups=[];'+app.slice(start,app.indexOf('const templates=makeTemplates();'))+
+  vm.runInContext('const traumaGroups=[];const groups=[];'+app.slice(start,markerIndex(app,APP_MARKERS.templates))+
     'const templates=__records;\n'+(end>0?tail.slice(0,end):tail)+'\nthis.__render=function(t){return String(generate(t));};',context,{filename:'app.js',timeout:10000});
   return records.map(record=>context.__render(record));
 }
