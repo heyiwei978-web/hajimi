@@ -1308,6 +1308,25 @@ test('ECG tools calculate both QTc formulas and RR heart rate, discard stale res
   }
 });
 
+test('classification renders correctly whichever script arrives first (async classification.js vs deferred data)',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    for(const [slow,route,check] of [
+      ['classification-data','/classification','.class-dept-card'],
+      ['classification-data','/classification/guke/femoral-neck','.class-type-detailed'],
+      ['classification.js','/classification/guke/femoral-neck','.class-type-detailed'],
+      ['classification-detail-v2-lower','/classification/guke/femoral-neck','.class-type-detailed']]){
+      await context.unroute('**/*');
+      await context.route('**/api/session',route=>route.fulfill({json:{authenticated:false,user:null}}));
+      await context.route(url=>new URL(url).pathname.startsWith('/'+slow),async route=>{await new Promise(resolve=>setTimeout(resolve,600));await route.continue();});
+      await page.goto(base+route,{waitUntil:'networkidle'});
+      await page.locator(check).first().waitFor({state:'attached'});
+      assert.doesNotMatch(await page.locator('#classificationApp').innerText(),/暂时无法加载/,slow+' late on '+route);
+    }
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('classification is a separate department-first hub with 17 orthopedic dossiers, references, and deep links',async()=>{
  for(const width of [375,1440]){
   const {page,context,errors}=await pageFor(width);
@@ -1361,6 +1380,8 @@ test('every original orthopedic disease now explains fracture-line morphology an
   ];
   for(const [id,n,code,feature] of cases){
    await page.goto(base+'/classification/guke/'+id,{waitUntil:'domcontentloaded'});
+   // 逐型详情按需加载（P1-3），渲染在 DOMContentLoaded 之后完成。
+   await page.locator('#class-types').waitFor();
    const cards=page.locator('.class-type-detailed');
    const actual=await cards.count();
    if(actual!==n){
