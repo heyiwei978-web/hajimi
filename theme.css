@@ -14,7 +14,6 @@ main:focus{outline:none}
 .search-results .card h3{font-size:17px;overflow-wrap:anywhere}
 .search-results .card p{font-size:14px;line-height:1.75;margin-bottom:16px;overflow-wrap:anywhere}
 .search-results .tag{font-size:12px}
-.search-results .card-actions{margin-top:auto}
 .search-results .search-more{grid-column:1/-1}
 @media(max-width:700px){.template-grid.search-results{grid-template-columns:minmax(0,1fr)}.search-results .card{padding:18px}}
 @media(max-width:640px){.search-more{flex-wrap:wrap}}
