@@ -101,3 +101,5 @@
   .labs-item{break-inside:avoid;border:1px solid #999;margin-bottom:6pt}
   .labs-item:not([open]) .labs-item-body{display:none}
 }
+/* 资料渲染前先占满一屏，页脚和参考资料不会从可视区被推开（布局偏移 CLS，2026-11-21） */
+#labsContent:empty{min-height:100vh}
