@@ -74,6 +74,7 @@ npm run build                # 生成 home.html 与 dist/（Vercel 部署时自�
 npm test                     # 单元与运行时测试（安全边界、病历生成链、导航、构建等）
 npm run audit:quality:check  # 病历质量门禁（CI 必跑）
 npx playwright install chromium && npm run test:browser   # 构建后跑手机/电脑浏览器回归
+# 已预装 Chromium、但版本与锁定的 Playwright 不一致时：CHROMIUM_EXECUTABLE_PATH=<chromium 路径> npm run test:browser
 ```
 
 其他审核命令：`npm run audit:clinical`（身份账本与修订流程）、`npm run audit:quality`、`npm run audit:operative`、`npm run audit:conditional`。
