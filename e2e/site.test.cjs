@@ -1324,8 +1324,9 @@ test('record library cards are real links: href deep links, in-page navigation o
     const href=await disease.getAttribute('href');
     const popup=context.waitForEvent('page');
     await disease.click({modifiers:[process.platform==='darwin'?'Meta':'Control']});
-    const opened=await popup;await opened.waitForLoadState('domcontentloaded');
-    assert.equal(new URL(opened.url()).pathname,new URL(base+href).pathname);
+    // 只等新标签页提交到卡片自己的地址，不等它加载完（CI 上新标签页的加载事件不稳定）。
+    const opened=await popup,expected=new URL(base+href).pathname;
+    await opened.waitForURL(url=>url.pathname===expected,{waitUntil:'commit'});
     await opened.close();
     assert.equal(new URL(page.url()).pathname,'/bl/puwai');
     // Keyboard: Tab focus + Enter follows the link in-page.
