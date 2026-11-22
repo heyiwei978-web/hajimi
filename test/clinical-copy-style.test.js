@@ -2,8 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
+import {legacyIndexHtml, readLegacy, readLegacySource} from './legacy-chain.mjs';
 
-const clinicalStyle = readFileSync(new URL('../record-clinical-style-v25.js', import.meta.url), 'utf8');
+const clinicalStyle = readLegacy('record-clinical-style-v25.js');
 
 function sandbox(seeds, rows) {
   const scope = {

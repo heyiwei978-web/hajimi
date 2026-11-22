@@ -8,6 +8,7 @@ on:
     branches: [main, 'preview/disease-case-workspace']
     paths:
       - '*.js'
+      - 'js/**'
       - '*.html'
       - '*.css'
       - 'api/**'

@@ -17,14 +17,40 @@ function sign(value, secret) {
   return crypto.createHmac('sha256', secret).update(value).digest('base64url');
 }
 
-export function createSession(user) {
+// 会话有效期（2026-11-19 负责人确定）：12 小时 + 滑动续期。
+// - 每个会话 12 小时后过期；管理操作（通过 guardRequest 的管理员请求）和打开管理页面
+//   （GET /api/session）时，签发已超过 RENEW_AFTER_MS 的会话会换成新的 12 小时会话。
+// - 续期最长到登录后 MAX_LIFETIME_MS（7 天），之后必须重新登录，被盗的 Cookie 不能无限续命。
+// - 不带登录时间（l）的旧格式会话（原 7 天有效期）一律无效，上线后需重新登录一次。
+export const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+export const RENEW_AFTER_MS = 30 * 60 * 1000;
+export const MAX_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
+// 允许服务器之间少量时钟误差，超出的会话视为伪造或旧格式。
+const CLOCK_SKEW_MS = 60 * 1000;
+
+// 会话版本号（可选）：HAJIMI_SESSION_VERSION 写进每个新会话。修改这个变量并重新部署，
+// 之前签发的所有会话立即失效，不用更换签名密钥。
+function sessionVersion() {
+  const value = process.env.HAJIMI_SESSION_VERSION;
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+// loginAt：首次登录时间；续期时沿用，用来计算 7 天上限。
+export function createSession(user, {now = Date.now(), loginAt = now} = {}) {
   const secret = sessionSecret();
   if (!secret) throw new Error('Session signing is not configured');
-  const payload = Buffer.from(JSON.stringify({u: user, exp: Date.now() + 604800000})).toString('base64url');
+  const version = sessionVersion();
+  const exp = Math.min(now + SESSION_TTL_MS, loginAt + MAX_LIFETIME_MS);
+  const payload = Buffer.from(JSON.stringify({u: user, l: loginAt, exp, ...(version ? {v: version} : {})})).toString('base64url');
   return payload + '.' + sign(payload, secret);
 }
 
-export function readSession(req) {
+export function sessionCookie(token, maxAgeMs = SESSION_TTL_MS) {
+  return 'hajimi_session=' + encodeURIComponent(token) + '; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=' + Math.max(0, Math.floor(maxAgeMs / 1000));
+}
+export const CLEAR_SESSION_COOKIE = 'hajimi_session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0';
+
+export function readSession(req, now = Date.now()) {
   const secret = sessionSecret();
   if (!secret) return null;
   try {
@@ -35,9 +61,25 @@ export function readSession(req) {
     const [payload, signature] = parts;
     if (!crypto.timingSafeEqual(Buffer.from(sign(payload, secret)), Buffer.from(signature))) return null;
     const data = JSON.parse(Buffer.from(payload, 'base64url').toString());
-    if (data.u !== (process.env.HAJIMI_ADMIN_USER || 'admin') || !Number.isFinite(data.exp) || Date.now() >= data.exp) return null;
+    if (data.u !== (process.env.HAJIMI_ADMIN_USER || 'admin') || !Number.isFinite(data.exp) || now >= data.exp) return null;
+    if (!Number.isFinite(data.l) || data.l > now + CLOCK_SKEW_MS || now >= data.l + MAX_LIFETIME_MS) return null;
+    if (data.exp > now + SESSION_TTL_MS + CLOCK_SKEW_MS) return null;
+    if ((data.v === undefined ? '' : data.v) !== sessionVersion()) return null;
     return data;
   } catch { return null; }
+}
+
+// 滑动续期：有效会话签发超过 RENEW_AFTER_MS 时换发新会话（保留登录时间）。
+// 返回是否续期；没有会话或已到 7 天上限时什么也不做。
+export function renewSession(req, res, now = Date.now()) {
+  const session = readSession(req, now);
+  if (!session || typeof res?.setHeader !== 'function') return false;
+  const issuedAt = session.exp - SESSION_TTL_MS;
+  const next = Math.min(now + SESSION_TTL_MS, session.l + MAX_LIFETIME_MS);
+  if (now - issuedAt < RENEW_AFTER_MS || next <= session.exp) return false;
+  try { res.setHeader('Set-Cookie', sessionCookie(createSession(session.u, {now, loginAt: session.l}), next - now)); }
+  catch { return false; }
+  return true;
 }
 
 export const isAdmin = req => !!readSession(req);

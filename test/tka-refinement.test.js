@@ -2,17 +2,18 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 import {loadClinicalSource} from '../scripts/clinical-compiler.mjs';
+import {legacyIndexHtml, readLegacy, readLegacySource} from './legacy-chain.mjs';
 
 const entry = new URL('../index.html',import.meta.url);
 const tag = '<script defer src="/record-tka-refinement-v28.js?v=20261012-tka1"></script>';
 
 function samples() {
-  const html = fs.readFileSync(entry,'utf8').replace('<script defer src="/record-tka-complete-v31.js?v=20261025-tka14"></script>','');
+  const html = legacyIndexHtml().replace('<script defer src="/record-tka-complete-v31.js?v=20261025-tka14"></script>','');
   assert(html.includes(tag), 'v28 must run after v27 at compile time');
   assert(html.indexOf('/record-course-v27.js') < html.indexOf('/record-tka-refinement-v28.js'));
   return {
-    before: loadClinicalSource(html.replace(tag,'' )).records,
-    after: loadClinicalSource(html).records
+    before: loadClinicalSource(html.replace(tag,'' ),{readSource:readLegacySource}).records,
+    after: loadClinicalSource(html,{readSource:readLegacySource}).records
   };
 }
 const tkaDoc = (records,name) => records.find(record =>

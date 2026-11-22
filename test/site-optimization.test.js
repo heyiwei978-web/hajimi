@@ -5,19 +5,20 @@ import test from 'node:test';
 test('main application external scripts are deferred but keep source order',()=>{
   const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
   const tags=[...html.matchAll(/<script\s+([^>]*?)src="([^"]+)"([^>]*)><\/script>/g)];
-  assert(tags.length>=30,'expected the clinical script chain');
+  // 旧病历生成链已于 2026-11-18 删除，页面只剩在用脚本。
+  assert(tags.length>=5,'expected the library runtime scripts');
   for(const tag of tags){
     const attrs=(tag[1]+' '+tag[3]);
     assert.match(attrs,/\bdefer\b/,tag[2]+' should be deferred');
     assert.doesNotMatch(attrs,/\basync\b/,tag[2]+' must preserve ordered execution');
   }
   const srcs=tags.map(x=>x[2]);
-  assert(srcs.findIndex(x=>x.startsWith('/app.js?'))<srcs.findIndex(x=>x.startsWith('/ideal-cases.js')));
-  assert(srcs.findIndex(x=>x.startsWith('/record-quality-v23.js'))<srcs.findIndex(x=>x.startsWith('/departments.js')));
+  assert(srcs.findIndex(x=>x.startsWith('/search-core.js?'))<srcs.findIndex(x=>x.startsWith('/app.js?')));
+  assert(srcs.findIndex(x=>x.startsWith('/app.js?'))<srcs.findIndex(x=>x.startsWith('/departments.js')));
 });
 
 test('long medical-record and pathway pages use safe offscreen rendering optimization',()=>{
-  const css=fs.readFileSync(new URL('../ui-polish.css',import.meta.url),'utf8');
+  const css=fs.readFileSync(new URL('../styles.css',import.meta.url),'utf8');
   assert.match(css,/rendering and navigation performance pass/);
   assert.match(css,/\.record-book-section[^\{]*,[\s\S]*?\.pathway-section[^\{]*,[\s\S]*?\.ortho-category\{[\s\S]*?scroll-margin-top:84px/);
   assert.match(css,/@supports \(content-visibility:auto\)/);

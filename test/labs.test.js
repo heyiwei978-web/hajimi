@@ -4,11 +4,12 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {PUBLIC_FILES} from '../scripts/public-assets.mjs';
 import {MODULES, NAV_SURFACES} from '../config/site-modules.mjs';
+import {sourcePath} from '../scripts/public-assets.mjs';
 
-const read = file => fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+const read = file => fs.readFileSync(new URL('../'+sourcePath(file), import.meta.url), 'utf8');
 function load() {
   const context = {window: {}};
-  vm.runInNewContext(read('labs-data.js'), context);
+  vm.runInNewContext(read('js/labs-data.js'), context);
   return context.window.HAJIMI_LABS;
 }
 
@@ -29,7 +30,7 @@ test('lab interpretation data is complete, unique and cross-linked', () => {
 });
 
 test('lab tool links point at existing calculators and ECG links at existing entries', () => {
-  const data = load(), tools = read('tools-page.js'), ecg = read('ecg-data.js');
+  const data = load(), tools = read('js/tools-page.js'), ecg = read('js/ecg-data.js');
   for (const item of data.categories.flatMap(category => category.items)) {
     for (const [key] of item.tools || []) assert.match(tools, new RegExp('\\n' + key + ":\\['"), item.id + ' tool ' + key);
     for (const [path] of item.ecg || []) {
@@ -47,6 +48,6 @@ test('lab page is registered in the navigation, routes and public files', () => 
   for (const source of ['/labs', '/labs/']) assert.ok(vercel.rewrites.some(rule => rule.source === source && rule.destination === '/labs.html'));
   for (const file of ['labs.html', 'labs.css', 'labs.js', 'labs-data.js']) assert.ok(PUBLIC_FILES.includes(file), file);
   assert.doesNotMatch(read('labs.html'), /<script>(?!<\/script>)|\son[a-z]+=/i);
-  assert.doesNotMatch(read('labs.js'), /innerHTML|insertAdjacentHTML|eval\(|new Function/);
-  assert.match(read('labs.js'), /item\.source[\s\S]*labs-source/, 'per-item source line is rendered when present');
+  assert.doesNotMatch(read('js/labs.js'), /innerHTML|insertAdjacentHTML|eval\(|new Function/);
+  assert.match(read('js/labs.js'), /item\.source[\s\S]*labs-source/, 'per-item source line is rendered when present');
 });

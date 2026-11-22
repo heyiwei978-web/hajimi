@@ -1,3 +1,4 @@
+import {withMonitoring} from './_monitoring.js';
 import {blob as blobClient} from './_blob-auth.js';
 import {guardRequest} from './_security.js';
 import {privateGalleryStore,galleryItems,PRIVATE_IMAGE_PATH} from './_private-gallery.js';
@@ -19,4 +20,4 @@ export function createPrivateImageHandler({store=privateGalleryStore,blob=blobCl
     }catch{return res.status(503).end();}
   };
 }
-export default createPrivateImageHandler();
+export default withMonitoring('private-image', createPrivateImageHandler());

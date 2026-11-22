@@ -26,10 +26,11 @@ function regionSource(file, region) {
 
 const NAV_PATTERNS = {
   official: /<nav\b[^>]*aria-label="主导航"[^>]*>([\s\S]*?)<\/nav>/g,
+  workstation: /<nav\b[^>]*aria-label="主导航"[^>]*>([\s\S]*?)<\/nav>/g,
   tools: /<nav\b[^>]*aria-label="主导航"[^>]*>([\s\S]*?)<\/nav>/g,
   library: /<div class="top-actions library-top-actions">([\s\S]*?)<\/div>/g
 };
-const ACTIVE_CLASS = {official: 'active', tools: 'active', library: 'library-active-link'};
+const ACTIVE_CLASS = {official: 'active', workstation: 'active', tools: 'active', library: 'library-active-link'};
 
 function navLinks(surface) {
   const source = regionSource(surface.file, surface.region);
@@ -76,7 +77,7 @@ for (const surface of NAV_SURFACES) {
     const links = navLinks(surface);
     const expected = navModules(surface);
     assert.deepEqual(links.map(({href, label}) => ({href, label})),
-      expected.map(({href, label}) => ({href, label})), 'links, labels and order');
+      expected.map(({href, label, workspace}) => ({href, label: surface.variant === 'workstation' ? workspace : label})), 'links, labels and order');
     const active = links.filter(link => link.classes.includes(ACTIVE_CLASS[surface.variant]));
     if (surface.active === null) assert.equal(active.length, 0, 'no active entry');
     else assert.deepEqual(active.map(link => link.href), [MODULES.find(module => module.id === surface.active).href], 'one active entry');
@@ -111,7 +112,7 @@ test('department lists elsewhere in the site agree with the registry', () => {
     DEPARTMENTS.map(({name, slug}) => ({name, slug})), 'department router list');
 
   const context = {window: {}};
-  vm.runInNewContext(renderClassificationDepartments(read('classification-data.js')), context, {filename: 'classification-data.js'});
+  vm.runInNewContext(renderClassificationDepartments(read('js/classification-data.js')), context, {filename: 'classification-data.js'});
   // JSON round trip: objects created inside the vm belong to another realm.
   const classification = JSON.parse(JSON.stringify(context.window.HAJIMI_CLASSIFICATION_DATA.departments));
   assert.deepEqual(classification.map(({id, name, ready}) => ({id, name, ready})),
@@ -136,16 +137,16 @@ test('mobile navigation order guard still holds', () => {
   // The 4th official navigation entry is hidden by a generic rule and restored
   // by an equal-specificity override. Removing the override, or reordering the
   // registry, changes what phones see; this test makes that coupling explicit.
-  const styles = read('styles.css'), polish = read('ui-polish.css');
-  if (/\.global-links a:nth-child\(4\)\{display:none\}/.test(styles)) {
-    assert.match(polish, /\.official-nav \.official-links a\{display:flex/, 'official navigation restores every entry');
+  // ui-polish.css was merged into the end of styles.css (2026-11-18); the
+  // restoring override must still come after the generic hiding rule.
+  const styles = read('styles.css');
+  const hide = styles.search(/\.global-links a:nth-child\(4\)\{display:none\}/);
+  if (hide >= 0) {
+    const restore = styles.search(/\.official-nav \.official-links a\{display:flex/);
+    assert.ok(restore > hide, 'official navigation restores every entry after the generic rule');
   }
   const official = NAV_SURFACES.filter(surface => surface.variant === 'official');
   for (const surface of official) {
-    for (const stylesheet of ['styles.css', 'ui-polish.css']) {
-      assert.match(readPage(surface.file), new RegExp(`href="/${stylesheet}\\?`), `${surface.file} loads ${stylesheet}`);
-    }
-    const page = readPage(surface.file);
-    assert.ok(page.indexOf('/styles.css?') < page.indexOf('/ui-polish.css?'), `${surface.file} loads ui-polish.css after styles.css`);
+    assert.match(readPage(surface.file), /href="\/styles\.css\?/, `${surface.file} loads styles.css`);
   }
 });
