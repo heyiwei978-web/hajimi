@@ -2988,6 +2988,8 @@ test('complete case framework selects DeepSeek, edits chapters and saves a priva
       assert.equal(saves,1);
       const record=[...records.values()][0];assert.equal(record.sections[0].text,manual);
       assert(record.sections.every(item=>item.confirmed));assert.equal(record.published,false);
+      // 保存提示先于已保存列表刷新出现（note-case.js 先 saveFeedback 再 await reloadSaved），等列表出现再计数。
+      await page.locator('.note-frame-saved-item').first().waitFor({state:'attached'});
       assert.equal(await page.locator('.note-frame-saved-item').count(),1);
       await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.__copiedCase=text;}}}));
       await page.locator('#noteFrameCopy').click();
