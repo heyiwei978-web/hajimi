@@ -27,8 +27,20 @@ function ensureCommit() {
 }
 const cache = new Map();
 // 读取删除前提交里的文件（相对仓库根目录的路径）。
+// 并行拉取时，提交对象可能已经写入、但它的文件树还没写完，此时 git show 报 "bad object"（CI 浅克隆中出现过）。
+// 失败时等待片刻、重新拉取后再读；文件确实不存在时，多次重试后仍会抛出原始错误。
 export function readLegacy(file) {
-  if (!cache.has(file)) { ensureCommit(); cache.set(file, git(['show', LEGACY_COMMIT + ':' + file])); }
+  if (!cache.has(file)) {
+    ensureCommit();
+    for (let attempt = 0; ; attempt++) {
+      try { cache.set(file, git(['show', LEGACY_COMMIT + ':' + file])); break; }
+      catch (error) {
+        if (attempt >= 8) throw error;
+        pause(200 + Math.floor(Math.random() * 400) * (attempt + 1));
+        try { git(['fetch', '--quiet', '--depth=1', 'origin', LEGACY_COMMIT]); } catch {}
+      }
+    }
+  }
   return cache.get(file);
 }
 // 删除前的病历库页面，包含完整的旧生成链 <script> 列表。
