@@ -50,6 +50,8 @@ async function pageFor(width=1440, options={}) {
   const page = await context.newPage();
   const errors=[];
   page.on('pageerror',error=>errors.push(error.message));
+  // vercel.json 的 CSP 已加到每个响应上：被拦下的内联样式、脚本等只出现在控制台，这里一并当作页面错误。
+  page.on('console',message=>{if(message.type()==='error'&&/Content Security Policy/i.test(message.text()))errors.push('CSP: '+message.text());});
   return {page, context, errors};
 }
 async function mockNote(page, handler, classify=()=>({route:'separate'})) {
@@ -1344,6 +1346,25 @@ test('record library cards are real links: href deep links, in-page navigation o
   }finally{await context.close();}
 });
 
+test('classification renders correctly whichever script arrives first (async classification.js vs deferred data)',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    for(const [slow,route,check] of [
+      ['classification-data','/classification','.class-dept-card'],
+      ['classification-data','/classification/guke/femoral-neck','.class-type-detailed'],
+      ['classification.js','/classification/guke/femoral-neck','.class-type-detailed'],
+      ['classification-detail-v2-lower','/classification/guke/femoral-neck','.class-type-detailed']]){
+      await context.unroute('**/*');
+      await context.route('**/api/session',route=>route.fulfill({json:{authenticated:false,user:null}}));
+      await context.route(url=>new URL(url).pathname.startsWith('/'+slow),async route=>{await new Promise(resolve=>setTimeout(resolve,600));await route.continue();});
+      await page.goto(base+route,{waitUntil:'networkidle'});
+      await page.locator(check).first().waitFor({state:'attached'});
+      assert.doesNotMatch(await page.locator('#classificationApp').innerText(),/暂时无法加载/,slow+' late on '+route);
+    }
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('classification is a separate department-first hub with 17 orthopedic dossiers, references, and deep links',async()=>{
  for(const width of [375,1440]){
   const {page,context,errors}=await pageFor(width);
@@ -1397,6 +1418,8 @@ test('every original orthopedic disease now explains fracture-line morphology an
   ];
   for(const [id,n,code,feature] of cases){
    await page.goto(base+'/classification/guke/'+id,{waitUntil:'domcontentloaded'});
+   // 逐型详情按需加载（P1-3），渲染在 DOMContentLoaded 之后完成。
+   await page.locator('#class-types').waitFor();
    const cards=page.locator('.class-type-detailed');
    const actual=await cards.count();
    if(actual!==n){
@@ -2039,7 +2062,7 @@ test('administrator can download a backup and restore it with revision protectio
       let revision='fixture-v1',restored=false,restorePayload;
       const backup={id:'1791500000000-550e8400-e29b-41d4-a716-446655440000',createdAt:'2026-10-09T00:00:00Z',user:'fixture-admin',action:'save',templateCount:1,caseCount:0};
       await context.route('**/api/content',route=>route.fulfill({json:{version:1,revision,templateOverrides:restored?{}:{sample:{body:'Fixture record'}},cases:[]}}));
-      await context.route('**/api/content-history*',route=>{
+      await context.route(/\/api\/content\?feed=history/,route=>{
         if(route.request().method()==='POST'){restorePayload=route.request().postDataJSON();revision='fixture-v2';restored=true;return route.fulfill({json:{ok:true}});}
         if(new URL(route.request().url()).searchParams.has('id'))return route.fulfill({json:{version:1,templateOverrides:{},cases:[]}});
         return route.fulfill({json:{revision,history:[backup]}});
@@ -2062,7 +2085,7 @@ test('central management searches, paginates, edits templates and cases, and mai
     try{
       let data={version:1,revision:'fixture-v1',templateOverrides:{'示例病种 · 入院记录':{body:'原有自定义正文'}},cases:Array.from({length:54},(_,index)=>({id:'case-'+index,template:'示例病种 · 入院记录',title:'案例 '+index,description:'经过脱敏的说明',published:index!==0,images:index<2?['cases/shared.jpg']:[],createdAt:'2026-01-01T00:00:00Z'}))},writes=0,uploads=[];
       await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
-      await context.route('**/api/content-history*',route=>route.fulfill({json:{revision:data.revision,history:[]}}));
+      await context.route(/\/api\/content\?feed=history/,route=>route.fulfill({json:{revision:data.revision,history:[]}}));
       await context.route('**/api/content',route=>{
         if(route.request().method()==='PUT'){const next=route.request().postDataJSON();assert.equal(next.revision,data.revision);writes++;data={...next,revision:'fixture-v'+(writes+1)};}
         return route.fulfill({json:data});
@@ -2092,7 +2115,7 @@ test('central editor preserves a conflicting draft and exports it without overwr
   try{
     const name='示例病种 · 入院记录';let attempts=0,lastPayload;
     await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
-    await context.route('**/api/content-history*',route=>route.fulfill({json:{revision:'fixture-v1',history:[]}}));
+    await context.route(/\/api\/content\?feed=history/,route=>route.fulfill({json:{revision:'fixture-v1',history:[]}}));
     await context.route('**/api/content',route=>{if(route.request().method()==='PUT'){attempts++;lastPayload=route.request().postDataJSON();return route.fulfill({status:409,json:{error:'资料已在其他页面更新'}});}return route.fulfill({json:{version:1,revision:'fixture-v1',templateOverrides:{[name]:{body:'旧正文'}},cases:[]}});});
     await page.goto(base+'/admin',{waitUntil:'networkidle'});await page.getByRole('button',{name:'编辑正文',exact:true}).click();await page.locator('#managedTemplateBody').fill('待核对的编辑草稿');await page.getByRole('button',{name:'保存正文',exact:true}).click();await page.waitForSelector('#managedTemplateError:visible');assert.equal(lastPayload.revision,'fixture-v1');assert.equal(await page.locator('#managedTemplateBody').inputValue(),'待核对的编辑草稿');assert.match(await page.locator('#managedTemplateError').innerText(),/下载本次草稿/);
     const downloading=page.waitForEvent('download');await page.getByRole('button',{name:'下载本次草稿',exact:true}).click();const downloaded=JSON.parse(fs.readFileSync(await (await downloading).path(),'utf8'));assert.deepEqual(downloaded,{template:name,body:'待核对的编辑草稿'});
@@ -2104,7 +2127,7 @@ test('case retry reuses an uploaded image and logout clears private lists and ed
   const {page,context,errors}=await pageFor(375);
   try{
     let authenticated=true,uploads=0,writes=0,data={version:1,revision:'fixture-v1',templateOverrides:{},cases:[{id:'private-case',template:'示例模板',title:'私有案例',description:'私有草稿说明',published:false,images:[]}]};
-    await context.route('**/api/session',route=>route.fulfill({json:{authenticated,user:'fixture-admin'}}));await context.route('**/api/logout',route=>{authenticated=false;return route.fulfill({json:{ok:true}});});await context.route('**/api/content-history*',route=>route.fulfill({json:{revision:data.revision,history:[]}}));
+    await context.route('**/api/session',route=>{if(route.request().method()==='DELETE'){authenticated=false;return route.fulfill({json:{ok:true}});}return route.fulfill({json:{authenticated,user:'fixture-admin'}});});await context.route(/\/api\/content\?feed=history/,route=>route.fulfill({json:{revision:data.revision,history:[]}}));
     await context.route('**/api/content',route=>{if(route.request().method()==='PUT'){writes++;if(writes===1)return route.fulfill({status:503,json:{error:'备份失败，未保存'}});data={...route.request().postDataJSON(),revision:'fixture-v2'};}return route.fulfill({json:data});});
     await context.route('**/api/upload',route=>{uploads++;return route.fulfill({json:{pathname:'cases/upload-once.jpg'}});});await context.route('**/api/image?*',route=>route.fulfill({status:404}));
     await page.goto(base+'/admin',{waitUntil:'networkidle'});await page.locator('#managerKind').selectOption('cases');await page.getByRole('button',{name:'编辑案例',exact:true}).click();const png=await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=2;canvas.height=2;return canvas.toDataURL('image/png').split(',')[1];});await page.locator('#managedCaseForm input[name="images"]').setInputFiles({name:'retry.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});await page.locator('#managedCaseForm input[name="title"]').fill('保留的案例草稿');await page.getByRole('button',{name:'保存案例',exact:true}).click();await page.waitForSelector('#managedCaseError:visible');assert.equal(uploads,1);assert.equal(await page.locator('#managedCaseForm input[name="title"]').inputValue(),'保留的案例草稿');assert.equal(data.cases[0].title,'私有案例');
@@ -2117,12 +2140,12 @@ test('failed admin reads disable management; late responses after logout cannot 
   const {page,context,errors}=await pageFor(375);
   try{
     await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
-    await context.route('**/api/content',route=>route.fulfill({status:503,json:{error:'资料读取失败'}}));await context.route('**/api/content-history*',route=>route.fulfill({status:503,json:{error:'历史读取失败'}}));
+    await context.route('**/api/content',route=>route.fulfill({status:503,json:{error:'资料读取失败'}}));await context.route(/\/api\/content\?feed=history/,route=>route.fulfill({status:503,json:{error:'历史读取失败'}}));
     await page.goto(base+'/admin',{waitUntil:'networkidle'});assert(await page.locator('#adminDataError').isVisible());assert.equal(await page.locator('#overrideCount').innerText(),'—');assert(await page.locator('#managerSearch').isDisabled());assert(await page.locator('#managerControls').evaluate(element=>element.disabled));assert(await page.locator('#downloadCurrent').isDisabled());assert.equal(await page.locator('#managerList .manager-item').count(),0);
     let release,authenticated=true;const pending=new Promise(resolve=>release=resolve);
-    await context.route('**/api/session',route=>route.fulfill({json:{authenticated,user:'fixture-admin'}}));await context.route('**/api/logout',route=>{authenticated=false;return route.fulfill({json:{ok:true}});});
+    await context.route('**/api/session',route=>{if(route.request().method()==='DELETE'){authenticated=false;return route.fulfill({json:{ok:true}});}return route.fulfill({json:{authenticated,user:'fixture-admin'}});});
     await context.route('**/api/content',async route=>{await pending;return route.fulfill({json:{version:1,revision:'fixture-v1',templateOverrides:{private:{body:'私有模板正文'}},cases:[{id:'private',template:'private',title:'私有案例标题',published:false}]}});});
-    await context.route('**/api/content-history*',async route=>{await pending;return route.fulfill({json:{revision:'fixture-v1',history:[]}});});
+    await context.route(/\/api\/content\?feed=history/,async route=>{await pending;return route.fulfill({json:{revision:'fixture-v1',history:[]}});});
     await page.reload({waitUntil:'domcontentloaded'});await page.waitForSelector('#dashboardPanel:not([hidden])');await page.getByRole('button',{name:'退出登录',exact:true}).click();await page.waitForSelector('#loginPanel:visible');release();await page.waitForLoadState('networkidle');
     assert.equal(await page.locator('#dashboardPanel').isVisible(),false);assert.equal(await page.locator('#managerList .manager-item').count(),0);assert.equal(await page.locator('#managedTemplateBody').inputValue(),'');assert(!((await page.locator('body').innerText()).includes('私有案例标题')));assert.deepEqual(errors,[]);
   }finally{await context.close();}
@@ -2153,8 +2176,7 @@ test('record pages: phone header matches other sections with a scrolling navigat
 test('library logout reports failures, then removes unpublished cases and clears their editor drafts',async()=>{
   const {page,context,errors}=await pageFor(375);
   try{
-    let logouts=0;await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
-    await context.route('**/api/logout',route=>{logouts++;return route.fulfill(logouts===1?{status:503,json:{error:'暂不可用'}}:{json:{ok:true}});});
+    let logouts=0;await context.route('**/api/session',route=>{if(route.request().method()==='DELETE'){logouts++;return route.fulfill(logouts===1?{status:503,json:{error:'暂不可用'}}:{json:{ok:true}});}return route.fulfill({json:{authenticated:true,user:'fixture-admin'}});});
     await context.route('**/api/content',async route=>{const name=await page.evaluate(()=>templates[+document.querySelector('.record-book-section .preview').dataset.index].name);return route.fulfill({json:{version:1,revision:'fixture-v1',templateOverrides:{},cases:[{id:'private',template:name,title:'未发布测试案例',description:'待清理的私有草稿',published:false,images:[]},{id:'public',template:name,title:'公开案例',published:true,images:[]}]}});});
     await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});await page.locator('.record-book-section .preview').first().click();const privateCase=page.locator('.cms-case-card').filter({hasText:'未发布测试案例'});await privateCase.getByRole('button',{name:'编辑：未发布测试案例',exact:true}).click();assert.equal(await page.locator('#cmsCaseForm input[name="title"]').inputValue(),'未发布测试案例');await page.keyboard.press('Escape');await page.keyboard.press('Escape');
     await page.locator('#libraryShell [data-cms-logout]').click();await page.waitForFunction(()=>document.getElementById('toast').textContent.includes('退出失败'));assert.match(await page.locator('#toast').innerText(),/退出失败/);assert(await page.locator('#libraryShell [data-cms-badge]').isVisible());
@@ -2906,7 +2928,7 @@ test('admin dashboard shows the login self-check; signed-out visitors never see 
       await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin',security:[
         {id:'password-hash',ok:false,message:'管理员密码仍使用无盐 SHA-256<img src=x onerror=alert(1)>'},
         {id:'session-secret',ok:true,message:'会话签名密钥长度符合要求。'}]}}));
-      await context.route('**/api/content-history**',route=>route.fulfill({json:{revision:'fixture-v1',updatedAt:null,history:[]}}));
+      await context.route(/\/api\/content\?feed=history/,route=>route.fulfill({json:{revision:'fixture-v1',updatedAt:null,history:[]}}));
       await context.route('**/api/private-gallery',route=>route.fulfill({json:{items:[],revision:'missing'}}));
       await page.reload({waitUntil:'networkidle'});
       await page.locator('#securityCheck').waitFor({state:'visible'});
@@ -2925,7 +2947,7 @@ test('admin dashboard lists recent sign-ins and failed attempts as plain text',a
     try{
       const failure=Array.from({length:8},(_,index)=>({at:new Date(Date.now()-index*60000).toISOString(),kind:index===0?'blocked':'failure',ip:'198.51.100.'+index,country:'US',region:'',city:'',agent:'curl/8.0'}));
       await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin',security:[]}}));
-      await context.route('**/api/content-history**',route=>route.fulfill({json:{revision:'fixture-v1',updatedAt:null,history:[]}}));
+      await context.route(/\/api\/content\?feed=history/,route=>route.fulfill({json:{revision:'fixture-v1',updatedAt:null,history:[]}}));
       await context.route('**/api/private-gallery',route=>route.fulfill({json:{items:[],revision:'missing'}}));
       await context.route('**/api/login-log',route=>route.fulfill({json:{success:[{at:'2026-11-11T08:00:00.000Z',kind:'success',ip:'203.0.113.7',country:'CN',region:'SH',city:'上海<img src=x onerror=alert(1)>',
         agent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'}],failure}}));
@@ -3002,6 +3024,8 @@ test('complete case framework selects DeepSeek, edits chapters and saves a priva
       assert.equal(saves,1);
       const record=[...records.values()][0];assert.equal(record.sections[0].text,manual);
       assert(record.sections.every(item=>item.confirmed));assert.equal(record.published,false);
+      // 保存提示先于已保存列表刷新出现（note-case.js 先 saveFeedback 再 await reloadSaved），等列表出现再计数。
+      await page.locator('.note-frame-saved-item').first().waitFor({state:'attached'});
       assert.equal(await page.locator('.note-frame-saved-item').count(),1);
       await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.__copiedCase=text;}}}));
       await page.locator('#noteFrameCopy').click();

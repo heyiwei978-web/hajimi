@@ -42,3 +42,14 @@ BLOB_READ_WRITE_TOKEN=... node scripts/restore-blob.mjs backup --apply --confirm
 
 - 每周一次：两次备份之间的改动，要靠 Vercel Blob 自身和后台的历史版本兜底。
 - 每份构件保留 90 天，所以最多能找回约 13 份。需要更长期保存的，请定期下载到本地。
+
+## 限流状态清理（2026-11-21，优化方案 P0-5）
+
+登录失败、AI 生成和前端报错上报的限流计数按网络地址摘要各存一个文件（`security/login-rate/`、`security/note-rate/`、`monitoring/rate/`），窗口最长 15 分钟，但文件本身原先从不删除。现在 `blob-backup.yml` 在备份任务成功后再运行一个 `cleanup-rate-state` 任务（`scripts/cleanup-rate-state.mjs --apply`）：
+
+- 只列出上述三个前缀，并再次核对路径必须是「前缀 + 64 位十六进制 + `.json`」，其他文件一律不删；
+- 只删除超过 1 天未更新的文件，单次最多 5000 个；
+- 这些文件本来就不进入备份，误删也只是让该地址的计数从零开始；
+- 网站接口（`api/_blob-auth.js`）仍然只有读取和写入，不具备列出或删除的能力。
+
+本地可以不加 `--apply` 运行，只统计将删除的数量；但不要在会话中用生产令牌运行（AGENTS.md 第 7 节）。
