@@ -37,6 +37,8 @@
 .note-frame-completion legend { padding:0 8px;font-size:18px;font-weight:600;color:var(--ds-text); }
 .note-frame-preview { max-height:680px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:18px;line-height:1.85;color:#08333d; }
 .note-frame-library { margin-top:24px; }
+/* 文书清单渲染前，把「我已保存的病历」放到一屏之外，清单出现时不会把它推开（布局偏移 CLS，2026-11-22） */
+#noteFrameWorkspace[hidden] + .note-frame-library { margin-top:100vh; }
 #noteFrameReload { margin:4px 0 12px; }
 .note-frame-saved-list { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px; }
 .note-frame-saved-item { display:flex;flex-direction:column;gap:6px;padding:14px;text-align:left;background:#fff;border:1px solid var(--ds-blue-100);border-radius:12px;color:var(--ds-text);font:inherit;cursor:pointer;overflow-wrap:anywhere; }

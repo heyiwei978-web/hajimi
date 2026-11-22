@@ -1002,8 +1002,9 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   }
   #libraryShell .site-home-mark svg{width:16px;height:16px}
 }
-/* Reserve the template list while catalogs load so the guide below does not jump into view and back out. */
-#templateGrid:empty,#templateGrid>.library-loading:only-child{min-height:70vh}
+/* Reserve the template list while catalogs load so the guide below does not jump into view and back out.
+   A full screen (was 70vh): on phones 70vh still left the guide visible above the fold (CLS, 2026-11-22). */
+#templateGrid:empty,#templateGrid>.library-loading:only-child{min-height:100vh}
 
 /* Keep fixed and sticky controls clear of device safe areas. */
 .topbar{padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}

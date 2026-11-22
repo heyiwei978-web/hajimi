@@ -45,6 +45,9 @@
   if(typeof document!=='undefined'&&document.body){
     var list=classesFor(location.pathname);
     for(var i=0;i<list.length;i++)document.body.classList.add(list[i]);
+    // 词条页的标题和摘要要等资料包：先按常见高度预留位置（ecg.css），资料渲染后由 ecg.js 移除，
+    // 搜索框和正文不会在资料到达时被整体推开（布局偏移）。
+    if(list.indexOf('ecg-entry-page')>=0)document.body.classList.add('ecg-data-pending');
     preloadEcgData(document,location.pathname);
   }
 })();

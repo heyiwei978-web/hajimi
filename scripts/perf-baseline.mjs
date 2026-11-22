@@ -13,7 +13,7 @@ import {fileURLToPath} from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const dist = path.join(root, 'dist');
 export const ROUTES = ['/', '/bl', '/bl/guke', '/bl/guke/TKA', '/classification', '/classification/guke/femoral-neck',
-  '/ecg', '/ecg/atlas/arrhythmia/atrial-fibrillation', '/labs', '/pathway', '/tools', '/duty', '/search?q=骨折', '/note', '/admin'];
+  '/ecg', '/ecg/atlas/arrhythmias/atrial-fibrillation', '/labs', '/pathway', '/tools', '/duty', '/search?q=骨折', '/note', '/admin'];
 const TYPES = {'.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json'};
 
 export function routeFile(config, pathname) {
