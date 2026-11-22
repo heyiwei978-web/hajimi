@@ -33,7 +33,7 @@
       const label=layer.querySelector('text');label.textContent=r.ms+' ms'+(r.rate?' · '+r.rate+'/分':'');
       label.setAttribute('x',Math.min(Math.max((left+right)/2,70),width-70));
       layer.querySelectorAll('line[data-leg]').forEach(line=>line.classList.toggle('is-active',Number(line.dataset.leg)===active));
-      output.innerHTML='';const value=document.createElement('strong');value.textContent='卡尺：'+describe(r);const hint=document.createElement('small');hint.textContent='拖动或点按移动最近的红线；键盘：方向键移动右线，Shift+方向键移动左线，Alt 微调。按网格计算（1 小格 = 40 ms），仅用于练习测量方法。';output.append(value,hint);
+      output.replaceChildren();const value=document.createElement('strong');value.textContent='卡尺：'+describe(r);const hint=document.createElement('small');hint.textContent='拖动或点按移动最近的红线；键盘：方向键移动右线，Shift+方向键移动左线，Alt 微调。按网格计算（1 小格 = 40 ms），仅用于练习测量方法。';output.append(value,hint);
     }
     function toSvgX(event){
       const point=svg.createSVGPoint();point.x=event.clientX;point.y=event.clientY;
