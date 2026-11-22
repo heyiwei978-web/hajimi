@@ -59,7 +59,7 @@ body { margin: 0; }
   border-bottom: 1px solid var(--ws-line);
   background: var(--ws-surface);
 }
-.ws-brand, .ws-account, .ws-button {
+.ws-brand, .ws-button {
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -80,15 +80,6 @@ body { margin: 0; }
 .ws-brand strong, .ws-brand small { display: block; }
 .ws-brand strong { font-size: 17px; letter-spacing: -.02em; }
 .ws-brand small { color: var(--ws-muted); font-size: 12px; }
-.ws-account {
-  justify-self: end;
-  padding: 0 9px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 650;
-  white-space: nowrap;
-}
-.ws-account svg { color: var(--ws-teal); }
 .home-search {
   display: flex;
   align-items: center;
@@ -153,7 +144,7 @@ body { margin: 0; }
   color: var(--ws-teal);
   box-shadow: inset 3px 0 var(--ws-teal);
 }
-.ws-nav a:hover, .ws-account:hover, .home-search button:hover { background: #e0f0ea; }
+.ws-nav a:hover, .home-search button:hover { background: #e0f0ea; }
 .ws-main {
   width: 100%;
   max-width: 1360px;
@@ -301,7 +292,6 @@ body { margin: 0; }
     padding: calc(7px + env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 9px max(14px, env(safe-area-inset-left));
   }
   .ws-brand-mark { width: 36px; height: 36px; }
-  .ws-account { grid-column: 2; grid-row: 1; padding-inline: 5px; }
   .home-search { grid-column: 1 / -1; grid-row: 2; }
   .ws-rail {
     position: fixed;
