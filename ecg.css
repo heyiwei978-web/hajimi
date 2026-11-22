@@ -36,6 +36,9 @@ body.ecg-page{
 .ecg-page .class-content-section{padding:20px;margin-top:18px;scroll-margin-top:calc(var(--site-header-height,72px) + 16px);scroll-margin-bottom:calc(var(--ecg-footer-height,140px) + 16px)}
 /* Reserve the content area while the ECG bundle loads (avoids a layout shift). */
 #ecgApp>p[role="status"]:only-child{min-height:70vh;margin:0}
+/* 词条页底栏固定、正文下方没有别的内容，不需要预留：提示移出文档流，正文区在资料到达前高度为 0，
+   标题区高度变化时不会连同整块正文一起计入布局偏移。 */
+.ecg-data-pending #ecgApp>p[role="status"]:only-child{min-height:0;position:absolute}
 .ecg-atlas-list .ecg-global-search{display:none}
 .ecg-page #ecgApp section[id]{scroll-margin-top:calc(var(--site-header-height,72px) + 16px)}
 .ecg-page .class-content-section p,.ecg-page .class-content-section li{font-size:17px;line-height:1.9}
@@ -87,6 +90,10 @@ body.ecg-page{
 .ecg-entry-page .class-hero{padding:20px 22px}
 .ecg-subpage .class-hero-stats,.ecg-entry-page .class-notice{display:none}
 .ecg-entry-page .class-hero h1{font-size:32px}
+/* 词条资料到达前（route-shell.js 加 ecg-data-pending，ecg.js 渲染时移除）：标题区按 94 个词条渲染后的
+   中位高度预留（手机面包屑多为两行），资料到达后搜索框只需小幅移动（布局偏移 CLS，2026-11-22）。 */
+.ecg-data-pending .class-hero{min-height:221px}
+@media screen and (max-width:699px){.ecg-data-pending .class-hero{min-height:227px}.ecg-data-pending .class-breadcrumb{min-height:59px}}
 .ecg-entry-page .class-shell{padding-bottom:calc(var(--ecg-footer-height,150px) + 32px)}
 html:has(.ecg-entry-page){scroll-padding-bottom:calc(var(--ecg-footer-height,150px) + 16px)}
 /* Phones: related entries become a compact list (category and title); the

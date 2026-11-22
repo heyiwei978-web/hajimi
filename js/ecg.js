@@ -46,7 +46,7 @@
   // never leaks classes, listeners or footer metadata from the previous page.
   function resetShell(){
     for(const undo of cleanup.splice(0))try{undo();}catch{}
-    document.body.classList.remove('ecg-entry-page','ecg-atlas-list');
+    document.body.classList.remove('ecg-entry-page','ecg-atlas-list','ecg-data-pending');
     if(eyebrow)eyebrow.textContent=defaults.eyebrow;
     if(footer&&footer.innerHTML!==defaults.footer)footer.innerHTML=defaults.footer;
     document.documentElement.style.removeProperty('--ecg-footer-height');

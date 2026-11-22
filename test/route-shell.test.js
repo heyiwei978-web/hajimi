@@ -46,7 +46,7 @@ test('the class names it predicts are the ones the page scripts actually toggle'
   const departments=readFileSync(new URL('../departments.js',import.meta.url),'utf8');
   const ecg=readFileSync(new URL('../js/ecg.js',import.meta.url),'utf8');
   for(const name of ['department-no-sidebar','library-root-page','disease-book-page'])assert.match(departments,new RegExp("'"+name+"'"));
-  for(const name of ['ecg-subpage','ecg-atlas-list','ecg-entry-page'])assert.match(ecg,new RegExp("'"+name+"'"));
+  for(const name of ['ecg-subpage','ecg-atlas-list','ecg-entry-page','ecg-data-pending'])assert.match(ecg,new RegExp("'"+name+"'"));
   // Department slugs must stay in sync with the router.
   for(const slug of ['guke','puwai','shennei','fuke'])assert.match(departments,new RegExp(slug));
 });
@@ -82,4 +82,22 @@ test('route-shell starts the ECG data download on every /ecg route except the ho
   const ecg=readFileSync(new URL('../js/ecg.js',import.meta.url),'utf8');
   assert.match(ecg,/getElementById\('ecgDataScript'\)/);assert.match(ecg,/dataset\.state==='error'/);
   assert.match(ecg,/meta\[name="hajimi-ecg-data"\]/);
+});
+
+test('ECG entry pages are marked as waiting for data before first paint, other routes are not',()=>{
+  const bodyClasses=pathname=>{
+    const added=new Set();
+    const document={
+      body:{classList:{add:name=>added.add(name)}},
+      getElementById:()=>null, querySelector:()=>null,
+      head:{appendChild(){}}, createElement:()=>({setAttribute(){}})
+    };
+    runInNewContext(readFileSync(new URL('../js/route-shell.js',import.meta.url),'utf8'),{window:{},document,location:{pathname}},{filename:'route-shell.js'});
+    return [...added];
+  };
+  assert.deepEqual(bodyClasses('/ecg/atlas/arrhythmias/atrial-fibrillation'),['ecg-subpage','ecg-entry-page','ecg-data-pending']);
+  for(const pathname of ['/ecg','/ecg/basics','/ecg/atlas','/ecg/atlas/arrhythmias','/bl/guke/TKA'])
+    assert.ok(!bodyClasses(pathname).includes('ecg-data-pending'),pathname);
+  // ecg.js clears it with the other layout classes once a view renders.
+  assert.match(readFileSync(new URL('../js/ecg.js',import.meta.url),'utf8'),/classList\.remove\([^)]*'ecg-data-pending'/);
 });
