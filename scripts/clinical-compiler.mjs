@@ -5,6 +5,7 @@ import {planClinicalPublication} from './clinical-inventory.mjs';
 import {DEPARTMENTS} from '../config/site-modules.mjs';
 import {renderRouterDepartments} from './department-build.mjs';
 import {hasClinicalJsonSource,loadClinicalJsonSource} from './clinical-source.mjs';
+import {sourcePath} from './public-assets.mjs';
 const root=new URL('../',import.meta.url);
 const digest=value=>createHash('sha256').update(value).digest('hex').slice(0,20);
 
@@ -100,7 +101,9 @@ export function compileClinicalSite(html,directory,{inventory,cmsAudit,source=lo
   manifest.withdrawnGroups=[...new Map([...publication.withdrawn.map(({record})=>record),...(publication.removed||[])].map(r=>
     [r.department+'\0'+r.group,{department:r.department,group:r.group}]))]
     .filter(([key])=>!publicKeys.has(key)).map(([,value])=>value);
-  manifest.scripts.cms=[...html.matchAll(/<script[^>]*src="([^"]+)"/g)].map(match=>match[1]).find(value=>value.startsWith('/cms-core.js?'));
+  // 病历库运行时按清单加载 cms-core.js。清单不经过 asset-versions.mjs（它只改写 HTML），
+  // 所以这里直接用文件内容摘要作版本号，与页面里的 ?v= 规则一致：内容变了网址才变，可以长期缓存。
+  manifest.scripts.cms='/cms-core.js?v='+createHash('sha256').update(fs.readFileSync(new URL(sourcePath('cms-core.js'),root))).digest('hex').slice(0,12);
   const write=(prefix,text,extension='js')=>{const filename=prefix+'-'+digest(text)+'.'+extension;fs.writeFileSync(new URL(filename,directory),text);return '/'+filename;};
   for(const [department,slug]of Object.entries(slugs)){
     const strings=[],pool=new Map(),extras=[],extraPool=new Map(),rows=[];
