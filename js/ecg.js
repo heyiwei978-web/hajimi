@@ -1,7 +1,34 @@
 (()=>{
   'use strict';
-  const data=window.HAJIMI_ECG_DATA,app=document.getElementById('ecgApp');
-  if(!data||!Array.isArray(data.entries)||!app){if(app)app.textContent='心电图资料暂时无法加载。';return;}
+  const app=document.getElementById('ecgApp');
+  if(!app)return;
+  // 词条资料、示意图和经典 12 导联图在单独的资料包里（2026-11-20，优化方案 P1-3）。
+  // 心电图首页不需要它，先显示再在空闲时预取；其他页面由 route-shell.js 在 <body> 开头就开始下载，
+  // 这里只等它完成。未构建直接预览源文件时，资料由页面里的 defer 脚本提前载入。
+  const validData=value=>!!value&&Array.isArray(value.entries);
+  let data=validData(window.HAJIMI_ECG_DATA)?window.HAJIMI_ECG_DATA:null,dataPromise=null;
+  function loadData(){
+    if(data)return Promise.resolve(data);
+    if(validData(window.HAJIMI_ECG_DATA))return Promise.resolve(data=window.HAJIMI_ECG_DATA);
+    if(!dataPromise)dataPromise=new Promise((resolve,reject)=>{
+      let script=document.getElementById('ecgDataScript');
+      if(!script){
+        const url=document.querySelector('meta[name="hajimi-ecg-data"]')?.getAttribute('content');
+        if(!url){reject(new Error('missing ECG data URL'));return;}
+        script=document.createElement('script');script.id='ecgDataScript';script.src=url;script.async=true;
+        document.head.appendChild(script);
+      }else if(script.dataset.state==='error'){reject(new Error('ECG data failed to load'));return;}
+      script.addEventListener('load',resolve);
+      script.addEventListener('error',()=>reject(new Error('ECG data failed to load')));
+    }).then(()=>{
+      if(!validData(window.HAJIMI_ECG_DATA))throw new Error('ECG data invalid');
+      return data=window.HAJIMI_ECG_DATA;
+    }).catch(error=>{
+      // 下一次导航可以重试：移除失败的脚本，清空缓存的 Promise。
+      dataPromise=null;document.getElementById('ecgDataScript')?.remove();throw error;
+    });
+    return dataPromise;
+  }
   const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const points=items=>'<ul class="ecg-points">'+items.map(text=>'<li>'+esc(text)+'</li>').join('')+'</ul>';
   const entryUrl=entry=>'/ecg/atlas/'+entry.category+'/'+entry.id;
@@ -351,9 +378,15 @@
       section('ecg-ph-source','出处',textbookNote(P.source)+'<p><a class="btn" href="/ecg/basics">返回基础学习 →</a></p>');
   }
   function notFound(){setPage('页面未找到','请从栏目首页或图谱分类重新选择。',[{title:'页面未找到'}]);app.innerHTML='<p><a class="btn" href="/ecg">返回心电图首页</a></p>';}
-  function view(){
+  function currentRoute(){
     let route=[];try{route=location.pathname.replace(/\/+$/,'').split('/').filter(Boolean).map(decodeURIComponent);}catch{route=[];}
     if(route[0]==='ecg.html')route[0]='ecg';
+    return route;
+  }
+  // 只有心电图首页（/ecg）不需要资料包。
+  const needsData=()=>{const route=currentRoute();return !(route[0]==='ecg'&&route.length===1);};
+  function view(){
+    const route=currentRoute();
     const pages={basics,periop,tools,quiz,report,phenomena};
     if(route[0]!=='ecg')return notFound();
     if(route.length===1)return home();
@@ -399,15 +432,31 @@
     update();
     cleanup.push(()=>{window.removeEventListener('scroll',update);button.remove();});
   }
-  function render({focus=false,scroll=null}={}){
+  let renderToken=0;
+  function render(options={}){
+    const token=++renderToken;
+    // 记录导航开始时的焦点：资料要等下载时，渲染在之后的任务里完成，读者可能已经开始在搜索框输入。
+    const focusBefore=document.activeElement;
+    if(data||!needsData()){
+      renderView(options,focusBefore);
+      if(!data){const idle=window.requestIdleCallback||(callback=>setTimeout(callback,1200));idle(()=>loadData().catch(()=>{}));}
+      return;
+    }
+    // 不调用 resetShell：保留 route-shell.js 预先设好的版式类名，等资料到了由 renderView 统一重置。
+    const status=document.createElement('p');status.setAttribute('role','status');status.textContent='正在加载心电图栏目……';
+    app.replaceChildren(status);
+    loadData().then(()=>{if(token===renderToken)renderView(options,focusBefore);},()=>{
+      if(token===renderToken)app.textContent='心电图资料暂时无法加载，请检查网络后刷新页面。';
+    });
+  }
+  function renderView({focus=false,scroll=null}={},focusBefore=document.activeElement){
     resetShell();
     view();
     tocJump();
     if(window.HAJIMI_ECG_CALIPERS)window.HAJIMI_ECG_CALIPERS.enhance(app);
     globalSearch.sync();
     // Keyboard focus moves to the new title only if the reader has not already
-    // put it somewhere (e.g. started typing a search) before the next frame.
-    const focusBefore=document.activeElement;
+    // put it somewhere (e.g. started typing a search) since the navigation began.
     // Deferred scripts create these targets before the measured public header is ready.
     requestAnimationFrame(()=>{
       if(scroll!=null)window.scrollTo({top:scroll,behavior:'instant'});
@@ -466,6 +515,8 @@
     function update(){
       const query=input.value.trim();
       if(!query){close();return;}
+      // 首页上资料包可能还没到：先等它，再按当时输入框里的内容搜索。
+      if(!data){loadData().then(()=>{if(document.activeElement===input)update();},()=>{});return;}
       items=searchEngine().search(query,{limit:8});
       list.innerHTML=items.length?items.map((result,index)=>{
         const doc=result.doc,text=doc.type==='entry'&&S.terms(query).every(term=>S.normalize(doc.title+' '+doc.aliases.join(' ')).includes(term))?doc.summary:S.snippet(doc.body,query);

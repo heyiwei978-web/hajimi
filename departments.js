@@ -219,7 +219,7 @@
         '肾内科':{icon:'肾',cls:'dept-nephro',eyebrow:'NEPHROLOGY',hint:'AKI · 肾功能 · 内科记录'},
         '妇科':{icon:'妇',cls:'dept-gyn',eyebrow:'GYNAECOLOGY',hint:'妇科疾病 · 围手术期'}
       }[dep]||{icon:'科',cls:'dept-generic',eyebrow:'DEPARTMENT',hint:'病历模板'};
-      return `<article class="department-card library-department-card ${meta.cls}" data-department="${dep}" role="button" tabindex="0">
+      return `<a class="department-card library-department-card ${meta.cls}" data-department="${dep}" href="/bl/${deptToSlug[dep]}">
         <div class="department-visual">
           <span class="department-icon">${meta.icon}</span>
           <span class="department-eyebrow">${meta.eyebrow}</span>
@@ -229,12 +229,12 @@
         <p>${d?.desc||'病历模板'}</p>
         <small>${meta.hint}</small>
         <div class="department-card-open">进入科室 <span>→</span></div>
-      </article>`;
+      </a>`;
     }
     function diseaseCard(dep,g){
       const items=recordsForDisease(dep,g);
       const chips=['入院','术前','术中','术后'].map((s)=>{const n=items.filter((t)=>t.stage===s).length;return n?`<span>${s} ${n}章</span>`:''}).join('');
-      return `<article class="project-card disease-card" data-disease="${encodeURIComponent(g)}" role="button" tabindex="0"><div class="project-card-top"><span class="project-kind">${dep}</span><strong>1 套完整病历</strong></div><h3>${labelFor(g)}</h3><p>一个病种一个连续病历页面，目录可直达术前讨论、手术记录及术后各日病程。</p><div class="project-stage-chips">${chips}</div><div class="project-open">打开完整病历 <span>→</span></div></article>`;
+      return `<a class="project-card disease-card" data-disease="${encodeURIComponent(g)}" href="/bl/${deptToSlug[dep]}/${encodeURIComponent(g)}"><div class="project-card-top"><span class="project-kind">${dep}</span><strong>1 套完整病历</strong></div><h3>${labelFor(g)}</h3><p>一个病种一个连续病历页面，目录可直达术前讨论、手术记录及术后各日病程。</p><div class="project-stage-chips">${chips}</div><div class="project-open">打开完整病历 <span>→</span></div></a>`;
     }
     function orthoDiseaseCard(g){
       const items=recordsForDisease('骨科',g);
@@ -248,13 +248,13 @@
       const utility=g==='通用场景';
       const meta=utility?`1 组 · ${standardItems.length} 条记录`:specialCases.length?`1 套标准 · ${specialCases.length} 套特殊病例`:`1 套 · ${standardItems.length} 个章节`;
       const copy=utility?'检查理由、会诊和沟通等通用记录单独整理，不计作完整病历模板。':specialCases.length?'标准病历与术后特殊病例分开归档，特殊病例按各自真实时间线连续阅读。':'全部记录整合到同一病种页面，按病历顺序连续阅读并通过目录快速跳转。';
-      return `<article class="ortho-disease-card" data-disease="${encodeURIComponent(g)}" role="button" tabindex="0">
+      return `<a class="ortho-disease-card" data-disease="${encodeURIComponent(g)}" href="/bl/${deptToSlug['骨科']}/${encodeURIComponent(g)}">
         <div class="ortho-card-top"><span>${utility?'通用记录':'完整病历模板'}</span><strong>${meta}</strong></div>
         <h3>${labelFor(g)}</h3>
         <p>${copy}</p>
         <div class="ortho-stage-chips">${chips}</div>
         <div class="ortho-open">${utility?'查看通用记录':'打开整套模板'} <span>↗</span></div>
-      </article>`;
+      </a>`;
     }
     function orthoReserveCard(name){
       return `<article class="ortho-disease-card is-reserve" aria-label="${name}，预留">
@@ -266,9 +266,7 @@
     }
     function bindDiseaseCards(){
       document.querySelectorAll('[data-disease]').forEach((c)=>{
-        const go=()=>navigateDisease(decodeURIComponent(c.dataset.disease));
-        c.onclick=go;
-        c.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
+        c.onclick=linkClick(()=>navigateDisease(decodeURIComponent(c.dataset.disease)));
       });
     }
     function scrollToOrthoCategory(){
@@ -379,8 +377,7 @@
         <section id="libraryPersonal" class="library-quick-panel" aria-label="我的常用入口"></section>`;
       window.HAJIMI_PERSONAL?.mount();
       document.querySelectorAll('[data-department]').forEach((c)=>{
-        const go=()=>navigateDepartment(c.dataset.department);
-        c.onclick=go;c.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
+        c.onclick=linkClick(()=>navigateDepartment(c.dataset.department));
       });
       const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');
       templateStat(totalCount);
@@ -398,8 +395,7 @@
       if(grid)grid.innerHTML=toolbar(currentDept+' · '+departmentCount(currentDept)+' 套完整病历模板',false)+'<div class="project-grid">'+diseases.map((g)=>diseaseCard(currentDept,g)).join('')+'</div>';
       const b=document.getElementById('departmentBack');if(b)b.onclick=()=>navigateRoot();
       document.querySelectorAll('[data-disease]').forEach((c)=>{
-        const go=()=>navigateDisease(decodeURIComponent(c.dataset.disease));
-        c.onclick=go;c.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
+        c.onclick=linkClick(()=>navigateDisease(decodeURIComponent(c.dataset.disease)));
       });
       const tc=document.getElementById('templateCount'),ac=document.getElementById('allCount');templateStat(departmentCount(currentDept));if(ac)ac.textContent=departmentCount(currentDept);
     }
@@ -937,6 +933,14 @@
       const main=document.querySelector('#libraryShell main');
       if(main){main.tabIndex=-1;main.focus({preventScroll:true});}
     }
+    // 卡片是真正的链接（2026-11-20，优化方案 P2-3）：普通左键点击在页面内切换，
+    // 按住 Ctrl/⌘/Shift、中键或「在新标签页打开」时交给浏览器按 href 打开。
+    function linkClick(go){
+      return (e)=>{
+        if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
+        e.preventDefault();go();
+      };
+    }
     function navigateRoot(){history.pushState({},'', '/bl');finishNavigation();}
     function navigateDepartment(dep){history.pushState({},'', '/bl/'+deptToSlug[dep]);finishNavigation();}
     function navigateDisease(g){history.pushState({},'', '/bl/'+deptToSlug[currentDept]+'/'+encodeURIComponent(g));finishNavigation();}
@@ -1029,12 +1033,13 @@
             (showDesc?'<span class="case-match-description">'+highlight(desc)+'</span>':'')+'</div></li>';
         }).join('');
         const code=labelFor(c.group)!==c.group?'<span class="case-search-code">'+highlight(c.group)+'</span>':'';
-        return '<article class="case-search-card" data-case-group="'+encodeURIComponent(c.group)+'" data-case-department="'+encodeURIComponent(c.department)+'" data-case-id="'+encodeURIComponent(c.caseId)+'" tabindex="0" role="button">'+
+        const href='/bl/'+deptToSlug[c.department]+'/'+encodeURIComponent(c.group)+(c.caseType==='special'?'?case='+encodeURIComponent(c.caseId):'');
+        return '<a class="case-search-card" data-case-group="'+encodeURIComponent(c.group)+'" data-case-department="'+encodeURIComponent(c.department)+'" data-case-id="'+encodeURIComponent(c.caseId)+'" href="'+escapeHtml(href)+'">'+
         '<div class="case-search-card-top"><span>'+(c.caseType==='utility'?'通用记录':c.caseType==='special'?'特殊病例模板':'完整病历模板')+' · '+highlight(c.department)+'</span>'+code+'<span>内含 '+count+(c.caseType==='utility'?' 条记录':' 个章节')+'</span></div>'+
         '<h3>'+highlight(c.title)+'</h3><p>'+(c.caseType==='utility'?'按实际临床问题选用检查理由、会诊及沟通等通用记录。':'整合入院、术前、手术、术后康复、出院记录以及独立的签字同意与沟通资料。')+'</p>'+
         '<div class="case-search-matches"><h4>'+(state.q.trim()?'匹配章节':'符合筛选的章节')+'</h4><ul>'+examples+'</ul>'+
         (c.count>c.examples.length?'<small class="case-match-more">另有 '+(c.count-c.examples.length)+' 个匹配章节</small>':'')+'</div>'+
-        '<div class="case-search-card-bottom"><small>匹配 '+c.count+' 个章节</small><b>'+(c.caseType==='utility'?'查看通用记录':'打开整套模板')+' '+icon('next')+'</b></div></article>';
+        '<div class="case-search-card-bottom"><small>匹配 '+c.count+' 个章节</small><b>'+(c.caseType==='utility'?'查看通用记录':'打开整套模板')+' '+icon('next')+'</b></div></a>';
       }
       function append(){
         container.querySelector('.search-more')?.remove();
@@ -1055,8 +1060,7 @@
             history.pushState({},'', '/bl/'+deptToSlug[dep]+'/'+encodeURIComponent(g)+query);
             finishNavigation();
           };
-          card.onclick=open;
-          card.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};
+          card.onclick=linkClick(open);
         });
       }
       append();

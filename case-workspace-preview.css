@@ -2,7 +2,7 @@
 #templateGrid.case-search-results{display:block!important;max-width:none;width:100%;min-width:0}
 .case-search-intro{margin:4px 0 17px;padding:13px 17px;border:1px solid var(--ds-blue-100);border-radius:14px;background:var(--ds-bg);color:#40575d;font-size:13px;line-height:1.8}
 .case-search-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
-.case-search-card{background:#fff;border:1px solid #dfe7e9;border-radius:19px;padding:21px 23px;cursor:pointer;min-width:0;display:flex;flex-direction:column;gap:14px;box-shadow:0 5px 19px rgba(8,51,61,.045);transition:border-color .15s,box-shadow .15s,transform .15s}
+.case-search-card{background:#fff;border:1px solid #dfe7e9;border-radius:19px;padding:21px 23px;cursor:pointer;color:inherit;min-width:0;display:flex;flex-direction:column;gap:14px;box-shadow:0 5px 19px rgba(8,51,61,.045);transition:border-color .15s,box-shadow .15s,transform .15s}
 .case-search-card:hover,.case-search-card:focus-visible{border-color:#71bacc;box-shadow:0 14px 32px rgba(8,51,61,.09);transform:translateY(-1px);outline:none}
 .case-search-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#657e84;font-size:12px;font-weight:650}
 .case-search-card-top span:first-child{background:var(--ds-blue-50);border-radius:7px;padding:5px 9px;color:var(--ds-blue)}

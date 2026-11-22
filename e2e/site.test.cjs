@@ -989,6 +989,28 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
   }
 });
 
+test('ECG data bundle: a failed download shows a message, and a search typed before the data arrives still answers',async()=>{
+  const {page,context,errors}=await pageFor(375);
+  try{
+    // Direct landing on a data page while the data bundle is unreachable.
+    await context.route(/\/assets\/ecg-data-[0-9a-f]{20}\.js$/,route=>route.abort());
+    await page.goto(base+'/ecg/atlas',{waitUntil:'networkidle'});
+    await page.waitForFunction(()=>document.getElementById('ecgApp').textContent.includes('暂时无法加载'));
+    await context.unroute(/\/assets\/ecg-data-[0-9a-f]{20}\.js$/);
+    // The home page renders without the data; the search waits for it instead of failing.
+    let release;const held=new Promise(resolve=>{release=resolve;});
+    await context.route(/\/assets\/ecg-data-[0-9a-f]{20}\.js$/,async route=>{await held;await route.continue();});
+    await page.goto(base+'/ecg',{waitUntil:'domcontentloaded'});
+    await page.locator('#ecgApp .ecg-entry-grid').waitFor();
+    await page.locator('#ecgGlobalSearch').fill('房颤');
+    assert(await page.locator('#ecgGlobalResults').isHidden(),'no results before the data arrives');
+    release();
+    await page.locator('#ecgGlobalResults [role="option"]').first().waitFor();
+    assert.match(await page.locator('#ecgGlobalResults').innerText(),/心房颤动/);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('ECG framework navigates in-page, searches the whole section from the keyboard and measures sketches with calipers',async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width);
@@ -996,8 +1018,11 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
       const scripts=[];page.on('request',request=>{if(request.resourceType()==='script')scripts.push(new URL(request.url()).pathname);});
       await page.goto(base+'/ecg',{waitUntil:'networkidle'});
       const bundle=scripts.filter(item=>/^\/assets\/ecg-[0-9a-f]{20}\.js$/.test(item));
-      assert.equal(bundle.length,1,'one hashed ECG bundle');
-      assert.equal(scripts.filter(item=>/\/ecg-(?:data|book-data)/.test(item)).length,0,'source data files are bundled');
+      assert.equal(bundle.length,1,'one hashed ECG shell bundle');
+      assert.equal(scripts.filter(item=>/^\/ecg-(?:data|book-data)/.test(item)).length,0,'source data files are bundled');
+      // P1-3：资料包单独成包，首页最多在空闲时预取一次，之后的站内跳转不再下载。
+      assert(scripts.filter(item=>/^\/assets\/ecg-data-[0-9a-f]{20}\.js$/.test(item)).length<=1,'the data bundle is fetched at most once');
+      const fetched=scripts.length;
       // In-section links render without another document load or data download.
       await page.evaluate(()=>{window.__ecgMarker=1;});
       await page.locator('#ecgApp a[href="/ecg/atlas"]').first().click();
@@ -1005,6 +1030,7 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
       assert.equal(await page.locator('h1').innerText(),'图谱库');
       assert.equal(await page.evaluate(()=>window.__ecgMarker),1,'no full page reload');
       assert(await page.locator('#ecgGlobalSearchForm').isHidden(),'atlas uses its own filter');
+      assert(scripts.slice(fetched).every(item=>/^\/assets\/ecg-data-[0-9a-f]{20}\.js$/.test(item)),'in-section navigation loads nothing but (at most) the data bundle');
       await page.locator('a[href="/ecg/atlas/pulmonary"]').first().click();
       await page.locator('a[href="/ecg/atlas/pulmonary/pulmonary-embolism"]').click();
       await page.waitForURL(base+'/ecg/atlas/pulmonary/pulmonary-embolism');
@@ -1020,7 +1046,8 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
       await page.goBack();await settle(page);await page.goBack();await settle(page);
       assert.equal(await page.locator('h1').innerText(),'心电图');
       assert.equal(await page.locator('#ecgReviewFooter').innerText().then(text=>/参考文献：见各栏目及词条/.test(text)),true,'footer metadata resets');
-      assert.equal(scripts.filter(item=>item.startsWith('/assets/ecg-')).length,1,'bundle downloaded once');
+      assert.equal(scripts.filter(item=>/^\/assets\/ecg-[0-9a-f]{20}\.js$/.test(item)).length,1,'shell bundle downloaded once');
+      assert.equal(scripts.filter(item=>/^\/assets\/ecg-data-[0-9a-f]{20}\.js$/.test(item)).length,1,'data bundle downloaded once');
       // Global search: "/" focuses, results span long-form pages, keyboard opens the result.
       await page.keyboard.press('/');
       assert.equal(await page.evaluate(()=>document.activeElement.id),'ecgGlobalSearch');
@@ -1061,6 +1088,30 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
   }
+});
+
+test('ECG navigation that waits for the data bundle still leaves focus in a search box the reader moved to',async()=>{
+  const {page,context,errors}=await pageFor(1440);
+  try{
+    // Hold the data bundle so the navigation from the home page has to wait for it (as on a slow connection).
+    let release;const held=new Promise(resolve=>{release=resolve;});
+    await context.route(/\/assets\/ecg-data-[0-9a-f]{20}\.js$/,async route=>{await held;await route.continue();});
+    await page.goto(base+'/ecg',{waitUntil:'domcontentloaded'});
+    await page.locator('#ecgApp .ecg-entry-grid').waitFor();
+    await page.locator('main a[href="/ecg/basics"]').first().click();
+    await page.locator('#ecgGlobalSearch').focus();
+    release();
+    await page.locator('#ecgApp section').first().waitFor();
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.equal(await page.evaluate(()=>document.activeElement.id),'ecgGlobalSearch','focus stays where the reader put it');
+    // Without that, the late render still moves focus to the new page title.
+    await page.goto(base+'/ecg',{waitUntil:'networkidle'});
+    await page.locator('main a[href="/ecg/periop"]').first().click();
+    await page.waitForURL(base+'/ecg/periop');
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.equal(await page.evaluate(()=>document.activeElement.id),'ecgTitle');
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
 });
 
 test('ECG in-page navigation does not pull focus away from a search started before the next frame',async()=>{
@@ -1308,6 +1359,44 @@ test('ECG tools calculate both QTc formulas and RR heart rate, discard stale res
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
   }
+});
+
+test('record library cards are real links: href deep links, in-page navigation on click or Enter, new tab with Ctrl',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await page.goto(base+'/bl',{waitUntil:'networkidle'});
+    assert.equal(await page.locator('[role="button"].department-card,[role="button"].ortho-disease-card,[role="button"].disease-card,[role="button"].case-search-card,article.department-card').count(),0,'no clickable non-link cards');
+    const dept=page.locator('a.library-department-card[href="/bl/puwai"]');
+    assert.equal(await dept.count(),1);
+    await page.evaluate(()=>{window.__libraryMarker=1;});
+    await dept.click();await page.waitForURL(base+'/bl/puwai');
+    assert.equal(await page.evaluate(()=>window.__libraryMarker),1,'plain click stays in the page');
+    const disease=page.locator('a.disease-card').first();
+    assert.match(await disease.getAttribute('href'),/^\/bl\/puwai\/[^/]+$/);
+    // Ctrl/⌘/Shift/中键点击：卡片自己的处理器不能拦截（交给浏览器按 href 在新标签页打开），当前页面也不在页内跳转。
+    // 不依赖浏览器真的打开新标签页（CI 上新标签页的导航时有时无，见 #158 的 CI）：在文档上记录点击是否已被拦截，
+    // 然后由测试自己拦下默认行为，避免真的打开或跳转。
+    const href=await disease.getAttribute('href');
+    await page.evaluate(()=>{window.__clicks=[];document.addEventListener('click',event=>{if(event.target.closest('a.disease-card')){window.__clicks.push(event.defaultPrevented);event.preventDefault();}});});
+    for(const modifiers of [[process.platform==='darwin'?'Meta':'Control'],['Shift']])await disease.click({modifiers});
+    await disease.click({button:'middle'});
+    await page.waitForTimeout(200);
+    assert.deepEqual(await page.evaluate(()=>window.__clicks),[false,false],'modified clicks are left to the browser (middle clicks fire auxclick, not click)');
+    assert.equal(new URL(page.url()).pathname,'/bl/puwai','no in-page navigation for modified clicks');
+    assert.equal(await page.evaluate(()=>window.__libraryMarker),1);
+    // Keyboard: Tab focus + Enter follows the link in-page.
+    await disease.focus();await page.keyboard.press('Enter');
+    await page.waitForURL(url=>url.pathname===new URL(base+href).pathname);
+    assert.equal(await page.evaluate(()=>window.__libraryMarker),1);
+    // Orthopaedic index and search results use links too.
+    await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
+    const ortho=page.locator('a.ortho-disease-card[href^="/bl/guke/"]');
+    assert((await ortho.count())>0);
+    await page.goto(base+'/bl?q=%E8%82%9D%E8%84%93%E8%82%BF',{waitUntil:'networkidle'});
+    await page.locator('a.case-search-card').first().waitFor();
+    assert.match(await page.locator('a.case-search-card').first().getAttribute('href'),/^\/bl\/puwai\//);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
 });
 
 test('classification renders correctly whichever script arrives first (async classification.js vs deferred data)',async()=>{
