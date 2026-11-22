@@ -1,7 +1,7 @@
 // Public assets are an explicit allowlist. Clinical authoring sources, policy,
 // identity ledgers and audit artifacts remain in Git, never in dist/.
 export const PUBLIC_PAGES=[
-  'admin.html','classification.html','duty.html','duty-orders.html','labs.html','note.html','ecg.html',
+  '404.html','admin.html','classification.html','duty.html','duty-orders.html','labs.html','note.html','ecg.html',
   'password-hash.html','pathway.html','search.html','tools.html'
 ];
 export const PUBLIC_STYLES=[
