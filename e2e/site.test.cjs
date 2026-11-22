@@ -1373,15 +1373,17 @@ test('record library cards are real links: href deep links, in-page navigation o
     assert.equal(await page.evaluate(()=>window.__libraryMarker),1,'plain click stays in the page');
     const disease=page.locator('a.disease-card').first();
     assert.match(await disease.getAttribute('href'),/^\/bl\/puwai\/[^/]+$/);
-    // Ctrl/⌘-click opens the card's own URL in a new tab and leaves this page alone.
+    // Ctrl/⌘/Shift/中键点击：卡片自己的处理器不能拦截（交给浏览器按 href 在新标签页打开），当前页面也不在页内跳转。
+    // 不依赖浏览器真的打开新标签页（CI 上新标签页的导航时有时无，见 #158 的 CI）：在文档上记录点击是否已被拦截，
+    // 然后由测试自己拦下默认行为，避免真的打开或跳转。
     const href=await disease.getAttribute('href');
-    const popup=context.waitForEvent('page');
-    await disease.click({modifiers:[process.platform==='darwin'?'Meta':'Control']});
-    // 只等新标签页提交到卡片自己的地址，不等它加载完（CI 上新标签页的加载事件不稳定）。
-    const opened=await popup,expected=new URL(base+href).pathname;
-    await opened.waitForURL(url=>url.pathname===expected,{waitUntil:'commit'});
-    await opened.close();
-    assert.equal(new URL(page.url()).pathname,'/bl/puwai');
+    await page.evaluate(()=>{window.__clicks=[];document.addEventListener('click',event=>{if(event.target.closest('a.disease-card')){window.__clicks.push(event.defaultPrevented);event.preventDefault();}});});
+    for(const modifiers of [[process.platform==='darwin'?'Meta':'Control'],['Shift']])await disease.click({modifiers});
+    await disease.click({button:'middle'});
+    await page.waitForTimeout(200);
+    assert.deepEqual(await page.evaluate(()=>window.__clicks),[false,false],'modified clicks are left to the browser (middle clicks fire auxclick, not click)');
+    assert.equal(new URL(page.url()).pathname,'/bl/puwai','no in-page navigation for modified clicks');
+    assert.equal(await page.evaluate(()=>window.__libraryMarker),1);
     // Keyboard: Tab focus + Enter follows the link in-page.
     await disease.focus();await page.keyboard.press('Enter');
     await page.waitForURL(url=>url.pathname===new URL(base+href).pathname);
