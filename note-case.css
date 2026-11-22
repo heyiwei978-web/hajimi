@@ -2,7 +2,7 @@
 /* Keep the chapter list visible and put editing right below the chosen item. */
 .note-shared > summary { cursor:pointer; font-weight:650; color:var(--ws-ink,#08333d); }
 .note-shared[open] > summary { margin-bottom:18px; }
-.note-back-to-checklist { display:inline-flex; align-items:center; min-height:44px; font-weight:650; }
+.note-back-to-checklist { display:inline-flex; align-items:center; min-height:44px; color:var(--ds-blue); font-weight:650; }
 .note-frame-heading { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; }
 .note-frame-heading h2 { margin:0; scroll-margin-top:calc(var(--site-header-height,72px) + 16px); }
 .note-frame-progress { margin:0; font-size:.875rem; color:var(--ws-muted,var(--ds-muted)); font-variant-numeric:tabular-nums; }
@@ -44,7 +44,7 @@
 .note-frame button:disabled { cursor:default;opacity:.6; }
 .note-frame .note-batch-controls { flex-wrap:wrap; }
 .note-frame .note-batch-controls button { white-space:normal; }
-#noteFrameSavedLink { display:inline-block;margin-top:12px;overflow-wrap:anywhere; }
+#noteFrameSavedLink { display:inline-block;margin-top:12px;color:var(--ds-blue);overflow-wrap:anywhere; }
 #noteFrameSavedLink[hidden] { display:none; }
 @media(max-width:700px) {
   .note-frame-config,.note-frame-saved-list { grid-template-columns:minmax(0,1fr); }
@@ -59,7 +59,7 @@
   .note-frame-preview { max-height:none;overflow:visible; }
 }
 
-.note-inline-link { display:inline-flex; align-items:center; min-height:44px; font-size:.875rem; font-weight:650; }
+.note-inline-link { display:inline-flex; align-items:center; min-height:44px; color:var(--ds-blue); font-size:.875rem; font-weight:650; }
 .note-hero > .note-inline-link { margin:-10px 0 8px; }
 .note-frame-toolbar { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px 16px; margin:16px 0 8px; }
 .note-frame-filters,.note-frame-shortcuts { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
