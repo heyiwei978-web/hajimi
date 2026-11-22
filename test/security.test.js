@@ -373,7 +373,7 @@ test('security response headers are present and not weakened', () => {
   const headers = Object.fromEntries(config.headers.find(rule => rule.source === '/(.*)').headers.map(item => [item.key,item.value]));
   const csp = Object.fromEntries(headers['Content-Security-Policy'].split(';').map(part => part.trim().split(/\s+/)).map(([name,...values]) => [name,values.join(' ')]));
   assert.deepEqual(csp,{
-    'default-src':"'self'",'script-src':"'self'",'style-src':"'self' 'unsafe-inline'",'img-src':"'self' data: blob:",'font-src':"'self'",
+    'default-src':"'self'",'script-src':"'self'",'style-src':"'self'",'img-src':"'self' data: blob:",'font-src':"'self'",
     'connect-src':"'self'",'frame-src':"'none'",'object-src':"'none'",'base-uri':"'self'",'form-action':"'self'",'frame-ancestors':"'none'"
   });
   assert.equal(headers['X-Content-Type-Options'],'nosniff');
@@ -472,3 +472,16 @@ test('login record can only be read by a signed-in administrator', async t => {
   assert.equal(failing.code,503);
 });
 
+
+test('no inline styles or <style> blocks: CSP style-src stays without unsafe-inline', () => {
+  // 脚本通过 element.style 修改样式不受 CSP 限制；页面和拼接的 HTML 里不能出现 style 属性或 <style> 块。
+  const files = [...fs.readdirSync(new URL('../', import.meta.url)).filter(file => file.endsWith('.html')),
+    ...fs.readdirSync(new URL('../js/', import.meta.url)).filter(file => file.endsWith('.js')).map(file => 'js/' + file),
+    'app.js', 'departments.js', 'search-core.js', 'scripts/navigation-build.mjs', 'scripts/department-build.mjs', 'scripts/clinical-compiler.mjs', 'scripts/build-home.mjs'];
+  for (const file of files) {
+    const text = fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+    assert.doesNotMatch(text, /<style[\s>]/i, file + ' has a <style> block');
+    assert.doesNotMatch(text, /\sstyle\s*=\s*["'\\]/i, file + ' has an inline style attribute');
+    assert.doesNotMatch(text, /setAttribute\(\s*["']style["']/, file + ' sets a style attribute');
+  }
+});
