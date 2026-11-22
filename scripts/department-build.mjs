@@ -37,7 +37,7 @@ export function renderHomeDepartments(source, departments=DEPARTMENTS) {
         throw new Error('Unexpected content between homepage department cards');
       }
       const cards = departments.filter(department => department.records).map(department =>
-        `<a href="/bl/${html(department.slug)}"><span class="home-department-icon" aria-hidden="true">${html(presentation(department,'homeIcon'))}</span><div><strong>${html(department.name)}</strong><small>${html(presentation(department,'homeDescription'))}</small></div><b aria-hidden="true">↗</b></a>`);
+        `<a href="/bl/${html(department.slug)}"><span class="home-department-icon" aria-hidden="true">${html(presentation(department,'homeIcon'))}</span><div><strong>${html(department.name)}</strong><small>${html(presentation(department,'homeDescription'))}</small></div><b aria-hidden="true">›</b></a>`);
       return match[1] + prefix + cards.join(gaps[0] || '') + suffix + match[3];
     }, 'homepage department grid');
 }
