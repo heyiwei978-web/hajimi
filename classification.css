@@ -2,7 +2,6 @@
 *{box-sizing:border-box}
 body.class-page{margin:0;background:var(--cl-bg);color:var(--cl-ink);font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
 .class-shell{width:min(1360px,calc(100% - 36px));margin:0 auto;padding:23px 0 65px}
-.class-topnav .official-links a.active{color:var(--ds-blue);font-weight:750}
 .class-breadcrumb{display:flex;gap:9px;align-items:center;flex-wrap:wrap;color:#7a949a;font-size:12px;margin:0 0 20px}
 .class-breadcrumb a{color:var(--ds-muted);text-decoration:none}.class-breadcrumb a:hover{color:var(--ds-blue)}
 .class-hero{min-height:258px;display:flex;justify-content:space-between;align-items:center;gap:30px;border-radius:22px;padding:37px 43px;background:linear-gradient(125deg,var(--ds-ink) 5%,var(--ds-blue-strong) 97%);color:white;position:relative;overflow:hidden}

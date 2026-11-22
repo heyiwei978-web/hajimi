@@ -864,7 +864,9 @@ test('ECG routes share the public layout, expose learning sections, case practic
         const response=await page.goto(base+'/ecg'+(route?'/'+route:''),{waitUntil:'networkidle'});
         assert.equal(response.status(),200);
         assert.equal(await page.locator('h1').innerText(),title);
-        assert.equal(await page.locator('header nav a.active').getAttribute('href'),'/ecg');
+        // 心电图 belongs to 临床: that destination is highlighted (aria-current="true") and fully visible.
+        assert.equal(await page.locator('header nav a.active').getAttribute('href'),'/clinical');
+        assert.equal(await page.locator('header nav a.active').getAttribute('aria-current'),'true');
         assert(await page.locator('header nav a.active').evaluate(element=>{const r=element.getBoundingClientRect(),nav=element.closest('nav').getBoundingClientRect();return r.left>=nav.left-1&&r.right<=nav.right+1;}));
         assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
         assert.match(await page.locator('#ecgReviewFooter').innerText(),/仅供临床参考，不替代医生判断/);
@@ -938,12 +940,13 @@ test('ECG routes share the public layout, expose learning sections, case practic
         await page.getByRole('main').locator('a[href="/ecg"]').click();
         await page.waitForURL(base+'/ecg');
       }
+      // Every section reaches 临床 (which lists 心电图) from the same five-entry navigation.
       for(const route of ['/classification','/pathway','/tools','/duty']){
         await page.goto(base+route,{waitUntil:'networkidle'});
-        assert.equal(await page.locator('header nav a[href="/ecg"]').count(),1,'public ECG navigation on '+route);
+        assert.equal(await page.locator('header nav a[href="/clinical"]').count(),1,'临床 in the navigation on '+route);
       }
       await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
-      assert.equal(await page.locator('.library-top-actions a[href="/ecg"]').count(),1);
+      assert.equal(await page.locator('#libraryShell .site-nav a[href="/clinical"]').count(),1);
       if(width===320){await page.locator('#menuBtn').click();await page.locator('.mobile-drawer-shortcuts a[href="/ecg"]').click();await page.waitForURL(base+'/ecg');}
       await page.goto(base+'/ecg/atlas/not-a-category',{waitUntil:'networkidle'});
       assert.equal(await page.locator('h1').innerText(),'页面未找到');
@@ -2214,21 +2217,26 @@ test('failed admin reads disable management; late responses after logout cannot 
   }finally{await context.close();}
 });
 
-test('record pages: phone header matches other sections with a scrolling navigation row',async()=>{
-  for(const width of [360,390,700,1280]){
+test('record pages: same five-entry navigation, bottom tabs on phones, patient and sign-in controls in the header',async()=>{
+  for(const width of [360,390,700,768,1280]){
     const {page,context,errors}=await pageFor(width);
     try{
       await page.goto(base+'/bl/guke/'+encodeURIComponent('股骨转子间骨折'),{waitUntil:'networkidle'});
-      const active=page.locator('.library-top-actions .library-active-link');
+      const nav=page.locator('#libraryShell nav[aria-label="主导航"]');
+      assert.deepEqual(await nav.locator('a').allInnerTexts(),['工作台','临床','资料','学习','我的']);
+      const active=nav.locator('a.active');
+      assert.equal(await active.getAttribute('href'),'/clinical');
       const box=await active.boundingBox();
-      assert(box&&box.width>0&&box.x>=0&&box.x+box.width<=width,'the current section is shown in the navigation');
-      assert.equal(await page.locator('.library-top-actions a').count(),10,'all main sections, including 检验解读 and AI 病历生成');
+      assert(box&&box.width>0&&box.x>=0&&box.x+box.width<=width,'the current destination is shown in the navigation');
       assert.equal(await page.locator('#patientBtn').isVisible(),true);
       assert.equal(await page.locator('#libraryShell [data-auth-slot] [data-cms-login]').isVisible(),true);
-      if(width<=650){
-        const [brand,nav]=await Promise.all([page.locator('.library-topbar .brandline').boundingBox(),page.locator('.library-top-actions').boundingBox()]);
-        assert(nav.y>=brand.y+brand.height-1,'navigation sits in its own row below the brand');
-        assert(nav.width>=width-40,'and spans the header width');
+      const [header,bar]=await Promise.all([page.locator('#libraryShell .library-topbar').boundingBox(),nav.boundingBox()]);
+      if(width<=720){
+        const viewport=await page.evaluate(()=>({width:document.documentElement.clientWidth,height:innerHeight}));
+        // Pages that reserve a scrollbar gutter (styles.css) leave it beside fixed bars when scrollbars are not overlaid.
+        assert(Math.abs(bar.y+bar.height-viewport.height)<2&&bar.x<=0&&bar.width>=viewport.width-16,`phones: tab bar along the bottom edge (${JSON.stringify(bar)} in ${JSON.stringify(viewport)})`);
+      }else{
+        assert(bar.y>=header.y-1&&bar.y+bar.height<=header.y+header.height+1,'wider screens: navigation inside the header');
       }
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
       assert.deepEqual(errors,[]);
@@ -2365,20 +2373,49 @@ test('pathway directory selections and direct links leave their title cards belo
   }
 });
 
-test('the active navigation link stays visible after loading and resizing each standalone page',async()=>{
+test('the highlighted destination stays visible after loading and resizing each standalone page',async()=>{
   const {page,context,errors}=await pageFor(320);
   try{
-    for(const route of ['/tools','/admin','/pathway','/duty']){
+    for(const [route,hub] of [['/tools','/clinical'],['/admin','/personal'],['/pathway','/clinical'],['/duty','/clinical']]){
       await page.setViewportSize({width:320,height:740});await page.goto(base+route,{waitUntil:'networkidle'});
       for(const width of [320,768,1440,375]){
         await page.setViewportSize({width,height:740});await settle(page);
-        assert(await page.locator('.official-links,.nav nav').evaluate(element=>{
-          const item=element.querySelector('a.active').getBoundingClientRect(),bounds=element.getBoundingClientRect();
-          return item.left>=bounds.left-1&&item.right<=bounds.right+1;
-        }),`visible selected navigation on ${route} at ${width}px`);
-        assert.equal(await page.evaluate(()=>scrollY),0,'horizontal navigation does not scroll the page');
+        const active=page.locator('header nav a.active');
+        assert.equal(await active.getAttribute('href'),hub,route);
+        const box=await active.boundingBox();
+        assert(box&&box.x>=0&&box.x+box.width<=width&&box.y>=0&&box.y+box.height<=740,`visible highlighted destination on ${route} at ${width}px`);
+        assert.equal(await page.evaluate(()=>scrollY),0,'the navigation does not scroll the page');
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
       }
-      assert.equal(await page.locator('header a[href="/duty"]').count(),1);
+      assert.equal(await page.locator('header nav a').count(),5);
+    }
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('phones: bottom-anchored controls and the end of each page stay clear of the tab bar',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await page.goto(base+'/ecg/atlas/arrhythmias/atrial-fibrillation',{waitUntil:'networkidle'});
+    const [footer,tabs]=await Promise.all([page.locator('#ecgReviewFooter').boundingBox(),page.locator('header nav').boundingBox()]);
+    assert(Math.abs(footer.y+footer.height-tabs.y)<2,'the ECG review footer sits directly on the tab bar');
+    for(const route of ['/tools','/labs','/pathway','/duty','/note','/admin','/classification','/bl/guke']){
+      await page.goto(base+route,{waitUntil:'networkidle'});
+      // Lazily rendered sections (content-visibility) change the page height while scrolling: repeat until it settles.
+      for(let attempt=0;attempt<20;attempt++){
+        await page.evaluate(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:'instant'}));await settle(page);
+        if(await page.evaluate(()=>Math.abs(scrollY+innerHeight-document.documentElement.scrollHeight)<2))break;
+      }
+      // The page's own top-level blocks (not content inside panels that scroll on their own).
+      const last=await page.evaluate(()=>{
+        const nav=document.querySelector('nav[aria-label="主导航"]:not(.ws-nav)').getBoundingClientRect();
+        const shell=document.querySelector('#libraryShell:not([hidden])')||document.body;
+        const blocks=[...shell.querySelectorAll(':scope > *, :scope > .page > *, :scope > .page > * > main > *, :scope > main > *')]
+          .filter(element=>{const r=element.getBoundingClientRect(),style=getComputedStyle(element);
+            return r.height>0&&!['fixed','absolute','sticky'].includes(style.position)&&!element.matches('nav,header,script,dialog,aside,[hidden]');});
+        return {bottom:Math.max(...blocks.map(element=>element.getBoundingClientRect().bottom)),tabs:nav.top};
+      });
+      assert(last.bottom<=last.tabs+1,`${route}: the last content ends above the tab bar (${last.bottom} > ${last.tabs})`);
     }
     assert.deepEqual(errors,[]);
   }finally{await context.close();}
@@ -2828,7 +2865,7 @@ test('order reference is locked without login; admins search, edit, insert, dele
     assert.deepEqual(current, SHEETS, 'restored to the first backup');
 
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no horizontal page scroll');
-    assert.equal(await page.getAttribute('header nav a[aria-current="page"]', 'href'), '/duty');
+    assert.equal(await page.getAttribute('header nav a[aria-current="true"]', 'href'), '/clinical', '值班资料 sits under 临床');
     assert.deepEqual(errors, []);
     await context.close();
   }
@@ -2841,7 +2878,7 @@ test('lab interpretation lists every item, searches, opens deep links and fits p
     const total = await page.locator('.labs-item').count();
     assert.ok(total >= 50);
     assert.match(await page.textContent('#labsResult'), new RegExp('共 ' + total + ' 项'));
-    assert.equal(await page.getAttribute('header nav a[aria-current="page"]', 'href'), '/labs');
+    assert.equal(await page.getAttribute('header nav a[aria-current="true"]', 'href'), '/clinical', '检验解读 sits under 临床');
     await page.fill('#labsSearch', 'Cr');
     await page.waitForFunction(() => /找到 \d+ 项/.test(document.querySelector('#labsResult').textContent));
     assert.equal(await page.locator('#lab-cr').isVisible(), true);

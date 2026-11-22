@@ -97,7 +97,7 @@
   .labs-ranges th{width:44%}
 }
 @media print{
-  .labs-search,.labs-toc,.labs-steps,.official-nav,.skip-link{display:none!important}
+  .labs-search,.labs-toc,.labs-steps,.skip-link{display:none!important}
   .labs-item{break-inside:avoid;border:1px solid #999;margin-bottom:6pt}
   .labs-item:not([open]) .labs-item-body{display:none}
 }

@@ -42,7 +42,7 @@ test('main site and completed orthopedic records link to the pathway center',()=
   const vercel=JSON.parse(fs.readFileSync(new URL('../vercel.json',import.meta.url),'utf8'));
   assert.match(index,/class="home-quick-pathway ws-text-link" href="\/pathway"/);
   assert.doesNotMatch(index,/首个样板/);
-  assert.match(index,/href="\/pathway">临床路径/);
+  assert.match(fs.readFileSync(new URL('../workstation-sections.html',import.meta.url),'utf8'),/<a class="ws-row" href="\/pathway">/);
   assert.match(departments,/查看临床路径/);
   for(const key of ['tka','tha','fnf','intertroch','pilon','trimalleolar','acdf','lumbarFusion']) assert.match(departments,new RegExp("'"+key+"'"));
   assert.match(fs.readFileSync(new URL('../js/pathway.js',import.meta.url),'utf8'),/URLSearchParams\(location\.search\)/);

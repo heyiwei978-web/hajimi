@@ -105,7 +105,7 @@ test('pinyin initials find Chinese titles without letting abbreviations drift', 
 test('search page is registered, published and free of inline script', () => {
   const module = MODULES.find(entry => entry.id === 'search');
   assert.equal(module.href, '/search');
-  assert.equal(module.nav, false, 'search is not a tenth main navigation entry');
+  assert.ok(!module.workspace && !module.hub, 'search is not a main navigation destination');
   assert.ok(NAV_SURFACES.some(surface => surface.file === 'search.html' && surface.active === null));
   const vercel = JSON.parse(read('vercel.json'));
   for (const source of ['/search', '/search/']) assert.ok(vercel.rewrites.some(rule => rule.source === source && rule.destination === '/search.html'));

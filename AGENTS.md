@@ -85,16 +85,17 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 
 ## 5. 生成与注册机制（改之前先确认源头）
 
-- **导航**：所有页面的主导航链接由 `scripts/navigation-build.mjs` 按 `config/site-modules.mjs` 在构建时生成。
-  - 增删改栏目、改导航顺序、改当前项 → 只改注册表，不要手改各页面的导航链接。
-  - 导航顺序也是界面约定：`styles.css` 在 640px 以下隐藏第 4 个导航项，`styles.css` 后部的规则（原 `ui-polish.css`）再为官方导航恢复；调整顺序要在手机宽度下验证。
+- **导航**（2026-11-22 起全站统一）：每个页面的主导航都是同样五项——工作台、临床、资料、学习、我的（注册表中带 `workspace` 的模块），由 `scripts/navigation-build.mjs` 按 `config/site-modules.mjs` 在构建时生成。电脑宽度在顶栏里（工作台各页是左侧栏），720px 及以下固定在屏幕底部。
+  - 其余栏目用 `hub` 指明归属（病历模板、疾病分型、心电图等属于「临床」，管理入口属于「我的」）；打开这些栏目时高亮所属一项（`aria-current="true"`），在五项自己的页面上为 `aria-current="page"`。栏目入口放在对应的工作台页面（`workstation-sections.html`），不进主导航。
+  - 增删改栏目、改归属、改当前项 → 只改注册表，不要手改各页面的导航链接。
+  - 手机底部导航的高度记在 `--site-tabbar-height`（`theme.css`「统一顶栏与主导航」）；新增固定在屏幕底部的元素要加上它，例如 `bottom:calc(16px + var(--site-tabbar-height,env(safe-area-inset-bottom,0px)))`。
   - 注册表的 `routes` 要与 `vercel.json` 的 rewrites 保持一致；新增路由两处都要改。
 - **科室**：科室卡片、路由元数据、分型列表由 `scripts/department-build.mjs` 依据注册表的 `DEPARTMENTS` 生成。
 - **发布白名单**：`scripts/public-assets.mjs` 是公开文件的显式白名单。新增要公开的页面、样式或脚本，必须加入对应列表，否则不会进入 `dist/`。病历源脚本、`config/`、`scripts/`、`docs/`、`content/` 和所有 `.md` 都不得公开。
 - **心电图**：`ecg.html` 的脚本顺序必须与 `scripts/ecg-compiler.mjs` 中的 `ECG_SOURCES` 一致，否则构建失败；编译期会校验词条 id、分类、示意图、相关链接、参考文献（必须 https）和日期格式。
 - **首页**：首页样式和入口内容维护在 `index.html`；`home.html` 由构建生成。
 - **缓存版本号**：构建时 `scripts/asset-versions.mjs` 把 `dist/` 页面里所有 `/文件.css|js?v=…` 替换为该文件内容的哈希。**不需要也不要手动改版本号**；源 HTML 里的 `?v=` 只在不构建直接预览源文件时起作用。新增引用时照样写 `?v=` 即可被接管。
-- **顶栏**：官方页面（`official`）和工具页（`tools`）的整个 `<header>` 由 `scripts/navigation-build.mjs` 按模板生成：品牌区来自 `SITE_BRAND`，导航来自 `MODULES`；页面只能保留额外的 header 样式类和 `.official-nav-right` 里的专属按钮。往顶栏里加别的内容会让构建失败——需要的话先改模板。源文件里的顶栏与构建结果保持逐字节一致：改完注册表后运行 `npm run sync:nav` 同步源文件，再 `npm run build`（测试 `navigation-build` 会检查两者一致）。
+- **顶栏**：除工作台各页和病历模板库外，所有页面（注册表 `site`）的整个 `<header class="site-header">` 由 `scripts/navigation-build.mjs` 按同一个模板生成：品牌区来自 `SITE_BRAND`，导航来自 `MODULES`；页面只能保留额外的 header 样式类和 `.site-header-right` 里的专属按钮（`.site-header-action`，1180px 以下隐藏）。病历模板库保留自己的顶栏（科室品牌、患者信息、登录），只共用 `<nav class="site-nav">`。往顶栏里加别的内容会让构建失败——需要的话先改模板。源文件里的顶栏与构建结果保持逐字节一致：改完注册表后运行 `npm run sync:nav` 同步源文件，再 `npm run build`（测试 `navigation-build` 会检查两者一致）。
 
 ## 6. 医学内容（最高风险，必须遵守）
 
@@ -142,7 +143,7 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 
 ## 8. 界面与前端规范
 
-- 参考 `docs/interface-design.md`：移动端优先、单列起步；统一青岚配色（见 `docs/interface-design.md`）、卡片、按钮、标题和间距；手机导航在自身区域横向滚动。
+- 参考 `docs/interface-design.md`：移动端优先、单列起步；统一青岚配色（见 `docs/interface-design.md`）、卡片、按钮、标题和间距；手机上主导航是底部五项标签栏。
 - 病历阅读字号 18/20/22px 三档，目录、正文、预览同步；字号与高亮只改显示，不影响复制和打印。
 - 无障碍基线（不得倒退）：每页 `lang="zh-CN"`、跳到主内容链接、全局 `:focus-visible` 焦点框、`prefers-reduced-motion` 全局降级、表单都有 label、提示信息用 `role="status"`/`aria-live`、破坏性操作先确认。
 - 不禁止缩放（不写 `user-scalable=no` / `maximum-scale=1`），不用 `transition: all`，不用可点击的 `<div>`/`<span>` 代替按钮或链接。
@@ -186,4 +187,3 @@ npx playwright install chromium && npm run test:browser   # 构建后跑手机/�
 
 ## 11. 已知待办（供参考，不代表已授权）
 
-- 工具页顶栏仍使用独立的 `tools` 结构与样式（tools-page.css）；如要与官方顶栏完全合并，需要同时调整样式并做视觉核对。

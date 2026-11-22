@@ -47,7 +47,7 @@
     },
     "pathway.css": {
       "important": 2,
-      "colorLiterals": 61
+      "colorLiterals": 60
     },
     "personal-workstation.css": {
       "important": 0,
@@ -62,12 +62,12 @@
       "colorLiterals": 21
     },
     "styles.css": {
-      "important": 74,
-      "colorLiterals": 262
+      "important": 70,
+      "colorLiterals": 247
     },
     "theme.css": {
       "important": 8,
-      "colorLiterals": 74
+      "colorLiterals": 69
     },
     "tools-page.css": {
       "important": 2,
@@ -75,7 +75,7 @@
     },
     "tools-polish.css": {
       "important": 2,
-      "colorLiterals": 7
+      "colorLiterals": 5
     }
   }
 }
