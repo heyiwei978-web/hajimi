@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import test from 'node:test';
 import fs from 'node:fs';
-import {createSession,readSession,sha256,hashPassword,verifyPassword,securityChecks} from '../api/_auth.js';
+import {createSession,readSession,renewSession,SESSION_TTL_MS,MAX_LIFETIME_MS,sha256,hashPassword,verifyPassword,securityChecks} from '../api/_auth.js';
 import {guardRequest} from '../api/_security.js';
 import login,{createLoginHandler} from '../api/login.js';
 import {createLoginLog,describeRequest,LIMITS} from '../api/_login-log.js';
@@ -66,6 +66,90 @@ test('missing signing secret rejects an empty-key forgery and prevents new sessi
   await login(request({body:{username:'test-admin',password:'test-password'}}),res);
   assert.equal(res.code,503);
   assert.equal(res.headers['set-cookie'],undefined);
+});
+
+test('HAJIMI_SESSION_VERSION revokes every earlier session without rotating the signing secret', t => {
+  const previous = process.env.HAJIMI_SESSION_VERSION;
+  t.after(() => { if (previous === undefined) delete process.env.HAJIMI_SESSION_VERSION; else process.env.HAJIMI_SESSION_VERSION = previous; });
+  delete process.env.HAJIMI_SESSION_VERSION;
+  const legacy = adminEnvironment(t);
+  const read = cookie => readSession(request({headers:{cookie}}));
+  assert.ok(read(legacy), 'without a version, sessions stay valid');
+  assert.equal(JSON.parse(Buffer.from(legacy.slice('hajimi_session='.length).split('.')[0],'base64url')).v, undefined);
+
+  process.env.HAJIMI_SESSION_VERSION = '20261119';
+  assert.equal(read(legacy), null, 'setting a version for the first time logs out older sessions');
+  const current = 'hajimi_session=' + createSession('test-admin');
+  assert.equal(read(current).v, '20261119');
+
+  process.env.HAJIMI_SESSION_VERSION = ' 20261119 ';
+  assert.ok(read(current), 'surrounding whitespace in the variable is ignored');
+
+  process.env.HAJIMI_SESSION_VERSION = '20261120';
+  assert.equal(read(current), null, 'changing the version logs out every session signed under the old one');
+
+  delete process.env.HAJIMI_SESSION_VERSION;
+  assert.equal(read(current), null, 'removing the version does not revive versioned sessions');
+  const forgedPayload = Buffer.from(JSON.stringify({u:'test-admin',exp:Date.now()+60000,v:''})).toString('base64url');
+  const forged = 'hajimi_session='+forgedPayload+'.'+crypto.createHmac('sha256','wrong-secret').update(forgedPayload).digest('base64url');
+  assert.equal(read(forged), null);
+});
+
+test('sessions last 12 hours, slide on admin use, and stop renewing 7 days after login', t => {
+  adminEnvironment(t);
+  const hour = 60 * 60 * 1000, start = Date.UTC(2026, 10, 19, 0, 0, 0);
+  assert.equal(SESSION_TTL_MS, 12 * hour); assert.equal(MAX_LIFETIME_MS, 7 * 24 * hour);
+  const cookieOf = token => 'hajimi_session=' + token;
+  const at = (cookie, now) => readSession(request({headers:{cookie}}), now);
+  const first = cookieOf(createSession('test-admin', {now:start}));
+  assert.ok(at(first, start + 12 * hour - 1));
+  assert.equal(at(first, start + 12 * hour), null, 'expires after 12 hours without use');
+
+  const quiet = response();
+  assert.equal(renewSession(request({headers:{cookie:first}}), quiet, start + 10 * 60 * 1000), false, 'no renewal within the first 30 minutes');
+  assert.equal(quiet.headers['set-cookie'], undefined);
+
+  const renewed = response(), renewAt = start + 11 * hour;
+  assert.equal(renewSession(request({headers:{cookie:first}}), renewed, renewAt), true);
+  assert.match(renewed.headers['set-cookie'], /^hajimi_session=[^;]+; Path=\/; HttpOnly; Secure; SameSite=Strict; Max-Age=43200$/);
+  const second = renewed.headers['set-cookie'].split(';')[0];
+  assert.ok(at(second, renewAt + 12 * hour - 1), 'renewed session runs 12 hours from the renewal');
+  assert.equal(at(second, renewAt).l, start, 'login time is carried over');
+
+  // Keep renewing every 11 hours: the session never outlives login + 7 days.
+  let cookie = first, now = start, last = null;
+  while (true) {
+    now += 11 * hour;
+    const res = response();
+    if (!at(cookie, now)) break;
+    if (renewSession(request({headers:{cookie}}), res, now)) cookie = res.headers['set-cookie'].split(';')[0];
+    last = now;
+  }
+  assert.ok(last < start + MAX_LIFETIME_MS && now >= start + MAX_LIFETIME_MS - 11 * hour);
+  assert.equal(at(cookie, start + MAX_LIFETIME_MS), null, 'no session survives 7 days after login');
+
+  const sign = payload => crypto.createHmac('sha256', process.env.HAJIMI_SESSION_SECRET).update(payload).digest('base64url');
+  const token = data => { const payload = Buffer.from(JSON.stringify(data)).toString('base64url'); return cookieOf(payload + '.' + sign(payload)); };
+  assert.equal(at(token({u:'test-admin', exp:start + 6 * 24 * hour}), start), null, 'old 7-day sessions without a login time are rejected');
+  assert.equal(at(token({u:'test-admin', l:start, exp:start + 2 * SESSION_TTL_MS}), start), null, 'expiry beyond 12 hours is rejected');
+  assert.equal(at(token({u:'test-admin', l:start + hour, exp:start + 2 * hour}), start), null, 'login time in the future is rejected');
+});
+
+test('admin requests through guardRequest and GET /api/session renew; anonymous requests never get a cookie', async t => {
+  adminEnvironment(t);
+  const old = 'hajimi_session=' + createSession('test-admin', {now:Date.now() - 2 * 60 * 60 * 1000});
+  const guarded = response();
+  assert.equal(guardRequest(request({method:'GET',headers:{cookie:old}}), guarded, {methods:['GET'],admin:true}), true);
+  assert.match(guarded.headers['set-cookie'], /^hajimi_session=.+Max-Age=43200$/);
+  const status = response();
+  await session(request({method:'GET',headers:{cookie:old}}), status);
+  assert.equal(status.body.authenticated, true); assert.match(status.headers['set-cookie'], /Max-Age=43200$/);
+  const anonymous = response();
+  await session(request({method:'GET',headers:{cookie:''}}), anonymous);
+  assert.equal(anonymous.headers['set-cookie'], undefined);
+  const publicRead = response();
+  assert.equal(guardRequest(request({method:'GET',headers:{cookie:old}}), publicRead, {methods:['GET']}), true);
+  assert.equal(publicRead.headers['set-cookie'], undefined, 'non-admin endpoints do not touch the session');
 });
 
 test('expired, tampered, extra-part and malformed-cookie sessions are rejected', t => {
