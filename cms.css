@@ -1,6 +1,6 @@
 
 .cms-auth-slot{display:inline-flex;align-items:center;gap:8px}
-.cms-login-btn,.cms-logout-btn{border:0;background:none;color:#06c;font-size:12px;cursor:pointer;padding:4px 0}
+.cms-login-btn,.cms-logout-btn{border:0;background:none;color:#04768a;font-size:12px;cursor:pointer;padding:4px 0}
 .cms-admin-badge{font-size:12px;font-weight:650;color:#137333;background:#e6f4ea;border-radius:999px;padding:5px 8px;white-space:nowrap}
 .cms-dialog{border:0;border-radius:18px;padding:0;width:min(520px,calc(100vw - 28px));max-height:calc(100dvh - 32px);overflow:auto;box-shadow:0 25px 80px rgba(0,0,0,.22)}
 .cms-dialog::backdrop{background:rgba(0,0,0,.36);backdrop-filter:blur(4px)}
@@ -25,10 +25,10 @@
 .cms-check input{width:20px!important;height:20px;margin:0!important;flex-shrink:0}
 .cms-privacy{font-size:12px;line-height:1.55;color:#8a5b00;background:#fff8e6;border:1px solid #f5dfab;border-radius:10px;padding:10px 12px}
 .cms-preview-admin{display:inline-flex;flex-wrap:wrap;gap:8px;min-width:0}
-.cms-cases{margin:22px 0 0;border-top:1px solid #eceef1;padding:22px 0 6px}
+.cms-cases{margin:22px 0 0;border-top:1px solid var(--ds-blue-50);padding:22px 0 6px}
 .cms-cases-title{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .cms-cases-title strong{font-size:17px}
-.cms-cases-title span{font-size:12px;color:#8a9098}
+.cms-cases-title span{font-size:12px;color:#869295}
 .cms-case-card{border:1px solid #e7e8ea;border-radius:12px;padding:14px;margin:10px 0;background:#fff}
 .cms-case-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
 .cms-case-head>div:first-child{min-width:0;flex:1;overflow-wrap:anywhere}
@@ -53,7 +53,7 @@
 .cms-actions{padding-bottom:env(safe-area-inset-bottom,0px)}
 /* 放大 toggle for the template and case editors. */
 .cms-head-buttons{display:flex;align-items:center;gap:8px;flex:none}
-.cms-expand{border:1px solid #cfd8e3;background:#fff;color:#1d4f86;border-radius:999px;min-height:44px;padding:0 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.cms-expand{border:1px solid #cadade;background:#fff;color:var(--ds-blue-strong);border-radius:999px;min-height:44px;padding:0 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
 .cms-dialog.is-expanded{width:calc(100vw - 16px);max-width:none;height:calc(100dvh - 16px);max-height:none}
 .cms-edit-dialog.is-expanded textarea{height:calc(100dvh - 250px);font-size:17px}
 .cms-dialog.is-expanded textarea[name="description"]{height:calc(100dvh - 520px);min-height:200px;font-size:17px}

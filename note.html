@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f8f8">
+<title>AI 病历生成 · 哈基米工作站</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%228%22%20fill%3D%22%2311697a%22%2F%3E%3Cg%20transform%3D%22translate(4%204)%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.65%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%206c-2.5-1.7-6-2.2-9-1v13c3-1.2%206.5-1%209%201%202.5-2%206-2.2%209-1V5c-3-1.2-6.5-.7-9%201v13M15%2011h3m-1.5-1.5v3%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="/styles.css?v=20261118-merge1">
+<link rel="stylesheet" href="/theme.css?v=20261118-merge1">
+<link rel="stylesheet" href="/note.css?v=20261113-note1">
+<link rel="stylesheet" href="/note-case.css?v=20261117">
+</head>
+<body class="note-page">
+<a class="skip-link" href="#noteMain">跳到主要内容</a>
+<header class="global-nav official-nav">
+  <div class="global-nav-inner official-nav-inner">
+    <a class="global-brand official-brand" href="/"><span class="official-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-2.5-1.7-6-2.2-9-1v13c3-1.2 6.5-1 9 1 2.5-2 6-2.2 9-1V5c-3-1.2-6.5-.7-9 1v13M15 11h3m-1.5-1.5v3"/></svg></span><span class="official-brand-text"><strong>哈基米工作站</strong><small>个人医学工作台</small></span></a>
+    <nav class="global-links official-links" aria-label="主导航"><a href="/">首页</a><a href="/bl">病历模板</a><a href="/classification">疾病分型</a><a href="/ecg">心电图</a><a href="/labs">检验解读</a><a href="/pathway">临床路径</a><a href="/duty">值班资料</a><a href="/tools">临床工具</a><a class="active" href="/note" aria-current="page">AI 病历生成</a><a href="/admin">管理入口</a></nav>
+  </div>
+</header>
+<main id="noteMain" class="note-main">
+  <section class="note-hero">
+    <h1>完整病历框架</h1>
+    <p>填写一次共用病情，按清单逐项填写或用 DeepSeek 生成。</p>
+    <a id="noteOpenLegacy" class="note-inline-link" href="#noteLegacyTools">打开原有 AI 病历生成</a>
+  </section>
+
+  <section class="note-privacy" aria-label="隐私说明">
+    <strong>仅供虚构教学示例，请勿输入真实患者信息</strong>
+    <span>示例内容会发送给第三方 AI 服务。请勿输入真实患者身份或病情，生成后请逐项核对。</span>
+  </section>
+
+  <p id="noteLogin" class="note-login" hidden>需要先<a href="/admin">登录管理入口</a>才能使用 AI 生成；登录后回到本页，本标签页已填写的草稿会保留。</p>
+
+  <details id="noteSharedInputs" class="note-card note-shared">
+    <summary>共用病情与 DeepSeek 模型</summary>
+  <form id="noteForm" novalidate>
+    <div class="note-case-toolbar">
+      <p class="note-tip">当前病例信息由下方文书共用，仅暂存在本标签页。</p>
+      <button type="button" id="noteNewCase" class="note-button note-secondary">新建病例 / 清空本病例</button>
+    </div>
+    <label class="note-field note-wide">DeepSeek 模型
+      <select name="model" id="noteModel"><option value="">原配置默认模型</option></select>
+    </label>
+    <p id="noteModelStatus" class="note-tip" role="status">登录后可读取同一接口当前可用的 DeepSeek 模型。</p>
+    <h2>病例基本信息</h2>
+    <label class="note-field note-wide">科室
+      <select name="department"><option>骨科</option><option>普外科</option><option>肾内科</option><option>妇科</option></select>
+    </label>
+    <label class="note-field note-wide">常见病种（可选，选后自动填入示例）
+      <select id="notePreset"><option value="">— 不使用示例，手动填写 —</option></select>
+    </label>
+    <div class="note-row">
+      <label class="note-field">性别
+        <select name="sex"><option value="">未填</option><option>男</option><option>女</option></select>
+      </label>
+      <label class="note-field">年龄（岁）
+        <input name="age" inputmode="numeric" maxlength="3" pattern="\d{1,3}" autocomplete="off">
+      </label>
+    </div>
+    <label class="note-field note-wide">主诉 <em>必填</em>
+      <input name="complaint" maxlength="120" autocomplete="off" placeholder="例如：摔伤致右髋部疼痛、活动受限3小时">
+    </label>
+    <label class="note-field note-wide">主诊断 <em>必填</em>
+      <input name="diagnosis" maxlength="160" autocomplete="off" placeholder="例如：右股骨颈骨折（Garden Ⅳ型）">
+    </label>
+    <label class="note-field note-wide">现病史要点（可选）
+      <textarea name="history" maxlength="600" rows="3" placeholder="受伤经过、院外处理、影像检查结果等"></textarea>
+    </label>
+    <label class="note-field note-wide">其他诊断 / 合并症（可选）
+      <input name="secondary" maxlength="300" autocomplete="off" placeholder="例如：高血压病2级、2型糖尿病">
+    </label>
+    <details class="note-details">
+      <summary>补充核对要点（可选）</summary>
+      <label class="note-field">过敏及长期禁忌
+        <textarea name="allergies" maxlength="200" rows="2" placeholder="填写已确认的过敏或限制；留空不等于无过敏"></textarea>
+      </label>
+      <label class="note-field">入院检查要点
+        <textarea name="checks" maxlength="400" rows="3" placeholder="保留原始数值、单位和检查时间；后续新结果写在当日变化中"></textarea>
+      </label>
+    </details>
+
+    <h2>手术信息 <small>生成术前小结、手术记录、术后病程时需要</small></h2>
+    <label class="note-field note-wide">手术方式
+      <input name="operation" maxlength="160" autocomplete="off" list="noteOperations" placeholder="例如：右侧人工股骨头置换术">
+      <datalist id="noteOperations"></datalist>
+    </label>
+    <label class="note-field note-wide">麻醉方式
+      <select name="anesthesia"><option value="">未填</option><option>全身麻醉</option><option>腰硬联合麻醉</option><option>神经阻滞麻醉</option><option>椎管内麻醉</option><option>局部麻醉</option></select>
+    </label>
+    <label class="note-field note-wide">补充说明（可选）
+      <textarea name="extra" maxlength="400" rows="2" placeholder="需特别注意的共同病情或限制；实际术中信息请填下方“已确认的手术细节”"></textarea>
+    </label>
+    <label class="note-field">补充说明适用范围
+      <select name="extraScope"><option value="shared">共同病情与限制</option><option value="operative">仅手术及术后文书</option><option value="">旧版未分类，按原文时点核对</option></select>
+    </label>
+    <p id="noteLegacyExtra" class="note-tip" hidden>旧草稿的补充说明尚未分类；其中的术中、术后事实不应写入入院或术前文书。可选择适用范围，或将实际手术信息移到下方。</p>
+    <details class="note-details">
+      <summary>已确认的手术细节（可选）</summary>
+      <label class="note-field">实际手术信息
+        <textarea name="operativeFacts" maxlength="600" rows="3" placeholder="例如：实际入路、出血量、假体型号、是否输血或放置引流。仅供手术及术后文书使用，未提供的具体参数不编造。"></textarea>
+      </label>
+    </details>
+
+    <a class="note-back-to-checklist" href="#noteFrameHeading">返回病历清单 ↓</a>
+    <details id="noteLegacyTools" class="note-details">
+      <summary>参考模板与单份文书工具</summary>
+    <label class="note-field note-wide">参考现有教学病例（可选）
+      <select id="noteCase"><option value="">不选择参考病例</option></select>
+    </label>
+    <label class="note-field note-wide">参考章节
+      <select id="noteChapter" disabled><option value="">选择病例后查看</option></select>
+    </label>
+    <p id="noteCaseStatus" class="note-tip" role="status">适合常规模板时，模板片段会发送给 AI 作为写法参考；不适合时将单独生成，不使用参考片段。</p>
+    <label class="note-field note-wide" id="noteReferenceWrap" hidden>教学病例原文
+      <textarea id="noteReference" rows="8" readonly></textarea>
+    </label>
+    <label class="note-field note-wide">参考片段（可选，最多 1000 字）
+      <textarea name="referenceText" maxlength="1000" rows="4" placeholder="可从原文复制并编辑参考片段；请先删除姓名、住院号等身份信息。片段将发送给 AI。"></textarea>
+    </label>
+    <h2>每日病程 <small>生成单份术前或术后病程时填写</small></h2>
+    <label class="note-field">当日变化所属阶段
+      <select name="dailyPhase"><option value="post">术后（术后天数）</option><option value="pre">术前（住院天数）</option></select>
+    </label>
+    <label class="note-field note-wide">住院天数或术后天数
+      <input name="day" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="填写第几天，例如 2">
+    </label>
+    <label class="note-field note-wide">当日变化（可选）
+      <textarea name="daily" maxlength="600" rows="3" placeholder="只补充今天的症状、查体变化、新检查结果及处理调整，可注明查房医师级别；常规内容自动补全，具体数值以输入为准"></textarea>
+    </label>
+    <button type="button" id="noteNextDay" class="note-button note-secondary">下一天，清空当日变化</button>
+    <p class="note-tip">保留基础病情与已生成文书。前一天的变化和生成正文不会自动作为今天的事实。</p>
+    <h2>生成独立文书</h2>
+    <fieldset class="note-batch">
+      <legend>整套生成</legend>
+      <p class="note-tip">勾选本次需要的文书，逐份判断并生成。每份通常有一次识别请求和一次生成请求，均计入限流（每 10 分钟最多 20 次）；遇到失败会暂停，可手动继续。</p>
+      <div class="note-batch-options">
+        <label><input type="checkbox" data-batch-type="first" checked>首次病程记录</label>
+        <label><input type="checkbox" data-batch-type="preop" checked>术前小结</label>
+        <label><input type="checkbox" data-batch-type="op" checked>手术记录</label>
+        <label><input type="checkbox" data-batch-type="postop" checked>术后首次病程</label>
+        <label><input type="checkbox" data-batch-type="spec">专科检查</label>
+        <label><input type="checkbox" data-batch-type="preDaily">术前病程记录</label>
+        <label><input type="checkbox" data-batch-type="postDaily">术后病程记录</label>
+        <label><input type="checkbox" data-batch-type="caseChapter">所选参考章节</label>
+      </div>
+      <div class="note-batch-controls">
+        <button type="button" id="noteGenerateSet" class="note-button">生成所选文书（4 份）</button>
+        <button type="button" id="noteResume" class="note-button note-secondary" hidden>继续未完成文书</button>
+      </div>
+    </fieldset>
+    <p class="note-tip">也可单独生成一份；重新生成同类型、同一天的文书前会确认替换。</p>
+    <div class="note-actions" role="group" aria-label="选择要生成的文书">
+      <button type="button" data-type="caseChapter">生成所选章节</button>
+      <button type="button" data-type="spec">专科检查</button>
+      <button type="button" data-type="first">首次病程记录</button>
+      <button type="button" data-type="preDaily">术前病程记录</button>
+      <button type="button" data-type="preop">术前小结</button>
+      <button type="button" data-type="op">手术记录</button>
+      <button type="button" data-type="postop">术后首次病程</button>
+      <button type="button" data-type="postDaily">术后病程记录</button>
+    </div>
+    <p id="noteStatus" class="note-status" role="status" aria-live="polite"></p>
+    </details>
+  </form>
+  </details>
+
+  <section id="noteCaseFrame" class="note-card note-frame" aria-labelledby="noteFrameHeading">
+    <div class="note-frame-heading">
+      <h2 id="noteFrameHeading" tabindex="-1">病历文书清单</h2>
+      <p id="noteFrameProgress" class="note-frame-progress" role="status"></p>
+    </div>
+    <details id="noteFrameSettings" class="note-details note-frame-settings">
+      <summary>路径与天数 <span id="noteFrameSettingsSummary"></span></summary>
+      <div class="note-frame-config">
+        <label class="note-field">诊疗路径<select id="noteFrameMode"><option value="surgery">手术病历</option><option value="medical">非手术病历</option></select></label>
+        <label class="note-field" id="noteFramePreWrap">手术在住院第几天<input id="noteFramePreDays" type="number" min="1" max="30" value="3" inputmode="numeric"></label>
+        <label class="note-field" id="noteFramePostWrap">术后每日病程天数<input id="noteFramePostDays" type="number" min="1" max="90" value="14" inputmode="numeric"></label>
+        <label class="note-field" id="noteFrameStayWrap" hidden>住院每日病程天数<input id="noteFrameStayDays" type="number" min="1" max="90" value="7" inputmode="numeric"></label>
+      </div>
+      <fieldset class="note-frame-extras">
+        <legend>按需加入其他文书</legend>
+        <div id="noteFrameExtras" class="note-batch-options"></div>
+      </fieldset>
+      <button type="button" id="noteFrameBuild" class="note-button note-secondary">应用到清单</button>
+    </details>
+    <p id="noteFrameStatus" class="note-status" role="status" aria-live="polite"></p>
+    <div id="noteFrameWorkspace" hidden>
+      <div class="note-frame-toolbar">
+        <div class="note-frame-filters" role="group" aria-label="筛选病历文书">
+          <button type="button" class="note-button note-secondary" data-frame-filter="all" aria-pressed="true">全部</button>
+          <button type="button" class="note-button note-secondary" data-frame-filter="missing" aria-pressed="false">待填写</button>
+          <button type="button" class="note-button note-secondary" data-frame-filter="review" aria-pressed="false">待核对</button>
+        </div>
+        <div class="note-frame-shortcuts">
+          <button type="button" id="noteFrameNext" class="note-button note-secondary">下一项未完成</button>
+          <a class="note-inline-link" href="#noteFrameCompletion">跳到整套保存 ↓</a>
+        </div>
+      </div>
+      <p id="noteFrameFilterEmpty" class="note-tip" role="status" hidden></p>
+      <div id="noteFrameDirectory" class="note-frame-directory"></div>
+      <div id="noteFrameEditor" class="note-frame-editor" hidden>
+        <label class="note-field"><span id="noteFrameNotesLabel">本章补充要点</span><textarea id="noteFrameSectionNotes" maxlength="600" rows="3"></textarea></label>
+        <label class="note-field">本章正文<textarea id="noteFrameOutput" rows="12" maxlength="16000" spellcheck="false"></textarea></label>
+        <label class="note-frame-confirm"><input id="noteFrameConfirmed" type="checkbox">我已核对本章内容</label>
+        <p id="noteFrameSectionModel" class="note-tip" hidden></p>
+        <div class="note-frame-shortcuts">
+          <button type="button" id="noteFrameCopySection" class="note-button note-secondary" disabled>复制本章</button>
+          <button type="button" id="noteFrameConfirmNext" class="note-button note-secondary" disabled>核对完成，继续下一项</button>
+        </div>
+        <p id="noteFrameEditorStatus" class="note-status" hidden></p>
+      </div>
+      <div class="note-batch-controls note-frame-batch">
+        <button type="button" id="noteFrameGenerateMissing" class="note-button note-secondary">批量生成空白文书</button>
+        <button type="button" id="noteFrameStop" class="note-button note-secondary" hidden>完成本章后停止</button>
+      </div>
+      <fieldset id="noteFrameCompletion" class="note-frame-completion"><legend>病历完成设置</legend>
+        <label class="note-field">保存名称<input id="noteFrameTitle" maxlength="100" autocomplete="off" placeholder="例如：右股骨颈骨折完整教学病历"></label>
+        <label class="note-frame-confirm"><input id="noteFrameFinalConfirm" type="checkbox">我已核对整套虚构教学病历，确认保存</label>
+        <p id="noteFrameCompletionHint" class="note-tip"></p>
+        <div class="note-batch-controls"><button type="button" id="noteFrameComplete" class="note-button" disabled>完成病历并保存到网站</button><button type="button" id="noteFrameCopy" class="note-button note-secondary" disabled>复制整套病历</button></div>
+        <button type="button" id="noteFrameVerifySave" class="note-button note-secondary" hidden>核对保存结果 / 恢复版本</button>
+        <p id="noteFrameSaveStatus" class="note-status" hidden></p>
+        <a id="noteFrameSavedLink" target="_blank" rel="noopener" hidden>打开已保存病历</a>
+      </fieldset>
+      <details class="note-details"><summary>连续预览整套病历</summary><pre id="noteFramePreview" class="note-frame-preview"></pre></details>
+    </div>
+    <details class="note-details note-frame-library">
+      <summary>我已保存的病历</summary>
+      <button type="button" id="noteFrameReload" class="note-button note-secondary">刷新列表</button>
+      <label class="note-field">搜索已保存病历<input id="noteFrameSearch" type="search" maxlength="100" placeholder="名称、诊断或科室"></label>
+      <p id="noteFrameLibraryStatus" class="note-tip" role="status"></p>
+      <div id="noteFrameSavedList" class="note-frame-saved-list"></div>
+    </details>
+  </section>
+
+  <button type="button" id="noteStop" class="note-button note-secondary" hidden>完成本份后停止</button>
+  <p id="noteBatchStatus" class="note-status" role="status" aria-live="polite" hidden></p>
+  <p id="noteStorageStatus" class="note-status note-error" role="status" hidden></p>
+
+  <section id="noteResult" class="note-card note-result" hidden>
+    <div id="noteDocumentList" class="note-document-list" role="group" aria-label="本病例已生成文书"></div>
+    <div class="note-result-head">
+      <h2 id="noteResultTitle">生成结果</h2>
+      <div class="note-result-buttons">
+        <button type="button" id="noteCopy">复制本份</button>
+        <button type="button" id="noteClear" class="note-secondary">删除本份</button>
+      </div>
+    </div>
+    <p id="noteRoute" class="note-tip" role="status" hidden></p>
+    <details id="noteFacts" class="note-details">
+      <summary>核对本份文书的输入事实</summary>
+      <p class="note-tip">以下为生成时的输入快照。文字匹配仅供对照，不判断医学正确性；阶段不适用的信息可能不写入本份文书。提示不随正文复制。</p>
+      <dl id="noteFactList" class="note-facts"></dl>
+    </details>
+    <label class="visually-hidden" for="noteOutput">生成结果（可直接修改）</label>
+    <textarea id="noteOutput" rows="18" spellcheck="false" aria-describedby="noteReview"></textarea>
+    <p id="noteCopyStatus" class="note-status" role="status" aria-live="polite" hidden></p>
+    <p id="noteReview" class="note-tip">医学审核提醒：生成内容仅供虚构教学，自动补全内容需由专业人员核对。此提醒不随正文复制。</p>
+    <p class="note-tip">可切换文书逐份编辑、复制，刷新可恢复。共用设备使用后请点击“清空本病例”并关闭标签页。</p>
+  </section>
+</main>
+<script defer src="/note-case-core.js?v=20261117"></script>
+<script defer src="/note-workflow.js?v=20261116"></script>
+<script defer src="/note-documents.js?v=20261116"></script>
+<script defer src="/note.js?v=20261115-note2"></script>
+<script defer src="/note-case.js?v=20261117"></script>
+<script defer src="/workspace.js?v=20261009-layout1"></script>
+</body>
+</html>

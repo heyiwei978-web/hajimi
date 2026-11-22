@@ -8,8 +8,9 @@ import {loadBuildSource} from '../scripts/clinical-compiler.mjs';
 import {planClinicalPublication} from '../scripts/clinical-inventory.mjs';
 import {compileCaseTemplates} from '../scripts/clinical-compiler.mjs';
 import {collectSiteSearch, withChapterNames, SEARCH_SECTIONS, SITE_SEARCH_DATA} from '../scripts/site-search-build.mjs';
+import {sourcePath} from '../scripts/public-assets.mjs';
 
-const read = file => fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+const read = file => fs.readFileSync(new URL('../'+sourcePath(file), import.meta.url), 'utf8');
 const publication = planClinicalPublication(loadBuildSource(read('index.html')));
 const manifest = withChapterNames({caseTemplates: compileCaseTemplates(publication.published)}, publication.published);
 const index = collectSiteSearch(manifest);
@@ -17,7 +18,7 @@ const bySection = id => index.documents.filter(document => document.s === id);
 
 function engine() {
   const context = {window: {}};
-  vm.runInNewContext(read('ecg-search.js'), context);
+  vm.runInNewContext(read('js/ecg-search.js'), context);
   const api = context.window.HAJIMI_ECG_SEARCH;
   const search = api.create(index.documents.map(item =>
     ({type: item.s, title: item.t, aliases: item.a, body: [item.d, item.b].filter(Boolean).join(' '), item})));
@@ -43,7 +44,7 @@ test('site search covers every section with unique, well-formed links', () => {
 });
 
 test('site search follows each section\'s own data', () => {
-  const labs = vm.runInNewContext(read('labs-data.js') + ';window.HAJIMI_LABS', {window: {}});
+  const labs = vm.runInNewContext(read('js/labs-data.js') + ';window.HAJIMI_LABS', {window: {}});
   const labItems = labs.categories.flatMap(category => category.items);
   assert.equal(bySection('labs').length, labItems.length + 1, 'every lab item plus the section page');
   for (const item of labItems) assert.ok(bySection('labs').some(document => document.u === '/labs#lab-' + item.id), item.id);
@@ -51,7 +52,7 @@ test('site search follows each section\'s own data', () => {
   const tools = [...read('tools.html').matchAll(/data-tool="([a-z0-9-]+)"/g)].map(match => match[1]);
   assert.equal(bySection('tools').length, tools.length + 1, 'every calculator card plus the section page');
   // Calculators are declared either in SRC (`id:[`) or in EXTRA (`id:{src:[`); both open from ?tool=id.
-  for (const id of tools) assert.match(read('tools-page.js'), new RegExp('\\n' + id + ":(?:\\[|\\{src:\\[)"), 'tool ' + id + ' can be opened by link');
+  for (const id of tools) assert.match(read('js/tools-page.js'), new RegExp('\\n' + id + ":(?:\\[|\\{src:\\[)"), 'tool ' + id + ' can be opened by link');
 
   const cases = manifest.caseTemplates.items;
   assert.equal(bySection('records').length, cases.length + 1, 'one entry per published case plus the section page');
@@ -93,7 +94,7 @@ test('search page is registered, published and free of inline script', () => {
   const html = read('search.html');
   assert.doesNotMatch(html, /<script>(?!<\/script>)|\son[a-z]+=/i);
   assert.match(html, /<script defer src="\/site-search-data\.js\?v=[^"]+"><\/script>/);
-  assert.doesNotMatch(read('site-search.js'), /insertAdjacentHTML|eval\(|new Function|localStorage|sessionStorage/);
-  assert.equal(read('site-search.js').match(/innerHTML/g).length, 1, 'only the escaped highlight helper writes HTML');
+  assert.doesNotMatch(read('js/site-search.js'), /insertAdjacentHTML|eval\(|new Function|localStorage|sessionStorage/);
+  assert.equal(read('js/site-search.js').match(/innerHTML/g).length, 1, 'only the escaped highlight helper writes HTML');
   assert.match(read('index.html'), /<form class="home-search" action="\/search" method="get" role="search">/);
 });

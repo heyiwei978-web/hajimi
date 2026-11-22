@@ -1,0 +1,87 @@
+<template id="clinical">
+  <div class="ws-heading">
+    <div><h1>临床</h1><p>按临床任务打开所需资料</p></div>
+    <a class="ws-button ws-button-primary" href="/note">AI 病历生成</a>
+  </div>
+  <div class="ws-columns">
+    <div class="ws-stack">
+      <section class="ws-panel" aria-labelledby="ws-documents-title">
+        <div class="ws-panel-heading"><h2 id="ws-documents-title">病历与路径</h2></div>
+        <a class="ws-row" href="/bl"><span><strong>病历模板</strong><small>按科室、病种和诊疗阶段查看完整教学示例</small></span><b aria-hidden="true">›</b></a>
+        <a class="ws-row" href="/note"><span><strong>AI 病历生成</strong><small>使用 DeepSeek 整份生成或按章节核对、生成</small></span><b aria-hidden="true">›</b></a>
+        <a class="ws-row" href="/pathway"><span><strong>骨科临床路径</strong><small>从入院评估到康复和出院</small></span><b aria-hidden="true">›</b></a>
+      </section>
+      <section class="ws-panel" aria-labelledby="ws-reference-title">
+        <div class="ws-panel-heading"><h2 id="ws-reference-title">临床参考</h2></div>
+        <a class="ws-row" href="/classification"><span><strong>疾病分型</strong><small>按科室浏览分型、影像特征和手术指征</small></span><b aria-hidden="true">›</b></a>
+        <a class="ws-row" href="/ecg"><span><strong>心电图</strong><small>查阅基础、图谱、病例和围手术期评估</small></span><b aria-hidden="true">›</b></a>
+        <a class="ws-row" href="/labs"><span><strong>检验解读</strong><small>浏览检验项目与临床解读</small></span><b aria-hidden="true">›</b></a>
+      </section>
+    </div>
+    <section class="ws-panel ws-accent" aria-labelledby="ws-duty-title">
+      <div class="ws-panel-heading"><h2 id="ws-duty-title">床旁与值班</h2></div>
+      <a class="ws-row" href="/tools"><span><strong>临床工具</strong><small>评分、医学公式与计算器</small></span><b aria-hidden="true">›</b></a>
+      <a class="ws-row" href="/duty"><span><strong>值班资料</strong><small>交班清单、复评提醒与快捷入口</small></span><b aria-hidden="true">›</b></a>
+      <a class="ws-row" href="/duty/orders"><span><strong>值班医嘱参考</strong><small>按场景浏览已有示例</small></span><b aria-hidden="true">›</b></a>
+    </section>
+  </div>
+</template>
+
+<template id="materials">
+  <div class="ws-heading">
+    <div><h1>资料</h1><p>查找已发布的医学内容，或按栏目浏览</p></div>
+    <a class="ws-button ws-button-primary" href="/search">打开全站搜索</a>
+  </div>
+  <div class="ws-columns">
+    <section class="ws-panel" aria-labelledby="ws-browse-title">
+      <div class="ws-panel-heading"><h2 id="ws-browse-title">站内资料</h2></div>
+      <a class="ws-row" href="/classification"><span><strong>疾病分型</strong><small>按病种查看已收录的分型和参考来源</small></span><b aria-hidden="true">›</b></a>
+      <a class="ws-row" href="/pathway"><span><strong>骨科临床路径</strong><small>按病种查看已有路径资料</small></span><b aria-hidden="true">›</b></a>
+      <a class="ws-row" href="/ecg/atlas"><span><strong>心电图图谱</strong><small>按临床表现和典型图形查阅</small></span><b aria-hidden="true">›</b></a>
+      <a class="ws-row" href="/labs"><span><strong>检验解读</strong><small>按名称、缩写或检验类别查找</small></span><b aria-hidden="true">›</b></a>
+    </section>
+    <section class="ws-panel ws-accent" aria-labelledby="ws-private-materials-title">
+      <div class="ws-panel-heading"><h2 id="ws-private-materials-title">个人资料库</h2><span class="ws-state">待接入</span></div>
+      <p class="ws-panel-note">指南、书籍和共识的上传、全文检索、页码定位与引用收藏将在个人资料库接入后开放。</p>
+    </section>
+  </div>
+</template>
+
+<template id="study">
+  <div class="ws-heading"><div><h1>学习</h1><p>医学学习、病例练习和个人考试复习</p></div></div>
+  <div class="ws-columns">
+    <section class="ws-panel" aria-labelledby="ws-practice-title">
+      <div class="ws-panel-heading"><h2 id="ws-practice-title">继续学习</h2></div>
+      <a class="ws-row" href="/ecg/basics"><span><strong>心电图基础</strong><small>按主题复习判读基础</small></span><b aria-hidden="true">›</b></a>
+      <a class="ws-row" href="/ecg/quiz"><span><strong>心电图病例练习</strong><small>结合病例练习判读</small></span><b aria-hidden="true">›</b></a>
+    </section>
+    <section class="ws-panel ws-accent" aria-labelledby="ws-exams-title">
+      <div class="ws-panel-heading"><h2 id="ws-exams-title">我的医学考试</h2><span class="ws-state">待接入</span></div>
+      <p class="ws-panel-note">个人考试资料、复习进度和错题将在考试资料接入后显示。</p>
+    </section>
+  </div>
+</template>
+
+<template id="personal">
+  <div class="ws-heading"><div><h1>我的</h1><p>收藏与访问记录保存在当前浏览器</p></div></div>
+  <div class="ws-columns">
+    <div class="ws-stack">
+      <section id="favorites" class="ws-panel" aria-labelledby="ws-favorites-title">
+        <div class="ws-panel-heading"><h2 id="ws-favorites-title">我的收藏</h2><a class="ws-text-link" href="/bl">管理病种收藏</a></div>
+        <div class="ws-saved" data-workstation-list="favorites">
+          <div class="ws-empty"><p>打开病种并点击「收藏病种」后，这里会显示收藏。</p><a class="ws-text-link" href="/bl">浏览病历模板 <span aria-hidden="true">→</span></a></div>
+        </div>
+      </section>
+      <section class="ws-panel" aria-labelledby="ws-history-title">
+        <div class="ws-panel-heading"><h2 id="ws-history-title">最近访问</h2><a class="ws-text-link" href="/bl">管理访问记录</a></div>
+        <div class="ws-saved" data-workstation-list="recent">
+          <div class="ws-empty"><p>打开病种后，这里会显示访问记录。</p></div>
+        </div>
+      </section>
+    </div>
+    <section class="ws-panel ws-accent" aria-labelledby="ws-admin-title">
+      <div class="ws-panel-heading"><h2 id="ws-admin-title">站点管理</h2></div>
+      <a class="ws-row" href="/admin"><span><strong data-workstation-account>管理员登录</strong><small>内容维护与账号设置</small></span><b aria-hidden="true">›</b></a>
+    </section>
+  </div>
+</template>

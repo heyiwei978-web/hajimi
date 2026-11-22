@@ -1,10 +1,11 @@
 {
   "type": "module",
   "dependencies": {
-    "@vercel/blob": "2.8.1"
+    "@vercel/blob": "2.8.2"
   },
   "scripts": {
     "test": "node --test test/*.test.js",
+    "lint": "node scripts/code-style.mjs && node scripts/css-guard.mjs",
     "audit:clinical": "node scripts/audit-clinical-library.mjs",
     "build": "node scripts/build-home.mjs",
     "sync:nav": "node scripts/navigation-build.mjs",
@@ -13,7 +14,8 @@
     "audit:quality:check": "node scripts/clinical-quality-audit.mjs --check",
     "audit:operative": "node scripts/operative-conditional-audit.mjs",
     "audit:conditional": "node scripts/clinical-conditional-language-audit.mjs",
-    "clinical:new": "node scripts/clinical-new-disease.mjs"
+    "clinical:new": "node scripts/clinical-new-disease.mjs",
+    "perf:baseline": "node scripts/perf-baseline.mjs"
   },
   "devDependencies": {
     "playwright": "1.61.1"

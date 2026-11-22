@@ -3,23 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f6f8fb">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231d67d8%22/%3E%3Cpath d=%22M10 8v16m12-16v16M10 16h12%22 stroke=%22white%22 stroke-width=%223.5%22/%3E%3C/svg%3E">
+<meta name="theme-color" content="#f5f8f8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%228%22%20fill%3D%22%2311697a%22%2F%3E%3Cg%20transform%3D%22translate(4%204)%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.65%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%206c-2.5-1.7-6-2.2-9-1v13c3-1.2%206.5-1%209%201%202.5-2%206-2.2%209-1V5c-3-1.2-6.5-.7-9%201v13M15%2011h3m-1.5-1.5v3%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <title>网站管理 · 哈基米工作站</title>
-<link rel="stylesheet" href="/styles.css?v=20261030-ui1">
 <link rel="stylesheet" href="/cms.css?v=20261030-ui1">
 <link rel="stylesheet" href="/admin.css?v=20261009-manager1">
 <link rel="stylesheet" href="/private-gallery.css?v=20261027-private1">
-<link rel="stylesheet" href="/ui-polish.css?v=20261011-jump1">
-<link rel="stylesheet" href="/accessibility.css?v=20261009-quality1">
-<link rel="stylesheet" href="/workspace-design.css?v=20261030-ui1">
-<link rel="stylesheet" href="/design-system.css?v=20261108-ds1">
+<link rel="stylesheet" href="/styles.css?v=20261118-merge1">
+<link rel="stylesheet" href="/theme.css?v=20261118-merge1">
 </head>
 <body class="admin-page">
 <a class="skip-link" href="#adminContent">跳到主要内容</a>
 <header class="global-nav official-nav">
   <div class="global-nav-inner official-nav-inner">
-    <a class="global-brand official-brand" href="/"><span class="official-brand-mark" aria-hidden="true">H</span><span class="official-brand-text"><strong>哈基米工作站</strong><small>hajimi Clinical Workspace</small></span></a>
+    <a class="global-brand official-brand" href="/"><span class="official-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-2.5-1.7-6-2.2-9-1v13c3-1.2 6.5-1 9 1 2.5-2 6-2.2 9-1V5c-3-1.2-6.5-.7-9 1v13M15 11h3m-1.5-1.5v3"/></svg></span><span class="official-brand-text"><strong>哈基米工作站</strong><small>个人医学工作台</small></span></a>
     <nav class="global-links official-links" aria-label="主导航">
       <a href="/">首页</a>
       <a href="/bl">病历模板</a>
@@ -29,6 +26,7 @@
       <a href="/pathway">临床路径</a>
       <a href="/duty">值班资料</a>
       <a href="/tools">临床工具</a>
+      <a href="/note">AI 病历生成</a>
       <a class="active" href="/admin" aria-current="page">管理入口</a>
     </nav>
   </div>
@@ -111,12 +109,12 @@
 
       <a class="admin-tool-card" href="https://github.com/heyiwei978-web/hajimi" target="_blank" rel="noopener">
         <span class="admin-card-icon">‹/›</span>
-        <div><small>高级维护</small><h2>源码管理</h2><p>打开现有私有 GitHub 项目。Vercel 继续从 main 分支自动部署到正式域名。</p></div>
+        <div><small>高级维护</small><h2>源码管理</h2><p>打开现有 GitHub 项目（公开仓库，请勿提交密钥或患者数据）。Vercel 继续从 main 分支自动部署到正式域名。</p></div>
         <b>打开 GitHub →</b>
       </a>
 
       <a class="admin-tool-card" href="/">
-        <span class="admin-card-icon">H</span>
+        <span class="admin-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-2.5-1.7-6-2.2-9-1v13c3-1.2 6.5-1 9 1 2.5-2 6-2.2 9-1V5c-3-1.2-6.5-.7-9 1v13M15 11h3m-1.5-1.5v3"/></svg></span>
         <div><small>正式站点</small><h2>返回网站首页</h2><p>检查修改后的首页、病历模板、科室页面及临床工具是否正常。</p></div>
         <b>返回首页 →</b>
       </a>
@@ -128,6 +126,26 @@
       <button id="downloadCurrent" type="button" class="admin-primary" disabled>下载当前资料备份</button>
       <p id="historyStatus" role="status" aria-live="polite">正在加载修改历史…</p>
       <div id="historyList" class="admin-history-list"></div>
+    </section>
+
+    <section id="loginLog" class="admin-guide admin-security admin-login-log" aria-labelledby="loginLogTitle">
+      <div class="admin-card-head"><div><span>仅管理员可见</span><h2 id="loginLogTitle">登录记录</h2></div><button id="refreshLoginLog" class="admin-secondary" type="button">刷新</button></div>
+      <p id="loginLogStatus" role="status" aria-live="polite">正在加载登录记录…</p>
+      <h3 id="loginLogSuccessTitle" hidden>最近登录成功</h3>
+      <ul id="loginLogSuccess" class="admin-login-log-list" aria-labelledby="loginLogSuccessTitle"></ul>
+      <h3 id="loginLogFailureTitle" hidden>最近失败的登录尝试</h3>
+      <ul id="loginLogFailure" class="admin-login-log-list" aria-labelledby="loginLogFailureTitle"></ul>
+      <button id="loginLogMore" class="admin-secondary" type="button" hidden>显示全部失败尝试</button>
+      <p class="admin-security-note">记录登录的时间、大致地区、网络地址和设备，不记录密码和输入的用户名。保留最近 50 次成功登录和 100 次失败尝试。发现不是自己的登录，请立即更换密码和 HAJIMI_SESSION_SECRET 并重新部署。</p>
+    </section>
+
+    <section id="errorLog" class="admin-guide admin-security admin-login-log" aria-labelledby="errorLogTitle">
+      <div class="admin-card-head"><div><span>仅管理员可见</span><h2 id="errorLogTitle">错误记录</h2></div><button id="refreshErrorLog" class="admin-secondary" type="button">刷新</button></div>
+      <p id="errorLogStatus" role="status" aria-live="polite">正在加载错误记录…</p>
+      <ul id="errorLogList" class="admin-login-log-list" aria-labelledby="errorLogTitle"></ul>
+      <button id="errorLogMore" class="admin-secondary" type="button" hidden>显示全部</button>
+      <button id="clearErrorLog" class="admin-secondary" type="button" hidden>问题已处理，清空记录</button>
+      <p class="admin-security-note">访客页面脚本的报错和接口的服务器错误会记在这里，相同的报错合并计数，保留最近 100 种。只记录报错文字、出错文件、页面路径、浏览器和大致国家，不记录页面内容、输入内容和网址里的查询参数。</p>
     </section>
 
     <section id="securityCheck" class="admin-guide admin-security" aria-labelledby="securityCheckTitle" hidden>

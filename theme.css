@@ -1,0 +1,762 @@
+/* theme.css：全站公共界面层。2026-11-18 由 accessibility.css、workspace-design.css、design-system.css 按原加载顺序合并而成。
+   页面专属样式按需放在本文件之前或之后，见 docs/interface-design.md。 */
+
+/* ===== 以下原为 accessibility.css ===== */
+.patient-strip[hidden]{display:none!important}
+.skip-link{position:fixed;top:10px;left:16px;z-index:3000;padding:10px 16px;border:2px solid #047b90;border-radius:8px;background:#fff;color:var(--ds-blue-strong);font-size:16px;font-weight:700;text-decoration:none;transform:translateY(-160%)}
+.skip-link:focus{transform:none;outline:3px solid #047b90;outline-offset:2px}
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #047b90;outline-offset:3px}
+main:focus{outline:none}
+.search-more{display:flex;justify-content:center;padding:20px 0;gap:12px;align-items:center}
+.search-more span{font-size:14px;color:var(--ds-muted)}
+.template-grid.search-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}
+.search-results .card{display:flex;flex-direction:column;min-width:0;padding:20px;border:1px solid var(--ds-line);border-radius:14px;background:#fff}
+.search-results .card h3{font-size:17px;overflow-wrap:anywhere}
+.search-results .card p{font-size:14px;line-height:1.75;margin-bottom:16px;overflow-wrap:anywhere}
+.search-results .tag{font-size:12px}
+.search-results .search-more{grid-column:1/-1}
+@media(max-width:700px){.template-grid.search-results{grid-template-columns:minmax(0,1fr)}.search-results .card{padding:18px}}
+@media(max-width:640px){.search-more{flex-wrap:wrap}}
+@media print{.skip-link,.search-more{display:none!important}}
+@media screen{
+  .ortho-card-top,.department-card-top,.record-chapter-title>span,.record-book-toc-head p,.record-book-toc a>span,.feature-eyebrow{color:var(--ds-muted)}
+  .top,.source-tag,.bottom>a:not(.openext),.sectionhead p,#formulaCount{color:var(--ds-muted)}
+}
+.library-loading{padding:24px;border:1px solid var(--ds-line);border-radius:12px;background:#fff;color:var(--ds-muted);font-size:15px}
+@media print{.library-loading{display:none!important}}
+
+/* ===== 以下原为 workspace-design.css ===== */
+/* Shared interface, 2026-10-10. Clinical text and print typography are unchanged. */
+:root{
+  --ws-blue:#11697a;
+  --ws-blue-hover:#0c5564;
+  --ws-radius:16px;--ws-shadow:0 5px 20px rgba(8,51,61,.045);
+  --h-ink:var(--ws-ink);--h-text:var(--ws-text);--h-muted:var(--ws-muted);
+  --h-line:var(--ws-line);--h-bg:var(--ws-bg);--h-blue:var(--ws-blue)
+}
+@media screen{
+  body,.official-home,body.duty-page,body.pathway-page,body.admin-page{background:var(--ws-bg);color:var(--ws-text)}
+  a,button,input,select,textarea{touch-action:manipulation}
+  button,input,select,textarea{font-family:var(--h-font)}
+  :focus-visible{outline:3px solid var(--ws-blue);outline-offset:3px}
+  :where(h1,h2,h3,h4){color:var(--ws-ink)}
+  :where(p,h1,h2,h3,h4,a,button){overflow-wrap:anywhere}
+
+  /* One navigation and brand treatment throughout the workstation. */
+  .official-nav,.tools-page .nav{height:72px;min-height:72px;backdrop-filter:none;}
+  .official-nav-inner,.tools-page .navin{max-width:1328px;width:100%;height:100%;padding:0 24px;gap:24px;flex-wrap:nowrap}
+  .official-brand,.workspace-brand{display:flex;align-items:center;gap:11px;flex-shrink:0;text-decoration:none}
+  .official-brand-mark,.library-brand-mark{display:grid;place-items:center;flex-shrink:0;width:36px;height:36px;border-radius:11px;color:#fff;font-weight:750;line-height:1}
+  .official-brand-text strong{display:block;font-size:1rem;line-height:1.4;letter-spacing:0;color:var(--ws-ink)}
+  .official-brand-text small{display:block;margin-top:2px;font-size:12px;line-height:1.3;color:var(--ws-muted);letter-spacing:.025em}
+  .official-nav .official-links,.tools-page .nav nav{display:flex;align-items:center;gap:24px;min-width:0;width:auto;flex:0 1 auto}
+  .official-nav .official-links a,.tools-page .nav nav a{display:flex;align-items:center;min-height:48px;padding:0 1px;border-bottom:3px solid transparent;color:var(--ws-muted);font-size:.9375rem;font-weight:600;white-space:nowrap;text-decoration:none}
+  .official-nav .official-links a.active,.tools-page .nav nav a.active{border-bottom-color:var(--ws-blue);}
+  .official-nav .official-links a:hover,.tools-page .nav nav a:hover{color:var(--ws-blue)}
+  .official-nav-right{min-width:0;gap:12px}
+  .official-search{border:1px solid var(--ws-line);border-radius:8px;background:#fff;font-size:.875rem;min-height:40px}
+  #libraryShell .library-topbar{border-color:var(--ws-line);backdrop-filter:none}
+
+  #libraryShell .library-top-actions .text-action{color:var(--ws-muted)}
+  #libraryShell .library-header-tools .patient-action{background:var(--ws-soft);border-color:var(--ws-line);color:var(--ws-blue);border-radius:10px}
+
+  /* The homepage opens with a usable search and direct clinical destinations. */
+
+  .home-search{margin:24px 0 0}
+  .home-search label{display:block;margin-bottom:9px;font-size:.9375rem;font-weight:650;color:var(--ws-ink)}
+
+  .home-quick-grid{display:grid;gap:10px}
+  .home-quick-grid>a{display:grid;grid-template-columns:42px minmax(0,1fr) 16px;align-items:center;gap:13px;padding:13px 14px;border:1px solid var(--ws-line);border-radius:12px;text-decoration:none;color:var(--ws-ink);min-width:0;background:#fff}
+  .home-quick-grid>a:hover{border-color:#9ac0ca;background:var(--ws-soft)}
+  .home-department-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:10px;background:var(--ws-soft);color:var(--ws-blue);font-size:1.125rem;font-weight:750}
+  .home-quick-grid strong{display:block;font-size:1.125rem;line-height:1.4}
+  .home-quick-grid small{display:block;font-size:.8125rem;line-height:1.6;color:var(--ws-muted);margin-top:3px}
+  .home-quick-grid b{color:var(--ws-blue);font-size:1rem}
+  .home-quick-pathway{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;margin-top:14px;padding:12px 0 0;border-top:1px solid var(--ws-line);text-decoration:none;font-size:.9375rem;color:var(--ws-blue);font-weight:650}
+
+  /* Compact introductions and visible search; primary destinations come first. */
+  #libraryShell,#libraryShell .page{background:var(--ws-bg)}
+  #libraryShell .content,.department-no-sidebar #libraryShell .content{width:min(1200px,calc(100% - 48px));padding:28px 0 64px}
+  #libraryShell .article-intro,.library-root-page #libraryShell .article-intro{margin:0 0 20px;padding:0 0 20px;border:0;border-bottom:1px solid var(--ws-line);border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+  .library-root-page .article-intro:after{display:none}
+  #libraryShell .breadcrumb{font-size:12px;letter-spacing:.1em;color:var(--ws-muted)}
+  #libraryShell .article-intro h1,.library-root-page #libraryShell .article-intro h1{font-size:clamp(1.75rem,3vw,2.375rem);line-height:1.3;margin:10px 0 8px;color:var(--ws-ink)}
+  #libraryShell .lead{font-size:1rem;line-height:1.75;color:var(--ws-muted)}
+  #libraryShell .library-guidance{max-width:none;margin-top:14px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;font-size:.875rem;color:var(--ws-muted)}
+  .library-guidance summary{cursor:pointer;width:fit-content;min-height:36px;color:var(--ws-blue)}
+  #libraryShell .library-guidance summary strong{display:inline;font-size:.875rem}
+  .library-guidance[open]>span{display:block;padding:10px 14px;background:var(--ws-soft);border-left:3px solid var(--ws-blue);line-height:1.85;max-width:56em}
+  #libraryShell .patient-strip{border-color:var(--ws-line);border-radius:10px;background:#fff}
+  #libraryShell .patient-strip[hidden]{display:none}
+  #libraryShell .controls-section,.library-root-page #libraryShell .controls-section{margin:0 0 24px;padding:20px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);background:#fff;box-shadow:none}
+  #libraryShell .controls-section h2{font-size:1.0625rem;margin:0 0 14px;line-height:1.5}
+  #libraryShell .searchbox,.library-root-page #libraryShell .searchbox{height:52px;border:1px solid var(--ds-line-strong);border-radius:10px;background:#fff;box-shadow:none}
+
+  #libraryShell .searchbox input{font-size:1rem;color:var(--ws-ink)}
+  #libraryShell .searchbox kbd{flex-shrink:0;white-space:nowrap;font-size:12px;padding:3px 6px}
+  #libraryShell .filter-row{gap:12px}
+  #libraryShell .filter-row label,.library-root-page #libraryShell .filter-row label{padding:0;border:0;background:transparent;min-width:0;font-size:.875rem;color:var(--ws-muted)}
+  #libraryShell .filter-row select,.library-root-page #libraryShell .filter-row select{height:44px;padding:0 12px;border:1px solid var(--ws-line);border-radius:8px;background:#fff;font-size:1rem;outline-offset:3px}
+  #libraryShell .doc-section{padding-top:0;border-color:var(--ws-line)}
+  #libraryShell .result-head{gap:12px;align-items:center;margin-bottom:16px;padding:0;flex-wrap:wrap}
+  #libraryShell .result-head h2{font-size:1.375rem;line-height:1.5;min-width:0}
+  #libraryShell .result-head>div{font-size:.8125rem;color:var(--ws-muted);flex-wrap:wrap}
+  #libraryShell .stat-line{border-radius:8px;background:var(--ds-blue-50);color:var(--ws-muted);font-size:.8125rem}
+  .library-overview{grid-template-columns:minmax(0,1.1fr) minmax(320px,1fr);align-items:center;gap:28px;padding:24px;margin:0 0 24px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);background:#fff;color:var(--ws-ink);}
+  .library-overview-copy>span{color:var(--ws-blue);font-size:12px}
+  .library-overview h2{color:var(--ws-ink);font-size:1.5rem;line-height:1.55;letter-spacing:0}
+  .library-overview p{color:var(--ws-muted);font-size:.9375rem;line-height:1.8}
+  .library-overview-stats{gap:12px}
+  .library-overview-stats div{padding:14px;border:0;border-radius:10px;background:var(--ws-soft);backdrop-filter:none}
+  .library-overview-stats strong{font-size:1.625rem;color:var(--ws-blue)}
+  .library-overview-stats span{font-size:.8125rem;color:var(--ws-muted)}
+  .library-root-home-row{margin-bottom:14px}
+  #libraryShell .result-head .section-no,.library-section-heading>div>span{display:none}
+
+  .library-department-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+  .library-department-grid+.library-overview{margin:24px 0 0}
+  .library-department-card{min-width:0;min-height:278px;padding:22px;border-radius:var(--ws-radius);background:#fff;display:flex;flex-direction:column}
+  .library-department-card:before{display:none}
+  .library-department-card:hover{transform:none;border-color:#9ac0ca;box-shadow:var(--ws-shadow)}
+  .department-icon{background:var(--ws-soft);box-shadow:none}
+  .department-eyebrow{font-size:12px;color:var(--ws-muted);overflow-wrap:anywhere}
+  .library-department-card .department-card-top{margin-top:16px;gap:8px;flex-wrap:wrap}
+  .library-department-card .department-card-top span,.library-department-card .department-card-top strong{font-size:.8125rem;color:var(--ws-muted)}
+  .library-department-card h3{font-size:1.625rem;line-height:1.4;margin:12px 0 8px}
+  .library-department-card p{font-size:.9375rem;line-height:1.8;color:var(--ws-muted)}
+  .library-department-card small{font-size:.8125rem;color:var(--ws-muted);line-height:1.65;margin-bottom:20px}
+  .library-department-card .department-card-open{font-size:.9375rem;padding-top:14px;color:var(--ws-blue);border-color:var(--ws-line)}
+  .library-quick-panel,.library-root-page .guide-section{padding:24px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);box-shadow:none;background:#fff;margin-top:24px}
+  .library-quick-head h3{font-size:1.375rem}
+  .library-quick-head p,.library-root-page .steps span{font-size:.875rem;color:var(--ws-muted);line-height:1.8}
+  .library-root-page .guide-section .steps{gap:20px}
+  .library-root-page .steps li{padding-bottom:8px;min-width:0}
+  .personal-list a{color:var(--ws-blue)}
+  #libraryShell .btn,.duty-page .btn{border-radius:9px;border-color:var(--ws-line);color:var(--ws-blue);box-shadow:none;min-height:44px}
+  #libraryShell .btn.primary,.duty-page .btn.primary{background:var(--ws-blue);border-color:var(--ws-blue);color:#fff}
+  #libraryShell .btn:hover:not(:disabled){border-color:var(--ws-blue)}
+  #libraryShell .sidebar{background:#fff;border-color:var(--ws-line)}
+  #libraryShell .nav-item.active,#libraryShell .nav-item:hover{background:var(--ws-soft);color:var(--ws-blue)}
+  .department-toolbar{margin-bottom:18px;gap:12px;flex-wrap:wrap}
+  .department-toolbar>span{font-size:.875rem;color:var(--ws-muted)}
+
+  /* Consistent disease cards, with complete titles and predictable action positions. */
+  .ortho-hero{padding:26px;margin:0 0 20px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);background:#fff;color:var(--ws-ink);gap:24px}
+  .ortho-hero:after{display:none}
+  .ortho-eyebrow{font-size:12px;color:var(--ws-blue)}
+  .ortho-hero h2{font-size:1.875rem;line-height:1.4;color:var(--ws-ink)}
+  .ortho-hero p{font-size:1rem;line-height:1.8;color:var(--ws-muted)}
+  .ortho-stats div{background:var(--ws-soft);border:0;box-shadow:none}
+  .ortho-stats strong{color:var(--ws-blue)}
+  .ortho-stats span{color:var(--ws-muted);font-size:.8125rem}
+  .ortho-jump{gap:10px}
+  .ortho-jump a{background:#fff;border-color:var(--ws-line);font-size:1rem;line-height:1.6;min-width:0;color:var(--ws-ink)}
+  .ortho-jump a span{font-size:12px;color:var(--ws-muted)}
+  .ortho-category{padding:20px;border-color:var(--ws-line);border-radius:var(--ws-radius);box-shadow:none;background:#fff}
+  .ortho-category-head{gap:16px;flex-wrap:wrap}
+  .ortho-category-head h3{font-size:1.5rem;line-height:1.4;color:var(--ws-ink)}
+  .ortho-category-head p{font-size:.9375rem;color:var(--ws-muted);line-height:1.8}
+  .ortho-category-head>strong{font-size:.8125rem;color:var(--ws-muted)}
+  .ortho-disease-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .ortho-disease-card,.project-card,.case-search-card{padding:22px;border-color:var(--ws-line);border-radius:13px;background:#fff;box-shadow:none;min-width:0}
+  .ortho-disease-card:hover,.project-card:hover,.case-search-card:hover{transform:none;border-color:#9ac0ca;box-shadow:var(--ws-shadow)}
+  .ortho-card-top,.project-card-top{gap:10px;flex-wrap:wrap;font-size:.8125rem;line-height:1.7;color:var(--ws-muted)}
+  .ortho-card-top strong{font-size:.8125rem;color:var(--ws-muted)}
+  .ortho-disease-card h3,.project-card h3,.case-search-card h3{font-size:1.3125rem;line-height:1.55;margin:14px 0 9px;color:var(--ws-ink)}
+  .ortho-disease-card p,.project-card p,.case-search-card p{font-size:1rem;line-height:1.8;color:var(--ws-muted)}
+  .ortho-stage-chips,.project-stage-chips{gap:6px;padding-top:8px}
+  .ortho-stage-chips span,.project-stage-chips span{font-size:.875rem;line-height:1.6;border-color:var(--ws-line);background:var(--ws-bg)}
+  .ortho-open,.project-open{font-size:.9375rem;color:var(--ws-blue);margin-top:18px;border-color:var(--ws-line);padding-top:14px}
+  .case-search-card-top{flex-wrap:wrap;gap:8px}
+  .case-search-card-bottom{flex-wrap:wrap;border-color:var(--ws-line)}
+  .case-search-card-top span:first-child{background:var(--ws-soft);color:var(--ws-blue)}
+  .case-search-card-bottom b{color:var(--ws-blue)}
+
+  /* Quiet paper and a strong current-directory state support sustained reading. */
+  .record-book-hero{padding:28px;border-radius:var(--ws-radius);background:#02404b;box-shadow:none}
+  .record-book-hero h2{font-size:2rem;line-height:1.4;color:#fff}
+  .record-book-hero p{color:var(--ds-blue-100);font-size:1rem;line-height:1.8}
+  .record-book-hero-stats div{box-shadow:none}
+  #libraryShell .record-book-hero .btn.primary{background:#fff;color:var(--ws-blue);border-color:#fff}
+  #libraryShell .record-book-hero .btn.ghost{background:transparent;color:#fff;border-color:#9db7be}
+  .source-template-note{padding:14px 18px;border-radius:10px;font-size:.9375rem;line-height:1.8;background:var(--ds-blue-50);border-color:var(--ds-line);color:var(--ws-text)}
+  .case-file-sidebar{border-color:var(--ws-line)!important;border-radius:var(--ws-radius)!important;background:#fff}
+  .case-file-sidebar .record-book-toc-head{background:#fff;padding:20px;border-color:var(--ws-line)}
+  .case-file-sidebar .record-book-toc-head h3{font-size:1.25rem;color:var(--ws-ink)}
+  .case-nav-family h4{color:var(--ws-blue)}
+  .case-nav-group[open]{background:#fff;border-color:var(--ws-line)}
+  .case-file-sidebar .case-nav-item.is-current{color:var(--ws-blue);}
+  .case-file-sidebar .case-nav-item:hover{background:var(--ds-bg)}
+  .case-file-tools,.case-file-bottom-nav{border-color:var(--ws-line);border-radius:13px;box-shadow:none}
+  .case-file-tools strong,.case-file-bottom-nav strong{color:var(--ws-ink)}
+  .case-file-tools small{color:var(--ws-muted)}
+  .record-book-section{border-color:var(--ws-line);border-radius:var(--ws-radius);box-shadow:none}
+  .record-book-section-head{background:#f8fafc;border-color:var(--ws-line)}
+  .record-chapter-no{background:var(--ws-blue)}
+  .record-chapter-title>span{font-size:.8125rem;color:var(--ws-muted)}
+  .record-book-body,.case-workspace .record-book-body,.record-paper{line-height:1.9;color:#08333d;letter-spacing:0}
+  .record-book-body{padding:26px 30px}
+  .special-case-library-head{border-color:var(--ws-line);background:#fff;border-radius:var(--ws-radius)}
+  .special-case-book{border-color:var(--ws-line);border-radius:var(--ws-radius)}
+  .modal,.cms-edit-dialog,.cms-case-dialog{border-radius:var(--ws-radius)}
+  .modal::backdrop,.cms-edit-dialog::backdrop,.cms-case-dialog::backdrop{background:#08333d66;backdrop-filter:none}
+
+  /* Clinical tools, pathway content, duty forms and management share the same rhythm. */
+  .tools-page .main,.pathway-shell,.duty-main,.admin-main{width:min(1280px,calc(100% - 48px));max-width:1280px;margin:0 auto;padding:32px 0 64px}
+  .tools-page .hero,.duty-hero,.admin-hero{padding:4px 0 24px;text-align:left}
+  .tools-page .hero h1,.duty-hero h1,.admin-hero h1{font-size:clamp(2rem,3.5vw,2.75rem);line-height:1.3;letter-spacing:-.02em;color:var(--ws-ink);margin:10px 0}
+  .tools-page .hero>p:last-child{margin:14px 0 0;max-width:48em;font-size:1rem;line-height:1.8;color:var(--ws-muted)}
+  .tools-page .eyebrow,.duty-kicker,.admin-kicker{font-size:.75rem;letter-spacing:.12em;color:var(--ws-blue)}
+  .tools-page .notice,.pathway-note,.duty-privacy{border-color:var(--ws-line);border-radius:12px;box-shadow:none;background:#fff;padding:16px 18px;font-size:.9375rem;line-height:1.8;color:var(--ws-muted)}
+  .tools-page .notice{margin-bottom:24px}
+  .tools-page .notice strong,.tools-page .notice span{font-size:.9375rem;color:var(--ws-muted)}
+  .tools-page .formula-toolbar{margin:0 0 28px;gap:12px}
+  .tools-page .formula-search{height:52px;min-width:0;border-color:var(--ds-line-strong);border-radius:10px}
+  .tools-page .formula-search input{font-size:1rem;min-width:0}
+  .tools-page #formulaCount{font-size:.875rem}
+  .tools-page .section{margin-bottom:32px}
+  .tools-page .sectionhead{gap:12px;flex-wrap:wrap}
+  .tools-page .sectionhead h2{font-size:1.375rem;line-height:1.4;color:var(--ws-ink)}
+  .tools-page .sectionhead p{font-size:.875rem;color:var(--ws-muted)}
+  .tools-page .grid{gap:16px}
+  .tools-page .card{padding:22px;min-height:216px;border-radius:var(--ws-radius);}
+  .tools-page .card:hover{transform:none;border-color:#9ac0ca;box-shadow:var(--ws-shadow)}
+  .tools-page .icon{background:var(--ws-soft);color:var(--ws-blue);font-size:.75rem}
+  .tools-page .card h3{font-size:1.25rem;line-height:1.5;color:var(--ws-ink)}
+  .tools-page .card p{font-size:1rem;line-height:1.8;color:var(--ws-muted)}
+  .tools-page .bottom button,.tools-page .openext{min-height:44px;font-size:.9375rem;color:var(--ws-blue)}
+  .tools-page .sourcebox{background:#fff;color:var(--ws-ink);border:1px solid var(--ws-line);border-radius:var(--ws-radius)}
+  .tools-page .sourcebox h2{font-size:1.375rem;color:var(--ws-ink)}
+  .tools-page .sourcebox p{font-size:.9375rem;line-height:1.8;color:var(--ws-muted)}
+  .tools-page dialog{border-radius:var(--ws-radius)}
+  .tools-page .calc{background:var(--ws-blue)}
+  .tools-page .result{background:var(--ws-soft)}
+  .tools-page .tool-jump{display:flex;flex-wrap:wrap;gap:8px;margin:-12px 0 28px}
+  .tools-page .tool-jump a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:6px 14px;border:1px solid var(--ws-line);border-radius:999px;background:#fff;color:var(--ws-ink);font-size:.9375rem;font-weight:600;text-decoration:none;white-space:nowrap}
+  .tools-page .tool-jump a:hover{border-color:#9ac0ca;color:var(--ws-blue)}
+  .tools-page .tool-jump a[hidden]{display:none}
+  .tools-page .tool-jump small{color:var(--ws-muted);font-size:.8125rem;font-weight:600}
+  .tools-page .section{scroll-margin-top:calc(var(--site-header-height,72px) + 16px)}
+  .pathway-hero{padding:32px;gap:28px;border:1px solid var(--ws-line);border-radius:var(--ws-radius);background:#fff;color:var(--ws-ink)}
+  .pathway-hero:after{display:none}
+  .pathway-kicker{font-size:.75rem;color:var(--ws-blue)}
+  .pathway-hero h1{font-size:clamp(2rem,3.5vw,2.75rem);line-height:1.35;color:var(--ws-ink)}
+  .pathway-hero p{font-size:1rem;line-height:1.8;color:var(--ws-muted)}
+  .pathway-hero-metrics div{background:var(--ws-soft);border:0;border-radius:12px;backdrop-filter:none}
+  .pathway-hero-metrics strong{color:var(--ws-blue)}
+  .pathway-hero-metrics span{font-size:.8125rem;color:var(--ws-muted)}
+  .pathway-btn{border-radius:9px;min-height:46px;font-size:.9375rem}
+  .pathway-btn.primary{background:var(--ws-blue);border-color:var(--ws-blue);color:#fff}
+  .pathway-btn.secondary{background:#fff;color:var(--ws-blue);border-color:var(--ws-line)}
+  .pathway-sidebar,.pathway-title-card,.pathway-section,.pathway-overview-grid div{border-color:var(--ws-line);border-radius:var(--ws-radius);box-shadow:none;background:#fff}
+  .pathway-nav-item{min-height:48px;font-size:1rem;line-height:1.5}
+  .pathway-nav-item.active{background:var(--ws-soft);color:var(--ws-blue)}
+  .pathway-title-card h2{font-size:1.75rem;line-height:1.5;color:var(--ws-ink)}
+  .pathway-title-card p,.pathway-note{font-size:.9375rem;line-height:1.8;color:var(--ws-muted)}
+  .pathway-section-head h3{font-size:1.375rem;line-height:1.5}
+  .pathway-panel ul,.pathway-copy{font-size:1.0625rem;line-height:1.85;color:var(--ws-text)}
+  .pathway-section-head>span{background:var(--ws-blue)}
+  .duty-card,.admin-guide,.admin-login-card,.admin-overview>div,.admin-tool-card,.admin-status{border-color:var(--ws-line);border-radius:var(--ws-radius);box-shadow:none;background:#fff}
+  .duty-card{padding:26px;margin-top:24px}
+  .duty-card h2,.admin-card-head h2{font-size:1.375rem;line-height:1.5;color:var(--ws-ink)}
+  .duty-card-head p,.duty-task-form label,.duty-notes label{font-size:.9375rem;color:var(--ws-muted);line-height:1.8}
+  .duty-link-grid a{background:#fff;border-color:var(--ws-line);border-radius:12px;color:var(--ws-blue)}
+  .duty-link-grid span{color:var(--ws-muted);font-size:.9375rem}
+  .admin-tool-card.primary{border-color:var(--ds-line-strong);background:var(--ds-bg)}
+  .admin-primary{background:var(--ws-blue);border-color:var(--ws-blue)}
+  .admin-secondary{color:var(--ws-blue);border-color:var(--ws-line)}
+}
+
+@media screen and (max-width:1180px){
+  .official-nav-right{display:none}
+
+  .library-department-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ortho-disease-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media screen and (min-width:1181px){
+  #libraryShell .controls-section .toolbar{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:center}
+}
+@media screen and (max-width:1100px){
+  .official-nav,.tools-page .nav{height:auto;min-height:0}
+  .official-nav-inner,.tools-page .navin{flex-wrap:wrap;gap:8px;padding:12px 24px 0}
+  .official-nav .official-links,.tools-page .nav nav{flex:0 0 100%;order:3;width:100%;max-width:100%;gap:24px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;min-height:48px}
+  .official-nav .official-links::-webkit-scrollbar,.tools-page .nav nav::-webkit-scrollbar{display:none}
+  .official-nav .official-links a,.tools-page .nav nav a{flex-shrink:0;min-height:48px;font-size:.9375rem}
+
+}
+@media screen and (max-width:900px){
+
+  .home-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .library-overview{grid-template-columns:minmax(0,1fr);gap:20px}
+  .library-overview-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .pathway-hero{padding:26px;grid-template-columns:minmax(0,1fr)}
+}
+@media screen and (max-width:640px){
+  .official-nav-inner,.tools-page .navin{padding:10px 16px 0;gap:8px}
+  /* 疾病分型科室卡与心电图栏目入口：手机上改为左图标、右文字的紧凑卡片。 */
+  main :is(.class-dept-grid,.ecg-entry-grid){gap:10px}
+  main :is(.class-dept-grid,.ecg-entry-grid) .class-dept-card{min-height:0;padding:16px;display:grid;grid-template-columns:48px minmax(0,1fr);column-gap:14px;align-items:start}
+  main :is(.class-dept-grid,.ecg-entry-grid) .class-dept-symbol{grid-column:1;grid-row:1/span 4;margin:0;width:48px;height:48px}
+  main :is(.class-dept-grid,.ecg-entry-grid) .class-dept-index{grid-column:2;font-size:.75rem}
+  main :is(.class-dept-grid,.ecg-entry-grid) .class-dept-card h3{grid-column:2;margin:2px 0 4px;font-size:1.125rem;line-height:1.45}
+  main :is(.class-dept-grid,.ecg-entry-grid) .class-dept-card p{grid-column:2;font-size:.9375rem;line-height:1.7}
+  main :is(.class-dept-grid,.ecg-entry-grid) .class-dept-foot{grid-column:2;margin-top:8px;padding-top:0;font-size:.875rem}
+  main .class-disease-card.ecg-card{min-height:0;padding:16px}
+  main .class-disease-card.ecg-card h3{margin:0 0 4px;font-size:1.125rem;line-height:1.45}
+  main .class-disease-card.ecg-card p{font-size:.9375rem;line-height:1.7}
+  main .class-disease-card.ecg-card :is(small,b){font-size:.875rem}
+  /* 临床工具：手机上分类横向滑动，卡片改成紧凑的左图标、右文字。 */
+  .tools-page .tool-jump{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;margin:-4px -16px 24px;padding:0 16px}
+  .tools-page .tool-jump::-webkit-scrollbar{display:none}
+  .tools-page .tool-jump a{flex:none}
+  .tools-page .grid{gap:10px}
+  .tools-page .card{min-height:0;display:grid;grid-template-columns:52px minmax(0,1fr);column-gap:12px;align-items:start}
+  .tools-page .card .top{grid-column:1;grid-row:1/span 3;flex-direction:column;align-items:center;gap:4px;font-size:12px;text-align:center}
+  .tools-page .card .icon{min-width:48px;max-width:52px;font-size:12px;overflow-wrap:anywhere;line-height:1.1}
+  .tools-page .card h3{grid-column:2;margin:0 0 4px;font-size:1.0625rem;line-height:1.45}
+  .tools-page .card p{grid-column:2;font-size:.9375rem;line-height:1.6}
+  .tools-page .card .bottom{grid-column:2;margin-top:8px;padding-top:6px;align-items:center}
+  .tools-page .bottom button,.tools-page .openext{min-height:40px}
+
+  .official-nav .official-links,.tools-page .nav nav{gap:22px}
+
+  /* 手机首屏优先给搜索：标题收成一行，隐藏英文眉题与介绍段 */
+
+  .home-search{margin-top:14px}
+
+  .home-quick-grid{grid-template-columns:minmax(0,1fr)}
+  .home-quick-grid>a{padding:12px}
+
+  #libraryShell .content,.department-no-sidebar #libraryShell .content{width:calc(100% - 28px);padding-top:20px}
+  #libraryShell .library-topbar{padding-left:12px;padding-right:12px}
+  #libraryShell .library-brand-mark{width:32px;height:32px}
+  #libraryShell .library-brand-copy strong{font-size:.9375rem}
+  #libraryShell .controls-section,.library-root-page #libraryShell .controls-section{padding:16px}
+  #libraryShell .filter-row{grid-template-columns:minmax(0,1fr);gap:10px}
+  #libraryShell .filter-row label{display:grid;grid-template-columns:66px minmax(0,1fr);gap:8px;white-space:normal}
+  #libraryShell .result-head h2{font-size:1.25rem}
+  /* The count fills in after the catalog loads; keep it on its own line from the start. */
+  body:not(.library-root-page) #libraryShell .result-head>div{flex-basis:100%}
+  .library-overview{padding:20px}
+  .library-overview h2{font-size:1.375rem}
+  .library-overview-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .library-department-grid{grid-template-columns:minmax(0,1fr);gap:12px}
+  .library-department-card{min-height:0;padding:20px}
+  .library-department-card h3{font-size:1.5rem}
+  .library-quick-panel,.library-root-page .guide-section{padding:20px}
+  .library-root-page .guide-section .steps{grid-template-columns:minmax(0,1fr);gap:12px}
+  .ortho-hero{padding:20px}
+  .ortho-hero h2{font-size:1.625rem}
+  .ortho-jump{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .ortho-jump a{padding:10px;line-height:1.5}
+  /* 骨科科室页：手机上去掉与页首重复的标题和数字卡，分类改为横滑按钮，更快看到病种。 */
+  #libraryShell .content:has(.ortho-hero) .stat-line{display:none}
+  #libraryShell .ortho-hero{display:block;padding:14px 16px;margin:0 0 14px}
+  #libraryShell .ortho-hero :is(.ortho-eyebrow,h2,.ortho-stats){display:none}
+  #libraryShell .ortho-hero p{font-size:.9375rem;line-height:1.7}
+  #libraryShell .ortho-jump{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;margin:0 -16px 20px;padding:0 16px}
+  #libraryShell .ortho-jump::-webkit-scrollbar{display:none}
+  #libraryShell .ortho-jump a{flex:none;display:inline-flex;align-items:center;min-height:44px;padding:6px 14px;border-radius:999px;font-size:.9375rem;white-space:nowrap}
+  #libraryShell .ortho-jump a span{display:none}
+  /* 病历库科室卡与骨科病种卡：手机上收紧间距，科室卡改为左图标、右文字。 */
+  #libraryShell .library-department-card{display:grid;grid-template-columns:48px minmax(0,1fr);column-gap:14px;align-items:start;min-height:0;padding:16px}
+  #libraryShell .library-department-card .department-visual{grid-column:1;grid-row:1/span 4}
+  #libraryShell .library-department-card .department-eyebrow,#libraryShell .library-department-card small{display:none}
+  #libraryShell .library-department-card :is(.department-card-top,h3,p,.department-card-open){grid-column:2}
+  #libraryShell .library-department-card .department-card-top{margin-top:0}
+  #libraryShell .library-department-card h3{margin:2px 0 4px;font-size:1.25rem}
+  #libraryShell .library-department-card .department-card-open{margin-top:8px;padding-top:8px}
+  #libraryShell .ortho-disease-card{padding:14px 16px;min-height:0}
+  #libraryShell .ortho-disease-card h3{margin:8px 0 4px;font-size:1.1875rem}
+  #libraryShell .ortho-disease-card p{margin:0 0 8px;font-size:.9375rem;line-height:1.7}
+  #libraryShell .ortho-stage-chips{gap:4px;padding-top:2px}
+  #libraryShell .ortho-stage-chips span{padding:2px 6px;font-size:.8125rem;white-space:nowrap}
+  #libraryShell .ortho-stage-chips b{margin-left:2px}
+  #libraryShell .ortho-open{margin-top:10px;padding-top:10px}
+  .ortho-category{padding:14px}
+  .ortho-category-head h3{font-size:1.375rem}
+  .ortho-disease-grid{grid-template-columns:minmax(0,1fr);gap:12px}
+  .ortho-disease-card,.project-card,.case-search-card{padding:18px}
+  .project-grid{grid-template-columns:minmax(0,1fr)}
+  .record-book-hero{padding:22px}
+  .record-book-hero h2{font-size:1.75rem}
+  .source-template-note{padding:14px;font-size:.875rem}
+  .record-book-body{padding:22px 18px}
+  .tools-page .main,.pathway-shell,.duty-main,.admin-main{width:calc(100% - 32px);padding-top:24px}
+  .tools-page .hero h1,.duty-hero h1,.admin-hero h1{font-size:2rem}
+  .tools-page .card,.duty-card{padding:20px}
+  .tools-page .formula-toolbar{margin-bottom:24px}
+  .tools-page .notice{padding:16px;gap:6px}
+  .pathway-hero{padding:22px}
+  .pathway-hero h1{font-size:2rem;line-height:1.4}
+  .pathway-hero-metrics div{min-width:0}
+
+  /* 临床路径：手机上四个数字一行排开、两个按钮并排，更快进入路径正文。 */
+  .pathway-hero-metrics{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .pathway-hero-metrics div{min-height:0;padding:10px 4px;align-items:center;text-align:center}
+  .pathway-hero-metrics strong{font-size:1.125rem}
+  .pathway-hero-metrics span{margin-top:4px;font-size:12px;line-height:1.35}
+  .pathway-hero-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(136px,1fr));gap:8px;margin-top:18px}
+  .pathway-btn{width:100%;padding:0 6px;font-size:.8125rem;white-space:nowrap;text-align:center}
+  .pathway-title-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pathway-title-card{padding:20px}
+  .pathway-title-card h2{font-size:1.375rem}
+  .pathway-section-head h3{font-size:1.25rem}
+}
+
+/* Small, locally styled components; no framework CSS or external font requests. */
+@media screen{
+  .clinical-icon{display:inline-block;vertical-align:middle;flex-shrink:0;width:20px;height:20px}
+  .case-search-card:focus-visible{outline:3px solid var(--ws-blue);outline-offset:3px}
+  .case-search-card .search-hit{background:#fff0b3;color:#08333d;border-radius:3px;font:inherit}
+  .case-search-card-top .case-search-code{color:var(--ws-blue);font-weight:750;font-variant-numeric:tabular-nums}
+  .case-search-card-bottom{margin-top:auto}
+  .case-search-card-bottom b{display:inline-flex;align-items:center;gap:5px}
+  .case-search-matches{min-width:0;border-top:1px solid var(--ws-line);padding-top:14px}
+  .case-search-matches h4{margin:0 0 10px;color:var(--ws-muted);font-size:.875rem;font-weight:650}
+  .case-search-matches ul{display:grid;gap:12px;list-style:none;padding:0;margin:0}
+  .case-search-matches li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;min-width:0}
+  .case-search-matches li>.clinical-icon{margin-top:3px;color:var(--ws-blue)}
+  .case-search-matches li>div{min-width:0;overflow-wrap:anywhere}
+  .case-search-matches li b{display:block;font-size:var(--clinical-font-size,18px);font-weight:650;line-height:1.55;color:var(--ws-ink)}
+  .case-search-matches li small{display:block;margin-top:3px;font-size:.875rem;line-height:1.6;color:var(--ws-muted)}
+  .case-match-description{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:5px;font-size:.875rem;line-height:1.7;color:var(--ws-muted)}
+  .case-match-more{display:block;margin-top:12px;color:var(--ws-muted);font-size:.875rem}
+  .reading-font-slot{min-width:0}
+  .reading-font-controls{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0}
+  .reading-font-label{display:inline-flex;align-items:center;gap:5px;margin-right:2px;color:var(--ws-muted);font-size:.875rem;line-height:1.5;white-space:nowrap}
+  .reading-font-controls button{display:grid;place-items:center;min-width:44px;min-height:44px;padding:0 8px;border:1px solid var(--ws-line);border-radius:8px;background:#fff;color:var(--ws-ink);font-size:16px;line-height:1;font-weight:650;cursor:pointer;font-variant-numeric:tabular-nums}
+  .reading-font-controls button[aria-pressed="true"]{background:var(--ws-blue);border-color:var(--ws-blue);color:#fff}
+  .reading-font-controls button:hover{border-color:var(--ws-blue)}
+  .reading-font-controls button:focus-visible{outline:3px solid var(--ws-blue);outline-offset:2px}
+  .reading-font-controls .reading-font-note{flex-basis:100%;color:var(--ws-muted);font-size:.8125rem;line-height:1.5}
+  .reading-font-controls [hidden]{display:none}
+  .record-book-toc-head .reading-font-slot{margin-top:14px}
+  .preview-tools .reading-font-slot{margin-left:auto}
+  .record-book-body,.case-workspace .record-book-body,.record-paper,
+  .case-file-sidebar .case-nav-item b,.record-book-toc a>b,.special-case-toc a b{font-size:var(--clinical-font-size,18px)}
+  .case-file-sidebar .case-nav-item{border:1px solid transparent}
+  .case-file-sidebar .case-nav-item.is-current{border-color:#a2c9d3;background:var(--ds-blue-50);box-shadow:inset 4px 0 var(--ws-blue)}
+  .case-file-sidebar .case-nav-item>.case-nav-current-label{display:none;grid-column:2;justify-self:start;margin:0;padding:2px 6px;border:0;border-radius:4px;background:var(--ds-blue-100);color:var(--ws-blue);font-size:.75rem;line-height:1.5;font-weight:650}
+  .case-file-sidebar .case-nav-item.is-current>.case-nav-current-label{display:block}
+}
+@media screen and (max-width:640px){
+  .preview-tools .reading-font-slot{flex-basis:100%;margin-left:0}
+}
+@media print{
+  .reading-font-slot{display:none!important}
+}
+/* Layout fixes 2026-10-11: scrollable top tabs show a fade so hidden tabs are discoverable;
+   duty hero button keeps its spacing on phones. */
+@media screen and (max-width:1100px){
+  .official-nav .official-links,.tools-page .nav nav{
+    -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);
+    mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);
+    padding-right:24px;scroll-padding-inline:24px}
+}
+@media screen and (max-width:600px){
+  body.duty-page .duty-hero>.btn{display:inline-flex;margin-top:16px}
+}
+
+/* Preserve the library header spacing while respecting display cutouts. */
+#libraryShell .library-topbar{padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+@media(max-width:650px){
+  #libraryShell .library-topbar,.cms-admin-mode #libraryShell .library-topbar{padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+}
+
+/* Mid widths (phone landscape, small tablets): keep the library title on one line
+   and let the navigation links scroll inside their own area instead of squeezing the brand. */
+@media screen and (min-width:651px) and (max-width:1100px){
+  #libraryShell .library-topbar .brandline,#libraryShell .library-topbar .brand{flex-shrink:0;white-space:nowrap}
+  #libraryShell .library-topbar .brand small{display:none}
+  #libraryShell .library-top-actions{flex:1 1 auto;min-width:0;flex-shrink:1;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none}
+  #libraryShell .library-top-actions::-webkit-scrollbar{display:none}
+  #libraryShell .library-top-actions>:first-child{margin-left:auto}
+  #libraryShell .library-top-actions>*{flex-shrink:0;white-space:nowrap}
+  /* Patient info and login sit outside the scrolling links, on the right. */
+  #libraryShell .library-header-tools{margin-left:12px}
+  #libraryShell .library-top-actions .library-active-link{display:block}
+  #libraryShell .library-topbar{column-gap:16px}
+}
+
+/* Phones: the library header matches the other sections — brand row with
+   patient info and login, then the main navigation scrolling in its own row. */
+@media screen and (max-width:650px){
+  #libraryShell .library-topbar,.cms-admin-mode #libraryShell .library-topbar{height:auto;min-height:0;flex-wrap:wrap;align-items:center;column-gap:8px;row-gap:2px;padding-top:8px}
+  #libraryShell .library-topbar .brandline{order:1;flex:1 1 0;min-width:0}
+  /* Signed in, the badge and logout need their own row so the title stays whole. */
+  .cms-admin-mode #libraryShell .library-topbar .brandline{flex:0 0 100%}
+  #libraryShell .library-header-tools{order:2;margin-left:0;gap:6px}
+  #libraryShell .library-top-actions{order:3;flex:0 0 100%;width:100%;margin-left:0;display:flex;justify-content:flex-start;gap:22px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;min-height:48px}
+  #libraryShell .library-top-actions::-webkit-scrollbar{display:none}
+  #libraryShell .library-top-actions .text-action,#libraryShell .library-top-actions .library-active-link{display:flex;align-items:center;flex-shrink:0;min-height:48px;padding:0 1px;font-size:.9375rem;font-weight:600;white-space:nowrap}
+  #libraryShell .library-top-actions .library-active-link{color:var(--ws-blue,#03849a)}
+  #libraryShell .library-top-actions .library-active-link:after{height:3px;border-radius:0}
+}
+
+/* 全站统一免责声明（心电图页沿用自有页脚） */
+@media screen{
+  .site-disclaimer{max-width:1180px;margin:24px auto 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--ws-line,var(--ds-line));font-size:.8125rem;line-height:1.7;text-align:center}
+}
+@media print{.site-disclaimer{display:none}}
+
+/* 合并章节：章内每份记录一个小标题，可单独复制 */
+@media screen{
+  .record-merged-part+.record-merged-part{border-top:1px dashed var(--ws-line,var(--ds-line))}
+  .record-merged-part-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding:16px 22px 0}
+  .record-merged-part-head h4{margin:0;font-size:1rem;font-weight:700;color:var(--ws-blue,var(--ds-blue))}
+  .record-merged-part-actions{display:flex;gap:8px}
+  .record-merged-part-actions .btn{min-height:40px;padding:0 12px;font-size:.875rem}
+  .case-nav-count{font-style:normal;font-weight:500;font-size:.75rem;color:var(--ws-muted,var(--ds-muted));margin-left:4px}
+}
+@media screen and (max-width:640px){
+  .record-merged-part-head{padding:14px 14px 0}
+}
+@media print{
+  .record-merged-part-actions{display:none}
+  .record-merged-part-head{padding:10px 0 0}
+  .record-merged-part-head h4{margin:0;font-size:12pt}
+}
+
+/* 界面细节统一，2026-10-31：只改屏幕显示，打印与病历正文不受影响 */
+@media screen{
+  /* 疾病分型、心电图的横幅改为与其他栏目一致的蓝白卡片 */
+  .class-page .class-shell .class-hero{background:#fff;color:var(--ws-text);border:1px solid var(--ws-line);border-radius:20px;}
+  .class-page .class-shell .class-hero:after{display:none}
+  .class-page .class-shell .class-hero h1{color:var(--ws-ink)}
+  .class-page .class-shell .class-hero h1 em{color:var(--ws-blue)}
+  .class-page .class-shell .class-hero p{color:var(--ws-muted)}
+  .class-page .class-shell .class-eyebrow{color:var(--ws-blue)}
+  .class-page .class-shell .class-hero-stats div{background:var(--ws-soft);border-color:transparent}
+  .class-page .class-shell .class-hero-stats strong{color:var(--ws-blue)}
+  .class-page .class-shell .class-hero-stats span{color:var(--ws-muted)}
+
+  /* 搜索框统一用线条放大镜图标 */
+  .search-icon{display:block;width:18px;height:18px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;color:var(--ws-muted)}
+  .official-search{display:inline-flex;align-items:center;gap:6px}
+  .official-search .search-icon{width:16px;height:16px}
+  #libraryShell .searchbox,.tools-page .formula-search{display:flex;align-items:center;gap:8px}
+}
+@media screen and (max-width:640px){
+  /* 手机顶栏更矮：去掉英文副标题，首屏多露出内容 */
+  .official-nav,.tools-page .nav{height:auto;min-height:0}
+  .official-nav-inner,.tools-page .navin{padding-top:8px}
+  .official-brand-text small{display:none}
+  .official-brand-text strong{font-size:.9375rem}
+  .official-brand-mark{width:28px;height:28px;border-radius:8px;font-size:.875rem}
+  .official-nav .official-links a,.tools-page .nav nav a{min-height:44px;font-size:.875rem}
+
+  /* 手机上隐藏装饰性的英文小标题 */
+  .class-page .class-shell .class-eyebrow,.duty-kicker,.pathway-kicker,.tools-page .hero .eyebrow,
+  #libraryShell .breadcrumb,.ortho-eyebrow,.case-file-eyebrow,.class-dossier-kicker{display:none}
+  .class-page .class-shell .class-hero h1{margin-top:0}
+  .class-page .class-shell .class-hero{padding:22px 20px}
+  .class-page .class-shell .class-hero-stats div{min-height:64px;padding:12px}
+
+  /* 键盘快捷键提示在手机上用不到，让出搜索框宽度 */
+  #libraryShell .searchbox kbd,.ecg-global-field kbd{display:none}
+}
+
+/* 网站检查修改，2026-10-31：只改屏幕显示，病历正文、复制与打印不受影响 */
+@media screen{
+  /* 病历模板页左上角与其他栏目一致：H 标志 + 「哈基米工作站」，下面一行写当前栏目 */
+  #libraryShell .library-brand-copy{display:block;line-height:1.05}
+  #libraryShell .library-brand-copy strong{display:block;font-size:1rem;line-height:1.4;font-weight:700;color:var(--ws-ink)}
+  #libraryShell .library-brand-copy small{display:block;margin-top:2px;font-size:12px;line-height:1.3;color:var(--ws-muted);letter-spacing:.025em}
+  #libraryShell .site-home-mark .library-brand-mark{font-size:1rem}
+
+  /* 打开具体病种时，正文优先：去掉上方重复的模板库大标题，横幅压缩 */
+  body.disease-book-page #libraryShell .article-intro{padding:0;border-bottom:0}
+  body.disease-book-page #libraryShell .article-intro>.breadcrumb,
+  body.disease-book-page #libraryShell #libraryTitle,
+  body.disease-book-page #libraryShell #libraryLead,
+  body.disease-book-page #libraryShell .library-guidance{display:none}
+  body.disease-book-page #libraryShell .patient-strip{margin:0 0 12px}
+  body.disease-book-page #libraryShell .department-toolbar{margin-bottom:12px;padding-bottom:12px}
+  body.disease-book-page #libraryShell .record-book-hero{padding:20px 24px;align-items:center}
+  body.disease-book-page #libraryShell .record-book-hero h2{font-size:1.5rem;line-height:1.35;margin-bottom:0}
+  body.disease-book-page #libraryShell .record-book-hero p{display:none}
+  body.disease-book-page #libraryShell .record-book-hero-actions{margin-top:14px}
+  body.disease-book-page #libraryShell .record-book-hero>strong{line-height:1.5}
+  body.disease-book-page #libraryShell .record-book-hero>strong small{margin:0;font-size:.8125rem;color:rgba(255,255,255,.8)}
+  body.disease-book-page #libraryShell .source-template-note{margin:12px 0}
+
+  /* 过小的文字放大到能看清 */
+
+  .disease-hero>strong small{font-size:.75rem}
+}
+@media screen and (min-width:641px){
+  body.disease-book-page #libraryShell .content{padding-top:18px}
+}
+@media screen and (max-width:640px){
+  body.disease-book-page #libraryShell .record-book-hero{padding:18px}
+  body.disease-book-page #libraryShell .record-book-hero h2{font-size:1.25rem}
+  body.disease-book-page #libraryShell .record-book-hero>strong{display:none}
+  #libraryShell .library-brand-copy small{display:none}
+}
+
+/* 统一顶栏，2026-11-08：参考 GitHub、Stripe、Vercel 等站点的全局导航——
+   标志在左、栏目紧跟其后、搜索/登录等按钮靠右。各栏目（含病历模板）顶栏同高，
+   标志与栏目起点位置一致，换页时导航不再左右跳动。只改电脑宽度的屏幕显示。 */
+@media screen and (min-width:1101px){
+  .official-nav-inner,.tools-page .navin{justify-content:flex-start}
+  .official-nav .official-brand,.tools-page .nav .workspace-brand,#libraryShell .library-topbar .brandline{flex:0 0 208px;width:208px;min-width:0}
+  .official-nav-inner,.tools-page .navin{flex-wrap:nowrap;padding-top:0}
+  .official-nav .official-links,.tools-page .nav nav{margin-left:16px;align-self:stretch;height:auto;overflow:visible}
+  .official-nav .official-links a,.tools-page .nav nav a{min-height:0;height:100%;padding-top:3px}
+  .official-nav-right{margin-left:auto}
+  #libraryShell .library-topbar{height:72px;min-height:72px;justify-content:flex-start;column-gap:24px;
+    padding-left:max(24px,calc((100% - 1328px) / 2 + 24px),env(safe-area-inset-left,0px));
+    padding-right:max(24px,calc((100% - 1328px) / 2 + 24px),env(safe-area-inset-right,0px))}
+  #libraryShell .library-top-actions{margin-left:16px;gap:24px;align-self:stretch;align-items:stretch}
+  #libraryShell .library-top-actions .text-action{display:flex;align-items:center;padding:3px 1px 0;font-size:.9375rem;font-weight:600;white-space:nowrap}
+  #libraryShell .library-top-actions .text-action:hover{color:var(--ws-blue)}
+  #libraryShell .library-top-actions .library-active-link{color:var(--ws-blue)}
+  #libraryShell .library-top-actions .library-active-link:after{height:3px;border-radius:0;background:var(--ws-blue)}
+  #libraryShell .library-header-tools{margin-left:auto}
+}
+
+/* ===== 以下原为 design-system.css ===== */
+/* 设计系统 v2（2026-11-08）
+   参考 Stripe、Linear、Vercel、Apple 等站点的界面做法：统一内容宽度、半透明吸顶顶栏、
+   柔和分层阴影、悬停反馈、胶囊式标签与清晰的焦点环。
+   本文件在每个页面最后加载，只改屏幕显示；打印样式、病历正文、复制内容均不受影响。 */
+:root{
+  --ds-ink:#14252b;
+  --ds-text:#2c3e44;
+  --ds-muted:#5d6f75;
+  --ds-line:#dfe7e9;
+  --ds-line-strong:#a9d8de;
+  --ds-bg:#f5f8f8;
+  --ds-blue:#11697a;
+  --ds-blue-strong:#0c5564;
+  --ds-blue-50:#eef7f8;
+  --ds-blue-100:#d5ecef;
+  --ds-shadow-xs:0 1px 2px rgba(20,37,43,.05);
+  --ds-shadow-sm:0 1px 2px rgba(20,37,43,.04),0 3px 8px -2px rgba(20,37,43,.06);
+  --ds-shadow-md:0 2px 4px rgba(20,37,43,.04),0 14px 32px -10px rgba(20,37,43,.18);
+  --ds-ring:0 0 0 3px rgba(17,105,122,.18);
+  --ds-ease:cubic-bezier(.2,.8,.2,1);
+  /* 让旧样式里的设计变量与新系统一致 */
+  --ws-ink:var(--ds-ink);--ws-text:var(--ds-text);--ws-muted:var(--ds-muted);
+  --ws-line:var(--ds-line);--ws-bg:var(--ds-bg);--ws-soft:var(--ds-blue-50)
+}
+
+@media screen{
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+  body,.official-home,body.duty-page,body.pathway-page,body.admin-page,body.class-page,body.tools-page,body.labs-page,#libraryShell,#libraryShell .page{background-color:var(--ds-bg)}
+  :where(h1,h2,h3){letter-spacing:-.01em}
+  :where(h1){letter-spacing:-.022em}
+  ::selection{background:var(--ds-blue-100);color:var(--ds-ink)}
+
+  /* ---------- 顶栏：半透明磨砂（Apple / Vercel） ---------- */
+  .official-nav,.tools-page .nav,#libraryShell .library-topbar{
+    background:rgba(255,255,255,.96);border-bottom:1px solid rgba(20,37,43,.08);box-shadow:none
+  }
+  @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+    .official-nav,.tools-page .nav,#libraryShell .library-topbar{
+      background:rgba(255,255,255,.8);
+      -webkit-backdrop-filter:saturate(180%) blur(14px);backdrop-filter:saturate(180%) blur(14px)
+    }
+  }
+  .official-brand-mark,.library-brand-mark{
+    background:linear-gradient(145deg,#0b7e92 0%,var(--ds-blue) 55%,var(--ds-blue-strong) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 1px 2px rgba(20,37,43,.18)
+  }
+
+  /* 导航：悬停时出现浅色胶囊（Linear / GitHub），当前栏目保留底部指示条 */
+  .official-nav .official-links a,.tools-page .nav nav a,#libraryShell .library-top-actions .text-action{position:relative;transition:color .15s ease}
+  .official-nav .official-links a::before,.tools-page .nav nav a::before,#libraryShell .library-top-actions .text-action::before{
+    content:"";position:absolute;left:-9px;right:-9px;top:50%;height:34px;margin-top:-17px;border-radius:8px;
+    background:transparent;transition:background-color .15s ease;z-index:-1
+  }
+  .official-nav .official-links,.tools-page .nav nav,#libraryShell .library-top-actions{isolation:isolate}
+  .official-nav .official-links a:hover::before,.tools-page .nav nav a:hover::before,#libraryShell .library-top-actions .text-action:hover::before{background:rgba(17,105,122,.07)}
+  .official-nav .official-links a.active,.tools-page .nav nav a.active,#libraryShell .library-top-actions .library-active-link{color:var(--ds-blue);font-weight:650}
+
+  /* ---------- 卡片：统一边框与分层阴影（Stripe） ---------- */
+  .home-quick-panel,.official-feature,.pathway-home-banner,
+  #libraryShell .controls-section,.library-overview,.library-department-card,.ortho-disease-card,
+  .class-page .class-shell .class-hero,.class-dept-card,.class-disease-card,.class-content-section,
+  .duty-card,.duty-privacy,.orders-sheet,.orders-search,.orders-locked,
+  .tools-page .card,.tools-page .notice,
+  .admin-tool-card,.admin-login-card,.admin-guide,.admin-status,
+  .pathway-hero,.pathway-main>section,.pathway-sidebar{
+    border-color:var(--ds-line);box-shadow:var(--ds-shadow-sm)
+  }
+
+  /* 可点击的卡片：悬停轻微上浮（仅限鼠标设备） */
+  .official-feature,.home-quick-grid>a,.library-department-card,.ortho-disease-card,
+  .class-dept-card,.class-disease-card,.duty-link-grid a,.tools-page .card,.admin-tool-card,.pathway-home-banner{
+    transition:transform .2s var(--ds-ease),box-shadow .2s var(--ds-ease),border-color .2s ease,background-color .2s ease
+  }
+  @media (hover:hover) and (pointer:fine){
+    .official-feature:hover,.library-department-card:hover,.ortho-disease-card:hover,
+    .class-dept-card:not(.is-pending):hover,.class-disease-card:hover,.duty-link-grid a:hover,
+    .tools-page .card:hover,.admin-tool-card:hover,.pathway-home-banner:hover{
+      transform:translateY(-2px);box-shadow:var(--ds-shadow-md);border-color:var(--ds-line-strong)
+    }
+    .home-quick-grid>a:hover{border-color:var(--ds-line-strong);background:var(--ds-bg);box-shadow:var(--ds-shadow-sm)}
+  }
+  /* 卡片里的「进入 →」箭头随悬停右移 */
+  .feature-enter,.department-card-open,.class-dept-foot a,.ortho-disease-card .disease-open{transition:transform .2s var(--ds-ease)}
+
+  /* ---------- 按钮 ---------- */
+  .btn,.official-cta,.home-search-field button,.orders-action{transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease,transform .1s ease}
+  .btn:active,.official-cta:active,.home-search-field button:active{transform:translateY(1px)}
+  .official-cta.primary,.home-search-field button,.orders-locked .btn.primary,.duty-task-form .btn.primary,.duty-note-actions .btn.primary,.orders-dialog-actions .btn.primary{
+    background:linear-gradient(180deg,var(--ds-blue) 0%,var(--ds-blue) 100%);border-color:var(--ds-blue-strong);color:#fff;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 1px 2px rgba(20,37,43,.16)
+  }
+  .official-cta.primary:hover,.home-search-field button:hover,.orders-locked .btn.primary:hover,.duty-task-form .btn.primary:hover,.duty-note-actions .btn.primary:hover,.orders-dialog-actions .btn.primary:hover{
+    background:linear-gradient(180deg,var(--ds-blue) 0%,var(--ds-blue-strong) 100%)
+  }
+  .official-cta.secondary:hover,.btn.ghost:hover{background-color:var(--ds-bg);border-color:var(--ds-line-strong)}
+
+  /* ---------- 搜索框：统一焦点环 ---------- */
+  .home-search-field,#libraryShell .searchbox,.orders-search-field,.ecg-global-field,.tools-page .formula-search{transition:border-color .15s ease,box-shadow .15s ease}
+  .home-search-field:focus-within,#libraryShell .searchbox:focus-within,.orders-search-field:focus-within,.ecg-global-field:focus-within,.tools-page .formula-search:focus-within{
+    border-color:var(--ds-blue);box-shadow:var(--ds-ring)
+  }
+
+  /* ---------- 数字：等宽对齐 ---------- */
+  .official-stats strong,.library-overview-stats strong,.class-hero-stats strong,.pathway-hero strong,#checklistProgress,#dutyTaskCount,.orders-sheet-count{font-variant-numeric:tabular-nums}
+
+  /* ---------- 首页首屏：柔和渐变与网格底纹（Vercel / Linear） ---------- */
+  body.portal-mode{
+    background:
+      radial-gradient(1100px 520px at 12% -8%,rgba(17,105,122,.10),transparent 62%),
+      radial-gradient(900px 460px at 92% -4%,rgba(4,168,195,.10),transparent 60%),
+      var(--ds-bg);
+    background-repeat:no-repeat
+  }
+
+  /* ---------- 页脚与免责声明 ---------- */
+  .site-disclaimer{color:var(--ds-muted);border-top-color:var(--ds-line)}
+}
+
+/* ---------- 统一内容宽度：与顶栏同一列（电脑宽度） ---------- */
+@media screen and (min-width:1101px){
+
+  .class-page:not(.ecg-page) .class-shell{width:min(1280px,calc(100% - 48px))}
+  .library-root-page #libraryShell .page{max-width:1328px}
+  .library-root-page #libraryShell .content{width:min(1280px,calc(100% - 48px))}
+}
+
+/* ---------- 眉题：胶囊标签（电脑宽度；手机上这些眉题本来就隐藏） ---------- */
+@media screen and (min-width:641px){
+  .official-kicker,.duty-kicker,.class-page .class-shell .class-eyebrow,.tools-page .hero .eyebrow,.pathway-hero .pathway-kicker,#libraryShell .article-intro>.breadcrumb,.labs-kicker{
+    display:inline-flex;align-items:center;gap:8px;width:fit-content;padding:5px 12px 5px 10px;
+    border:1px solid var(--ds-blue-100);border-radius:999px;background:rgba(238,247,248,.85);
+    color:var(--ds-blue);font-size:12px;line-height:1.4;letter-spacing:.12em;font-weight:700
+  }
+  .official-kicker::before,.duty-kicker::before,.class-page .class-shell .class-eyebrow::before,.tools-page .hero .eyebrow::before,.pathway-hero .pathway-kicker::before,#libraryShell .article-intro>.breadcrumb::before,.labs-kicker::before{
+    content:"";width:6px;height:6px;border-radius:50%;background:#068ea5;box-shadow:0 0 0 3px rgba(6,142,165,.18)
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .official-feature,.home-quick-grid>a,.library-department-card,.ortho-disease-card,.class-dept-card,.class-disease-card,
+  .duty-link-grid a,.tools-page .card,.admin-tool-card,.pathway-home-banner,.feature-enter,.btn,.official-cta{transition:none!important;transform:none!important}
+}

@@ -12,7 +12,7 @@ test('retained numeric and stable IDs resolve originals; withdrawn IDs remain un
   const directory=pathToFileURL(folder+'/'),{source,manifest,publication}=compileClinicalSite(fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),directory);
   const context={window:{HAJIMI_MANIFEST:manifest},location:{pathname:'/bl'},console,
     document:{createElement(){return {};},head:{append(){}}},fetch:async url=>({ok:true,json:async()=>JSON.parse(fs.readFileSync(new URL(url.slice(1),directory),'utf8'))})};
-  vm.createContext(context);vm.runInContext(fs.readFileSync(new URL('../library-loader.js',import.meta.url),'utf8'),context);
+  vm.createContext(context);vm.runInContext(fs.readFileSync(new URL('../js/library-loader.js',import.meta.url),'utf8'),context);
   for(const item of Object.values(manifest.departments))vm.runInContext(fs.readFileSync(new URL(item.catalog.slice(1),directory),'utf8'),context);
   const H=context.window.HAJIMI;
   // Removed cases are no longer in the source: their reserved IDs must resolve to nothing.
