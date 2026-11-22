@@ -844,6 +844,7 @@ test('workspace routes, mobile bottom tabs and browser-local case history', asyn
       const resume=page.locator('[data-workstation-list="recent"] a[href="/bl/guke/TKA"]');
       await resume.waitFor();
       assert.match(await resume.innerText(),/全膝关节置换/);
+      assert.equal(await page.locator('[data-workstation-list="recent"]').getByText('股骨颈骨折').count(),0,'history replaces the suggestions');
       // The favourite is also listed on the homepage itself.
       assert.match(await page.locator('#homeContent [data-workstation-list="favorites"] a[href="/bl/guke/TKA"]').innerText(),/全膝关节置换/);
       await page.locator('a[href="/personal#favorites"]').click();
@@ -1536,6 +1537,9 @@ test('homepage search opens shareable clinical results and reset restores depart
       const search=page.getByRole('searchbox',{name:'搜索全站资料',exact:true});
       const bounds=await search.boundingBox();assert(bounds.y>0&&bounds.y+bounds.height<900,'homepage search is in the initial viewport');
       assert.equal(await page.locator('.home-quick-grid a').count(),4);
+      // A first visit suggests common diseases in place of the empty history.
+      const suggested=page.locator('[data-workstation-list="recent"] a.ws-row');
+      assert.deepEqual(await suggested.locator('strong').allInnerTexts(),['膝关节骨性关节炎','股骨颈骨折','股骨粗隆间骨折']);
       // "/" jumps to the search box, as on /search.
       await page.locator('body').click({position:{x:2,y:2}});await page.keyboard.press('/');
       assert(await search.evaluate(node=>node===document.activeElement),'"/" focuses the homepage search');
