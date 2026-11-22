@@ -74,7 +74,7 @@
     }catch(ex){err.textContent=ex.message;err.hidden=false;}
   }
   async function logout(){
-    try{await req('/api/logout',{method:'POST',body:'{}'});}catch(ex){notify('退出失败：'+ex.message);return;}
+    try{await req('/api/session',{method:'DELETE'});}catch(ex){notify('退出失败：'+ex.message);return;}
     CMS.auth=false;CMS.user=null;CMS.data.cases=CMS.data.cases.filter(item=>item.published!==false);
     for(const id of ['cmsEditDialog','cmsCaseDialog'])document.getElementById(id)?.close();
     const editForm=document.getElementById('cmsEditForm'),caseForm=document.getElementById('cmsCaseForm');editForm.reset();caseForm.reset();editForm.onsubmit=null;caseForm.onsubmit=null;

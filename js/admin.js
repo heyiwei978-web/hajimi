@@ -30,7 +30,7 @@
     historyList.replaceChildren();historyStatus.textContent='正在加载修改历史…';
     for(const id of ['overrideCount','caseCount'])document.getElementById(id).textContent='—';
     try{
-      const [current,history]=await Promise.all([json('/api/content',{cache:'no-store'}),json('/api/content-history',{cache:'no-store'})]);
+      const [current,history]=await Promise.all([json('/api/content',{cache:'no-store'}),json('/api/content?feed=history',{cache:'no-store'})]);
       if(generation!==epoch||request!==loadGeneration)return;
       if(current.revision!==history.revision)throw new Error('资料在加载期间发生更新，请点击刷新重试');
       content=current;revision=history.revision;downloadCurrent.disabled=false;
@@ -47,11 +47,11 @@
         copy.append(title,detail);row.append(copy);
         const actions=document.createElement('div');actions.className='admin-history-actions';
         const exportButton=document.createElement('button');exportButton.type='button';exportButton.className='admin-secondary';exportButton.textContent='下载备份';
-        exportButton.onclick=async()=>{exportButton.disabled=true;try{download(await json('/api/content-history?id='+encodeURIComponent(item.id)), 'hajimi-backup-'+item.id+'.json');}catch(ex){historyStatus.textContent=ex.message;}finally{exportButton.disabled=false;}};
+        exportButton.onclick=async()=>{exportButton.disabled=true;try{download(await json('/api/content?feed=history&id='+encodeURIComponent(item.id)), 'hajimi-backup-'+item.id+'.json');}catch(ex){historyStatus.textContent=ex.message;}finally{exportButton.disabled=false;}};
         const restoreButton=document.createElement('button');restoreButton.type='button';restoreButton.className='admin-secondary';restoreButton.textContent='恢复此版本';
         restoreButton.onclick=async()=>{
           if(!confirm('将把网站模板与案例恢复至 '+date+'。当前资料会先自动备份。确认恢复？'))return;
-          try{await mutate('/api/content-history',{id:item.id,revision});await loadDashboard();notify('已恢复历史版本，恢复前资料已自动备份');}
+          try{await mutate('/api/content?feed=history',{id:item.id,revision});await loadDashboard();notify('已恢复历史版本，恢复前资料已自动备份');}
           catch(ex){await loadDashboard();historyStatus.textContent=ex.message;}
         };
         actions.append(exportButton,restoreButton);row.append(actions);historyList.append(row);
@@ -190,7 +190,7 @@
     try{const session=await json('/api/login',{method:'POST',body:JSON.stringify(Object.fromEntries(new FormData(form).entries()))});form.reset();showAuth(true,session.user);notify('已进入网站管理模式');returnAfterLogin();}
     catch(ex){error.textContent=ex.message;error.hidden=false;}finally{button.disabled=false;button.textContent='登录管理后台';}
   });
-  document.getElementById('adminLogout').onclick=async()=>{try{await json('/api/logout',{method:'POST',body:'{}'});showAuth(false);notify('已退出管理模式');}catch(ex){notify(ex.message);}};
+  document.getElementById('adminLogout').onclick=async()=>{try{await json('/api/session',{method:'DELETE'});showAuth(false);notify('已退出管理模式');}catch(ex){notify(ex.message);}};
   async function verifySession(){
     const generation=epoch;
     try{const session=await json('/api/session',{cache:'no-store'});if(generation===epoch&&(!session.authenticated||dashboard.hidden))showAuth(!!session.authenticated,session.user);}
