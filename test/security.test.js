@@ -2,13 +2,14 @@ import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import test from 'node:test';
 import fs from 'node:fs';
-import {createSession,readSession,sha256,hashPassword,verifyPassword,securityChecks} from '../api/_auth.js';
+import {createSession,readSession,renewSession,SESSION_TTL_MS,MAX_LIFETIME_MS,sha256,hashPassword,verifyPassword,securityChecks} from '../api/_auth.js';
 import {guardRequest} from '../api/_security.js';
-import login from '../api/login.js';
-import logout from '../api/logout.js';
+import login,{createLoginHandler} from '../api/login.js';
+import {createLoginLog,describeRequest,LIMITS} from '../api/_login-log.js';
+import {createLoginLogHandler} from '../api/login-log.js';
 import session from '../api/session.js';
-import content from '../api/content.js';
-import history from '../api/content-history.js';
+import content,{createContentApi} from '../api/content.js';
+import {createHistoryHandler} from '../api/_content-history.js';
 import upload from '../api/upload.js';
 import image,{createImageHandler} from '../api/image.js';
 
@@ -67,6 +68,90 @@ test('missing signing secret rejects an empty-key forgery and prevents new sessi
   assert.equal(res.headers['set-cookie'],undefined);
 });
 
+test('HAJIMI_SESSION_VERSION revokes every earlier session without rotating the signing secret', t => {
+  const previous = process.env.HAJIMI_SESSION_VERSION;
+  t.after(() => { if (previous === undefined) delete process.env.HAJIMI_SESSION_VERSION; else process.env.HAJIMI_SESSION_VERSION = previous; });
+  delete process.env.HAJIMI_SESSION_VERSION;
+  const legacy = adminEnvironment(t);
+  const read = cookie => readSession(request({headers:{cookie}}));
+  assert.ok(read(legacy), 'without a version, sessions stay valid');
+  assert.equal(JSON.parse(Buffer.from(legacy.slice('hajimi_session='.length).split('.')[0],'base64url')).v, undefined);
+
+  process.env.HAJIMI_SESSION_VERSION = '20261119';
+  assert.equal(read(legacy), null, 'setting a version for the first time logs out older sessions');
+  const current = 'hajimi_session=' + createSession('test-admin');
+  assert.equal(read(current).v, '20261119');
+
+  process.env.HAJIMI_SESSION_VERSION = ' 20261119 ';
+  assert.ok(read(current), 'surrounding whitespace in the variable is ignored');
+
+  process.env.HAJIMI_SESSION_VERSION = '20261120';
+  assert.equal(read(current), null, 'changing the version logs out every session signed under the old one');
+
+  delete process.env.HAJIMI_SESSION_VERSION;
+  assert.equal(read(current), null, 'removing the version does not revive versioned sessions');
+  const forgedPayload = Buffer.from(JSON.stringify({u:'test-admin',exp:Date.now()+60000,v:''})).toString('base64url');
+  const forged = 'hajimi_session='+forgedPayload+'.'+crypto.createHmac('sha256','wrong-secret').update(forgedPayload).digest('base64url');
+  assert.equal(read(forged), null);
+});
+
+test('sessions last 12 hours, slide on admin use, and stop renewing 7 days after login', t => {
+  adminEnvironment(t);
+  const hour = 60 * 60 * 1000, start = Date.UTC(2026, 10, 19, 0, 0, 0);
+  assert.equal(SESSION_TTL_MS, 12 * hour); assert.equal(MAX_LIFETIME_MS, 7 * 24 * hour);
+  const cookieOf = token => 'hajimi_session=' + token;
+  const at = (cookie, now) => readSession(request({headers:{cookie}}), now);
+  const first = cookieOf(createSession('test-admin', {now:start}));
+  assert.ok(at(first, start + 12 * hour - 1));
+  assert.equal(at(first, start + 12 * hour), null, 'expires after 12 hours without use');
+
+  const quiet = response();
+  assert.equal(renewSession(request({headers:{cookie:first}}), quiet, start + 10 * 60 * 1000), false, 'no renewal within the first 30 minutes');
+  assert.equal(quiet.headers['set-cookie'], undefined);
+
+  const renewed = response(), renewAt = start + 11 * hour;
+  assert.equal(renewSession(request({headers:{cookie:first}}), renewed, renewAt), true);
+  assert.match(renewed.headers['set-cookie'], /^hajimi_session=[^;]+; Path=\/; HttpOnly; Secure; SameSite=Strict; Max-Age=43200$/);
+  const second = renewed.headers['set-cookie'].split(';')[0];
+  assert.ok(at(second, renewAt + 12 * hour - 1), 'renewed session runs 12 hours from the renewal');
+  assert.equal(at(second, renewAt).l, start, 'login time is carried over');
+
+  // Keep renewing every 11 hours: the session never outlives login + 7 days.
+  let cookie = first, now = start, last = null;
+  while (true) {
+    now += 11 * hour;
+    const res = response();
+    if (!at(cookie, now)) break;
+    if (renewSession(request({headers:{cookie}}), res, now)) cookie = res.headers['set-cookie'].split(';')[0];
+    last = now;
+  }
+  assert.ok(last < start + MAX_LIFETIME_MS && now >= start + MAX_LIFETIME_MS - 11 * hour);
+  assert.equal(at(cookie, start + MAX_LIFETIME_MS), null, 'no session survives 7 days after login');
+
+  const sign = payload => crypto.createHmac('sha256', process.env.HAJIMI_SESSION_SECRET).update(payload).digest('base64url');
+  const token = data => { const payload = Buffer.from(JSON.stringify(data)).toString('base64url'); return cookieOf(payload + '.' + sign(payload)); };
+  assert.equal(at(token({u:'test-admin', exp:start + 6 * 24 * hour}), start), null, 'old 7-day sessions without a login time are rejected');
+  assert.equal(at(token({u:'test-admin', l:start, exp:start + 2 * SESSION_TTL_MS}), start), null, 'expiry beyond 12 hours is rejected');
+  assert.equal(at(token({u:'test-admin', l:start + hour, exp:start + 2 * hour}), start), null, 'login time in the future is rejected');
+});
+
+test('admin requests through guardRequest and GET /api/session renew; anonymous requests never get a cookie', async t => {
+  adminEnvironment(t);
+  const old = 'hajimi_session=' + createSession('test-admin', {now:Date.now() - 2 * 60 * 60 * 1000});
+  const guarded = response();
+  assert.equal(guardRequest(request({method:'GET',headers:{cookie:old}}), guarded, {methods:['GET'],admin:true}), true);
+  assert.match(guarded.headers['set-cookie'], /^hajimi_session=.+Max-Age=43200$/);
+  const status = response();
+  await session(request({method:'GET',headers:{cookie:old}}), status);
+  assert.equal(status.body.authenticated, true); assert.match(status.headers['set-cookie'], /Max-Age=43200$/);
+  const anonymous = response();
+  await session(request({method:'GET',headers:{cookie:''}}), anonymous);
+  assert.equal(anonymous.headers['set-cookie'], undefined);
+  const publicRead = response();
+  assert.equal(guardRequest(request({method:'GET',headers:{cookie:old}}), publicRead, {methods:['GET']}), true);
+  assert.equal(publicRead.headers['set-cookie'], undefined, 'non-admin endpoints do not touch the session');
+});
+
 test('expired, tampered, extra-part and malformed-cookie sessions are rejected', t => {
   const cookie = adminEnvironment(t);
   const valid = cookie.slice('hajimi_session='.length);
@@ -79,10 +164,12 @@ test('expired, tampered, extra-part and malformed-cookie sessions are rejected',
 
 test('cross-site requests and spoofed origins cannot perform admin writes', async t => {
   const cookie = adminEnvironment(t);
-  for (const handler of [login,logout,content,history,upload]) {
+  const history = createHistoryHandler();
+  const writes = [[login,'POST'],[session,'DELETE'],[content,'PUT'],[history,'POST'],[upload,'POST']];
+  for (const [handler,method] of writes) {
     for (const headers of [{origin:'https://attacker.example'},{origin:'null'},{'sec-fetch-site':'cross-site'},{origin:'https://wdyxzl.icu.attacker.example'}]) {
       const res = response();
-      await handler(request({method:handler === content ? 'PUT' : 'POST',headers:{cookie,...headers}}),res);
+      await handler(request({method,headers:{cookie,...headers}}),res);
       assert.equal(res.code,403);
       assert.equal(res.headers['set-cookie'],undefined);
     }
@@ -113,6 +200,35 @@ test('public session remains readable while admin writes require authentication'
     const denied = response(); await handler(request({method,headers:{cookie:''}}),denied);
     assert.equal(denied.code,401);
   }
+});
+
+test('logout is DELETE /api/session: clears the cookie, needs the admin marker, and POST is refused', async t => {
+  const cookie = adminEnvironment(t);
+  const res = response();
+  await session(request({method:'DELETE',headers:{cookie,origin:'https://wdyxzl.icu'}}),res);
+  assert.equal(res.code,200); assert.deepEqual(res.body,{ok:true});
+  assert.match(res.headers['set-cookie'],/^hajimi_session=; Path=\/; HttpOnly; Secure; SameSite=Strict; Max-Age=0$/);
+  const unmarked = response();
+  await session(request({method:'DELETE',headers:{cookie,'x-hajimi-admin':undefined}}),unmarked);
+  assert.equal(unmarked.code,403); assert.equal(unmarked.headers['set-cookie'],undefined);
+  const post = response();
+  await session(request({method:'POST',headers:{cookie}}),post);
+  assert.equal(post.code,405); assert.equal(post.headers.allow,'GET, DELETE');
+});
+
+test('/api/content?feed=history reaches the admin-only history handler; other requests reach content', async t => {
+  const anonymous = response();
+  await content(request({method:'GET',query:{feed:'history'},headers:{cookie:''}}),anonymous);
+  assert.equal(anonymous.code,401, 'history stays admin-only behind the shared function');
+  const restore = response();
+  await content(request({method:'POST',query:{feed:'history'},headers:{cookie:''}}),restore);
+  assert.equal(restore.code,401);
+  const calls = [];
+  const api = createContentApi((req,res) => calls.push('content'),(req,res) => calls.push('history'));
+  for (const req of [{query:{feed:'history'}},{url:'/api/content?feed=history&id=x'},{query:{}},{url:'/api/content'},{query:{feed:'other'}},{query:{feed:['history','x']}}]) api(req,response());
+  assert.deepEqual(calls,['history','history','content','content','content','content']);
+  assert.equal(fs.readdirSync(new URL('../api/', import.meta.url)).filter(file => /^(logout|content-history)\.js$/.test(file)).length,0,
+    'merged endpoints must not come back as separate functions');
 });
 
 test('valid same-origin admin JSON passes the guard; wrong method and oversized writes do not', t => {
@@ -199,7 +315,7 @@ test('salted scrypt admin password hash is preferred and legacy SHA-256 still wo
 });
 
 test('browser-generated PBKDF2 hash (password-hash.js) is accepted by the login check', async () => {
-  await import('../password-hash.js');
+  await import('../js/password-hash.js');
   const hash = await globalThis.hajimiMakePasswordHash('a long admin password');
   assert.match(hash,/^pbkdf2\$600000\$[A-Za-z0-9_-]{22}\$[A-Za-z0-9_-]{43}$/);
   assert.equal(verifyPassword('a long admin password',{HAJIMI_ADMIN_PASSWORD_HASH:hash}),true);
@@ -257,7 +373,7 @@ test('security response headers are present and not weakened', () => {
   const headers = Object.fromEntries(config.headers.find(rule => rule.source === '/(.*)').headers.map(item => [item.key,item.value]));
   const csp = Object.fromEntries(headers['Content-Security-Policy'].split(';').map(part => part.trim().split(/\s+/)).map(([name,...values]) => [name,values.join(' ')]));
   assert.deepEqual(csp,{
-    'default-src':"'self'",'script-src':"'self'",'style-src':"'self' 'unsafe-inline'",'img-src':"'self' data: blob:",'font-src':"'self'",
+    'default-src':"'self'",'script-src':"'self'",'style-src':"'self'",'img-src':"'self' data: blob:",'font-src':"'self'",
     'connect-src':"'self'",'frame-src':"'none'",'object-src':"'none'",'base-uri':"'self'",'form-action':"'self'",'frame-ancestors':"'none'"
   });
   assert.equal(headers['X-Content-Type-Options'],'nosniff');
@@ -277,3 +393,95 @@ test('security response headers are present and not weakened', () => {
   assert.ok(![...denied].some(item => item.startsWith('clipboard')));
 });
 
+function memoryStorage() {
+  const files = new Map();
+  return {files,
+    async get(pathname) {
+      if (!files.has(pathname)) return null;
+      return {statusCode:200,stream:new Response(files.get(pathname)).body,blob:{etag:'"e"'}};
+    },
+    async put(pathname,body) { files.set(pathname,String(body)); return {pathname,etag:'"e"'}; }
+  };
+}
+
+test('login record keeps time, place and device, and never the credentials', async t => {
+  adminEnvironment(t);
+  const storage = memoryStorage(), log = createLoginLog(storage,{now:() => new Date('2026-11-11T08:00:00Z')});
+  const handler = createLoginHandler({log});
+  const from = {'x-forwarded-for':'203.0.113.7, 10.0.0.1','x-vercel-ip-country':'CN','x-vercel-ip-country-region':'SH',
+    'x-vercel-ip-city':'Shang%20Hai','user-agent':'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) Safari/604.1'};
+  const wrong = response();
+  await handler(request({headers:from,body:{username:'typed-secret-by-mistake',password:'wrong-password'}}),wrong);
+  assert.equal(wrong.code,401);
+  const ok = response();
+  await handler(request({headers:from,body:{username:'test-admin',password:'test-password'}}),ok);
+  assert.equal(ok.code,200);
+  const recorded = await log.read();
+  assert.deepEqual(recorded.success,[{at:'2026-11-11T08:00:00.000Z',kind:'success',ip:'203.0.113.7',country:'CN',region:'SH',city:'Shang Hai',agent:from['user-agent']}]);
+  assert.deepEqual(recorded.failure.map(item => item.kind),['failure']);
+  const stored = [...storage.files.values()].join('');
+  for (const secret of ['typed-secret-by-mistake','wrong-password','test-password','test-admin','hajimi_session']) {
+    assert.ok(!stored.includes(secret),secret+' is never written to the login record');
+  }
+  assert.deepEqual([...storage.files.keys()],['security/login-log.json']);
+});
+
+test('login record is bounded, sanitised and never blocks a login', async t => {
+  adminEnvironment(t);
+  const storage = memoryStorage(), log = createLoginLog(storage);
+  for (let index = 0; index < LIMITS.failure + 20; index++) await log.record('failure',request({headers:{'x-forwarded-for':'198.51.100.'+(index % 250)}}));
+  await log.record('success',request({headers:{'x-forwarded-for':'203.0.113.9'}}));
+  const recorded = await log.read();
+  assert.equal(recorded.failure.length,LIMITS.failure,'old failed attempts are dropped');
+  assert.equal(recorded.success.length,1,'failed attempts cannot push real sign-ins out');
+  assert.equal(await log.record('unknown-kind',request()),false);
+  const described = describeRequest(request({headers:{'x-forwarded-for':'1.2.3.4\r\nX: y','user-agent':'a'.repeat(500)+'\u0000','x-vercel-ip-city':'%E4%B8%8A%E6%B5%B7','x-vercel-ip-country':'%ZZ-bad'}}));
+  assert.doesNotMatch(JSON.stringify(described),/\\r|\\n|\\u0000/);
+  assert.equal(described.agent.length,200);
+  assert.equal(described.city,'上海');
+  // A broken store neither throws nor changes the login result.
+  const broken = createLoginLog({async get() { throw new Error('offline'); },async put() { throw new Error('offline'); }});
+  assert.equal(await broken.record('success',request()),false);
+  const res = response();
+  await createLoginHandler({log:broken})(request({body:{username:'test-admin',password:'test-password'}}),res);
+  assert.equal(res.code,200);
+  // A corrupted document reads as empty instead of failing the page.
+  storage.files.set('security/login-log.json','{not json');
+  assert.deepEqual(await log.read(),{success:[],failure:[]});
+});
+
+test('login record can only be read by a signed-in administrator', async t => {
+  const cookie = adminEnvironment(t);
+  const storage = memoryStorage(), log = createLoginLog(storage);
+  await log.record('success',request({headers:{'x-forwarded-for':'203.0.113.9'}}));
+  const handler = createLoginLogHandler(log);
+  const anonymous = response();
+  await handler(request({method:'GET',headers:{cookie:''}}),anonymous);
+  assert.equal(anonymous.code,401);
+  assert.equal(anonymous.body.success,undefined);
+  const write = response();
+  await handler(request({method:'POST',headers:{cookie}}),write);
+  assert.equal(write.code,405,'the record cannot be edited or cleared through the API');
+  const admin = response();
+  await handler(request({method:'GET',headers:{cookie}}),admin);
+  assert.equal(admin.code,200);
+  assert.equal(admin.body.success[0].ip,'203.0.113.9');
+  assert.equal(admin.headers['cache-control'],'private, no-store');
+  const failing = response();
+  await createLoginLogHandler({async read() { throw new Error('offline'); }})(request({method:'GET',headers:{cookie}}),failing);
+  assert.equal(failing.code,503);
+});
+
+
+test('no inline styles or <style> blocks: CSP style-src stays without unsafe-inline', () => {
+  // 脚本通过 element.style 修改样式不受 CSP 限制；页面和拼接的 HTML 里不能出现 style 属性或 <style> 块。
+  const files = [...fs.readdirSync(new URL('../', import.meta.url)).filter(file => file.endsWith('.html')),
+    ...fs.readdirSync(new URL('../js/', import.meta.url)).filter(file => file.endsWith('.js')).map(file => 'js/' + file),
+    'app.js', 'departments.js', 'search-core.js', 'scripts/navigation-build.mjs', 'scripts/department-build.mjs', 'scripts/clinical-compiler.mjs', 'scripts/build-home.mjs'];
+  for (const file of files) {
+    const text = fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+    assert.doesNotMatch(text, /<style[\s>]/i, file + ' has a <style> block');
+    assert.doesNotMatch(text, /\sstyle\s*=\s*["'\\]/i, file + ' has an inline style attribute');
+    assert.doesNotMatch(text, /setAttribute\(\s*["']style["']/, file + ' sets a style attribute');
+  }
+});

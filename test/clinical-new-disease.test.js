@@ -6,8 +6,9 @@ import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {CLINICAL_SOURCE_DIR,loadClinicalJsonSource} from '../scripts/clinical-source.mjs';
 import {PLACEHOLDER,parseArgs,scaffoldDisease} from '../scripts/clinical-new-disease.mjs';
+import {sourcePath} from '../scripts/public-assets.mjs';
 
-const source=new URL('../'+CLINICAL_SOURCE_DIR,import.meta.url);
+const source=new URL('../'+sourcePath(CLINICAL_SOURCE_DIR),import.meta.url);
 function withCopy(run){
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'hajimi-new-'));
   try{fs.cpSync(source,dir,{recursive:true});return run(pathToFileURL(dir+'/'),dir);}

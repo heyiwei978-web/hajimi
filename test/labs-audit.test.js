@@ -8,11 +8,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {sourcePath} from '../scripts/public-assets.mjs';
 
-const read = file => fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+const read = file => fs.readFileSync(new URL('../'+sourcePath(file), import.meta.url), 'utf8');
 function loadLabs() {
   const context = {window: {}};
-  vm.runInNewContext(read('labs-data.js'), context);
+  vm.runInNewContext(read('js/labs-data.js'), context);
   return JSON.parse(JSON.stringify(context.window.HAJIMI_LABS)); // 转成本 realm 的对象，便于 deepEqual
 }
 const data = loadLabs();
@@ -275,7 +276,7 @@ test('相关项目链接不指向自己、不重复', () => {
 // ---------------------------------------------------------------------------
 // 3. 与站内其他模块交叉核对
 // ---------------------------------------------------------------------------
-const toolsSource = read('tools-page.js');
+const toolsSource = read('js/tools-page.js');
 const toolCalc = key => {
   const m = toolsSource.match(new RegExp("k==='" + key + "'\\)go\\.onclick=\\(\\)=>\\{(.*)"));
   assert.ok(m, '找不到工具 ' + key + ' 的计算代码');
@@ -322,15 +323,15 @@ test('与临床工具：输入单位与检验解读页面单位不一致的工�
 
 test('与心电图：血钾、血钙、低钾病例的数值与检验解读一致', () => {
   const k = parseRange(row('k', '成人'));
-  const book = read('ecg-book-data-3.js');
+  const book = read('js/ecg-book-data-3.js');
   const hyper = book.match(/教材：血钾与心电图（大致对应）','>(\d+\.\d) mmol\/L/);
   assert.ok(hyper && Number(hyper[1]) > k.hi, '心电图教材高钾起始界值应高于血钾参考上限');
-  const cases = read('ecg-cases-data.js');
+  const cases = read('js/ecg-cases-data.js');
   for (const m of cases.matchAll(/低钾（(\d+\.\d) mmol\/L）/g)) assert.ok(Number(m[1]) < k.lo, '心电图病例「低钾」数值应低于参考下限');
   // 两边都要求查镁、以离子钙或校正钙为准。
-  assert.match(read('ecg-data.js'), /同时检查血镁/);
+  assert.match(read('js/ecg-data.js'), /同时检查血镁/);
   assert.match(byId.get('k').points.join(''), /查镁/);
-  assert.match(read('ecg-data.js'), /离子钙或白蛋白校正后血钙/);
+  assert.match(read('js/ecg-data.js'), /离子钙或白蛋白校正后血钙/);
   assert.match(byId.get('ca').points[0], /离子钙更准确/);
 });
 
@@ -347,7 +348,7 @@ test('与内科医嘱参考（初始资料）：高钾处理界值落在检验�
 
 test('页面状态保持「待审核」', () => {
   assert.equal(data.reviewStatus, '待审核');
-  assert.match(read('labs-data.js'), /草稿 · 待审核/);
+  assert.match(read('js/labs-data.js'), /草稿 · 待审核/);
 });
 
 test('2026-11-10 负责人确认的修订保持不变（低血糖分级、脓毒性休克、化脓性关节炎）', () => {

@@ -11,6 +11,9 @@
 - 写操作的来源校验：浏览器带有 Fetch Metadata 时，只接受 `Sec-Fetch-Site: same-origin`（或用户直接发起的 `none`）；同站的其他子域名（`same-site`）与跨站一样拒绝。
 - `Content-Security-Policy` 另设 `frame-src 'none'`：页面里不允许嵌入任何 iframe。`Permissions-Policy` 关闭本站不使用的浏览器能力（摄像头、麦克风、定位、支付、USB、串口、HID、MIDI、屏幕捕获、传感器等）；复制到剪贴板不受影响。响应头的完整取值由 `test/security.test.js` 固定，放宽任何一项都会让测试失败。
 - 登录安全自检：管理员登录后，`/admin` 页面显示「登录安全自检」——密码是否使用加盐哈希、旧的无盐 SHA-256 变量是否还留着、会话签名密钥是否不少于 32 个字符、用户名是否仍是默认的 `admin`。只报告配置方式，不返回任何配置值；未登录的访客拿不到这些信息。
+- 登录记录：每次登录成功、失败或被限流封锁，都会在私有 Blob（`security/login-log.json`）记一条——时间、Vercel 边缘提供的大致地区、网络地址和浏览器标识。**不记录密码，也不记录输入的用户名**（输错时密码常被填进用户名栏）。成功和失败分开保存（最近 50 次成功、100 次失败），大量失败尝试不会把真实登录挤掉。只有已登录的管理员能通过 `/api/login-log`（仅 GET）读取，在 `/admin` 的「登录记录」中查看；记录写入失败不会影响登录。
+- 错误记录：`/api/login-log?feed=errors` 是本站**唯一不需要登录的写入接口**（与登录记录共用 `api/login-log.js`，因为 Vercel 免费版每次部署最多 12 个函数），供前端 `error-report.js` 上报本站脚本的报错摘要（2026-11-18，负责人确认）。限制：只接受同源请求和 `X-Hajimi-Report: 1` 标识；JSON 正文不超过 2 KB，字段逐项校验清理（报错文字 300 字以内、6 位以上连续数字替换为 #、地址只保留站内路径并去掉查询参数和片段，`server` 类型不能由前端伪造）；同一网络地址 10 分钟内最多 20 次；同种报错在同一实例内 10 分钟只写一次存储（期间次数在内存累加，下次写入时并入）；全站每天（UTC）最多写入 300 条前端上报，超过后当天直接丢弃；不合格的请求一律不写入，且只返回 204、不回显。各接口返回 5xx 或抛出异常时由 `withMonitoring` 记一条（只记接口名、状态码和异常类型）。相同报错合并计数，最近 100 种存于私有 Blob（`monitoring/`），只有管理员能通过 GET/DELETE 查看和清空，在 `/admin`「错误记录」中查看。
+- 函数内限流（2026-11-20）：登录失败（15 分钟 10 次，封锁 15 分钟）、AI 生成（10 分钟 20 次）、错误上报（10 分钟 20 次）除了 Blob 中的计数，还在每个函数实例内存里准确计数（`api/_memory-limit.js`），取两者较大值，挡住打到同一实例的并发和突发请求。Blob 不可用时仍按负责人确定的策略放行（2026-11-20 确认），但同一实例内的内存上限照常生效。内存计数不跨实例、实例回收后清零，分布式限流仍需启用下文的 Vercel WAF 规则。
 - `.github/dependabot.yml` 每月检查 npm 依赖和 GitHub Actions 的更新并提出 PR；这些 PR 同样需要 CI 通过并由站点负责人审核后合并。
 
 - 内科医嘱参考 `/api/duty-orders` 读取和修改都要求管理员登录，资料存放在私有 Blob（`duty-orders/`），与公开 CMS 资料和私人图库分开；每次保存或恢复前自动备份，保留最近 50 份。
@@ -21,7 +24,7 @@
 - 推荐：`HAJIMI_ADMIN_PASSWORD_HASH`，加盐哈希。最简单的方式是打开网站的 `/admin/password` 页面，在浏览器内生成 PBKDF2-SHA256（60 万次迭代）校验码，密码不会离开本机；也可在本地运行 `node scripts/hash-password.mjs` 生成 scrypt 哈希（密码至少 12 个字符）。填入 Vercel 后重新部署，再删除旧的 `HAJIMI_ADMIN_PASSWORD_SHA256`。
 - 兼容：未设置上述变量时，仍使用 `HAJIMI_ADMIN_PASSWORD_SHA256`（无盐 SHA-256，泄露后易被离线破解，建议尽快替换）。
 
-会话密钥应使用至少 32 字节的随机值。会话有效期 7 天，“退出”只清除当前浏览器的 Cookie；如怀疑会话被盗用，更换 `HAJIMI_SESSION_SECRET` 并重新部署，即可让所有已签发会话立即失效。敏感值只在 Vercel Environment Variables 中安全填写，不提交到 GitHub。
+会话密钥应使用至少 32 字节的随机值。会话有效期 12 小时，管理操作或打开管理页面时自动续期（签发超过 30 分钟才换发），但从登录起最长 7 天，到期必须重新登录；本规则上线前签发的旧格式会话一律无效，需要重新登录一次。“退出”只清除当前浏览器的 Cookie；如怀疑会话被盗用，修改（或首次设置）`HAJIMI_SESSION_VERSION` 并重新部署，即可让所有已签发会话立即失效，不必更换签名密钥；值可以是任意不含敏感信息的短文本，例如日期 `20261119`。更换 `HAJIMI_SESSION_SECRET` 同样会让全部会话失效。敏感值只在 Vercel Environment Variables 中安全填写，不提交到 GitHub。
 
 ## Vercel 边缘防火墙：需要单独启用
 
@@ -33,8 +36,9 @@
 | --- | --- | --- | --- |
 | hajimi-login-limit | Path = `/api/login` 且 Method = POST | 10 次 / 60 秒 | Deny |
 | hajimi-upload-limit | Path = `/api/upload` 且 Method = POST | 30 次 / 60 秒 | Deny |
-| hajimi-admin-write-limit | `/api/content` + PUT，`/api/duty-orders` + PUT/POST，或 `/api/logout` + POST | 合计 60 次 / 60 秒 | Deny |
+| hajimi-admin-write-limit | `/api/content` + PUT，`/api/duty-orders` + PUT/POST，或 `/api/session` + DELETE（退出登录） | 合计 60 次 / 60 秒 | Deny |
 | hajimi-audit-limit | `/api/ortho-audit-runtime` + GET | 3 次 / 60 秒 | Deny |
+| hajimi-client-error-limit | Path = `/api/login-log` 且 Method = POST（该接口只有报错上报使用 POST） | 30 次 / 60 秒 | Deny |
 | hajimi-block-scanner-paths | Path 匹配 JSON 中的正则：WordPress、phpMyAdmin、Git 和环境文件探测 | 直接拦截 | Deny |
 
 使用固定时间窗口、按 IP 分组。保存并发布规则后，在项目 Firewall 事件列表确认规则已经生效。自定义限流的可用性和额度取决于项目套餐；未应用规则前，不应声称这些速率限制已开启。

@@ -101,3 +101,27 @@ test('backup and storage failures preserve prior index; orphan bytes cannot be r
   const denied=res();await f.image(req(cookie,{query:{path:orphan}}),denied);assert.equal(denied.code,404);
   f.backend.failGet=true;const read=res();await f.gallery(req(cookie),read);assert.equal(read.code,503);
 });
+
+// 2026-11-21：公开案例图片支持 ETag/304，过期后重新验证时不再重复传输图片；已下架或未发布的图片仍返回 404。
+test('public case images answer 304 for an unchanged ETag, still enforce publication, and admins get no-store',async t=>{
+  const objects=new Map([['cases/1-aa.png',{body:PNG,type:'image/png',etag:'"e1"'}],['cases/2-bb.png',{body:PNG,type:'image/png',etag:'"e2"'}]]);
+  const reads=[];
+  const blob={async get(path){reads.push(path);const o=objects.get(path);return o?{statusCode:200,blob:{etag:o.etag,contentType:o.type},stream:new Response(o.body).body}:null;}};
+  let cases=[{id:'a',template:'t',images:['cases/1-aa.png']},{id:'b',template:'t',published:false,images:['cases/2-bb.png']}];
+  const store={async read(){return {data:{cases}};}};
+  let clock=0;const handler=createImageHandler({store,blob,now:()=>clock});
+  const get=async(path,headers={},cookie='')=>{const out=res();await handler(req(cookie,{query:{path},headers}),out);return out;};
+  const first=await get('cases/1-aa.png');
+  assert.equal(first.code,200);assert.equal(first.headers.etag,'"e1"');assert.equal(first.headers['cache-control'],'private, max-age=600');
+  assert.deepEqual(Buffer.from(first.body),PNG);
+  for(const header of ['"e1"','W/"e1"','"zz", "e1"']){
+    const again=await get('cases/1-aa.png',{'if-none-match':header});
+    assert.equal(again.code,304,header);assert.equal(again.body,undefined);assert.equal(again.headers.etag,'"e1"');
+  }
+  assert.equal((await get('cases/1-aa.png',{'if-none-match':'"old"'})).code,200,'a changed image is sent in full');
+  assert.equal((await get('cases/2-bb.png',{'if-none-match':'"e2"'})).code,404,'unpublished images stay hidden even with a matching ETag');
+  cases=[{id:'a',template:'t',published:false,images:['cases/1-aa.png']}];clock+=61000;
+  assert.equal((await get('cases/1-aa.png',{'if-none-match':'"e1"'})).code,404,'unpublishing wins over a cached ETag once the index refreshes');
+  const admin=await get('cases/2-bb.png',{'if-none-match':'"e2"'},auth(t));
+  assert.equal(admin.code,200);assert.equal(admin.headers['cache-control'],'private, no-store');assert.equal(admin.headers.etag,undefined);
+});

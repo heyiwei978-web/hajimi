@@ -1,0 +1,81 @@
+{
+  "_说明": "样式预算：文件清单固定；每个文件的 !important 数量和直接写死的颜色数量只能减少。确需增加时，在 PR 中说明理由并同步修改本文件。见 docs/interface-design.md「样式防叠加规则」。",
+  "files": {
+    "admin.css": {
+      "important": 1,
+      "colorLiterals": 46
+    },
+    "case-workspace-preview.css": {
+      "important": 15,
+      "colorLiterals": 61
+    },
+    "classification.css": {
+      "important": 3,
+      "colorLiterals": 58
+    },
+    "cms.css": {
+      "important": 3,
+      "colorLiterals": 29
+    },
+    "duty-orders.css": {
+      "important": 6,
+      "colorLiterals": 28
+    },
+    "duty.css": {
+      "important": 1,
+      "colorLiterals": 42
+    },
+    "ecg.css": {
+      "important": 10,
+      "colorLiterals": 62
+    },
+    "labs.css": {
+      "important": 1,
+      "colorLiterals": 29
+    },
+    "library-personal.css": {
+      "important": 1,
+      "colorLiterals": 1
+    },
+    "note-case.css": {
+      "important": 0,
+      "colorLiterals": 8
+    },
+    "note.css": {
+      "important": 1,
+      "colorLiterals": 26
+    },
+    "pathway.css": {
+      "important": 2,
+      "colorLiterals": 61
+    },
+    "personal-workstation.css": {
+      "important": 0,
+      "colorLiterals": 17
+    },
+    "private-gallery.css": {
+      "important": 1,
+      "colorLiterals": 5
+    },
+    "site-search.css": {
+      "important": 0,
+      "colorLiterals": 21
+    },
+    "styles.css": {
+      "important": 74,
+      "colorLiterals": 262
+    },
+    "theme.css": {
+      "important": 8,
+      "colorLiterals": 74
+    },
+    "tools-page.css": {
+      "important": 2,
+      "colorLiterals": 36
+    },
+    "tools-polish.css": {
+      "important": 2,
+      "colorLiterals": 7
+    }
+  }
+}

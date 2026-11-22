@@ -33,7 +33,8 @@ test('page-specific header classes and right-hand slot content are kept', () => 
   assert.match(html, /<header class="global-nav official-nav class-topnav">/);
   assert.match(html, /<div class="official-nav-right"><a class="official-search" href="\/bl" aria-label="打开病历模板">病历模板 ↗<\/a><\/div>/);
   const home = renderPageNavigation(read('home.html'), 'home.html');
-  assert.match(home, /<div class="official-nav-right"><a class="official-search"[\s\S]*?<span class="official-auth" data-auth-slot><\/span><\/div>/);
+  assert.match(home, /<form class="home-search" action="\/search"/);
+  assert.match(home, /<a class="ws-account" href="\/personal"/);
 });
 
 test('unexpected content in a shared header stops the build', () => {

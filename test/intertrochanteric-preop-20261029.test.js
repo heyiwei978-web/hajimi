@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
+import {legacyIndexHtml, readLegacy, readLegacySource} from './legacy-chain.mjs';
 
-const source=fs.readFileSync(new URL('../record-intertrochanteric-v28.js',import.meta.url),'utf8');
+const source=readLegacy('record-intertrochanteric-v28.js');
 function chapter(short){
   const key=JSON.stringify('股骨转子间骨折 · '+short)+': ';
   const pos=source.indexOf(key);

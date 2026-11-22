@@ -1,3 +1,4 @@
+import {withMonitoring} from './_monitoring.js';
 import {randomUUID} from 'node:crypto';
 import {blob as blobClient} from './_blob-auth.js';
 import {readSession} from './_auth.js';
@@ -49,4 +50,4 @@ export function createPrivateGalleryHandler({store=privateGalleryStore,blob=blob
     }
   };
 }
-export default createPrivateGalleryHandler();
+export default withMonitoring('private-gallery', createPrivateGalleryHandler());
