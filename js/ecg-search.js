@@ -38,12 +38,21 @@
     // specific one. "Outright" means the term is not the start of a longer name in
     // the title, so 莫氏 alone does not pick 二度 II 型（莫氏 II 型）.
     if(best===85&&namedInTitle(doc.compactTitle,term.replace(/\s+/g,'')))best+=5;
+    // Pinyin initials (ggjgz for 股骨颈骨折) only count when nothing else matched,
+    // so abbreviations such as AF keep their own results.
+    if(!best&&/^[a-z]{2,}$/.test(term)){
+      for(const initials of doc.initials){
+        if(initials===term)best=Math.max(best,40);
+        else if(initials.startsWith(term))best=Math.max(best,30);
+        else if(term.length>2&&initials.includes(term))best=Math.max(best,20);
+      }
+    }
     if(!best&&has(doc.body,term))best=8;
     return best;
   }
 
   function create(docs){
-    const index=docs.map((doc,order)=>({...doc,order,title:normalize(doc.title),compactTitle:normalize(doc.title).replace(/\s+/g,''),aliases:(doc.aliases||[]).map(normalize),body:normalize(doc.body),raw:doc}));
+    const index=docs.map((doc,order)=>({...doc,order,title:normalize(doc.title),compactTitle:normalize(doc.title).replace(/\s+/g,''),aliases:(doc.aliases||[]).map(normalize),initials:doc.initials||[],body:normalize(doc.body),raw:doc}));
     function search(query,{limit=Infinity,type}={}){
       const list=terms(query);
       if(!list.length)return [];

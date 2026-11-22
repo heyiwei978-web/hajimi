@@ -9,6 +9,7 @@ import {planClinicalPublication} from '../scripts/clinical-inventory.mjs';
 import {compileCaseTemplates} from '../scripts/clinical-compiler.mjs';
 import {collectSiteSearch, withChapterNames, SEARCH_SECTIONS, SITE_SEARCH_DATA} from '../scripts/site-search-build.mjs';
 import {sourcePath} from '../scripts/public-assets.mjs';
+import {initialsOf, POLYPHONES} from '../scripts/pinyin-initials.mjs';
 
 const read = file => fs.readFileSync(new URL('../'+sourcePath(file), import.meta.url), 'utf8');
 const publication = planClinicalPublication(loadBuildSource(read('index.html')));
@@ -21,7 +22,7 @@ function engine() {
   vm.runInNewContext(read('js/ecg-search.js'), context);
   const api = context.window.HAJIMI_ECG_SEARCH;
   const search = api.create(index.documents.map(item =>
-    ({type: item.s, title: item.t, aliases: item.a, body: [item.d, item.b].filter(Boolean).join(' '), item})));
+    ({type: item.s, title: item.t, aliases: item.a, initials: item.p || [], body: [item.d, item.b].filter(Boolean).join(' '), item})));
   // Copy out of the vm realm so deepEqual compares plain arrays.
   return query => Array.from(search.search(query), hit => hit.doc.item);
 }
@@ -80,6 +81,25 @@ test('ranking puts exact names and abbreviations first', () => {
   assert.ok(search('Garden').some(item => item.u === '/classification/guke/femoral-neck'));
   assert.ok(search('手术记录').every(item => item.s === 'records'));
   assert.deepEqual(search('不存在的词条xyz'), []);
+});
+
+test('pinyin initials find Chinese titles without letting abbreviations drift', () => {
+  assert.deepEqual(initialsOf('股骨颈骨折'), ['ggjgz']);
+  assert.deepEqual(initialsOf('二度 I 型'), ['edx'], 'Latin letters and spaces are skipped');
+  assert.deepEqual(initialsOf('TKA'), [], 'no initials without Chinese');
+  assert.deepEqual(initialsOf('膀胱'), ['bg', 'pg'], 'medical readings of polyphones are indexed too');
+  assert.ok(initialsOf('脊椎').includes('jz'));
+  for (const letters of Object.values(POLYPHONES)) assert.match(letters, /^[a-z]{2,}$/);
+  // Every Chinese title is covered; regenerate config/pinyin-initials.json if a new character is missing.
+  for (const document of index.documents.filter(item => !item.d.startsWith('栏目 · ') && item.u !== '/duty/orders')) {
+    if (/\p{Script=Han}/u.test(document.t)) assert.ok(document.p?.length, 'no pinyin initials for ' + document.t + ' (node scripts/pinyin-table.mjs)');
+  }
+  const search = engine();
+  assert.equal(search('ggjgz')[0].t, '股骨颈骨折');
+  assert.ok(search('ggzzjgz').some(item => item.u === '/bl/guke/' + encodeURIComponent('股骨转子间骨折')));
+  assert.ok(search('ggzz').length > 0, 'a prefix of the initials is enough');
+  assert.equal(search('AF')[0].u, '/ecg/atlas/arrhythmias/atrial-fibrillation', 'abbreviations keep their own first result');
+  assert.equal(search('TKA')[0].u, '/bl/guke/TKA');
 });
 
 test('search page is registered, published and free of inline script', () => {

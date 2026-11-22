@@ -15,7 +15,7 @@
   const PREVIEW = 6;
   const sections = data.sections;
   const engine = engineApi.create(data.documents.map(item =>
-    ({type: item.s, title: item.t, aliases: item.a || [], body: [item.d, item.b].filter(Boolean).join(' '), item})));
+    ({type: item.s, title: item.t, aliases: item.a || [], initials: item.p || [], body: [item.d, item.b].filter(Boolean).join(' '), item})));
   const state = {query: '', section: 'all', expanded: new Set()};
 
   const el = (tag, className, text) => {

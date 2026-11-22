@@ -3,6 +3,7 @@ import {sourcePath} from './public-assets.mjs';
 import vm from 'node:vm';
 import {MODULES, DEPARTMENTS} from '../config/site-modules.mjs';
 import {loadEcg} from './ecg-compiler.mjs';
+import {initialsOf} from './pinyin-initials.mjs';
 
 // Site-wide search index (/search).
 //
@@ -12,7 +13,8 @@ import {loadEcg} from './ecg-compiler.mjs';
 // index only points at existing pages.
 //
 // Each document: {s: section id, t: title, d: one-line context, u: link,
-// a: aliases, b: extra searchable words}.
+// a: aliases, b: extra searchable words, p: pinyin initials of the title and
+// aliases (only when they contain Chinese), e.g. 股骨颈骨折 -> ggjgz}.
 
 const root = new URL('../', import.meta.url);
 const readSource = file => fs.readFileSync(new URL(sourcePath(file), root), 'utf8');
@@ -157,6 +159,14 @@ export function collectSiteSearch(manifest, read = readSource) {
     if (!documents.some(document => document.s === section.id)) errors.push('section ' + section.id + ' has no documents');
   }
   if (errors.length) throw new Error('Site search build failed:\n' + [...new Set(errors)].join('\n'));
+  // Section pages are titled by their (renameable) navigation labels and are one
+  // tap away in the navigation, so only content entries get pinyin initials.
+  const sectionPages = new Set(pageDocuments().map(document => document.u));
+  for (const document of documents) {
+    if (sectionPages.has(document.u)) continue;
+    const initials = [...new Set([document.t, ...document.a].flatMap(initialsOf))];
+    if (initials.length) document.p = initials;
+  }
   return {sections: SEARCH_SECTIONS, documents};
 }
 
