@@ -242,7 +242,7 @@ body { margin: 0; }
 }
 .ws-row b, .home-quick-grid b { flex: none; color: var(--ws-teal); font-size: 19px; font-weight: 500; }
 .ws-row:hover, .home-quick-grid a:hover { background: var(--ws-teal-soft); }
-.ws-empty, .ws-panel-note, .ws-status-line {
+.ws-empty, .ws-panel-note {
   color: var(--ws-muted);
   font-size: 14px;
   line-height: 1.6;
@@ -253,8 +253,7 @@ body { margin: 0; }
   border-radius: 8px;
   background: #f3f8f6;
 }
-.ws-empty p, .ws-status-line { margin: 3px 0; }
-.ws-status-line { margin: 0; padding: 11px 6px; border-top: 1px solid var(--ws-line); }
+.ws-empty p { margin: 3px 0; }
 .ws-panel-note { margin: 0; padding: 0 0 18px; }
 .ws-saved ul { list-style: none; margin: 0; padding: 0; }
 .ws-state {
