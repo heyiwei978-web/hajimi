@@ -844,6 +844,8 @@ test('workspace routes, mobile bottom tabs and browser-local case history', asyn
       const resume=page.locator('[data-workstation-list="recent"] a[href="/bl/guke/TKA"]');
       await resume.waitFor();
       assert.match(await resume.innerText(),/全膝关节置换/);
+      // The favourite is also listed on the homepage itself.
+      assert.match(await page.locator('#homeContent [data-workstation-list="favorites"] a[href="/bl/guke/TKA"]').innerText(),/全膝关节置换/);
       await page.locator('a[href="/personal#favorites"]').click();
       await page.waitForURL(base+'/personal#favorites');
       await page.locator('[data-workstation-list="favorites"] a[href="/bl/guke/TKA"]').waitFor();
