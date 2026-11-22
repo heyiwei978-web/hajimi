@@ -43,6 +43,19 @@
   });
   window.addEventListener('storage', renderLists);
 
+  // Same shortcut as /search: "/" jumps to the homepage search box.
+  const search = document.getElementById('homeSearch');
+  if (search) {
+    document.addEventListener('keydown', event => {
+      if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+      const active = document.activeElement;
+      if (active?.isContentEditable || /^(?:INPUT|TEXTAREA|SELECT)$/.test(active?.tagName || '')) return;
+      event.preventDefault();
+      search.focus();
+      search.select();
+    });
+  }
+
   const account = document.querySelector('[data-workstation-account]');
   if (!account) return;
   fetch('/api/session', {credentials:'same-origin', cache:'no-store'})
