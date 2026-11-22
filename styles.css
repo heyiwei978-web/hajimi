@@ -11,7 +11,7 @@
 .department-card-top{display:flex;justify-content:space-between;align-items:center;color:#869295;font-size:12px}
 .department-card h3{font-size:22px;margin:22px 0 7px}.department-card p{color:#738184;font-size:13px;line-height:1.6;margin:0}
 .department-card-open{margin-top:auto;padding-top:18px;color:#057c91;font-size:12px;font-weight:650;display:flex;justify-content:space-between}
-.department-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 18px;padding-bottom:14px;border-bottom:1px solid #eef7f8}
+.department-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 18px;padding-bottom:14px;border-bottom:1px solid var(--ds-blue-50)}
 .department-toolbar span{font-size:12px;color:#869295}
 .source-template-note{font-size:12px;color:#8a6a00;background:#fff9e8;border:1px solid #f3e1aa;border-radius:10px;padding:9px 11px;margin:10px 0 16px}
 @media(max-width:760px){.department-grid{grid-template-columns:1fr}.department-card{min-height:150px;padding:18px}.department-toolbar{align-items:flex-start;flex-direction:column}}
@@ -43,7 +43,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 }
 .ortho-hero-copy,.ortho-stats{position:relative;z-index:1}
 .ortho-eyebrow{
-  font-size:12px;font-weight:700;letter-spacing:.14em;color:#a9d8de;margin-bottom:12px
+  font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--ds-line-strong);margin-bottom:12px
 }
 .ortho-hero h2{
   margin:0 0 12px;line-height:1.12;color:#fff
@@ -65,8 +65,8 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0 0 32px
 }
 .ortho-jump a{
-  border:1px solid #dfe7e9;background:#fff;
-  color:#14252b;font-weight:650;transition:.18s ease
+  border:1px solid var(--ds-line);background:#fff;
+  color:var(--ds-ink);font-weight:650;transition:.18s ease
 }
 .ortho-jump a span{
   display:block;font-size:12px;letter-spacing:.08em;color:#97a2a5;margin-bottom:3px;font-weight:600
@@ -74,7 +74,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 
 .ortho-sections{display:grid;}
 .ortho-category{
-  border:1px solid #dfe7e9;
+  border:1px solid var(--ds-line);
   }
 .ortho-category-head{
   display:flex;justify-content:space-between;gap:24px;align-items:flex-start;}
@@ -84,24 +84,24 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .ortho-category-head h3{margin:0;letter-spacing:-.025em}
 .ortho-category-head p{margin:7px 0 0;max-width:640px;color:#717d80;}
 .ortho-category-head>strong{
-  white-space:nowrap;font-size:12px;color:#5d6f75;border:1px solid #dfe7e9;border-radius:999px;padding:7px 10px;background:#fff
+  white-space:nowrap;font-size:12px;color:var(--ds-muted);border:1px solid var(--ds-line);border-radius:999px;padding:7px 10px;background:#fff
 }
 .ortho-disease-grid{display:grid;}
 .ortho-disease-card{
-  border:1px solid #dfe7e9;background:#fff;
+  border:1px solid var(--ds-line);background:#fff;
   display:flex;flex-direction:column;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease
 }
 .ortho-disease-card:hover{
   border-color:#cad7db;}
 .ortho-card-top{display:flex;justify-content:space-between;align-items:center;color:#95a2a6;}
-.ortho-card-top strong{font-weight:650;color:#5d6f75}
+.ortho-card-top strong{font-weight:650;color:var(--ds-muted)}
 
 .ortho-disease-card p{color:#748184;}
 .ortho-stage-chips{display:flex;flex-wrap:wrap;margin-top:auto}
 .ortho-stage-chips span{
-  border:1px solid #dfe7e9;background:#f8f9fa;border-radius:999px;padding:4px 7px;color:#5d6f75
+  border:1px solid var(--ds-line);background:#f8f9fa;border-radius:999px;padding:4px 7px;color:var(--ds-muted)
 }
-.ortho-stage-chips b{font-weight:700;margin-left:4px;color:#14252b}
+.ortho-stage-chips b{font-weight:700;margin-left:4px;color:var(--ds-ink)}
 .ortho-open{
   display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid #eef0f2;
   color:#097487;font-weight:700
@@ -110,16 +110,16 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .ortho-disease-card.is-reserve{
   cursor:default;border-style:dashed;background:repeating-linear-gradient(135deg,#fbfbfc,#fbfbfc 10px,#fafafa 10px,#fafafa 20px)
 }
-.ortho-disease-card.is-reserve:hover{transform:none;box-shadow:none;border-color:#dfe7e9}
+.ortho-disease-card.is-reserve:hover{transform:none;box-shadow:none;border-color:var(--ds-line)}
 
 .ortho-future{
-  margin-top:34px;padding:30px;border-radius:24px;background:#f5f8f8;border:1px solid #dfe7e9
+  margin-top:34px;padding:30px;border-radius:24px;background:var(--ds-bg);border:1px solid var(--ds-line)
 }
 .ortho-future>div:first-child>span{font-size:12px;letter-spacing:.12em;color:#86999e;font-weight:700}
 .ortho-future h3{margin:5px 0 5px;font-size:23px}
 .ortho-future>div:first-child p{margin:0;color:#758387;font-size:13px}
 .ortho-future-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:20px}
-.ortho-future-grid div{background:#fff;border:1px solid #dfe7e9;border-radius:14px;padding:14px}
+.ortho-future-grid div{background:#fff;border:1px solid var(--ds-line);border-radius:14px;padding:14px}
 .ortho-future-grid b{display:block;font-size:12px}
 .ortho-future-grid span{display:block;margin-top:4px;font-size:12px;color:#8d9b9f;line-height:1.5}
 
@@ -171,7 +171,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .global-links{gap:26px}
 .global-links a,.global-links button{
   font-size:12px;
-  color:#2c3e44;
+  color:var(--ds-text);
   font-weight:520;
   transition:opacity .16s ease;
 }
@@ -282,7 +282,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .library-top-actions{margin-left:auto}
 .library-header-tools{display:flex;align-items:center;gap:10px;flex:none;margin-left:18px}
 .library-header-tools .patient-action{
-  padding:8px 12px;border:1px solid #dfe7e9;border-radius:999px;background:#f8fafc;color:#2c3e44;
+  padding:8px 12px;border:1px solid var(--ds-line);border-radius:999px;background:#f8fafc;color:var(--ds-text);
   font-size:14px;font-weight:600;white-space:nowrap
 }
 
@@ -307,7 +307,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   overflow:hidden;
   margin-bottom:22px;
   padding:42px 42px 36px;
-  border:1px solid #dfe7e9;
+  border:1px solid var(--ds-line);
   border-radius:26px;
   background:
     radial-gradient(circle at 92% 18%,rgba(6,126,147,.13),transparent 28%),
@@ -337,7 +337,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .library-root-page .lead{
   position:relative;z-index:2;
   max-width:680px;
-  color:#5d6f75;
+  color:var(--ds-muted);
   font-size:16px;
   line-height:1.75
 }
@@ -346,7 +346,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   max-width:760px;
   margin-top:24px;
   padding:14px 16px;
-  border:1px solid #d5ecef;
+  border:1px solid var(--ds-blue-100);
   border-left:0;
   border-radius:12px;
   background:rgba(255,255,255,.78);
@@ -356,13 +356,13 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   color:#08333d;
   font-size:12px
 }
-.library-root-page .intro-note span{color:#5d6f75}
+.library-root-page .intro-note span{color:var(--ds-muted)}
 
 /* Search */
 .library-root-page .controls-section{
   margin:0 0 22px;
   padding:20px;
-  border:1px solid #dfe7e9;
+  border:1px solid var(--ds-line);
   border-radius:20px;
   background:rgba(255,255,255,.9);
   box-shadow:0 12px 34px rgba(5,27,32,.04)
@@ -374,7 +374,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .library-root-page .toolbar{gap:10px}
 .library-root-page .searchbox{
   height:52px;
-  border:1px solid #dfe7e9;
+  border:1px solid var(--ds-line);
   border-radius:14px;
   padding:0 15px;
   background:#fbfcfe;
@@ -389,10 +389,10 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .library-root-page .filter-row label{
   min-height:42px;
   padding:0 12px;
-  border:1px solid #dfe7e9;
+  border:1px solid var(--ds-line);
   border-radius:12px;
   background:#fff;
-  color:#5d6f75
+  color:var(--ds-muted)
 }
 .library-root-page .filter-row select{
   border:0;background:transparent;padding:0;outline:none
@@ -499,7 +499,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   width:190px;height:190px;border-radius:50%;
   background:rgba(255,255,255,.44)
 }
-.dept-ortho{background:linear-gradient(145deg,#f5f8f8,#eef7f8)}
+.dept-ortho{background:linear-gradient(145deg,var(--ds-bg),var(--ds-blue-50))}
 .dept-surgery{background:linear-gradient(145deg,#f9fffb,#e8f8ef)}
 .dept-nephro{background:linear-gradient(145deg,#fcfaff,#f0edff)}
 .dept-gyn{background:linear-gradient(145deg,#fff9fb,#fdeef3)}
@@ -532,7 +532,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   color:#83969b;font-size:12px
 }
 .library-department-card .department-card-top strong{
-  color:#5d6f75;font-size:12px
+  color:var(--ds-muted);font-size:12px
 }
 .library-department-card h3{
   position:relative;z-index:2;
@@ -544,7 +544,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   position:relative;z-index:2;
   max-width:390px;
   margin:0;
-  color:#5d6f75;
+  color:var(--ds-muted);
   font-size:13px;
   line-height:1.65
 }
@@ -567,7 +567,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .library-quick-panel{
   margin-top:28px;
   padding:26px;
-  border:1px solid #dfe7e9;
+  border:1px solid var(--ds-line);
   border-radius:22px;
   background:rgba(255,255,255,.78)
 }
@@ -588,7 +588,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .library-root-page .guide-section{
   margin-top:26px;
   padding:26px;
-  border:1px solid #dfe7e9;
+  border:1px solid var(--ds-line);
   border-radius:22px;
   background:#fff
 }
@@ -601,7 +601,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .library-root-page .steps li{
   display:block;
   padding:16px;
-  border:1px solid #dfe7e9;
+  border:1px solid var(--ds-line);
   border-radius:14px;
   background:#fafbfc
 }
@@ -609,7 +609,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   display:block;margin-bottom:8px;
   color:#03849a;font-weight:760
 }
-.library-root-page .steps li:last-child{border-bottom:1px solid #dfe7e9}
+.library-root-page .steps li:last-child{border-bottom:1px solid var(--ds-line)}
 .library-root-page .steps span{font-size:12px;line-height:1.6}
 
 /* General library polish */
@@ -621,9 +621,9 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   transition:background .15s ease,color .15s ease
 }
 
-#libraryShell .doc-section{border-bottom-color:#dfe7e9}
+#libraryShell .doc-section{border-bottom-color:var(--ds-line)}
 
-#libraryShell .btn.primary{background:#14252b;border-color:#14252b}
+#libraryShell .btn.primary{background:var(--ds-ink);border-color:var(--ds-ink)}
 #libraryShell .modal{border-radius:18px}
 #libraryShell .preview-modal{border-radius:18px}
 
@@ -669,21 +669,21 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .record-book-hero-actions .btn.primary{background:#fff;color:#051c21;border-color:#fff}
 .record-book-hero-actions .btn.ghost{color:#fff;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22)}
 .record-book-layout{display:grid;align-items:start;}
-.record-book-toc{position:sticky;overflow:auto;border:1px solid #dfe7e9;}
-.record-book-toc-head{border-bottom:1px solid #eef7f8}
+.record-book-toc{position:sticky;overflow:auto;border:1px solid var(--ds-line);}
+.record-book-toc-head{border-bottom:1px solid var(--ds-blue-50)}
 .record-book-toc-head>span{font-size:12px;letter-spacing:.15em;font-weight:800;color:#84979c}
 .record-book-toc-head h3{margin:4px 0 3px;letter-spacing:-.02em}
 .record-book-toc-head p{margin:0;color:#929ea1;font-size:12px}
 .record-book-toc nav{display:grid;}
-.record-book-toc a{display:grid;gap:7px;align-items:center;color:#2c3e44;text-decoration:none!important}
-.record-book-toc a:hover{background:#f5f8f8}
+.record-book-toc a{display:grid;gap:7px;align-items:center;color:var(--ds-text);text-decoration:none!important}
+.record-book-toc a:hover{background:var(--ds-bg)}
 .record-book-toc a>span{color:#94a2a6;font-variant-numeric:tabular-nums}
 .record-book-toc a>b{line-height:1.35}
-.record-book-toc a>small{font-size:12px;color:#9aa5a8;border:1px solid #dfe7e9;border-radius:999px;padding:2px 5px}
-.record-book-toc a.is-reserved{border:1px dashed #dfe7e9;margin-top:5px;background:#fafbfc}
+.record-book-toc a>small{font-size:12px;color:#9aa5a8;border:1px solid var(--ds-line);border-radius:999px;padding:2px 5px}
+.record-book-toc a.is-reserved{border:1px dashed var(--ds-line);margin-top:5px;background:#fafbfc}
 .record-book-content{min-width:0}
-.record-book-section{background:#fff;border:1px solid #dfe7e9;margin:0 0 20px;overflow:hidden;}
-.record-book-section-head{display:grid;align-items:center;border-bottom:1px solid #eef7f8;}
+.record-book-section{background:#fff;border:1px solid var(--ds-line);margin:0 0 20px;overflow:hidden;}
+.record-book-section-head{display:grid;align-items:center;border-bottom:1px solid var(--ds-blue-50);}
 .record-chapter-no{display:grid;place-items:center;color:#fff;font-weight:800;font-variant-numeric:tabular-nums}
 .record-chapter-title>span{display:block;color:#88979b;letter-spacing:.05em;margin-bottom:4px}
 .record-chapter-title h3{margin:0;}
@@ -691,11 +691,11 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .record-book-body{white-space:pre-wrap;}
 .record-back-toc{display:block;width:max-content;color:#6e7c80;font-size:12px;text-decoration:none!important}
 .record-book-reserved{border-style:dashed;box-shadow:none}
-.record-book-reserved .record-chapter-no{background:#eef7f8;color:#5d6f75}
-.record-reserve-copy{padding:25px 28px;color:#5d6f75;font-size:13px;line-height:1.85}
-.record-reserve-copy strong{color:#14252b}
+.record-book-reserved .record-chapter-no{background:var(--ds-blue-50);color:var(--ds-muted)}
+.record-reserve-copy{padding:25px 28px;color:var(--ds-muted);font-size:13px;line-height:1.85}
+.record-reserve-copy strong{color:var(--ds-ink)}
 .record-reserve-slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:0 28px 26px}
-.record-reserve-slots span{border:1px dashed #dfe7e9;padding:13px;color:#869396;font-size:12px;background:#fff}
+.record-reserve-slots span{border:1px dashed var(--ds-line);padding:13px;color:#869396;font-size:12px;background:#fff}
 @media(max-width:900px){
 
   .record-book-toc nav{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -719,10 +719,10 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 
 /* TKA special case library */
 .special-case-library{
-  margin:36px 0 8px;padding-top:34px;border-top:1px solid #dfe7e9
+  margin:36px 0 8px;padding-top:34px;border-top:1px solid var(--ds-line)
 }
 .special-case-library-head{
-  position:relative;border:1px solid #dfe7e9;border-radius:20px;padding:24px 26px;background:linear-gradient(145deg,#f5f8f8,#f5f8f8)
+  position:relative;border:1px solid var(--ds-line);border-radius:20px;padding:24px 26px;background:linear-gradient(145deg,var(--ds-bg),var(--ds-bg))
 }
 .special-case-library-head>span{
   display:block;font-size:12px;letter-spacing:.12em;color:#3f808f;font-weight:700
@@ -730,10 +730,10 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .special-case-library-head h3{margin:5px 0 7px;font-size:24px;letter-spacing:-.02em}
 .special-case-library-head p{margin:0;max-width:760px;color:#6a797d;font-size:12px;line-height:1.7}
 .special-case-library-head>strong{
-  position:absolute;right:24px;top:24px;font-size:12px;color:#5d6f75;background:#fff;border:1px solid #dfe7e9;border-radius:999px;padding:5px 9px
+  position:absolute;right:24px;top:24px;font-size:12px;color:var(--ds-muted);background:#fff;border:1px solid var(--ds-line);border-radius:999px;padding:5px 9px
 }
 .special-case-book{
-  margin-top:16px;border:1px solid #dfe7e9;border-radius:18px;background:#fff;overflow:hidden
+  margin-top:16px;border:1px solid var(--ds-line);border-radius:18px;background:#fff;overflow:hidden
 }
 .special-case-book[open]{box-shadow:0 12px 34px rgba(5,27,32,.05)}
 .special-case-summary{
@@ -744,22 +744,22 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 .special-case-summary h4{margin:4px 0 6px;font-size:17px;line-height:1.45}
 .special-case-summary p{margin:0;color:#707e82;font-size:12px;line-height:1.7;max-width:760px}
 .special-case-summary-meta{text-align:right;min-width:78px}
-.special-case-summary-meta strong{display:block;font-size:27px;line-height:1;color:#14252b}
+.special-case-summary-meta strong{display:block;font-size:27px;line-height:1;color:var(--ds-ink)}
 .special-case-summary-meta small{font-size:12px;color:#96a3a6}
 .special-case-actions{
-  display:flex;justify-content:flex-end;padding:10px 18px;border-top:1px solid #eef7f8;background:#fbfcfd
+  display:flex;justify-content:flex-end;padding:10px 18px;border-top:1px solid var(--ds-blue-50);background:#fbfcfd
 }
 .special-case-layout{
-  display:grid;grid-template-columns:210px minmax(0,1fr);border-top:1px solid #dfe7e9
+  display:grid;grid-template-columns:210px minmax(0,1fr);border-top:1px solid var(--ds-line)
 }
 .special-case-toc{
-  align-self:start;position:sticky;top:72px;padding:18px;border-right:1px solid #eef7f8;background:#fafbfc;max-height:calc(100vh - 90px);overflow:auto
+  align-self:start;position:sticky;top:72px;padding:18px;border-right:1px solid var(--ds-blue-50);background:#fafbfc;max-height:calc(100vh - 90px);overflow:auto
 }
 .special-case-toc>div span{display:block;font-size:12px;letter-spacing:.1em;color:#96a3a6}
 .special-case-toc>div b{display:block;margin-top:3px;font-size:13px}
 .special-case-toc nav{display:flex;flex-direction:column;margin-top:12px}
 .special-case-toc a{
-  display:grid;grid-template-columns:24px 1fr auto;gap:7px;align-items:start;padding:8px 0;border-top:1px solid #eef7f8;text-decoration:none;color:#39484c
+  display:grid;grid-template-columns:24px 1fr auto;gap:7px;align-items:start;padding:8px 0;border-top:1px solid var(--ds-blue-50);text-decoration:none;color:#39484c
 }
 .special-case-toc a span,.special-case-toc a small{font-size:12px;color:#96a3a6}
 .special-case-toc a b{font-size:12px;font-weight:600;line-height:1.45}
@@ -768,7 +768,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 @media(max-width:820px){
   .special-case-library-head>strong{position:static;display:inline-block;margin-top:12px}
   .special-case-layout{grid-template-columns:1fr}
-  .special-case-toc{position:static;max-height:none;border-right:0;border-bottom:1px solid #eef7f8}
+  .special-case-toc{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--ds-blue-50)}
 }
 @media(max-width:620px){
   .special-case-library-head{padding:20px 17px;border-radius:16px}
@@ -796,7 +796,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
     overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;
     background:#fff!important;
-    border-right:1px solid #dfe7e9!important;
+    border-right:1px solid var(--ds-line)!important;
     box-shadow:18px 0 42px rgba(5,27,32,.16)!important;
     z-index:1100!important;
     transform:translate3d(-105%,0,0)!important;
@@ -838,7 +838,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
     margin:0 -12px 10px;
     padding:17px 16px 12px;
     background:rgba(255,255,255,.96);
-    border-bottom:1px solid #eef7f8;
+    border-bottom:1px solid var(--ds-blue-50);
     backdrop-filter:blur(12px);
     -webkit-backdrop-filter:blur(12px);
 
@@ -879,7 +879,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
       linear-gradient(currentColor,currentColor) 0 7px/24px 2px no-repeat,
       linear-gradient(currentColor,currentColor) 0 14px/24px 2px no-repeat;
   }
-  #libraryShell .menu-btn:active{background:#eef7f8}
+  #libraryShell .menu-btn:active{background:var(--ds-blue-50)}
 }
 
 /* 2026-10-08: high-contrast disease-book hero actions */
@@ -894,7 +894,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
 }
 #libraryShell .record-book-hero-actions .btn.primary{
   background:#fff!important;
-  color:#14252b!important;
+  color:var(--ds-ink)!important;
   border-color:#fff!important;
   box-shadow:0 4px 14px rgba(0,0,0,.12);
   font-weight:700;
@@ -906,7 +906,7 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
   font-weight:650;
 }
 #libraryShell .record-book-hero-actions .btn.primary:hover{
-  background:#eef7f8!important;
+  background:var(--ds-blue-50)!important;
 }
 #libraryShell .record-book-hero-actions .btn.ghost:hover{
   background:rgba(255,255,255,.18)!important;
@@ -956,14 +956,14 @@ a,a:visited,a:hover,a:active{text-decoration:none!important}
     display:flex;
     align-items:center;
     justify-content:center;
-    border:1px solid #dfe7e9;
+    border:1px solid var(--ds-line);
     border-radius:10px;
     background:#f8fafc;
-    color:#2c3e44;
+    color:var(--ds-text);
     font-size:12px;
     font-weight:700;
   }
-  .mobile-drawer-shortcuts a:active{background:#eef7f8}
+  .mobile-drawer-shortcuts a:active{background:var(--ds-blue-50)}
   .department-toolbar-actions{width:100%}
   .department-toolbar-actions .btn{min-height:42px}
   .library-root-home-row{margin:0 0 14px}
@@ -1028,11 +1028,11 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 :focus-visible{outline:3px solid rgba(4,123,144,.24);outline-offset:2px}
 
 /* unified header */
-.official-nav,.library-topbar{min-height:62px;height:62px;background:rgba(255,255,255,.94);border-bottom:1px solid #dfe7e9;box-shadow:none}
+.official-nav,.library-topbar{min-height:62px;height:62px;background:rgba(255,255,255,.94);border-bottom:1px solid var(--ds-line);box-shadow:none}
 .official-nav-inner{max-width:1360px;padding:0 28px}
 .official-brand-mark,.library-brand-mark{width:32px;height:32px;border-radius:9px;box-shadow:none;background:linear-gradient(145deg,#0d7c90,#018da4)}
 .official-brand-text strong{font-size:16px;font-weight:700;letter-spacing:-.01em}
-.official-brand-text small{font-size:12px;color:#5d6f75}
+.official-brand-text small{font-size:12px;color:var(--ds-muted)}
 .official-links{gap:28px}
 .official-links a,.library-top-actions .text-action{font-size:14px;font-weight:600;white-space:nowrap}
 .official-search{background:#f4f6f8;color:#6f8388}
@@ -1045,20 +1045,20 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 /* library */
 #libraryShell{background:var(--h-bg)}
 #libraryShell .page{background:var(--h-bg)}
-#libraryShell .sidebar{top:62px;height:calc(100vh - 62px);background:#fbfcfd;border-right:1px solid #dfe7e9;padding:22px 12px}
+#libraryShell .sidebar{top:62px;height:calc(100vh - 62px);background:#fbfcfd;border-right:1px solid var(--ds-line);padding:22px 12px}
 #libraryShell .side-head{font-size:12px;font-weight:700;letter-spacing:.08em}
 #libraryShell .nav-label{padding-top:17px;font-size:12px}
 #libraryShell .nav-item{padding:8px 10px;border-radius:8px;font-size:12.5px;line-height:1.35}
-#libraryShell .nav-item:hover,#libraryShell .nav-item.active{background:#eef7f8;color:#11697a}
+#libraryShell .nav-item:hover,#libraryShell .nav-item.active{background:var(--ds-blue-50);color:var(--ds-blue)}
 #libraryShell .content{color:var(--h-text)}
 .article-intro h1{font-weight:700;letter-spacing:-.025em}
-.lead{color:#5d6f75}
+.lead{color:var(--ds-muted)}
 .intro-note{border-radius:0 8px 8px 0}
-.searchbox,.filter-row select{border-color:#dfe7e9;border-radius:8px}
+.searchbox,.filter-row select{border-color:var(--ds-line);border-radius:8px}
 #libraryShell .btn{border-radius:8px;font-weight:600}
 
 /* orthopaedics landing */
-.ortho-hero{margin:12px 0 18px;padding:28px;border-radius:18px;background:linear-gradient(135deg,#14252b 0%,#08333d 100%)}
+.ortho-hero{margin:12px 0 18px;padding:28px;border-radius:18px;background:linear-gradient(135deg,var(--ds-ink) 0%,#08333d 100%)}
 .ortho-hero:after{opacity:.55}
 .ortho-hero h2{font-size:32px;font-weight:700;letter-spacing:-.025em}
 .ortho-hero p{font-size:15px;line-height:1.75}
@@ -1068,7 +1068,7 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .ortho-jump a{border-radius:10px;padding:10px 12px;font-size:12px}
 .ortho-jump a:hover{transform:none;box-shadow:none;border-color:#bacbcf}
 .ortho-sections{gap:24px;grid-template-columns:minmax(0,1fr)}
-.ortho-category{min-width:0;padding:22px;border-radius:16px;background:#fff;border-color:#dfe7e9}
+.ortho-category{min-width:0;padding:22px;border-radius:16px;background:#fff;border-color:var(--ds-line)}
 .ortho-category-head{margin-bottom:16px}
 .ortho-category-head h3{font-size:22px;font-weight:700}
 .ortho-category-head p{font-size:14px;line-height:1.7}
@@ -1086,18 +1086,18 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .disease-book-page{background:var(--h-bg)}
 .disease-book-page .content{width:min(1220px,calc(100% - 38px));padding-top:26px}
 .disease-book-page .article-intro{padding-bottom:18px}
-.record-book-hero{border-radius:16px;background:linear-gradient(135deg,#14252b 0%,#01404c 100%)}
+.record-book-hero{border-radius:16px;background:linear-gradient(135deg,var(--ds-ink) 0%,#01404c 100%)}
 .record-book-layout{grid-template-columns:248px minmax(0,900px);gap:22px;justify-content:center;margin-top:16px}
-.record-book-toc{top:74px;max-height:calc(100vh - 90px);border-radius:13px;padding:14px;border-color:#dfe7e9;box-shadow:none;background:#fbfcfd}
+.record-book-toc{top:74px;max-height:calc(100vh - 90px);border-radius:13px;padding:14px;border-color:var(--ds-line);box-shadow:none;background:#fbfcfd}
 .record-book-toc-head{padding:2px 3px 11px}
 .record-book-toc-head h3{font-size:18px;font-weight:700}
 .record-book-toc nav{gap:2px;margin-top:8px}
 .record-book-toc a{grid-template-columns:25px minmax(0,1fr) auto;padding:8px 7px;border-radius:7px}
 .record-book-toc a>b{font-size:13px;font-weight:600}
 .record-book-toc a>span{font-size:12px}
-.record-book-section{border-radius:12px;margin-bottom:14px;border-color:#dfe7e9;box-shadow:none}
-.record-book-section-head{grid-template-columns:42px minmax(0,1fr) auto;gap:12px;padding:16px 18px;background:#fbfcfd;border-bottom-color:#dfe7e9}
-.record-chapter-no{width:38px;height:38px;border-radius:9px;background:#14252b;font-size:12px}
+.record-book-section{border-radius:12px;margin-bottom:14px;border-color:var(--ds-line);box-shadow:none}
+.record-book-section-head{grid-template-columns:42px minmax(0,1fr) auto;gap:12px;padding:16px 18px;background:#fbfcfd;border-bottom-color:var(--ds-line)}
+.record-chapter-no{width:38px;height:38px;border-radius:9px;background:var(--ds-ink);font-size:12px}
 .record-chapter-title h3{font-size:18px;font-weight:700;letter-spacing:-.01em}
 .record-chapter-title>span{font-size:12px}
 .record-book-body{padding:24px 30px 28px;font-family:var(--h-serif);font-size:16px;line-height:1.9;letter-spacing:.008em;color:#08333d;font-weight:400}

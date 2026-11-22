@@ -7,7 +7,7 @@
     },
     "case-workspace-preview.css": {
       "important": 15,
-      "colorLiterals": 129
+      "colorLiterals": 61
     },
     "classification.css": {
       "important": 3,
@@ -15,11 +15,11 @@
     },
     "cms.css": {
       "important": 3,
-      "colorLiterals": 31
+      "colorLiterals": 29
     },
     "duty-orders.css": {
       "important": 6,
-      "colorLiterals": 35
+      "colorLiterals": 28
     },
     "duty.css": {
       "important": 1,
@@ -35,15 +35,15 @@
     },
     "library-personal.css": {
       "important": 1,
-      "colorLiterals": 7
+      "colorLiterals": 1
     },
     "note-case.css": {
       "important": 0,
-      "colorLiterals": 24
+      "colorLiterals": 8
     },
     "note.css": {
       "important": 1,
-      "colorLiterals": 51
+      "colorLiterals": 26
     },
     "pathway.css": {
       "important": 2,
@@ -55,7 +55,7 @@
     },
     "private-gallery.css": {
       "important": 1,
-      "colorLiterals": 10
+      "colorLiterals": 5
     },
     "site-search.css": {
       "important": 0,
@@ -63,7 +63,7 @@
     },
     "styles.css": {
       "important": 74,
-      "colorLiterals": 348
+      "colorLiterals": 262
     },
     "theme.css": {
       "important": 8,
@@ -71,11 +71,11 @@
     },
     "tools-page.css": {
       "important": 2,
-      "colorLiterals": 45
+      "colorLiterals": 36
     },
     "tools-polish.css": {
       "important": 2,
-      "colorLiterals": 12
+      "colorLiterals": 7
     }
   }
 }
