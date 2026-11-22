@@ -1534,6 +1534,10 @@ test('homepage search opens shareable clinical results and reset restores depart
       const search=page.getByRole('searchbox',{name:'搜索全站资料',exact:true});
       const bounds=await search.boundingBox();assert(bounds.y>0&&bounds.y+bounds.height<900,'homepage search is in the initial viewport');
       assert.equal(await page.locator('.home-quick-grid a').count(),4);
+      // "/" jumps to the search box, as on /search.
+      await page.locator('body').click({position:{x:2,y:2}});await page.keyboard.press('/');
+      assert(await search.evaluate(node=>node===document.activeElement),'"/" focuses the homepage search');
+      assert.equal(await search.inputValue(),'','the shortcut key is not typed into the box');
       await search.fill('肝脓肿');await page.locator('.home-search button').click();
       // The homepage box searches every section; record-level search stays one link away.
       await page.waitForURL(/\/search\?q=/);
