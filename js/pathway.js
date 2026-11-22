@@ -58,7 +58,7 @@
     setActive(button||nav?.querySelector('[data-key="tka"]'));
     setPathwayUrl('tka');
     if(tka)tka.hidden=false;
-    if(dynamic){dynamic.hidden=true;dynamic.innerHTML='';}
+    if(dynamic){dynamic.hidden=true;dynamic.replaceChildren();}
     tka?.scrollIntoView({behavior:'instant',block:'start'});
   }
 

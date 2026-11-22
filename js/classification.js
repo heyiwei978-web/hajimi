@@ -1,16 +1,41 @@
 (()=>{
 'use strict';
+// 逐型详情和治疗资料按页面需要再加载（2026-11-20，优化方案 P1-3）：
+// 科室页不需要；骨科目录页的卡片计数和搜索要用全部详情；单病种页只要所在部位的详情和治疗资料。
+// 带内容摘要的网址写在 classification.html 的 <meta name="hajimi-lazy-script">，构建时与页面其他引用一起更新。
+const DETAIL_FILES={
+ 'classification-detail-v2-upper.js':['proximal-humerus','distal-humerus','clavicle','distal-radius','scaphoid'],
+ 'classification-detail-v2-lower.js':['femoral-neck','intertrochanteric','distal-femur','tibial-plateau','tibial-shaft','pilon','patella'],
+ 'classification-detail-v2-pelvis-foot.js':['ankle','calcaneus','talus','pelvic-ring','acetabulum']
+};
+const TREATMENT_FILE='classification-treatment.js';
+// 本脚本以 async 加载：一下载完就按地址开始下载需要的资料（不需要等目录资料和页面解析），
+// 与 classification-data.js 并行；渲染仍等到 DOMContentLoaded（defer 的目录资料此时已执行）和资料都就绪。
+const parts=location.pathname.replace(/\/+$/,'').split('/').filter(Boolean);
+const department=parts[1],slug=parts[2];
+const lazyUrls=Object.fromEntries([...document.querySelectorAll('meta[name="hajimi-lazy-script"]')].map(meta=>{const url=meta.getAttribute('content')||'';return [url.split('?')[0].slice(1),url];}));
+const detailFile=id=>Object.keys(DETAIL_FILES).find(file=>DETAIL_FILES[file].includes(id));
+const needed=department!=='guke'?[]:!slug?Object.keys(DETAIL_FILES):detailFile(slug)?[detailFile(slug),TREATMENT_FILE]:[];
+// 按顺序执行（async=false）；加载失败时照常显示已有内容，与原先 defer 脚本失败时的表现一致。
+const loadScript=file=>new Promise(resolve=>{const script=document.createElement('script');script.src=lazyUrls[file]||'/'+file;script.async=false;script.onload=script.onerror=()=>resolve();document.head.appendChild(script);});
+const loads=needed.map(loadScript);
+// 不能只看 readyState：解析结束后、defer 脚本执行前它已是 interactive。目录资料已在就直接开始；
+// 否则等 DOMContentLoaded（defer 脚本之后才触发），若它已错过则等 load；资料加载失败时 load 之后照常显示错误提示。
+const domReady=new Promise(resolve=>{
+ if(window.HAJIMI_CLASSIFICATION_DATA||document.readyState==='complete'){resolve();return;}
+ document.addEventListener('DOMContentLoaded',resolve,{once:true});window.addEventListener('load',resolve,{once:true});
+});
+Promise.all([domReady,...loads]).then(main);
+function main(){
 const data=window.HAJIMI_CLASSIFICATION_DATA;
 const app=document.getElementById('classificationApp');
 if(!data||!Array.isArray(data.entries)||!app){if(app)app.textContent='分型资料暂时无法加载。';return;}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const areas=[...new Set(data.entries.map(x=>x.area))];
-const extended=window.HAJIMI_CLASSIFICATION_DETAILS||{};
-const treatments=window.HAJIMI_CLASSIFICATION_TREATMENTS||{};
+let extended={},treatments={};
 const normalize=s=>String(s??'').normalize('NFKC').toLowerCase().replace(/\s+/g,'');
 const groupSize=d=>extended[d.id]?.types?.length||d.types.length;
-const parts=location.pathname.replace(/\/+$/,'').split('/').filter(Boolean);
-const department=parts[1],slug=parts[2],disease=data.entries.find(x=>x.id===slug);
+const disease=data.entries.find(x=>x.id===slug);
 const crumbs=document.getElementById('classBreadcrumb');
 const count=document.getElementById('classDiseaseCount');if(count)count.textContent=String(data.entries.length);
 const link=(url,label)=>'<a target="_blank" rel="noopener noreferrer" href="'+esc(url)+'">'+esc(label)+' <span aria-hidden="true">↗</span></a>';
@@ -76,7 +101,13 @@ function details(d){
  window.addEventListener('hashchange',()=>jump(location.hash));
  if(location.hash)requestAnimationFrame(()=>jump(location.hash));
 }
+function render(){
+ extended=window.HAJIMI_CLASSIFICATION_DETAILS||{};
+ treatments=window.HAJIMI_CLASSIFICATION_TREATMENTS||{};
 if(!department)departments();
 else if(department==='guke'){if(!slug)cards();else if(disease)details(disease);else{setCrumbs('<span>›</span><a href="/classification/guke">骨科</a>');app.innerHTML='<section class="class-error"><h2>未找到对应的疾病分型</h2><p>请回到骨科目录选择现有病种。</p><a href="/classification/guke">返回骨科</a></section>';}}
 else{const dept=data.departments.find(x=>x.id===department);setCrumbs('<span>›</span><span>'+esc(dept?.name||'其他科室')+'</span>');app.innerHTML='<section class="class-error"><h2>'+esc(dept?.name||'该科室')+'分型资料待建设</h2><p>科室分区已预留，当前暂无经过整理和审核的资料，不显示骨科内容。</p><a href="/classification">返回科室目录 →</a></section>';}
+}
+render();
+}
 })();

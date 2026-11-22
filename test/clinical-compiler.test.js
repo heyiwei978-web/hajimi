@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -25,6 +26,8 @@ test('compiled catalogs and per-disease bodies preserve every retained clinical 
   for(const file of Object.values(manifest.bodies)){
     for(const [id,body]of JSON.parse(fs.readFileSync(path.join(directory,file.slice(1)),'utf8')))records[id].sourceBody=body;
   }
+  const cmsDigest=crypto.createHash('sha256').update(fs.readFileSync(new URL('../js/cms-core.js',import.meta.url))).digest('hex').slice(0,12);
+  assert.equal(manifest.scripts.cms,'/cms-core.js?v='+cmsDigest,'the library loads cms-core.js by content digest, so it can be cached as immutable');
   const newDischargeRounds=source.records.filter(r=>r.department==='骨科'&&r.short==='出院当天查房记录');
   // 8 retained standard orthopedic cases + 2 TKA special cases (withdrawn cases were removed 2026-11-01).
   assert.ok(newDischargeRounds.length>=10,'Every orthopedic model patient needs a discharge-day round');

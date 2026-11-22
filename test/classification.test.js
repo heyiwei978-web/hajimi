@@ -55,3 +55,21 @@ test('pelvic and acetabular systems keep major subtypes and genuine CT-specific 
  for(const code of ['Sanders ⅡA','Sanders ⅡB','Sanders ⅡC','Sanders ⅢAB','Sanders ⅢAC','Sanders ⅢBC'])assert.ok(has('calcaneus',code));
  for(const code of ['Hawkins ⅡA（修订）','Hawkins ⅡB（修订）'])assert.ok(has('talus',code));
 });
+
+// 2026-11-20（优化方案 P1-3）：详情与治疗资料按页面加载，classification.js 里的「病种 → 详情文件」对照表必须与资料文件一致。
+test('lazy-loaded detail files: the id map in classification.js matches each file, and the page lists them as versioned meta, not scripts',()=>{
+ const app=readFileSync(new URL('../js/classification.js',import.meta.url),'utf8');
+ const map=JSON.parse(/const DETAIL_FILES=(\{[\s\S]*?\n\});/.exec(app)[1].replace(/'/g,'"'));
+ const {data}=catalog();
+ for(const [file,ids] of Object.entries(map)){
+  const context={window:{}};
+  runInNewContext(readFileSync(new URL('../'+sourcePath(file),import.meta.url),'utf8'),context,{filename:file});
+  assert.deepEqual(JSON.parse(JSON.stringify(Object.keys(context.window.HAJIMI_CLASSIFICATION_DETAILS).sort())),[...ids].sort(),file);
+ }
+ assert.deepEqual(Object.values(map).flat().sort(),JSON.parse(JSON.stringify(data.entries.map(x=>x.id).sort())),'every disease has exactly one detail file');
+ const html=readFileSync(new URL('../classification.html',import.meta.url),'utf8');
+ for(const file of [...Object.keys(map),'classification-treatment.js']){
+  assert.match(html,new RegExp('<meta name="hajimi-lazy-script" content="/'+file.replace(/\./g,'\\.')+'\\?v='),file+' needs a versioned meta entry');
+  assert.doesNotMatch(html,new RegExp('<script[^>]+/'+file.replace(/\./g,'\\.')),file+' must not load on every classification page');
+ }
+});

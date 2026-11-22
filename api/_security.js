@@ -1,4 +1,4 @@
-import {isAdmin,requirePostHeader} from './_auth.js';
+import {isAdmin,renewSession,requirePostHeader} from './_auth.js';
 
 const writes = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
@@ -34,6 +34,8 @@ export function guardRequest(req, res, {methods, admin = false, json = false, bo
   if (writes.has(req.method) && !requirePostHeader(req)) {
     res.status(403).json({error: '缺少管理请求标识'}); return false;
   }
+  // 管理操作为会话滑动续期（见 _auth.js）。
+  if (admin) renewSession(req, res);
   if (!json) return true;
   if (!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type'] || '')) {
     res.status(415).json({error: '仅支持 JSON 请求'}); return false;

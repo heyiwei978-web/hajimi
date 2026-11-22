@@ -25,9 +25,26 @@
     if(parts[0]==='ecg'||parts[0]==='ecg.html')return ecgClasses(parts);
     return [];
   }
-  window.HAJIMI_ROUTE_SHELL={classesFor:classesFor};
+  // /ecg 下除首页以外的页面都要用心电图资料包：在这里（<body> 开头、同步执行）就开始下载，
+  // 与页面脚本并行，ecg.js 只需等它完成。地址来自构建时写入的 <meta name="hajimi-ecg-data">。
+  function needsEcgData(pathname){
+    var parts=String(pathname||'').split('/').filter(Boolean);
+    return (parts[0]==='ecg'||parts[0]==='ecg.html')&&parts.length>1;
+  }
+  function preloadEcgData(doc,pathname){
+    if(!needsEcgData(pathname)||doc.getElementById('ecgDataScript'))return null;
+    var meta=doc.querySelector('meta[name="hajimi-ecg-data"]'),url=meta&&meta.getAttribute('content');
+    if(!url)return null;
+    var script=doc.createElement('script');
+    script.id='ecgDataScript';script.src=url;script.async=true;
+    script.onerror=function(){script.setAttribute('data-state','error');};
+    doc.head.appendChild(script);
+    return script;
+  }
+  window.HAJIMI_ROUTE_SHELL={classesFor:classesFor,needsEcgData:needsEcgData,preloadEcgData:preloadEcgData};
   if(typeof document!=='undefined'&&document.body){
     var list=classesFor(location.pathname);
     for(var i=0;i<list.length;i++)document.body.classList.add(list[i]);
+    preloadEcgData(document,location.pathname);
   }
 })();

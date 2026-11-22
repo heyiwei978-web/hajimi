@@ -6,12 +6,10 @@
     "js/classification.js": 6,
     "js/cms-core.js": 4,
     "js/comorbidity-modules.js": 3,
-    "js/ecg-calipers.js": 1,
     "js/ecg.js": 25,
-    "js/library-ui.js": 1,
-    "js/pathway.js": 3,
+    "js/pathway.js": 2,
     "js/site-search.js": 1,
-    "js/tools-page.js": 4,
+    "js/tools-page.js": 2,
     "scripts/clinical-compiler.mjs": 1
   }
 }

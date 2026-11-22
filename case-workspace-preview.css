@@ -1,51 +1,51 @@
 /* Disease-centered patient-case workspace. Clinical text and legacy reading styles stay intact. */
 #templateGrid.case-search-results{display:block!important;max-width:none;width:100%;min-width:0}
-.case-search-intro{margin:4px 0 17px;padding:13px 17px;border:1px solid #d5ecef;border-radius:14px;background:#f5f8f8;color:#40575d;font-size:13px;line-height:1.8}
+.case-search-intro{margin:4px 0 17px;padding:13px 17px;border:1px solid var(--ds-blue-100);border-radius:14px;background:var(--ds-bg);color:#40575d;font-size:13px;line-height:1.8}
 .case-search-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
-.case-search-card{background:#fff;border:1px solid #dfe7e9;border-radius:19px;padding:21px 23px;cursor:pointer;min-width:0;display:flex;flex-direction:column;gap:14px;box-shadow:0 5px 19px rgba(8,51,61,.045);transition:border-color .15s,box-shadow .15s,transform .15s}
+.case-search-card{background:#fff;border:1px solid #dfe7e9;border-radius:19px;padding:21px 23px;cursor:pointer;color:inherit;min-width:0;display:flex;flex-direction:column;gap:14px;box-shadow:0 5px 19px rgba(8,51,61,.045);transition:border-color .15s,box-shadow .15s,transform .15s}
 .case-search-card:hover,.case-search-card:focus-visible{border-color:#71bacc;box-shadow:0 14px 32px rgba(8,51,61,.09);transform:translateY(-1px);outline:none}
 .case-search-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#657e84;font-size:12px;font-weight:650}
-.case-search-card-top span:first-child{background:#eef7f8;border-radius:7px;padding:5px 9px;color:#11697a}
-.case-search-card h3{font-size:21px;font-weight:750;color:#14252b;margin:0}
-.case-search-card p{color:#5d6f75;font-size:13px;line-height:1.7;margin:0;flex:1}
-.case-search-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;border-top:1px solid #eef7f8}
+.case-search-card-top span:first-child{background:var(--ds-blue-50);border-radius:7px;padding:5px 9px;color:var(--ds-blue)}
+.case-search-card h3{font-size:21px;font-weight:750;color:var(--ds-ink);margin:0}
+.case-search-card p{color:var(--ds-muted);font-size:13px;line-height:1.7;margin:0;flex:1}
+.case-search-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;border-top:1px solid var(--ds-blue-50)}
 .case-search-card-bottom small{font-size:12px;color:#7f979d}
-.case-search-card-bottom b{font-size:12px;color:#11697a}
+.case-search-card-bottom b{font-size:12px;color:var(--ds-blue)}
 #templateGrid.case-search-results .search-more{grid-column:1/-1}
 body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px) minmax(0,1fr);gap:22px;align-items:start;margin-top:20px}
-.case-file-sidebar{padding:0!important;overflow:auto;max-height:calc(100vh - 100px);border:1px solid #d5ecef!important;border-radius:18px!important}
-.case-file-sidebar .record-book-toc-head{padding:23px 20px 17px;border-bottom:1px solid #eef7f8;background:linear-gradient(135deg,#f5f8f8,#fff)}
-.case-nav-family{padding:15px 12px;border-bottom:1px solid #eef7f8}
+.case-file-sidebar{padding:0!important;overflow:auto;max-height:calc(100vh - 100px);border:1px solid var(--ds-blue-100)!important;border-radius:18px!important}
+.case-file-sidebar .record-book-toc-head{padding:23px 20px 17px;border-bottom:1px solid var(--ds-blue-50);background:linear-gradient(135deg,var(--ds-bg),#fff)}
+.case-nav-family{padding:15px 12px;border-bottom:1px solid var(--ds-blue-50)}
 .case-nav-family:last-child{border-bottom:0}
-.case-nav-family h4{font-size:12px;color:#11697a;font-weight:800;letter-spacing:.02em;margin:0 9px 10px}
+.case-nav-family h4{font-size:12px;color:var(--ds-blue);font-weight:800;letter-spacing:.02em;margin:0 9px 10px}
 .case-nav-group{margin:4px 0;border:1px solid transparent;border-radius:10px}
-.case-nav-group[open]{background:#ffffff;border-color:#eef7f8}
-.case-nav-group summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;font-weight:750;color:#2c3e44;padding:11px 10px;list-style:none}
+.case-nav-group[open]{background:#ffffff;border-color:var(--ds-blue-50)}
+.case-nav-group summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;font-weight:750;color:var(--ds-text);padding:11px 10px;list-style:none}
 .case-nav-group summary::-webkit-details-marker{display:none}
 .case-nav-group summary:before{content:'▾';font-size:12px;color:#6c99a4}
 .case-nav-group:not([open]) summary:before{content:'▸'}
 .case-nav-group summary span{flex:1}
-.case-nav-group summary small{font-size:12px;background:#eef7f8;color:#11697a;padding:3px 7px;border-radius:30px;white-space:nowrap}
+.case-nav-group summary small{font-size:12px;background:var(--ds-blue-50);color:var(--ds-blue);padding:3px 7px;border-radius:30px;white-space:nowrap}
 .case-nav-group nav{padding:0 5px 8px;display:grid;gap:3px}
 .case-file-sidebar .case-nav-item{padding:9px 10px;display:grid;grid-template-columns:23px minmax(0,1fr);align-items:start;gap:7px;text-decoration:none;color:#475e64;border-radius:9px;line-height:1.45}
 .case-file-sidebar .case-nav-item span{color:#8ba4ab;font-size:12px;font-variant-numeric:tabular-nums;padding-top:2px}
 .case-file-sidebar .case-nav-item b{font-size:12px;font-weight:590;overflow-wrap:anywhere}
-.case-file-sidebar .case-nav-item:hover{background:#eef7f8}
-.case-file-sidebar .case-nav-item.is-current{background:#d5ecef;color:#11697a}
-.case-file-sidebar .case-nav-item.is-current span{color:#11697a}
+.case-file-sidebar .case-nav-item:hover{background:var(--ds-blue-50)}
+.case-file-sidebar .case-nav-item.is-current{background:var(--ds-blue-100);color:var(--ds-blue)}
+.case-file-sidebar .case-nav-item.is-current span{color:var(--ds-blue)}
 .case-nav-empty{font-size:12px;color:#92a8ad;padding:3px 16px 10px;margin:0}
 .case-file-reader-wrap{min-width:0}
 .case-file-reader{scroll-margin-top:92px}
 .case-file-reader>.record-book-section{scroll-margin-top:92px}
-.case-file-tools{display:flex;justify-content:space-between;gap:16px;align-items:center;background:#fff;border:1px solid #dfe7e9;border-radius:16px;padding:15px 18px;margin-bottom:15px;box-shadow:0 7px 18px rgba(8,51,61,.04)}
+.case-file-tools{display:flex;justify-content:space-between;gap:16px;align-items:center;background:#fff;border:1px solid var(--ds-line);border-radius:16px;padding:15px 18px;margin-bottom:15px;box-shadow:0 7px 18px rgba(8,51,61,.04)}
 .case-file-tools>div:first-child{display:flex;flex-direction:column;gap:4px}
 .case-file-eyebrow{font-size:12px;color:#4f8a98;letter-spacing:.13em;font-weight:700}
 .case-file-tools strong{font-size:15px;color:#08333d}
 .case-file-tools small{font-size:12px;color:#7d979d}
 .case-file-reader-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}
 .case-file-reader-actions .btn{font-size:12px;padding:8px 11px}
-.case-file-bottom-nav{padding:16px;background:#fff;border:1px solid #dfe7e9;border-radius:14px;margin-bottom:14px}
-.case-file-bottom-nav strong{display:block;margin-bottom:12px;font-size:17px;line-height:1.6;color:#2c3e44;overflow-wrap:anywhere}
+.case-file-bottom-nav{padding:16px;background:#fff;border:1px solid var(--ds-line);border-radius:14px;margin-bottom:14px}
+.case-file-bottom-nav strong{display:block;margin-bottom:12px;font-size:17px;line-height:1.6;color:var(--ds-text);overflow-wrap:anywhere}
 .case-file-bottom-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 #libraryShell .case-file-bottom-actions .btn{min-width:0;min-height:48px;padding:10px 4px;font-size:16px;white-space:nowrap}
 .case-file-bottom-actions .btn:disabled,.case-file-reader-actions .btn:disabled{opacity:.45;cursor:default}
@@ -116,47 +116,47 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 }
 @media screen and (max-width:720px){
  .case-workspace.case-continuous-reader .case-file-sidebar{position:sticky;top:calc(var(--site-header-height,62px) + 8px);z-index:35;max-height:calc(100dvh - var(--site-header-height,62px) - 24px);overflow:auto;overscroll-behavior:contain;margin-bottom:16px;background:#fff}
- .case-workspace .case-directory-summary{display:grid;grid-template-columns:auto minmax(0,1fr) 18px;align-items:center;gap:10px;min-height:56px;padding:12px 14px;list-style:none;color:#2c3e44;cursor:pointer}
- .case-directory-panel[open]>.case-directory-summary{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid #eef7f8}
+ .case-workspace .case-directory-summary{display:grid;grid-template-columns:auto minmax(0,1fr) 18px;align-items:center;gap:10px;min-height:56px;padding:12px 14px;list-style:none;color:var(--ds-text);cursor:pointer}
+ .case-directory-panel[open]>.case-directory-summary{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(--ds-blue-50)}
  .case-directory-summary::-webkit-details-marker{display:none}
  .case-directory-summary strong{font-size:17px;white-space:nowrap}
- .case-directory-summary #caseDirectoryCurrent{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;color:#5d6f75}
+ .case-directory-summary #caseDirectoryCurrent{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;color:var(--ds-muted)}
  .case-directory-chevron{font-size:20px;text-align:center}
  .case-directory-panel[open] .case-directory-chevron{transform:rotate(180deg)}
- .case-directory-panel[open]>.record-book-toc-head{border-top:1px solid #eef7f8}
+ .case-directory-panel[open]>.record-book-toc-head{border-top:1px solid var(--ds-blue-50)}
  .case-workspace.case-continuous-reader .case-file-reader>.record-book-section{scroll-margin-top:calc(var(--site-header-height,62px) + 92px)}
 }
 
 /* Optional chronic-condition supplements: outside the immutable clinical record.
    The option bar sits above the record; the supplement panel is a third column
    beside the record on wide screens and a bottom sheet on narrower ones. */
-.comorbidity-panel{margin:18px 0 4px;padding:20px 22px;border:1px solid #dfe7e9;border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(2,62,73,.05)}
+.comorbidity-panel{margin:18px 0 4px;padding:20px 22px;border:1px solid var(--ds-line);border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(2,62,73,.05)}
 .comorbidity-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
 .comorbidity-head h3{margin:6px 0 8px;color:#08333d;font-size:1.32rem}
-.comorbidity-head p{margin:0;max-width:850px;color:#5d6f75;line-height:1.75;font-size:1rem}
+.comorbidity-head p{margin:0;max-width:850px;color:var(--ds-muted);line-height:1.75;font-size:1rem}
 .comorbidity-head .btn{flex:none}
 .comorbidity-grid{margin-top:16px;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}
-.comorbidity-choice{display:flex;align-items:center;gap:9px;min-height:50px;padding:10px 12px;border:1px solid #dfe7e9;border-radius:12px;background:#f5f8f8;color:#2c3e44;font-weight:600;cursor:pointer;user-select:none;line-height:1.4}
-.comorbidity-choice:has(input:checked){border-color:#048196;background:#eef7f8;box-shadow:inset 0 0 0 1px #048196}
-.comorbidity-choice input{width:18px;height:18px;flex:none;accent-color:#11697a}
+.comorbidity-choice{display:flex;align-items:center;gap:9px;min-height:50px;padding:10px 12px;border:1px solid var(--ds-line);border-radius:12px;background:var(--ds-bg);color:var(--ds-text);font-weight:600;cursor:pointer;user-select:none;line-height:1.4}
+.comorbidity-choice:has(input:checked){border-color:#048196;background:var(--ds-blue-50);box-shadow:inset 0 0 0 1px #048196}
+.comorbidity-choice input{width:18px;height:18px;flex:none;accent-color:var(--ds-blue)}
 .comorbidity-choice:focus-within{outline:2px solid #098da4;outline-offset:2px}
 .comorbidity-caution{margin:14px 0 0;padding:11px 14px;border-left:4px solid #b27c2c;background:#fff8eb;color:#624719;font-size:.94rem;line-height:1.75}
 @media(max-width:1279px){.comorbidity-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:600px){.comorbidity-panel{padding:16px 14px}.comorbidity-head{flex-direction:column;gap:10px}.comorbidity-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.comorbidity-choice{padding:10px;min-height:48px}}
 
 /* The two pickers fold into one row above the record. */
-.supplement-pickers-fold{margin:14px 0 4px;border:1px solid #dfe7e9;border-radius:16px;background:#fff;box-shadow:0 6px 18px rgba(2,62,73,.05)}
+.supplement-pickers-fold{margin:14px 0 4px;border:1px solid var(--ds-line);border-radius:16px;background:#fff;box-shadow:0 6px 18px rgba(2,62,73,.05)}
 .supplement-pickers-fold>summary{display:flex;align-items:center;gap:10px;min-height:56px;padding:10px 16px;cursor:pointer;list-style:none;color:#08333d}
 .supplement-pickers-fold>summary::-webkit-details-marker{display:none}
 .supplement-fold-title{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;min-width:0}
 .supplement-fold-title strong{font-size:1.06rem}
-.supplement-fold-title small{color:#5d6f75;font-size:.9rem;font-weight:600}
-.supplement-fold-count{flex:none;padding:3px 10px;border-radius:999px;background:#eef7f8;color:#11697a;font-size:.86rem;font-weight:700}
+.supplement-fold-title small{color:var(--ds-muted);font-size:.9rem;font-weight:600}
+.supplement-fold-count{flex:none;padding:3px 10px;border-radius:999px;background:var(--ds-blue-50);color:var(--ds-blue);font-size:.86rem;font-weight:700}
 .supplement-fold-count[hidden]{display:none}
-.supplement-fold-action{flex:none;margin-left:auto;color:#11697a;font-size:.92rem;font-weight:700;white-space:nowrap}
+.supplement-fold-action{flex:none;margin-left:auto;color:var(--ds-blue);font-size:.92rem;font-weight:700;white-space:nowrap}
 .supplement-fold-action::before{content:"展开选择 ⌄"}
 .supplement-pickers-fold[open]>summary .supplement-fold-action::before{content:"收起 ⌃"}
-.supplement-pickers-fold[open]>summary{border-bottom:1px solid #d5ecef}
+.supplement-pickers-fold[open]>summary{border-bottom:1px solid var(--ds-blue-100)}
 .supplement-pickers-fold>.supplement-pickers{margin:0;padding:14px}
 .supplement-pickers-fold .comorbidity-panel{box-shadow:none}
 @media(max-width:600px){.supplement-pickers-fold>.supplement-pickers{padding:10px}.supplement-pickers-fold>summary{padding:10px 12px}}
@@ -165,17 +165,17 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 /* 特殊检查 column beside the chronic-condition options. */
 .supplement-pickers{display:grid;gap:14px;margin:18px 0 4px;align-items:start}
 .supplement-pickers>.comorbidity-panel{margin:0}
-.special-exam-group{margin-top:12px;border:1px solid #dfe7e9;border-radius:12px;background:#fbfdff}
-.special-exam-group>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;padding:10px 14px;cursor:pointer;font-weight:700;color:#2c3e44;list-style:none}
+.special-exam-group{margin-top:12px;border:1px solid var(--ds-line);border-radius:12px;background:#fbfdff}
+.special-exam-group>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;padding:10px 14px;cursor:pointer;font-weight:700;color:var(--ds-text);list-style:none}
 .special-exam-group>summary::-webkit-details-marker{display:none}
-.special-exam-group>summary::after{content:"⌄";font-size:18px;color:#5d6f75}
+.special-exam-group>summary::after{content:"⌄";font-size:18px;color:var(--ds-muted)}
 .special-exam-group[open]>summary::after{transform:rotate(180deg)}
-.special-exam-group>summary small{margin-left:auto;font-size:13px;color:#5d6f75;font-weight:600}
-.special-exam-group:has(input:checked)>summary small{color:#11697a}
+.special-exam-group>summary small{margin-left:auto;font-size:13px;color:var(--ds-muted);font-weight:600}
+.special-exam-group:has(input:checked)>summary small{color:var(--ds-blue)}
 .special-exam-group .special-exam-grid{margin:0;padding:0 12px 12px;grid-template-columns:repeat(3,minmax(0,1fr))}
 .special-exam-notes{margin-top:4px;padding-top:12px;border-top:1px dashed #c8dfe5}
 .special-exam-notes-title{margin:0 0 10px;color:#044551;font-size:1rem}
-.special-exam-notes-title small,.special-exam-detail h4 small{margin-left:8px;color:#5d6f75;font-size:.82rem;font-weight:600}
+.special-exam-notes-title small,.special-exam-detail h4 small{margin-left:8px;color:var(--ds-muted);font-size:.82rem;font-weight:600}
 .special-exam-detail{border-left-color:#2f8a6b}
 @media screen and (min-width:1100px){
  .supplement-pickers{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
@@ -187,28 +187,28 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 
 .comorbidity-side{min-width:0;background:#fff;border:1px solid #c8dfe5;border-radius:18px;box-shadow:0 10px 28px rgba(2,62,73,.08);padding:16px}
 .comorbidity-side[hidden],.comorbidity-fab[hidden]{display:none!important}
-.comorbidity-side-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid #d5ecef}
+.comorbidity-side-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--ds-blue-100)}
 .comorbidity-side-head h3{margin:4px 0 4px;color:#08333d;font-size:1.15rem}
 .comorbidity-side-head h3:focus{outline:none}
-#comorbiditySelectionStatus{display:block;color:#11697a;font-weight:700;font-size:.92rem}
+#comorbiditySelectionStatus{display:block;color:var(--ds-blue);font-weight:700;font-size:.92rem}
 .comorbidity-stage-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 8px}
 .comorbidity-stage-tabs[hidden],.comorbidity-follow[hidden]{display:none}
-.comorbidity-stage-tabs button{min-height:40px;padding:6px 12px;border:1px solid #dfe7e9;border-radius:999px;background:#f5f8f8;color:#0c5564;font:inherit;font-size:.94rem;font-weight:650;cursor:pointer}
-.comorbidity-stage-tabs button[aria-pressed="true"]{background:#11697a;border-color:#11697a;color:#fff}
-.comorbidity-follow{margin:0 0 10px;color:#5d6f75;font-size:.9rem;line-height:1.6;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
-.comorbidity-follow-btn{border:0;background:none;padding:2px 0;color:#11697a;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.comorbidity-stage-tabs button{min-height:40px;padding:6px 12px;border:1px solid var(--ds-line);border-radius:999px;background:var(--ds-bg);color:var(--ds-blue-strong);font:inherit;font-size:.94rem;font-weight:650;cursor:pointer}
+.comorbidity-stage-tabs button[aria-pressed="true"]{background:var(--ds-blue);border-color:var(--ds-blue);color:#fff}
+.comorbidity-follow{margin:0 0 10px;color:var(--ds-muted);font-size:.9rem;line-height:1.6;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.comorbidity-follow-btn{border:0;background:none;padding:2px 0;color:var(--ds-blue);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
 .comorbidity-notes{display:grid;gap:12px;margin:0}
-.comorbidity-detail{border:1px solid #d5ecef;border-left:4px solid #048196;border-radius:12px;padding:12px 14px;background:#fbfdff}
+.comorbidity-detail{border:1px solid var(--ds-blue-100);border-left:4px solid #048196;border-radius:12px;padding:12px 14px;background:#fbfdff}
 .comorbidity-detail h4{font-size:1.06rem;color:#044551;margin:0 0 4px}
 .comorbidity-box{margin:10px 0 0}
 .comorbidity-box-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 4px}
-.comorbidity-box-head strong{color:#0c5564;font-size:.94rem}
+.comorbidity-box-head strong{color:var(--ds-blue-strong);font-size:.94rem}
 .comorbidity-box-copy{flex:none;min-height:34px;padding:4px 10px;font-size:.86rem}
 .comorbidity-detail p{margin:0;color:#344c51;line-height:1.8;white-space:pre-wrap;font-size:1rem}
-.comorbidity-empty{font-size:.94rem;color:#5d6f75;margin:0;padding:8px 2px}
+.comorbidity-empty{font-size:.94rem;color:var(--ds-muted);margin:0;padding:8px 2px}
 .comorbidity-actions{margin:14px 0 8px}
 .comorbidity-actions .btn{width:100%}
-.comorbidity-footer{margin:0;color:#5d6f75;font-size:.86rem;line-height:1.6}
+.comorbidity-footer{margin:0;color:var(--ds-muted);font-size:.86rem;line-height:1.6}
 .comorbidity-side-close{min-height:36px;padding:4px 12px}
 
 @media screen and (min-width:1280px){
@@ -224,8 +224,8 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
  .case-workspace .comorbidity-side.is-open{display:block}
  body.disease-book-page #libraryShell .content:has(.case-workspace.has-comorbidity-side){padding-bottom:calc(96px + env(safe-area-inset-bottom))}
  .comorbidity-side-head{position:sticky;top:-14px;z-index:1;background:#fff;padding-top:2px}
- .comorbidity-fab{position:fixed;z-index:55;right:max(16px,env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:10px 18px;border:0;border-radius:999px;background:#11697a;color:#fff;font:inherit;font-size:1rem;font-weight:700;box-shadow:0 8px 22px rgba(8,51,61,.3);cursor:pointer}
- .comorbidity-fab b{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 6px;border-radius:999px;background:#fff;color:#11697a;font-size:.86rem}
+ .comorbidity-fab{position:fixed;z-index:55;right:max(16px,env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:10px 18px;border:0;border-radius:999px;background:var(--ds-blue);color:#fff;font:inherit;font-size:1rem;font-weight:700;box-shadow:0 8px 22px rgba(8,51,61,.3);cursor:pointer}
+ .comorbidity-fab b{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 6px;border-radius:999px;background:#fff;color:var(--ds-blue);font-size:.86rem}
 }
 @media print{.comorbidity-panel,.comorbidity-side,.comorbidity-fab{display:none!important}}
 
@@ -233,8 +233,8 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 .comorbidity-box-buttons{display:inline-flex;gap:6px;flex:none}
 .supplement-edited{margin-left:8px;padding:1px 6px;border-radius:6px;background:#fff3d6;color:#7a5200;font-style:normal;font-size:.78rem;font-weight:700}
 .supplement-editor{display:grid;gap:8px}
-.supplement-editor-label{display:grid;gap:6px;color:#5d6f75;font-size:.88rem}
-.supplement-editor textarea{width:100%;min-height:140px;padding:10px;border:1px solid #93b9c3;border-radius:10px;font:inherit;font-size:1rem;line-height:1.7;color:#2c3e44;resize:vertical}
+.supplement-editor-label{display:grid;gap:6px;color:var(--ds-muted);font-size:.88rem}
+.supplement-editor textarea{width:100%;min-height:140px;padding:10px;border:1px solid #93b9c3;border-radius:10px;font:inherit;font-size:1rem;line-height:1.7;color:var(--ds-text);resize:vertical}
 .supplement-editor-actions{display:flex;flex-wrap:wrap;gap:8px}
 .supplement-editor-status{margin:0;color:#8a3b12;font-size:.88rem;min-height:1em}
 .supplement-expand-dialog{border:0;border-radius:16px;padding:18px 20px calc(18px + env(safe-area-inset-bottom));width:min(1100px,calc(100vw - 16px));max-width:none;height:calc(100dvh - 32px);max-height:none;box-shadow:0 25px 80px rgba(0,0,0,.25);display:none;flex-direction:column;gap:10px}
@@ -242,11 +242,11 @@ body.disease-book-page .case-workspace{grid-template-columns:minmax(250px,286px)
 .supplement-expand-dialog::backdrop{background:#08333d66}
 .supplement-expand-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .supplement-expand-head strong{display:block;font-size:1.2rem;color:#08333d}
-.supplement-expand-head span{display:block;margin-top:4px;color:#5d6f75;font-size:.92rem}
-.supplement-expand-dialog textarea{flex:1;width:100%;min-height:200px;padding:14px;border:1px solid #93b9c3;border-radius:12px;font:inherit;font-size:1.1rem;line-height:1.8;color:#2c3e44;resize:none}
+.supplement-expand-head span{display:block;margin-top:4px;color:var(--ds-muted);font-size:.92rem}
+.supplement-expand-dialog textarea{flex:1;width:100%;min-height:200px;padding:14px;border:1px solid #93b9c3;border-radius:12px;font:inherit;font-size:1.1rem;line-height:1.8;color:var(--ds-text);resize:none}
 @media(max-width:600px){.supplement-expand-dialog{border-radius:0;padding:14px max(14px,env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}}
 @media print{.supplement-expand-dialog{display:none!important}}
 .supplement-expand-dialog,.supplement-expand-dialog *{box-sizing:border-box}
 .supplement-expand-dialog .btn{min-height:44px;padding:8px 18px;font-size:15px;border-radius:10px}
-.supplement-expand-dialog .btn.primary{background:#11697a;border-color:#11697a;color:#fff}
+.supplement-expand-dialog .btn.primary{background:var(--ds-blue);border-color:var(--ds-blue);color:#fff}
 @media(max-width:600px){.supplement-expand-dialog{inset:0;margin:0;width:100%;max-width:100%;height:100%;max-height:100%}}

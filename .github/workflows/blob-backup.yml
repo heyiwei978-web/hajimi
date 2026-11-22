@@ -66,3 +66,24 @@ jobs:
           path: ${{ runner.temp }}/out/
           retention-days: 90
           if-no-files-found: error
+
+  # 备份成功后，清理超过 1 天未更新的限流状态文件（scripts/cleanup-rate-state.mjs，优化方案 P0-5）。
+  # 只处理 security/login-rate/、security/note-rate/、monitoring/rate/ 三个前缀，单次最多删除 5000 个；
+  # 这些是临时计数，本来就不进入备份。网站接口本身不具备列出或删除 Blob 的能力。
+  cleanup-rate-state:
+    needs: backup
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Delete stale rate-limit state
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+        run: node scripts/cleanup-rate-state.mjs --apply
