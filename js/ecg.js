@@ -435,27 +435,28 @@
   let renderToken=0;
   function render(options={}){
     const token=++renderToken;
+    // 记录导航开始时的焦点：资料要等下载时，渲染在之后的任务里完成，读者可能已经开始在搜索框输入。
+    const focusBefore=document.activeElement;
     if(data||!needsData()){
-      renderView(options);
+      renderView(options,focusBefore);
       if(!data){const idle=window.requestIdleCallback||(callback=>setTimeout(callback,1200));idle(()=>loadData().catch(()=>{}));}
       return;
     }
     // 不调用 resetShell：保留 route-shell.js 预先设好的版式类名，等资料到了由 renderView 统一重置。
     const status=document.createElement('p');status.setAttribute('role','status');status.textContent='正在加载心电图栏目……';
     app.replaceChildren(status);
-    loadData().then(()=>{if(token===renderToken)renderView(options);},()=>{
+    loadData().then(()=>{if(token===renderToken)renderView(options,focusBefore);},()=>{
       if(token===renderToken)app.textContent='心电图资料暂时无法加载，请检查网络后刷新页面。';
     });
   }
-  function renderView({focus=false,scroll=null}={}){
+  function renderView({focus=false,scroll=null}={},focusBefore=document.activeElement){
     resetShell();
     view();
     tocJump();
     if(window.HAJIMI_ECG_CALIPERS)window.HAJIMI_ECG_CALIPERS.enhance(app);
     globalSearch.sync();
     // Keyboard focus moves to the new title only if the reader has not already
-    // put it somewhere (e.g. started typing a search) before the next frame.
-    const focusBefore=document.activeElement;
+    // put it somewhere (e.g. started typing a search) since the navigation began.
     // Deferred scripts create these targets before the measured public header is ready.
     requestAnimationFrame(()=>{
       if(scroll!=null)window.scrollTo({top:scroll,behavior:'instant'});

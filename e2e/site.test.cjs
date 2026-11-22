@@ -1088,6 +1088,30 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
   }
 });
 
+test('ECG navigation that waits for the data bundle still leaves focus in a search box the reader moved to',async()=>{
+  const {page,context,errors}=await pageFor(1440);
+  try{
+    // Hold the data bundle so the navigation from the home page has to wait for it (as on a slow connection).
+    let release;const held=new Promise(resolve=>{release=resolve;});
+    await context.route(/\/assets\/ecg-data-[0-9a-f]{20}\.js$/,async route=>{await held;await route.continue();});
+    await page.goto(base+'/ecg',{waitUntil:'domcontentloaded'});
+    await page.locator('#ecgApp .ecg-entry-grid').waitFor();
+    await page.locator('main a[href="/ecg/basics"]').first().click();
+    await page.locator('#ecgGlobalSearch').focus();
+    release();
+    await page.locator('#ecgApp section').first().waitFor();
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.equal(await page.evaluate(()=>document.activeElement.id),'ecgGlobalSearch','focus stays where the reader put it');
+    // Without that, the late render still moves focus to the new page title.
+    await page.goto(base+'/ecg',{waitUntil:'networkidle'});
+    await page.locator('main a[href="/ecg/periop"]').first().click();
+    await page.waitForURL(base+'/ecg/periop');
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.equal(await page.evaluate(()=>document.activeElement.id),'ecgTitle');
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('ECG in-page navigation does not pull focus away from a search started before the next frame',async()=>{
   const {page,context,errors}=await pageFor(1440);
   try{
