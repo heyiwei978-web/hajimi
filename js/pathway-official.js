@@ -161,7 +161,7 @@
   }
   function bullets(items){return '<ul>'+items.map((x)=>'<li>'+esc(x)+'</li>').join('')+'</ul>';}
   function pathwayMarkup(p){
-    const record=p.recordUrl?'<a href="'+p.recordUrl+'">对应完整病历 ↗</a>':'';
+    const record=p.recordUrl?'<a href="'+p.recordUrl+'">对应完整病历 →</a>':'';
     const patient=commonPatient.map(([title,copy],i)=>'<div><b>'+(i+1)+'</b><span>'+esc(title)+'</span><p>'+esc(copy)+'</p></div>'+(i<commonPatient.length-1?'<i>→</i>':'')).join('');
     return `
       <section class="pathway-title-card">

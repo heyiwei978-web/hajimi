@@ -91,7 +91,7 @@ function details(d){
  '<section id="class-images" class="class-content-section"><div class="class-section-label">02 / SOURCE RADIOGRAPHS</div><h3>真实术前影像资料</h3><p class="class-section-sub">适合影像检查：'+esc(d.imaging)+'。下列均为原文链接；本页不擅自转载患者影像。打开原图时须注意图注中哪些是术前DR、哪些是CT或术后片。</p><div class="class-figure-list">'+figures+'</div></section>'+
  '<section id="class-indications" class="class-content-section"><div class="class-section-label">03 / TREATMENT DECISIONS</div><h3>保守治疗与手术指征</h3><div class="class-decision"><span>本病种总体判断（逐型要点见各分型卡片）</span><p>'+esc(d.decision)+'</p></div><p class="class-asterisk">分型标签只是治疗决策的一部分。必须结合影像的实际移位/稳定性、患者年龄、合并伤、软组织条件、功能需要和麻醉风险。</p>'+treatmentSources+'</section>'+
  '<section id="class-sources" class="class-content-section"><div class="class-section-label">04 / EVIDENCE</div><h3>手术指征对应依据</h3>'+refs+'</section>'+
- '<div class="class-more"><a href="/bl/guke/'+encodeURIComponent(d.name)+'">查找对应病历模板 ↗</a><a href="/classification/guke">骨科所有病种 →</a></div></article></div>';
+ '<div class="class-more"><a href="/bl/guke/'+encodeURIComponent(d.name)+'">查找对应病历模板 →</a><a href="/classification/guke">骨科所有病种 →</a></div></article></div>';
  const jump=hash=>{
   if(!/^#type-\d+$/.test(hash))return;
   const target=document.getElementById(hash.slice(1));
