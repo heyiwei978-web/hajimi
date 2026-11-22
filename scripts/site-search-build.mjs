@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {sourcePath} from './public-assets.mjs';
 import vm from 'node:vm';
 import {MODULES, DEPARTMENTS} from '../config/site-modules.mjs';
 import {loadEcg} from './ecg-compiler.mjs';
@@ -14,7 +15,7 @@ import {loadEcg} from './ecg-compiler.mjs';
 // a: aliases, b: extra searchable words}.
 
 const root = new URL('../', import.meta.url);
-const readSource = file => fs.readFileSync(new URL(file, root), 'utf8');
+const readSource = file => fs.readFileSync(new URL(sourcePath(file), root), 'utf8');
 
 function runScripts(files, read) {
   const context = {window: {}};

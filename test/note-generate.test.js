@@ -6,8 +6,9 @@ import {PUBLIC_FILES} from '../scripts/public-assets.mjs';
 import {MODULES, NAV_SURFACES} from '../config/site-modules.mjs';
 import {createSession} from '../api/_auth.js';
 import {createNoteHandler, validateInput, buildMessages, findIdentifier, stripMarkdown, DOC_TYPES} from '../api/note-generate.js';
+import {sourcePath} from '../scripts/public-assets.mjs';
 
-const read = file => fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+const read = file => fs.readFileSync(new URL('../'+sourcePath(file), import.meta.url), 'utf8');
 function res() {
   return {code: 200, headers: {}, setHeader(k, v) { this.headers[k.toLowerCase()] = v; },
     status(n) { this.code = n; return this; }, json(b) { this.body = b; return this; }};
@@ -101,6 +102,66 @@ test('note generator forwards only the clinical fields and returns plain text', 
   assert.doesNotMatch(calls[0].options.body, /fixture-owner|hajimi_session/);
 });
 
+test('classification chooses only a supplied template and does not send the manual excerpt', async t => {
+  const cookie = auth(t), calls = [];
+  const candidates = [{id: 4, caseTitle: '教学病例', chapterTitle: '手术记录', operation: '教学手术'}];
+  const reply = {choices: [{message: {content: JSON.stringify({route: 'template', candidateId: 4})}, finish_reason:'stop'}]};
+  const r = res();
+  await createNoteHandler({fetchImpl: fakeFetch(calls, reply), env: ENV})(req(cookie,
+    {...BODY, action: 'classify', candidates, referenceText: '仅用于之后生成的参考片段'}), r);
+  assert.equal(r.code, 200);
+  assert.deepEqual(r.body, {route: 'template', candidateId: 4});
+  const sent = JSON.parse(calls[0].options.body);
+  assert.equal(sent.response_format.type, 'json_object');
+  assert.match(sent.messages[0].content, /资料不足|无法判断/);
+  assert.match(sent.messages[1].content, /教学病例/);
+  assert.match(sent.messages[1].content, /教学手术/);
+  assert.doesNotMatch(sent.messages[1].content, /仅用于之后生成的参考片段/);
+});
+
+test('classification never accepts an unknown candidate or malformed model output', async t => {
+  const cookie = auth(t), candidates = [{id: 1, caseTitle: '教学病例', chapterTitle: '手术记录'}];
+  for (const text of ['不是 JSON', '{"route":"template","candidateId":99}', '{"route":"template","candidateId":"1"}']) {
+    const r = res();
+    await createNoteHandler({fetchImpl: fakeFetch([], {choices: [{message: {content: text}, finish_reason:'stop'}]}), env: ENV})(req(cookie,
+      {...BODY, action: 'classify', candidates}), r);
+    assert.deepEqual(r.body, {route: 'uncertain'});
+  }
+  const calls = [], r = res();
+  await createNoteHandler({fetchImpl: fakeFetch(calls), env: ENV})(req(cookie,
+    {...BODY, action: 'classify', candidates: [candidates[0], candidates[0]]}), r);
+  assert.equal(r.code, 400);
+  assert.equal(calls.length, 0);
+});
+
+test('classification preserves stage boundaries and consumes the same quota as other requests', async t => {
+  const cookie = auth(t), calls = [];
+  let quotaCalls = 0;
+  const reply = {choices:[{message:{content:'{"route":"separate"}'}, finish_reason:'stop'}]};
+  const handler = createNoteHandler({fetchImpl:fakeFetch(calls, reply), env:ENV, quota:async()=>{quotaCalls++;return {allowed:true};}});
+  const r = res();
+  await handler(req(cookie, {...BODY, type:'first', action:'classify', candidates:[],
+    extraScope:'operative', extra:'虚构术后专用事实', operativeFacts:'虚构手术细节', daily:'虚构当日变化', dailyPhase:'post', day:'2'}), r);
+  assert.equal(r.code, 200);
+  assert.equal(quotaCalls, 1);
+  const sent = JSON.parse(calls[0].options.body).messages[1].content;
+  assert.doesNotMatch(sent, /虚构术后专用事实|虚构手术细节|虚构当日变化/);
+});
+
+test('classification respects exhausted quota and rejects truncated model output', async t => {
+  const cookie = auth(t), calls = [];
+  const body = {...BODY, action:'classify', candidates:[]};
+  const limited = res();
+  await createNoteHandler({fetchImpl:fakeFetch(calls), env:ENV, quota:async()=>({allowed:false,retryAfter:60})})(req(cookie, body), limited);
+  assert.equal(limited.code, 429);
+  assert.equal(calls.length, 0);
+  const truncated = res();
+  const reply = {choices:[{message:{content:'{"route":"separate"}'}, finish_reason:'length'}]};
+  await createNoteHandler({fetchImpl:fakeFetch(calls,reply), env:ENV, quota:async()=>({allowed:true})})(req(cookie, body), truncated);
+  assert.equal(truncated.code, 502);
+  assert.match(truncated.body.error, /截断/);
+});
+
 test('note generator maps AI errors to readable messages', async t => {
   const cookie = auth(t);
   for (const [status, pattern] of [[401, /密钥/], [402, /余额/], [429, /频繁/], [500, /暂时不可用/]]) {
@@ -160,8 +221,8 @@ test('note page is published, routed and part of the main navigation', () => {
   const page = read('note.html');
   assert.doesNotMatch(page, /<script>(?!<)|\son[a-z]+=/i);
   assert.match(page, /<a class="active" href="\/note" aria-current="page">AI 病历生成<\/a>/);
-  assert.doesNotMatch(read('note.js'), /localStorage/);
-  assert.match(read('note.js'), /sessionStorage/);
+  assert.doesNotMatch(read('js/note.js'), /localStorage/);
+  assert.match(read('js/note.js'), /sessionStorage/);
   assert.match(read('tools.html'), /href="\/note"/);
 });
 
@@ -275,7 +336,7 @@ test('same-origin, admin marker, JSON and byte limits still guard the AI before 
   let quotaCalls = 0;
   const handler = createNoteHandler({fetchImpl: fakeFetch(calls), env: ENV, quota: async () => { quotaCalls++; return {allowed: true}; }});
   for (const [mutate, code] of [
-    [r => { r.method = 'GET'; }, 405],
+    [r => { r.method = 'PATCH'; }, 405],
     [r => { r.headers.origin = 'https://other.test'; }, 403],
     [r => { r.headers['sec-fetch-site'] = 'cross-site'; }, 403],
     [r => { delete r.headers['x-hajimi-admin']; }, 403],

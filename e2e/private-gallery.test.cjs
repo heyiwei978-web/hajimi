@@ -12,8 +12,8 @@ before(async()=>{
   const {createContentStore}=await load('api/_content-store.js');
   const {createPrivateGalleryHandler}=await load('api/private-gallery.js');
   const {createPrivateImageHandler}=await load('api/private-image.js');
-  const {createContentHandler}=await load('api/content.js');
-  const {createHistoryHandler}=await load('api/content-history.js');
+  const {createContentHandler,createContentApi}=await load('api/content.js');
+  const {createHistoryHandler}=await load('api/_content-history.js');
   const {sha256}=await load('api/_auth.js');
   const {BlobPreconditionFailedError}=await import('@vercel/blob');
   const keys=['HAJIMI_ADMIN_USER','HAJIMI_ADMIN_PASSWORD_SHA256','HAJIMI_ADMIN_PASSWORD_HASH','HAJIMI_SESSION_SECRET','BLOB_READ_WRITE_TOKEN'];
@@ -28,9 +28,9 @@ before(async()=>{
   const routes={
     '/api/private-gallery':createPrivateGalleryHandler({store:privateStore,blob:storage}),
     '/api/private-image':createPrivateImageHandler({store:privateStore,blob:storage}),
-    '/api/content':createContentHandler(publicStore),'/api/content-history':createHistoryHandler(publicStore)
+    '/api/content':createContentApi(createContentHandler(publicStore),createHistoryHandler(publicStore))
   };
-  for(const name of ['login','session','logout'])routes['/api/'+name]=(await load('api/'+name+'.js')).default;
+  for(const name of ['login','session'])routes['/api/'+name]=(await load('api/'+name+'.js')).default;
   const config=JSON.parse(fs.readFileSync(path.join(root,'vercel.json')));
   server=http.createServer(async(req,res)=>{
     try{

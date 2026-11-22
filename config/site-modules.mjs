@@ -8,21 +8,25 @@
 // executed by scripts/clinical-compiler.mjs as part of the clinical record chain.
 //
 // Navigation order is a UI contract, not only data. styles.css hides the 4th
-// `.global-links` item below 640px and ui-polish.css restores it for official
+// `.global-links` item below 640px and a later rule in styles.css (formerly ui-polish.css) restores it for official
 // navigation bars; reordering MODULES changes which entry is affected on phones.
 
 // The build renders every official/tools header brand from these values
 // (scripts/navigation-build.mjs); edit here instead of in each page.
 export const SITE_BRAND = Object.freeze({
-  mark: 'H',
+  mark: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-2.5-1.7-6-2.2-9-1v13c3-1.2 6.5-1 9 1 2.5-2 6-2.2 9-1V5c-3-1.2-6.5-.7-9 1v13M15 11h3m-1.5-1.5v3"/></svg>',
   name: '哈基米工作站',
-  tagline: 'hajimi Clinical Workspace'
+  tagline: '个人医学工作台'
 });
 
 // `routes` mirrors the existing vercel.json rewrite sources for the section.
 // The registry describes routing; it does not generate vercel.json.
 export const MODULES = Object.freeze([
-  {id: 'home', label: '首页', href: '/', nav: true, routes: ['/']},
+  {id: 'home', label: '首页', href: '/', nav: true, workspace: '工作台', routes: ['/']},
+  {id: 'clinical', label: '临床', workspace: '临床', href: '/clinical', routes: ['/clinical', '/clinical/']},
+  {id: 'materials', label: '资料', workspace: '资料', href: '/materials', routes: ['/materials', '/materials/']},
+  {id: 'study', label: '学习', workspace: '学习', href: '/study', routes: ['/study', '/study/']},
+  {id: 'personal', label: '我的', workspace: '我的', href: '/personal', routes: ['/personal', '/personal/']},
   {id: 'records', label: '病历模板', href: '/bl', nav: true, routes: ['/bl', '/bl/:path*']},
   {id: 'classification', label: '疾病分型', href: '/classification', nav: true,
     routes: ['/classification', '/classification/', '/classification/:path*']},
@@ -76,12 +80,13 @@ export const DEPARTMENTS = Object.freeze([
 // `variant` names the markup family:
 //   official  <nav class="global-links official-links" aria-label="主导航">, active = a.active
 //   tools     <header class="nav"><div class="navin">…<nav aria-label="主导航">, active = a.active
+//   workstation  Five workspace destinations, rendered as a rail or phone tabs
 //   library   <div class="top-actions library-top-actions">, active = a.library-active-link
 // All registered surfaces use the same navigation entries and brand tagline.
 // The builder marks each active entry with aria-current="page".
 export const NAV_SURFACES = Object.freeze([
-  {file: 'index.html', region: 'portalHome', variant: 'official', active: 'home'},
-  {file: 'home.html', variant: 'official', active: 'home', generatedFrom: 'index.html'},
+  {file: 'index.html', region: 'portalHome', variant: 'workstation', active: 'home'},
+  {file: 'home.html', variant: 'workstation', active: 'home', generatedFrom: 'index.html'},
   {file: 'classification.html', variant: 'official', active: 'classification'},
   {file: 'ecg.html', variant: 'official', active: 'ecg'},
   {file: 'labs.html', variant: 'official', active: 'labs'},
@@ -96,6 +101,7 @@ export const NAV_SURFACES = Object.freeze([
 ].map(Object.freeze));
 
 export function navModules(surface) {
+  if (surface.variant === 'workstation') return MODULES.filter(module => module.workspace);
   const excluded = new Set(surface.exclude || []);
   return MODULES.filter(module => module.nav && !excluded.has(module.id));
 }

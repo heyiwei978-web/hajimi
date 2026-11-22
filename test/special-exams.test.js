@@ -10,8 +10,8 @@ function element(extra={}){
 }
 function load(){
   const context={window:{},navigator:{clipboard:{writeText:async value=>{context.copied=value;}}}};
-  vm.runInNewContext(fs.readFileSync(new URL('../special-exams.js',import.meta.url),'utf8'),context);
-  vm.runInNewContext(fs.readFileSync(new URL('../comorbidity-modules.js',import.meta.url),'utf8'),context);
+  vm.runInNewContext(fs.readFileSync(new URL('../js/special-exams.js',import.meta.url),'utf8'),context);
+  vm.runInNewContext(fs.readFileSync(new URL('../js/comorbidity-modules.js',import.meta.url),'utf8'),context);
   return context;
 }
 function fixture(){

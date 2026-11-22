@@ -8,8 +8,9 @@ import {promisify} from 'node:util';
 import {fileURLToPath} from 'node:url';
 import {NAV_SURFACES} from '../config/site-modules.mjs';
 import {renderPageNavigation} from '../scripts/navigation-build.mjs';
+import {sourcePath} from '../scripts/public-assets.mjs';
 
-const read = file => fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+const read = file => fs.readFileSync(new URL('../'+sourcePath(file), import.meta.url), 'utf8');
 
 test('current navigation rendering preserves every byte of the existing pages', () => {
   for (const file of new Set(NAV_SURFACES.map(surface => surface.file))) {
@@ -59,7 +60,7 @@ test('normal build consumes registry changes from a clean copy without exposing 
     const source = path.join(root, entry.name), destination = path.join(temporary, entry.name);
     if (entry.isFile() && (/\.(?:html|css|js)$/.test(entry.name) || ['package.json', 'vercel.json'].includes(entry.name))) {
       fs.copyFileSync(source, destination);
-    } else if (entry.isDirectory() && ['scripts', 'config', 'content'].includes(entry.name)) {
+    } else if (entry.isDirectory() && ['scripts', 'config', 'content', 'js'].includes(entry.name)) {
       copyDirectory(source, destination);
     }
   }
@@ -100,7 +101,6 @@ test('normal build consumes registry changes from a clean copy without exposing 
     assert.equal(comparable(html.replaceAll(label, '心电图')), comparable(before.get(name).toString('utf8')),
       name + ' only changes the navigation label');
   }
-  assert.deepEqual(changed.sort(), ['admin.html', 'classification.html', 'duty-orders.html', 'duty.html', 'ecg.html', 'home.html',
-    'index.html', 'labs.html', 'library.html', 'note.html', 'pathway.html', 'search.html', 'site-search-data.js', 'tools.html'].sort());
-  assert.equal(occurrences, 14, 'thirteen registered ECG links plus the lightweight homepage alias');
+  assert.deepEqual(changed.sort(), ['admin.html', 'classification.html', 'duty-orders.html', 'duty.html', 'ecg.html', 'labs.html', 'library.html', 'note.html', 'pathway.html', 'search.html', 'site-search-data.js', 'tools.html'].sort());
+  assert.equal(occurrences, 11, 'legacy navigation links follow the registered label');
 });

@@ -28,18 +28,14 @@ test('the build reads the per-disease JSON source, one file per department and d
   }
 });
 
-test('the retired generation chain is frozen; edit the JSON files instead',()=>{
+test('the retired generation chain stays deleted; edit the JSON files instead',()=>{
   assert(Array.isArray(index.retiredChain)&&index.retiredChain.length>40);
-  // search-core.js, app.js and departments.js also ran in the chain but are live
-  // runtime code (Claude's scope), so only the record/patch scripts are frozen.
+  // 2026-11-18 负责人确认删除旧生成链；index.json 里的 retiredChain 只作历史记录（改动会改变病历快照，故保留原样）。
+  // search-core.js、app.js、departments.js 仍是在用代码。历史版本见 test/legacy-chain.mjs。
   const runtimeCode=new Set(['search-core.js','app.js','departments.js']);
   for(const file of index.retiredChain.filter(item=>!runtimeCode.has(item.path))){
-    assert.equal(sha256(fs.readFileSync(new URL(file.path,root),'utf8')),file.sha256,file.path+' is retired and must not change');
+    assert(!fs.existsSync(new URL(file.path,root)),file.path+' was retired and deleted; do not restore it');
   }
-});
-
-test('the one-time export refuses to overwrite the JSON source',async()=>{
-  await assert.rejects(import(pathToFileURL(path.join(root.pathname,'scripts/clinical-source-export.mjs')).href+'?t='+Date.now()),/already exists/);
 });
 
 test('legacy ledger rendering applies only to the unchanged record version',()=>{

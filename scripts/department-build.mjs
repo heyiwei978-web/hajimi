@@ -26,7 +26,7 @@ function replaceOne(source, pattern, render, description) {
 }
 
 export function renderHomeDepartments(source, departments=DEPARTMENTS) {
-  return replaceOne(source, /(<div class="home-quick-grid">)([\s\S]*?)(<\/div>\s*(?=<a class="home-quick-pathway"))/g,
+  return replaceOne(source, /(<div class="home-quick-grid">)([\s\S]*?)(<\/div>\s*(?=<a class="home-quick-pathway\b))/g,
     match => {
       const inner = match[2], anchors = [...inner.matchAll(/<a\b[^>]*>[\s\S]*?<\/a>/g)];
       if (!anchors.length) throw new Error('Homepage department cards missing');

@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
+import {sourcePath} from '../scripts/public-assets.mjs';
+import {legacyIndexHtml, readLegacySource} from './legacy-chain.mjs';
 
 const traumaGroups=[
   '股骨转子间骨折','股骨大粗隆骨折','股骨干骨折','胫骨干骨折','胫骨平台骨折','踝关节三踝骨折',
@@ -10,7 +12,7 @@ const traumaGroups=[
 ];
 
 function loadedClinicalScripts(){
-  const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
+  const html=legacyIndexHtml();
   return [...html.matchAll(/<script\s+[^>]*?src="\/([^?"]+)(?:\?[^"]*)?"/g)]
     .map(match=>match[1])
     .filter(file=>/^(ideal-cases|orthopedic-expansion-[a-z]|record-quality-v\d+)\.js$/.test(file));
@@ -32,7 +34,7 @@ test('all clinical generation scripts parse and execute in site load order',()=>
 
   const runtime=[];
   for(const file of files){
-    const source=fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
+    const source=readLegacySource(file);
     assert.doesNotThrow(()=>new vm.Script(source,{filename:file}),file+' should parse');
     try{
       vm.runInContext(source,context,{filename:file,timeout:5000});

@@ -9,8 +9,9 @@ import {createSession} from '../api/_auth.js';
 import SEED, {ADDITIONS} from '../api/_duty-orders-seed.js';
 import {createDutyOrdersStore, validateSheets} from '../api/_duty-orders-store.js';
 import {createDutyOrdersHandler} from '../api/duty-orders.js';
+import {sourcePath} from '../scripts/public-assets.mjs';
 
-const read = file => fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+const read = file => fs.readFileSync(new URL('../'+sourcePath(file), import.meta.url), 'utf8');
 const CURRENT = 'duty-orders/current.json', HISTORY = 'duty-orders/history/';
 function res() {
   return {code: 200, headers: {}, setHeader(k, v) { this.headers[k.toLowerCase()] = v; },
@@ -75,7 +76,7 @@ test('order data is no longer a public file; the page is routed and uses the sha
   assert.ok(NAV_SURFACES.some(surface => surface.file === 'duty-orders.html' && surface.active === 'duty'));
   const html = read('duty-orders.html');
   assert.doesNotMatch(html, /duty-orders-data|<script>(?!<\/script>)|\son[a-z]+=/i);
-  assert.doesNotMatch(read('duty-orders.js'), /innerHTML|insertAdjacentHTML|eval\(|new Function/);
+  assert.doesNotMatch(read('js/duty-orders.js'), /innerHTML|insertAdjacentHTML|eval\(|new Function/);
 });
 
 test('reading and writing orders require an admin session, same origin and the admin marker, before storage', async t => {

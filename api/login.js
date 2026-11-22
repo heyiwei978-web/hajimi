@@ -1,4 +1,5 @@
-import {createSession,verifyPassword} from './_auth.js';
+import {withMonitoring} from './_monitoring.js';
+import {createSession,sessionCookie,verifyPassword} from './_auth.js';
 import {guardRequest} from './_security.js';
 import {checkLoginThrottle,recordLoginFailure,clearLoginFailures} from './_rate-limit.js';
 import {loginLog} from './_login-log.js';
@@ -27,7 +28,7 @@ export function createLoginHandler({log = loginLog} = {}) { return async functio
   try { token = createSession(username); }
   catch { return res.status(503).json({error:'管理登录尚未配置'}); }
   await log.record('success',req);
-  res.setHeader('Set-Cookie','hajimi_session='+encodeURIComponent(token)+'; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800');
+  res.setHeader('Set-Cookie',sessionCookie(token));
   return res.status(200).json({ok:true,user:username});
 }; }
-export default createLoginHandler();
+export default withMonitoring('login', createLoginHandler());

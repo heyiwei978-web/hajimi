@@ -50,7 +50,16 @@ async function pageFor(width=1440, options={}) {
   const page = await context.newPage();
   const errors=[];
   page.on('pageerror',error=>errors.push(error.message));
+  // vercel.json 的 CSP 已加到每个响应上：被拦下的内联样式、脚本等只出现在控制台，这里一并当作页面错误。
+  page.on('console',message=>{if(message.type()==='error'&&/Content Security Policy/i.test(message.text()))errors.push('CSP: '+message.text());});
   return {page, context, errors};
+}
+async function mockNote(page, handler, classify=()=>({route:'separate'})) {
+  return page.route('**/api/note-generate', route => {
+    if (route.request().method()==='GET') return route.fulfill({json:{defaultModel:'fixture-default',models:[{id:'deepseek-flash',name:'DeepSeek Flash'},{id:'deepseek-v4-pro',name:'DeepSeek Pro'}]}});
+    const body=route.request().postDataJSON();
+    return body.action==='classify' ? route.fulfill({json:classify(body)}) : handler(route,body);
+  });
 }
 // Merged chapters hold several records; a "document" is a standalone chapter or one record inside a merged chapter.
 const DOCS='#caseWorkspace .case-file-reader > .record-book-section:not(.record-book-merged), #caseWorkspace .record-merged-part';
@@ -67,13 +76,26 @@ async function closeRecordDirectory(page){
   if(await summary.isVisible()&&await page.locator('#caseDirectoryPanel').evaluate(element=>element.open))await summary.click();
 }
 
+async function openNoteInputs(page, legacy=false) {
+  for (const selector of legacy ? ['#noteSharedInputs','#noteLegacyTools'] : ['#noteSharedInputs']) {
+    const fold=page.locator(selector);
+    if (!await fold.evaluate(element=>element.open)) await fold.locator(':scope > summary').click();
+  }
+}
+
+async function openNoteFrameSection(page, index) {
+  const toggle=page.locator('#noteFrameDirectory button[aria-expanded]').nth(index);
+  if (await toggle.getAttribute('aria-expanded')==='false') await toggle.click();
+}
+
 test('note draft preserves edited output and manual selection, and reports copy failure',async()=>{
   for(const width of [390,1280]){
     const {page,context,errors}=await pageFor(width);
     try{
       let requests=0;
-      await page.route('**/api/note-generate',route=>{requests++;return route.fulfill({json:{label:'示例草稿',text:'虚构示例'}});});
+      await mockNote(page,route=>{requests++;return route.fulfill({json:{label:'示例草稿',text:'虚构示例'}});});
       await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       await page.locator('#notePreset').selectOption('1');
       const complaint=await page.locator('[name=complaint]').inputValue();
       await page.locator('#notePreset').selectOption('');
@@ -102,8 +124,10 @@ test('note page exposes published cases and generates daily notes without sendin
     const {page,context,errors}=await pageFor(width);
     try{
       let sent;
-      await page.route('**/api/note-generate',route=>{sent=route.request().postDataJSON();return route.fulfill({json:{label:'术后病程记录',text:'虚构示例草稿'}});});
+      await mockNote(page,route=>{sent=route.request().postDataJSON();return route.fulfill({json:{label:'术后病程记录',text:'虚构示例草稿'}});},
+        body=>body.type==='caseChapter'&&body.candidates.length?{route:'template',candidateId:body.candidates[0].id}:{route:'separate'});
       await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       const catalog=await (await page.request.get(base+'/note-cases.json')).json();
       assert.equal(await page.locator('#noteCase option').count(),catalog.length+1);
       const manifestFile=fs.readdirSync(path.join(root,'dist')).find(name=>/^library-manifest-.*\.js$/.test(name));
@@ -130,9 +154,10 @@ test('note page exposes published cases and generates daily notes without sendin
       await page.locator('#noteResult').waitFor({state:'visible'});
       assert.equal(sent.type,'postDaily');assert.equal(sent.department,'普外科');
       assert.equal(sent.day,'2');assert.equal(sent.daily,'虚构当日情况');
-      assert.match(sent.caseReference,/肝脓肿/);
+      assert.equal(sent.caseReference,'');
       assert(!JSON.stringify(sent).includes(reference));
       await page.locator('[name=referenceText]').fill('虚构参考格式');
+      await page.locator('[name=operation]').fill('');
       await page.locator('[data-type=caseChapter]').click();
       await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('已生成'));
       assert.equal(sent.type,'caseChapter');assert.equal(sent.referenceText,'虚构参考格式');
@@ -143,13 +168,122 @@ test('note page exposes published cases and generates daily notes without sendin
   }
 });
 
+test('note matches standard templates and keeps per-document routing when special cases are generated separately',async()=>{
+  const {validateInput}=await import('../api/note-generate.js');
+  for(const width of [390,1280]){
+    const {page,context,errors}=await pageFor(width);
+    try{
+      const sent=[], decisions=[];
+      await mockNote(page,(route,body)=>{sent.push(body);return route.fulfill({json:{text:'虚构教学文书正文'}});},body=>{
+        decisions.push(body);
+        const candidate=body.candidates.find(item=>item.caseTitle==='股骨转子间骨折');
+        return body.extra?{route:'separate'}:{route:'template',candidateId:candidate.id};
+      });
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
+      await page.locator('[name=complaint]').fill('虚构示例：摔伤后髋部疼痛');
+      await page.locator('[name=diagnosis]').fill('右股骨转子间骨折');
+      await page.locator('[data-type=first]').click();
+      await page.locator('#noteResult').waitFor({state:'visible'});
+      assert.match(await page.locator('#noteRoute').innerText(),/已参考常规模板：股骨转子间骨折/);
+      assert.match(decisions[0].candidates.find(item=>item.caseTitle==='股骨转子间骨折').operation,/髓内钉/);
+      assert.equal(sent[0].caseReference,'股骨转子间骨折');
+      assert.equal(sent[0].chapterTitle,'首次病程记录');
+      assert(sent[0].referenceText.length>0);
+      assert.doesNotMatch(sent[0].referenceText,/姓名|住院号|床号/);
+      assert.equal(validateInput(sent[0]).error,undefined,'automatically selected excerpt must pass server identity validation');
+      await page.locator('[name=extra]').fill('虚构示例：出现特殊情况');
+      await page.locator('[name=referenceText]').fill('手动参考片段');
+      await page.locator('[data-type=spec]').click();
+      await page.waitForFunction(()=>document.querySelector('#noteDocumentList').children.length===2);
+      assert.match(decisions[1].candidates.find(item=>item.caseTitle==='股骨转子间骨折').chapterTitle,/专科检查片段/);
+      assert.equal(sent[1].referenceText,'');
+      assert.equal(sent[1].caseReference,'');
+      assert.match(await page.locator('#noteRoute').innerText(),/未使用手动参考片段/);
+      await page.locator('#noteDocumentList button').filter({hasText:'首次病程记录'}).click();
+      assert.match(await page.locator('#noteRoute').innerText(),/已参考常规模板/);
+      await page.reload({waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
+      assert.match(await page.locator('#noteRoute').innerText(),/已参考常规模板/);
+      await page.locator('#noteDocumentList button').filter({hasText:'专科检查'}).click();
+      assert.match(await page.locator('#noteRoute').innerText(),/单独生成/);
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
+test('note classification failures pause the batch and preserve the existing document for resume',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    let fail=false, generated=0;
+    await page.route('**/api/note-generate',route=>{
+      const body=route.request().postDataJSON();
+      if(body.action==='classify')return fail?route.fulfill({status:429,json:{error:'识别请求过于频繁'}}):route.fulfill({json:{route:'separate'}});
+      generated++;return route.fulfill({json:{text:'虚构教学文书正文'}});
+    });
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
+    await page.locator('#notePreset').selectOption('0');
+    await page.locator('[data-type=spec]').click();
+    await page.locator('#noteResult').waitFor({state:'visible'});
+    await page.locator('#noteOutput').fill('已核对的旧文书');
+    fail=true;
+    await page.locator('#noteGenerateSet').click();
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('本套已暂停'));
+    assert.equal(generated,1);
+    assert.equal(await page.locator('#noteOutput').inputValue(),'已核对的旧文书');
+    assert.match(await page.locator('#noteResume').innerText(),/4 份/);
+    fail=false;
+    await page.locator('#noteResume').click();
+    await page.waitForFunction(()=>document.querySelector('#noteDocumentList').children.length===5&&document.querySelector('#noteForm').getAttribute('aria-busy')==='false');
+    assert.equal(generated,5);
+    await page.locator('#noteDocumentList button').filter({hasText:'专科检查'}).click();
+    assert.equal(await page.locator('#noteOutput').inputValue(),'已核对的旧文书');
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('note template loading timeout keeps the previous document and restores controls',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    let match=false, generated=0,release,seen;
+    const requestSeen=new Promise(resolve=>{seen=resolve;});
+    const held=new Promise(resolve=>{release=resolve;});
+    await mockNote(page,(route)=>{generated++;return route.fulfill({json:{text:'已有虚构正文'}});},body=>{
+      const candidate=body.candidates.find(item=>item.caseTitle==='股骨转子间骨折');
+      return match?{route:'template',candidateId:candidate.id}:{route:'separate'};
+    });
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
+    await page.locator('[name=complaint]').fill('虚构示例：摔伤后髋部疼痛');
+    await page.locator('[name=diagnosis]').fill('右股骨转子间骨折');
+    await page.locator('[data-type=first]').click();
+    await page.locator('#noteResult').waitFor({state:'visible'});
+    await page.locator('#noteOutput').fill('已编辑的旧文书');
+    await page.clock.install();
+    await page.route('**/records-*.json',async route=>{seen();await held;await route.abort().catch(()=>{});});
+    match=true;
+    await page.locator('[data-type=spec]').click();
+    await requestSeen;
+    await page.clock.fastForward(66000);
+    await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('模板加载超时'));
+    release();
+    assert.equal(generated,1);
+    assert.equal(await page.locator('#noteOutput').inputValue(),'已编辑的旧文书');
+    assert(await page.locator('[name=diagnosis]').isEnabled());
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('note edits and reference selection survive reload; copying pastes only the full edited body',async()=>{
   for(const width of [390,1280]){
     const {page,context,errors}=await pageFor(width);
     try{
       await context.grantPermissions(['clipboard-read','clipboard-write']);
-      await page.route('**/api/note-generate',route=>route.fulfill({json:{label:'首次病程记录',text:'虚构教学病历正文'}}));
+      await mockNote(page,route=>route.fulfill({json:{label:'首次病程记录',text:'虚构教学病历正文'}}));
       await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       const catalog=await (await page.request.get(base+'/note-cases.json')).json();
       const caseIndex=catalog.findIndex(item=>item.chapters.some(chapter=>chapter.hasBody));
       await page.locator('#noteCase').selectOption(String(caseIndex));
@@ -164,6 +298,7 @@ test('note edits and reference selection survive reload; copying pastes only the
       const edited='首次病程记录（虚构测试）\n\n一、病例特点\n摔伤致右髋部疼痛3小时，右股骨颈骨折。Hb 108 g/L，CRP > 10 mg/L，足趾活动存在。\n\n二、拟诊讨论\n结合受伤经过、局部体征与影像分析。\n\n三、诊疗计划\n1. 根据评估完善检查。\n2. 右下肢暂不负重。\n\n医师签名：';
       await page.locator('#noteOutput').fill(edited);
       await page.reload({waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       assert.equal(await page.locator('#noteOutput').inputValue(),edited);
       assert.equal(await page.locator('#noteCase').inputValue(),String(caseIndex));
       assert.equal(await page.locator('#noteChapter').inputValue(),String(chapterIndex));
@@ -190,6 +325,7 @@ test('note edits and reference selection survive reload; copying pastes only the
       }
       await page.locator('#noteOutput').fill('');
       await page.reload({waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       assert(await page.locator('#noteResult').isHidden(),'deleting all text must not restore the previous body');
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
@@ -200,8 +336,9 @@ test('note failures preserve edited content and restore controls, including a cl
   const {page,context,errors}=await pageFor(390);
   try{
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.locator('#notePreset').selectOption('0');
-    await page.route('**/api/note-generate',route=>route.fulfill({json:{label:'手术记录',text:'原始生成正文'}}));
+    await mockNote(page,route=>route.fulfill({json:{label:'手术记录',text:'原始生成正文'}}));
     await page.locator('[data-type=op]').click();
     await page.locator('#noteResult').waitFor({state:'visible'});
     const edited='已编辑正文：未输血，未放置引流管。';
@@ -212,7 +349,7 @@ test('note failures preserve edited content and restore controls, including a cl
       {status:502,json:{error:'生成内容被截断'}}, {status:504,body:'upstream timeout'},
       {status:200,body:'<html>bad gateway</html>'}, {status:200,json:{text:''}}, {status:200,json:null}
     ]){
-      await page.route('**/api/note-generate',route=>route.fulfill(fulfill));
+      await mockNote(page,route=>route.fulfill(fulfill));
       await page.locator('[data-type=op]').click();
       await page.waitForFunction(()=>document.querySelector('#noteForm').getAttribute('aria-busy')==='false');
       assert.equal(await page.locator('#noteOutput').inputValue(),edited);
@@ -221,7 +358,7 @@ test('note failures preserve edited content and restore controls, including a cl
       assert(await page.locator('#noteClear').isEnabled());
       assert(await page.locator('#noteChapter').isDisabled());
     }
-    await page.route('**/api/note-generate',route=>route.abort('failed'));
+    await mockNote(page,route=>route.abort('failed'));
     await page.locator('[data-type=op]').click();
     await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('网络连接失败'));
     assert.equal(await page.locator('#noteOutput').inputValue(),edited);
@@ -230,7 +367,7 @@ test('note failures preserve edited content and restore controls, including a cl
     let release,requestSeen;
     const seen=new Promise(resolve=>{requestSeen=resolve;});
     const held=new Promise(resolve=>{release=resolve;});
-    await page.route('**/api/note-generate',async route=>{requestSeen();await held;await route.fulfill({json:{label:'迟到结果',text:'不得覆盖原文'}}).catch(()=>{});});
+    await mockNote(page,async route=>{requestSeen();await held;await route.fulfill({json:{label:'迟到结果',text:'不得覆盖原文'}}).catch(()=>{});});
     await page.locator('[data-type=op]').click();
     await seen;
     assert(await page.locator('[name=diagnosis]').isDisabled());
@@ -258,6 +395,7 @@ test('note failures preserve edited content and restore controls, including a cl
     assert.equal(await page.locator('#noteOutput').inputValue(),edited);
     assert(await page.locator('#noteClear').isEnabled());
     await page.reload({waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     assert.equal(await page.locator('#noteOutput').inputValue(),edited);
     assert.deepEqual(errors,[]);
   }finally{await context.close();}
@@ -271,8 +409,9 @@ test('note reports blocked session storage and selects the entire body when clip
       Object.defineProperty(navigator,'clipboard',{value:{writeText:()=>Promise.reject(new Error('blocked'))}});
       document.execCommand=()=>false;
     });
-    await page.route('**/api/note-generate',route=>route.fulfill({json:{label:'手术记录',text:'虚构正文\n未输血。\n医师签名：'}}));
+    await mockNote(page,route=>route.fulfill({json:{label:'手术记录',text:'虚构正文\n未输血。\n医师签名：'}}));
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.locator('#notePreset').selectOption('0');
     await page.locator('[data-type=op]').click();
     await page.locator('#noteResult').waitFor({state:'visible'});
@@ -291,12 +430,13 @@ test('note sets resume only unfinished documents after reload and preserve separ
     try{
       await context.grantPermissions(['clipboard-read','clipboard-write']);
       const sent=[]; let fail=true;
-      await page.route('**/api/note-generate',route=>{
+      await mockNote(page,route=>{
         const body=route.request().postDataJSON();sent.push(body);
         if(body.type==='preop'&&fail){fail=false;return route.fulfill({status:429,json:{error:'生成请求过于频繁，请稍后重试'}});}
         return route.fulfill({json:{text:body.type+'（虚构测试）\n右股骨颈骨折。Hb 108 g/L，青霉素过敏。\n医师签名：'}});
       });
       await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       await page.locator('#notePreset').selectOption('0');
       await page.locator('.note-details').filter({has:page.locator('[name=allergies]')}).locator('summary').click();
       await page.locator('[name=allergies]').fill('青霉素过敏');
@@ -307,6 +447,7 @@ test('note sets resume only unfinished documents after reload and preserve separ
       const edited='首次病程记录（虚构测试）\nHb 108 g/L，青霉素过敏。\n1. 右下肢暂不负重。\n医师签名：';
       await page.locator('#noteOutput').fill(edited);
       await page.reload({waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       assert.equal(sent.length,2,'refresh must not send an AI request');
       assert.equal(await page.locator('#noteOutput').inputValue(),edited);
       await page.locator('#noteResume').click();
@@ -326,6 +467,7 @@ test('note sets resume only unfinished documents after reload and preserve separ
       assert.equal(await page.locator('#workflowPaste').inputValue(),edited);
       await page.locator('#workflowPaste').evaluate(el=>el.remove());
       await page.reload({waitUntil:'networkidle'});
+      await openNoteInputs(page,true);
       assert.equal(await page.locator('#noteDocumentList button').count(),4);
       assert.equal(await page.locator('#noteOutput').inputValue(),edited);
       if(process.env.NOTE_WORKFLOW_EVIDENCE_DIR){
@@ -349,8 +491,9 @@ test('note next day clears changes, keeps baseline and earlier documents, and su
   const {page,context,errors}=await pageFor(390);
   try{
     const sent=[];
-    await page.route('**/api/note-generate',route=>{const body=route.request().postDataJSON();sent.push(body);return route.fulfill({json:{text:'虚构：术后第'+body.day+'天正文\n'+body.daily}});});
+    await mockNote(page,route=>{const body=route.request().postDataJSON();sent.push(body);return route.fulfill({json:{text:'虚构：术后第'+body.day+'天正文\n'+body.daily}});});
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.locator('#notePreset').selectOption('0');
     await page.locator('[name=day]').fill('2');
     await page.locator('[name=daily]').fill('第2天新结果 Hb 98 g/L。');
@@ -360,6 +503,7 @@ test('note next day clears changes, keeps baseline and earlier documents, and su
     await page.locator('[name=day]').fill('3');
     assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('hajimi-note-draft-v1')).day),'2','uncommitted day edits must not persist with old daily facts');
     await page.reload({waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     assert.equal(await page.locator('[name=day]').inputValue(),'2');
     assert.equal(await page.locator('[name=daily]').inputValue(),'第2天新结果 Hb 98 g/L。');
     page.once('dialog',d=>d.dismiss());
@@ -381,6 +525,7 @@ test('note next day clears changes, keeps baseline and earlier documents, and su
     assert.equal(await page.locator('#noteDocumentList button').count(),2);
     page.once('dialog',d=>d.accept());await page.locator('#noteNewCase').click();
     await page.reload({waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     assert(await page.locator('#noteResult').isHidden());
     assert.equal(await page.locator('[name=diagnosis]').inputValue(),'');
     assert.equal(await page.locator('[name=daily]').inputValue(),'');
@@ -395,8 +540,9 @@ test('note batch validates all requests before sending and stopping retains an e
     let count=0,release,seen;
     const requestSeen=new Promise(resolve=>{seen=resolve;});
     const held=new Promise(resolve=>{release=resolve;});
-    await page.route('**/api/note-generate',async route=>{count++;seen();await held;await route.fulfill({json:{text:'虚构第一份正文'}});});
+    await mockNote(page,async route=>{count++;seen();await held;await route.fulfill({json:{text:'虚构第一份正文'}});});
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.locator('[name=complaint]').fill('虚构右髋疼痛');
     await page.locator('[name=diagnosis]').fill('右股骨颈骨折');
     await page.locator('#noteGenerateSet').click();
@@ -408,7 +554,9 @@ test('note batch validates all requests before sending and stopping retains an e
     await page.waitForFunction(()=>document.querySelector('#noteStatus').textContent.includes('已停止'));
     assert.equal(count,1);assert.equal(await page.locator('#noteDocumentList button').count(),1);
     assert.match(await page.locator('#noteResume').innerText(),/3 份/);
-    await page.reload({waitUntil:'networkidle'});assert.equal(count,1);
+    await page.reload({waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
+    assert.equal(count,1);
     page.once('dialog',d=>d.dismiss());
     await page.locator('[data-type=spec]').click();
     assert.equal(count,1);
@@ -429,11 +577,14 @@ test('note migrates the previous single result and does not resurrect it after d
   const {page,context,errors}=await pageFor(390);
   try{
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.evaluate(()=>{sessionStorage.removeItem('hajimi-note-documents-v1');sessionStorage.setItem('hajimi-note-result-v1',JSON.stringify({label:'旧版手术记录',text:'旧版本已编辑正文\n未输血。'}));});
     await page.reload({waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     assert.equal(await page.locator('#noteOutput').inputValue(),'旧版本已编辑正文\n未输血。');
     page.once('dialog',d=>d.accept());await page.locator('#noteClear').click();
     await page.reload({waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     assert(await page.locator('#noteResult').isHidden());assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
@@ -442,8 +593,9 @@ test('note protects partial facts during preset changes and isolates preoperativ
   const {page,context,errors}=await pageFor(390);
   try{
     let count=0;
-    await page.route('**/api/note-generate',route=>{count++;return route.fulfill({json:{text:'虚构病程正文'}});});
+    await mockNote(page,route=>{count++;return route.fulfill({json:{text:'虚构病程正文'}});});
     await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page,true);
     await page.locator('.note-details').filter({has:page.locator('[name=allergies]')}).locator('summary').click();
     await page.locator('[name=allergies]').fill('青霉素过敏');
     page.once('dialog',d=>d.dismiss());await page.locator('#notePreset').selectOption('0');
@@ -658,13 +810,46 @@ test('reviewed intertrochanteric case exposes 30 consistent teaching chapters on
 test('homepage is usable without JavaScript and avoids loading clinical data', async()=>{
   const {page,context}=await pageFor(393,{javaScriptEnabled:false});
   try {await page.goto(base+'/');assert(await page.locator('#portalHome').isVisible());
-    assert.equal(await page.getByRole('link',{name:'病历模板',exact:true}).count(),1);
+    assert.equal(await page.getByRole('link',{name:'AI 病历生成',exact:true}).getAttribute('href'),'/note');
     assert.equal(await page.locator('script[src*="app.js"],script[src*="record-quality"],#libraryShell').count(),0);
-    assert.equal(await page.locator('.official-feature').count(),6);
-    assert.equal(await page.locator('a.card-classification[href="/classification"]').count(),1);
-    assert.equal(await page.locator('a.card-ecg[href="/ecg"]').count(),1);
-    assert.match(await page.locator('a.card-ecg p').innerText(),/心电图基础.*围手术期/);
+    assert.equal(await page.locator('.home-quick-grid a').count(),4);
+    assert.match(await page.locator('a.ws-row[href="/ecg"]').innerText(),/心电图基础.*围手术期/);
+    assert.equal(await page.getByRole('navigation',{name:'主导航'}).getByRole('link').count(),5);
   } finally {await context.close();}
+});
+
+test('workspace routes, mobile bottom tabs and browser-local case history', async()=>{
+  for(const width of [390,1440]){
+    const {page,context,errors}=await pageFor(width);
+    try {
+      await page.goto(base+'/library.html');
+      await page.waitForURL(base+'/');
+      const nav=page.getByRole('navigation',{name:'主导航'});
+      assert.deepEqual(await nav.getByRole('link').allTextContents(),['工作台','临床','资料','学习','我的']);
+      const bounds=await nav.boundingBox();
+      if(width<720) assert.ok(bounds.y>800&&Math.abs(bounds.y+bounds.height-900)<2,'tabs sit at the viewport bottom');
+      else assert.ok(bounds.x+bounds.width<215&&bounds.y<120,'desktop navigation is in the left rail');
+      for(const [label,route,title] of [['临床','clinical','临床'],['资料','materials','资料'],['学习','study','学习'],['我的','personal','我的'],['工作台','','个人工作台']]){
+        await nav.getByRole('link',{name:label,exact:true}).click();
+        await page.waitForURL(base+'/'+route);
+        assert.equal(await page.locator('h1').innerText(),title);
+        assert.equal(await nav.locator('[aria-current="page"]').innerText(),label);
+        assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth),'no viewport overflow: '+route);
+      }
+      await page.getByRole('link',{name:'AI 病历生成',exact:true}).click();
+      await page.waitForURL(base+'/note');
+      await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});
+      await page.locator('#favoriteDisease').click();
+      await page.goto(base+'/');
+      const resume=page.locator('[data-workstation-list="recent"] a[href="/bl/guke/TKA"]');
+      await resume.waitFor();
+      assert.match(await resume.innerText(),/全膝关节置换/);
+      await page.locator('a[href="/personal#favorites"]').click();
+      await page.waitForURL(base+'/personal#favorites');
+      await page.locator('[data-workstation-list="favorites"] a[href="/bl/guke/TKA"]').waitFor();
+      assert.deepEqual(errors,[]);
+    } finally {await context.close();}
+  }
 });
 
 test('ECG routes share the public layout, expose learning sections, case practice and report pages',async()=>{
@@ -745,7 +930,12 @@ test('ECG routes share the public layout, expose learning sections, case practic
       assert.match(await page.locator('#ecg-oncall').innerText(),/术后气促/);
       assert.match(await page.locator('#ecg-oncall').innerText(),/术后心悸/);
       assert.equal(requests.filter(url=>/^\/(?:api\/|catalog-|records-|app-runtime-|department-runtime-)/.test(url)).length,0,'ECG remains independent of private administration and clinical-record loading');
-      for(const route of ['/','/classification','/pathway','/tools','/duty']){
+      for(const route of ['/','/clinical']){
+        await page.goto(base+route,{waitUntil:'networkidle'});
+        await page.getByRole('main').locator('a[href="/ecg"]').click();
+        await page.waitForURL(base+'/ecg');
+      }
+      for(const route of ['/classification','/pathway','/tools','/duty']){
         await page.goto(base+route,{waitUntil:'networkidle'});
         assert.equal(await page.locator('header nav a[href="/ecg"]').count(),1,'public ECG navigation on '+route);
       }
@@ -799,6 +989,28 @@ test('ECG atlas searches Chinese and exact abbreviations, keeps query on refresh
   }
 });
 
+test('ECG data bundle: a failed download shows a message, and a search typed before the data arrives still answers',async()=>{
+  const {page,context,errors}=await pageFor(375);
+  try{
+    // Direct landing on a data page while the data bundle is unreachable.
+    await context.route(/\/assets\/ecg-data-[0-9a-f]{20}\.js$/,route=>route.abort());
+    await page.goto(base+'/ecg/atlas',{waitUntil:'networkidle'});
+    await page.waitForFunction(()=>document.getElementById('ecgApp').textContent.includes('暂时无法加载'));
+    await context.unroute(/\/assets\/ecg-data-[0-9a-f]{20}\.js$/);
+    // The home page renders without the data; the search waits for it instead of failing.
+    let release;const held=new Promise(resolve=>{release=resolve;});
+    await context.route(/\/assets\/ecg-data-[0-9a-f]{20}\.js$/,async route=>{await held;await route.continue();});
+    await page.goto(base+'/ecg',{waitUntil:'domcontentloaded'});
+    await page.locator('#ecgApp .ecg-entry-grid').waitFor();
+    await page.locator('#ecgGlobalSearch').fill('房颤');
+    assert(await page.locator('#ecgGlobalResults').isHidden(),'no results before the data arrives');
+    release();
+    await page.locator('#ecgGlobalResults [role="option"]').first().waitFor();
+    assert.match(await page.locator('#ecgGlobalResults').innerText(),/心房颤动/);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('ECG framework navigates in-page, searches the whole section from the keyboard and measures sketches with calipers',async()=>{
   for(const width of [375,1440]){
     const {page,context,errors}=await pageFor(width);
@@ -806,8 +1018,11 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
       const scripts=[];page.on('request',request=>{if(request.resourceType()==='script')scripts.push(new URL(request.url()).pathname);});
       await page.goto(base+'/ecg',{waitUntil:'networkidle'});
       const bundle=scripts.filter(item=>/^\/assets\/ecg-[0-9a-f]{20}\.js$/.test(item));
-      assert.equal(bundle.length,1,'one hashed ECG bundle');
-      assert.equal(scripts.filter(item=>/\/ecg-(?:data|book-data)/.test(item)).length,0,'source data files are bundled');
+      assert.equal(bundle.length,1,'one hashed ECG shell bundle');
+      assert.equal(scripts.filter(item=>/^\/ecg-(?:data|book-data)/.test(item)).length,0,'source data files are bundled');
+      // P1-3：资料包单独成包，首页最多在空闲时预取一次，之后的站内跳转不再下载。
+      assert(scripts.filter(item=>/^\/assets\/ecg-data-[0-9a-f]{20}\.js$/.test(item)).length<=1,'the data bundle is fetched at most once');
+      const fetched=scripts.length;
       // In-section links render without another document load or data download.
       await page.evaluate(()=>{window.__ecgMarker=1;});
       await page.locator('#ecgApp a[href="/ecg/atlas"]').first().click();
@@ -815,6 +1030,7 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
       assert.equal(await page.locator('h1').innerText(),'图谱库');
       assert.equal(await page.evaluate(()=>window.__ecgMarker),1,'no full page reload');
       assert(await page.locator('#ecgGlobalSearchForm').isHidden(),'atlas uses its own filter');
+      assert(scripts.slice(fetched).every(item=>/^\/assets\/ecg-data-[0-9a-f]{20}\.js$/.test(item)),'in-section navigation loads nothing but (at most) the data bundle');
       await page.locator('a[href="/ecg/atlas/pulmonary"]').first().click();
       await page.locator('a[href="/ecg/atlas/pulmonary/pulmonary-embolism"]').click();
       await page.waitForURL(base+'/ecg/atlas/pulmonary/pulmonary-embolism');
@@ -830,7 +1046,8 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
       await page.goBack();await settle(page);await page.goBack();await settle(page);
       assert.equal(await page.locator('h1').innerText(),'心电图');
       assert.equal(await page.locator('#ecgReviewFooter').innerText().then(text=>/参考文献：见各栏目及词条/.test(text)),true,'footer metadata resets');
-      assert.equal(scripts.filter(item=>item.startsWith('/assets/ecg-')).length,1,'bundle downloaded once');
+      assert.equal(scripts.filter(item=>/^\/assets\/ecg-[0-9a-f]{20}\.js$/.test(item)).length,1,'shell bundle downloaded once');
+      assert.equal(scripts.filter(item=>/^\/assets\/ecg-data-[0-9a-f]{20}\.js$/.test(item)).length,1,'data bundle downloaded once');
       // Global search: "/" focuses, results span long-form pages, keyboard opens the result.
       await page.keyboard.press('/');
       assert.equal(await page.evaluate(()=>document.activeElement.id),'ecgGlobalSearch');
@@ -871,6 +1088,30 @@ test('ECG framework navigates in-page, searches the whole section from the keybo
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
   }
+});
+
+test('ECG navigation that waits for the data bundle still leaves focus in a search box the reader moved to',async()=>{
+  const {page,context,errors}=await pageFor(1440);
+  try{
+    // Hold the data bundle so the navigation from the home page has to wait for it (as on a slow connection).
+    let release;const held=new Promise(resolve=>{release=resolve;});
+    await context.route(/\/assets\/ecg-data-[0-9a-f]{20}\.js$/,async route=>{await held;await route.continue();});
+    await page.goto(base+'/ecg',{waitUntil:'domcontentloaded'});
+    await page.locator('#ecgApp .ecg-entry-grid').waitFor();
+    await page.locator('main a[href="/ecg/basics"]').first().click();
+    await page.locator('#ecgGlobalSearch').focus();
+    release();
+    await page.locator('#ecgApp section').first().waitFor();
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.equal(await page.evaluate(()=>document.activeElement.id),'ecgGlobalSearch','focus stays where the reader put it');
+    // Without that, the late render still moves focus to the new page title.
+    await page.goto(base+'/ecg',{waitUntil:'networkidle'});
+    await page.locator('main a[href="/ecg/periop"]').first().click();
+    await page.waitForURL(base+'/ecg/periop');
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.equal(await page.evaluate(()=>document.activeElement.id),'ecgTitle');
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
 });
 
 test('ECG in-page navigation does not pull focus away from a search started before the next frame',async()=>{
@@ -1120,6 +1361,63 @@ test('ECG tools calculate both QTc formulas and RR heart rate, discard stale res
   }
 });
 
+test('record library cards are real links: href deep links, in-page navigation on click or Enter, new tab with Ctrl',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    await page.goto(base+'/bl',{waitUntil:'networkidle'});
+    assert.equal(await page.locator('[role="button"].department-card,[role="button"].ortho-disease-card,[role="button"].disease-card,[role="button"].case-search-card,article.department-card').count(),0,'no clickable non-link cards');
+    const dept=page.locator('a.library-department-card[href="/bl/puwai"]');
+    assert.equal(await dept.count(),1);
+    await page.evaluate(()=>{window.__libraryMarker=1;});
+    await dept.click();await page.waitForURL(base+'/bl/puwai');
+    assert.equal(await page.evaluate(()=>window.__libraryMarker),1,'plain click stays in the page');
+    const disease=page.locator('a.disease-card').first();
+    assert.match(await disease.getAttribute('href'),/^\/bl\/puwai\/[^/]+$/);
+    // Ctrl/⌘/Shift/中键点击：卡片自己的处理器不能拦截（交给浏览器按 href 在新标签页打开），当前页面也不在页内跳转。
+    // 不依赖浏览器真的打开新标签页（CI 上新标签页的导航时有时无，见 #158 的 CI）：在文档上记录点击是否已被拦截，
+    // 然后由测试自己拦下默认行为，避免真的打开或跳转。
+    const href=await disease.getAttribute('href');
+    await page.evaluate(()=>{window.__clicks=[];document.addEventListener('click',event=>{if(event.target.closest('a.disease-card')){window.__clicks.push(event.defaultPrevented);event.preventDefault();}});});
+    for(const modifiers of [[process.platform==='darwin'?'Meta':'Control'],['Shift']])await disease.click({modifiers});
+    await disease.click({button:'middle'});
+    await page.waitForTimeout(200);
+    assert.deepEqual(await page.evaluate(()=>window.__clicks),[false,false],'modified clicks are left to the browser (middle clicks fire auxclick, not click)');
+    assert.equal(new URL(page.url()).pathname,'/bl/puwai','no in-page navigation for modified clicks');
+    assert.equal(await page.evaluate(()=>window.__libraryMarker),1);
+    // Keyboard: Tab focus + Enter follows the link in-page.
+    await disease.focus();await page.keyboard.press('Enter');
+    await page.waitForURL(url=>url.pathname===new URL(base+href).pathname);
+    assert.equal(await page.evaluate(()=>window.__libraryMarker),1);
+    // Orthopaedic index and search results use links too.
+    await page.goto(base+'/bl/guke',{waitUntil:'networkidle'});
+    const ortho=page.locator('a.ortho-disease-card[href^="/bl/guke/"]');
+    assert((await ortho.count())>0);
+    await page.goto(base+'/bl?q=%E8%82%9D%E8%84%93%E8%82%BF',{waitUntil:'networkidle'});
+    await page.locator('a.case-search-card').first().waitFor();
+    assert.match(await page.locator('a.case-search-card').first().getAttribute('href'),/^\/bl\/puwai\//);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('classification renders correctly whichever script arrives first (async classification.js vs deferred data)',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try{
+    for(const [slow,route,check] of [
+      ['classification-data','/classification','.class-dept-card'],
+      ['classification-data','/classification/guke/femoral-neck','.class-type-detailed'],
+      ['classification.js','/classification/guke/femoral-neck','.class-type-detailed'],
+      ['classification-detail-v2-lower','/classification/guke/femoral-neck','.class-type-detailed']]){
+      await context.unroute('**/*');
+      await context.route('**/api/session',route=>route.fulfill({json:{authenticated:false,user:null}}));
+      await context.route(url=>new URL(url).pathname.startsWith('/'+slow),async route=>{await new Promise(resolve=>setTimeout(resolve,600));await route.continue();});
+      await page.goto(base+route,{waitUntil:'networkidle'});
+      await page.locator(check).first().waitFor({state:'attached'});
+      assert.doesNotMatch(await page.locator('#classificationApp').innerText(),/暂时无法加载/,slow+' late on '+route);
+    }
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('classification is a separate department-first hub with 17 orthopedic dossiers, references, and deep links',async()=>{
  for(const width of [375,1440]){
   const {page,context,errors}=await pageFor(width);
@@ -1173,6 +1471,8 @@ test('every original orthopedic disease now explains fracture-line morphology an
   ];
   for(const [id,n,code,feature] of cases){
    await page.goto(base+'/classification/guke/'+id,{waitUntil:'domcontentloaded'});
+   // 逐型详情按需加载（P1-3），渲染在 DOMContentLoaded 之后完成。
+   await page.locator('#class-types').waitFor();
    const cards=page.locator('.class-type-detailed');
    const actual=await cards.count();
    if(actual!==n){
@@ -1815,7 +2115,7 @@ test('administrator can download a backup and restore it with revision protectio
       let revision='fixture-v1',restored=false,restorePayload;
       const backup={id:'1791500000000-550e8400-e29b-41d4-a716-446655440000',createdAt:'2026-10-09T00:00:00Z',user:'fixture-admin',action:'save',templateCount:1,caseCount:0};
       await context.route('**/api/content',route=>route.fulfill({json:{version:1,revision,templateOverrides:restored?{}:{sample:{body:'Fixture record'}},cases:[]}}));
-      await context.route('**/api/content-history*',route=>{
+      await context.route(/\/api\/content\?feed=history/,route=>{
         if(route.request().method()==='POST'){restorePayload=route.request().postDataJSON();revision='fixture-v2';restored=true;return route.fulfill({json:{ok:true}});}
         if(new URL(route.request().url()).searchParams.has('id'))return route.fulfill({json:{version:1,templateOverrides:{},cases:[]}});
         return route.fulfill({json:{revision,history:[backup]}});
@@ -1838,7 +2138,7 @@ test('central management searches, paginates, edits templates and cases, and mai
     try{
       let data={version:1,revision:'fixture-v1',templateOverrides:{'示例病种 · 入院记录':{body:'原有自定义正文'}},cases:Array.from({length:54},(_,index)=>({id:'case-'+index,template:'示例病种 · 入院记录',title:'案例 '+index,description:'经过脱敏的说明',published:index!==0,images:index<2?['cases/shared.jpg']:[],createdAt:'2026-01-01T00:00:00Z'}))},writes=0,uploads=[];
       await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
-      await context.route('**/api/content-history*',route=>route.fulfill({json:{revision:data.revision,history:[]}}));
+      await context.route(/\/api\/content\?feed=history/,route=>route.fulfill({json:{revision:data.revision,history:[]}}));
       await context.route('**/api/content',route=>{
         if(route.request().method()==='PUT'){const next=route.request().postDataJSON();assert.equal(next.revision,data.revision);writes++;data={...next,revision:'fixture-v'+(writes+1)};}
         return route.fulfill({json:data});
@@ -1868,7 +2168,7 @@ test('central editor preserves a conflicting draft and exports it without overwr
   try{
     const name='示例病种 · 入院记录';let attempts=0,lastPayload;
     await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
-    await context.route('**/api/content-history*',route=>route.fulfill({json:{revision:'fixture-v1',history:[]}}));
+    await context.route(/\/api\/content\?feed=history/,route=>route.fulfill({json:{revision:'fixture-v1',history:[]}}));
     await context.route('**/api/content',route=>{if(route.request().method()==='PUT'){attempts++;lastPayload=route.request().postDataJSON();return route.fulfill({status:409,json:{error:'资料已在其他页面更新'}});}return route.fulfill({json:{version:1,revision:'fixture-v1',templateOverrides:{[name]:{body:'旧正文'}},cases:[]}});});
     await page.goto(base+'/admin',{waitUntil:'networkidle'});await page.getByRole('button',{name:'编辑正文',exact:true}).click();await page.locator('#managedTemplateBody').fill('待核对的编辑草稿');await page.getByRole('button',{name:'保存正文',exact:true}).click();await page.waitForSelector('#managedTemplateError:visible');assert.equal(lastPayload.revision,'fixture-v1');assert.equal(await page.locator('#managedTemplateBody').inputValue(),'待核对的编辑草稿');assert.match(await page.locator('#managedTemplateError').innerText(),/下载本次草稿/);
     const downloading=page.waitForEvent('download');await page.getByRole('button',{name:'下载本次草稿',exact:true}).click();const downloaded=JSON.parse(fs.readFileSync(await (await downloading).path(),'utf8'));assert.deepEqual(downloaded,{template:name,body:'待核对的编辑草稿'});
@@ -1880,7 +2180,7 @@ test('case retry reuses an uploaded image and logout clears private lists and ed
   const {page,context,errors}=await pageFor(375);
   try{
     let authenticated=true,uploads=0,writes=0,data={version:1,revision:'fixture-v1',templateOverrides:{},cases:[{id:'private-case',template:'示例模板',title:'私有案例',description:'私有草稿说明',published:false,images:[]}]};
-    await context.route('**/api/session',route=>route.fulfill({json:{authenticated,user:'fixture-admin'}}));await context.route('**/api/logout',route=>{authenticated=false;return route.fulfill({json:{ok:true}});});await context.route('**/api/content-history*',route=>route.fulfill({json:{revision:data.revision,history:[]}}));
+    await context.route('**/api/session',route=>{if(route.request().method()==='DELETE'){authenticated=false;return route.fulfill({json:{ok:true}});}return route.fulfill({json:{authenticated,user:'fixture-admin'}});});await context.route(/\/api\/content\?feed=history/,route=>route.fulfill({json:{revision:data.revision,history:[]}}));
     await context.route('**/api/content',route=>{if(route.request().method()==='PUT'){writes++;if(writes===1)return route.fulfill({status:503,json:{error:'备份失败，未保存'}});data={...route.request().postDataJSON(),revision:'fixture-v2'};}return route.fulfill({json:data});});
     await context.route('**/api/upload',route=>{uploads++;return route.fulfill({json:{pathname:'cases/upload-once.jpg'}});});await context.route('**/api/image?*',route=>route.fulfill({status:404}));
     await page.goto(base+'/admin',{waitUntil:'networkidle'});await page.locator('#managerKind').selectOption('cases');await page.getByRole('button',{name:'编辑案例',exact:true}).click();const png=await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=2;canvas.height=2;return canvas.toDataURL('image/png').split(',')[1];});await page.locator('#managedCaseForm input[name="images"]').setInputFiles({name:'retry.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});await page.locator('#managedCaseForm input[name="title"]').fill('保留的案例草稿');await page.getByRole('button',{name:'保存案例',exact:true}).click();await page.waitForSelector('#managedCaseError:visible');assert.equal(uploads,1);assert.equal(await page.locator('#managedCaseForm input[name="title"]').inputValue(),'保留的案例草稿');assert.equal(data.cases[0].title,'私有案例');
@@ -1893,12 +2193,12 @@ test('failed admin reads disable management; late responses after logout cannot 
   const {page,context,errors}=await pageFor(375);
   try{
     await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
-    await context.route('**/api/content',route=>route.fulfill({status:503,json:{error:'资料读取失败'}}));await context.route('**/api/content-history*',route=>route.fulfill({status:503,json:{error:'历史读取失败'}}));
+    await context.route('**/api/content',route=>route.fulfill({status:503,json:{error:'资料读取失败'}}));await context.route(/\/api\/content\?feed=history/,route=>route.fulfill({status:503,json:{error:'历史读取失败'}}));
     await page.goto(base+'/admin',{waitUntil:'networkidle'});assert(await page.locator('#adminDataError').isVisible());assert.equal(await page.locator('#overrideCount').innerText(),'—');assert(await page.locator('#managerSearch').isDisabled());assert(await page.locator('#managerControls').evaluate(element=>element.disabled));assert(await page.locator('#downloadCurrent').isDisabled());assert.equal(await page.locator('#managerList .manager-item').count(),0);
     let release,authenticated=true;const pending=new Promise(resolve=>release=resolve);
-    await context.route('**/api/session',route=>route.fulfill({json:{authenticated,user:'fixture-admin'}}));await context.route('**/api/logout',route=>{authenticated=false;return route.fulfill({json:{ok:true}});});
+    await context.route('**/api/session',route=>{if(route.request().method()==='DELETE'){authenticated=false;return route.fulfill({json:{ok:true}});}return route.fulfill({json:{authenticated,user:'fixture-admin'}});});
     await context.route('**/api/content',async route=>{await pending;return route.fulfill({json:{version:1,revision:'fixture-v1',templateOverrides:{private:{body:'私有模板正文'}},cases:[{id:'private',template:'private',title:'私有案例标题',published:false}]}});});
-    await context.route('**/api/content-history*',async route=>{await pending;return route.fulfill({json:{revision:'fixture-v1',history:[]}});});
+    await context.route(/\/api\/content\?feed=history/,async route=>{await pending;return route.fulfill({json:{revision:'fixture-v1',history:[]}});});
     await page.reload({waitUntil:'domcontentloaded'});await page.waitForSelector('#dashboardPanel:not([hidden])');await page.getByRole('button',{name:'退出登录',exact:true}).click();await page.waitForSelector('#loginPanel:visible');release();await page.waitForLoadState('networkidle');
     assert.equal(await page.locator('#dashboardPanel').isVisible(),false);assert.equal(await page.locator('#managerList .manager-item').count(),0);assert.equal(await page.locator('#managedTemplateBody').inputValue(),'');assert(!((await page.locator('body').innerText()).includes('私有案例标题')));assert.deepEqual(errors,[]);
   }finally{await context.close();}
@@ -1929,8 +2229,7 @@ test('record pages: phone header matches other sections with a scrolling navigat
 test('library logout reports failures, then removes unpublished cases and clears their editor drafts',async()=>{
   const {page,context,errors}=await pageFor(375);
   try{
-    let logouts=0;await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin'}}));
-    await context.route('**/api/logout',route=>{logouts++;return route.fulfill(logouts===1?{status:503,json:{error:'暂不可用'}}:{json:{ok:true}});});
+    let logouts=0;await context.route('**/api/session',route=>{if(route.request().method()==='DELETE'){logouts++;return route.fulfill(logouts===1?{status:503,json:{error:'暂不可用'}}:{json:{ok:true}});}return route.fulfill({json:{authenticated:true,user:'fixture-admin'}});});
     await context.route('**/api/content',async route=>{const name=await page.evaluate(()=>templates[+document.querySelector('.record-book-section .preview').dataset.index].name);return route.fulfill({json:{version:1,revision:'fixture-v1',templateOverrides:{},cases:[{id:'private',template:name,title:'未发布测试案例',description:'待清理的私有草稿',published:false,images:[]},{id:'public',template:name,title:'公开案例',published:true,images:[]}]}});});
     await page.goto(base+'/bl/guke/TKA',{waitUntil:'networkidle'});await page.locator('.record-book-section .preview').first().click();const privateCase=page.locator('.cms-case-card').filter({hasText:'未发布测试案例'});await privateCase.getByRole('button',{name:'编辑：未发布测试案例',exact:true}).click();assert.equal(await page.locator('#cmsCaseForm input[name="title"]').inputValue(),'未发布测试案例');await page.keyboard.press('Escape');await page.keyboard.press('Escape');
     await page.locator('#libraryShell [data-cms-logout]').click();await page.waitForFunction(()=>document.getElementById('toast').textContent.includes('退出失败'));assert.match(await page.locator('#toast').innerText(),/退出失败/);assert(await page.locator('#libraryShell [data-cms-badge]').isVisible());
@@ -2682,7 +2981,7 @@ test('admin dashboard shows the login self-check; signed-out visitors never see 
       await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin',security:[
         {id:'password-hash',ok:false,message:'管理员密码仍使用无盐 SHA-256<img src=x onerror=alert(1)>'},
         {id:'session-secret',ok:true,message:'会话签名密钥长度符合要求。'}]}}));
-      await context.route('**/api/content-history**',route=>route.fulfill({json:{revision:'fixture-v1',updatedAt:null,history:[]}}));
+      await context.route(/\/api\/content\?feed=history/,route=>route.fulfill({json:{revision:'fixture-v1',updatedAt:null,history:[]}}));
       await context.route('**/api/private-gallery',route=>route.fulfill({json:{items:[],revision:'missing'}}));
       await page.reload({waitUntil:'networkidle'});
       await page.locator('#securityCheck').waitFor({state:'visible'});
@@ -2701,7 +3000,7 @@ test('admin dashboard lists recent sign-ins and failed attempts as plain text',a
     try{
       const failure=Array.from({length:8},(_,index)=>({at:new Date(Date.now()-index*60000).toISOString(),kind:index===0?'blocked':'failure',ip:'198.51.100.'+index,country:'US',region:'',city:'',agent:'curl/8.0'}));
       await context.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture-admin',security:[]}}));
-      await context.route('**/api/content-history**',route=>route.fulfill({json:{revision:'fixture-v1',updatedAt:null,history:[]}}));
+      await context.route(/\/api\/content\?feed=history/,route=>route.fulfill({json:{revision:'fixture-v1',updatedAt:null,history:[]}}));
       await context.route('**/api/private-gallery',route=>route.fulfill({json:{items:[],revision:'missing'}}));
       await context.route('**/api/login-log',route=>route.fulfill({json:{success:[{at:'2026-11-11T08:00:00.000Z',kind:'success',ip:'203.0.113.7',country:'CN',region:'SH',city:'上海<img src=x onerror=alert(1)>',
         agent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'}],failure}}));
@@ -2721,6 +3020,308 @@ test('admin dashboard lists recent sign-ins and failed attempts as plain text',a
   }
 });
 
+
+test('complete case framework selects DeepSeek, edits chapters and saves a private full record',async()=>{
+  for(const width of [390,1280]) {
+    const {page,context,errors}=await pageFor(width);
+    try {
+      await page.route('**/api/session',route=>route.fulfill({json:{authenticated:true}}));
+      const generated=[],records=new Map();let saves=0;
+      await mockNote(page,(route,body)=>{
+        generated.push(body);
+        return route.fulfill({json:{text:body.chapterTitle+'\n虚构教学正文，右侧 3*4 cm。\n医师签名：________',model:body.model}});
+      });
+      await page.route('**/api/note-generate?resource=cases*',route=>{
+        const url=new URL(route.request().url()),id=url.searchParams.get('id');
+        if(route.request().method()==='POST') {
+          const body=route.request().postDataJSON();saves++;
+          const record={...body,template:'__note_case__',published:false,completedAt:'2026-11-17T12:00:00Z'};
+          records.set(record.id,record);
+          return route.fulfill({json:{record,revision:'"saved-v1"',indexed:true}});
+        }
+        if(id)return route.fulfill({json:{record:records.get(id),revision:'"saved-v1"'}});
+        return route.fulfill({json:{items:[...records.values()].map(record=>({id:record.id,title:record.title,
+          diagnosis:record.facts.diagnosis,department:record.facts.department,sectionCount:record.sections.length,completedAt:record.completedAt}))}});
+      });
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      await openNoteInputs(page);
+      await page.locator('#noteModel').selectOption('deepseek-flash');
+      await page.locator('[name=complaint]').fill('虚构教学主诉');
+      await page.locator('[name=diagnosis]').fill('虚构教学诊断');
+      await page.locator('[name=extraScope]').selectOption('');
+      await page.locator('#noteFrameSettings > summary').click();
+      await page.locator('#noteFrameMode').selectOption('medical');
+      await page.locator('#noteFrameStayDays').fill('1');
+      await page.locator('#noteFrameBuild').click();
+      assert.equal(await page.locator('#noteFrameDirectory button[aria-expanded]').count(),5);
+      await openNoteFrameSection(page,0);
+      await page.locator('#noteFrameSectionNotes').fill('仅用于入院的虚构要点');
+      await page.locator('#noteFrameGenerateMissing').click();
+      await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已生成 5 章'));
+      assert.equal(generated.length,5);
+      assert(generated.every(body=>body.model==='deepseek-flash'));
+      assert.equal(generated[0].sectionNotes,'仅用于入院的虚构要点');
+      assert(!JSON.stringify(generated.slice(1)).includes('仅用于入院的虚构要点'));
+      assert(await page.locator('#noteFrameComplete').isDisabled());
+      const manual='人工修改的虚构正文\n右侧 3*4 cm；> 5 mm\n医师签名：________';
+      for(let index=0;index<5;index++) {
+        await openNoteFrameSection(page,index);
+        if(index===0)await page.locator('#noteFrameOutput').fill(manual);
+        await page.locator('#noteFrameConfirmed').check();
+      }
+      await page.locator('#noteFrameTitle').fill('完整教学病历 <示例>');
+      await page.locator('#noteFrameFinalConfirm').check();
+      assert(await page.locator('#noteFrameComplete').isEnabled());
+      await page.locator('#noteFrameComplete').click();
+      await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('完整病历已保存到网站'));
+      assert.equal(saves,1);
+      const record=[...records.values()][0];assert.equal(record.sections[0].text,manual);
+      assert(record.sections.every(item=>item.confirmed));assert.equal(record.published,false);
+      // 保存提示先于已保存列表刷新出现（note-case.js 先 saveFeedback 再 await reloadSaved），等列表出现再计数。
+      await page.locator('.note-frame-saved-item').first().waitFor({state:'attached'});
+      assert.equal(await page.locator('.note-frame-saved-item').count(),1);
+      await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.__copiedCase=text;}}}));
+      await page.locator('#noteFrameCopy').click();
+      assert((await page.evaluate(()=>window.__copiedCase)).includes(manual));
+      assert((await page.evaluate(()=>window.__copiedCase)).includes('出院记录'));
+      await page.evaluate(()=>{sessionStorage.removeItem('hajimi-note-case-frame-v1');sessionStorage.removeItem('hajimi-note-draft-v1');});
+      await page.reload({waitUntil:'networkidle'});
+      await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已打开网站保存的整套病历'));
+      assert.equal(await page.locator('#noteFrameOutput').inputValue(),manual);
+      assert.equal(await page.locator('[name=diagnosis]').inputValue(),'虚构教学诊断');
+      assert.equal(await page.locator('[name=extraScope]').inputValue(),'');
+      assert(await page.locator('#noteChapter').isDisabled());
+      assert(await page.locator('#noteFrameExtras input[value=anesthesiaConsult]').isDisabled());
+      await openNoteInputs(page,true);
+      await page.locator('[data-type=spec]').click();
+      await page.locator('#noteResult').waitFor({state:'visible'});
+      await page.locator('#noteOutput').fill('未保存的单份文书编辑');
+      page.once('dialog',dialog=>dialog.dismiss());
+      await page.locator('.note-frame-library > summary').click();
+      await page.locator('.note-frame-saved-item').click();
+      assert.equal(await page.locator('#noteOutput').inputValue(),'未保存的单份文书编辑');
+      assert.equal(generated.length,6,'opening a saved case never regenerates chapters');
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      assert.deepEqual(errors,[]);
+    } finally {await context.close();}
+  }
+});
+
+test('framework pauses failed generation, preserves edits and requires review after shared facts change',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try {
+    let fail=true,count=0;
+    await mockNote(page,(route,body)=>{
+      count++;
+      return fail&&count===2?route.fulfill({status:429,json:{error:'生成请求过于频繁，请约 10 分钟后再试'}}):
+        route.fulfill({json:{text:'虚构正文 '+body.chapterTitle,model:'fixture-default'}});
+    });
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page);
+    await page.locator('[name=complaint]').fill('虚构教学主诉');
+    await page.locator('[name=diagnosis]').fill('虚构教学诊断');
+    await page.locator('#noteFrameSettings > summary').click();
+    await page.locator('#noteFrameMode').selectOption('medical');
+    await page.locator('#noteFrameStayDays').fill('1');
+    await page.locator('#noteFrameBuild').click();
+    await page.locator('#noteFrameGenerateMissing').click();
+    await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('可稍后继续'));
+    assert.equal(count,2);
+    await openNoteFrameSection(page,0);
+    await page.locator('#noteFrameOutput').fill('保留人工编辑正文');
+    await page.locator('#noteFrameConfirmed').check();
+    await page.reload({waitUntil:'networkidle'});
+    assert.equal(count,2,'restoring does not resume AI calls');
+    assert.equal(await page.locator('#noteFrameOutput').inputValue(),'保留人工编辑正文');
+    fail=false;
+    await page.locator('#noteFrameGenerateMissing').click();
+    await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已生成 4 章'));
+    await openNoteFrameSection(page,0);
+    assert.equal(await page.locator('#noteFrameOutput').inputValue(),'保留人工编辑正文');
+    await openNoteInputs(page);
+    await page.locator('[name=diagnosis]').fill('修改后的虚构教学诊断');
+    assert.match(await page.locator('#noteFrameDirectory .note-frame-row-status').first().textContent(),/输入已变化/);
+    assert.equal(await page.locator('#noteFrameConfirmed').isChecked(),false);
+    assert(await page.locator('#noteFrameComplete').isDisabled());
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
+
+test('ambiguous first save offers a recovery link and restores the revision without overwriting edits',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try {
+    await page.route('**/api/session',route=>route.fulfill({json:{authenticated:true}}));
+    let record=null,lost=true;
+    await mockNote(page,(route,body)=>route.fulfill({json:{text:'完整虚构正文 '+body.chapterTitle,model:'deepseek-flash'}}));
+    await page.route('**/api/note-generate?resource=cases*',route=>{
+      if(route.request().method()==='POST') {
+        const body=route.request().postDataJSON();
+        if(record&&body.revision==='missing')return route.fulfill({status:409,json:{error:'已有更新'}});
+        record={...body,published:false};
+        if(lost){lost=false;return route.abort('failed');}
+        return route.fulfill({json:{record,revision:'"saved-v2"',indexed:true}});
+      }
+      if(new URL(route.request().url()).searchParams.has('id'))return route.fulfill({json:{record,revision:'"saved-v1"'}});
+      return route.fulfill({json:{items:[]}});
+    });
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page);
+    await page.locator('[name=complaint]').fill('虚构主诉');
+    await page.locator('[name=diagnosis]').fill('虚构诊断');
+    await page.locator('#noteFrameSettings > summary').click();
+    await page.locator('#noteFrameMode').selectOption('medical');
+    await page.locator('#noteFrameStayDays').fill('1');
+    await page.locator('#noteFrameBuild').click();
+    await page.locator('#noteFrameGenerateMissing').click();
+    await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已生成 5 章'));
+    for(let index=0;index<5;index++){
+      await openNoteFrameSection(page,index);
+      await page.locator('#noteFrameConfirmed').check();
+    }
+    await page.locator('#noteFrameFinalConfirm').check();
+    await page.locator('#noteFrameComplete').click();
+    await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('当前编辑内容已保留'));
+    assert(await page.locator('#noteFrameSavedLink').isVisible());
+    assert(await page.locator('#noteFrameVerifySave').isVisible());
+    assert.equal(await page.locator('#noteFrameSavedLink').getAttribute('target'),'_blank');
+    await page.locator('#noteFrameVerifySave').click();
+    await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('已核实网站保存的正文'));
+    await page.locator('#noteFrameComplete').click();
+    await page.waitForFunction(()=>document.querySelector('#noteFrameStatus').textContent.includes('完整病历已保存到网站'));
+    assert.equal(record.revision,'"saved-v1"');
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
+
+test('saved DeepSeek choice survives reference restoration before model discovery returns',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try {
+    await page.route('**/api/session',route=>route.fulfill({json:{authenticated:true}}));
+    await page.route('**/api/note-generate?resource=cases*',route=>route.fulfill({json:{items:[]}}));
+    await page.route('**/api/note-generate',async route=>{
+      await new Promise(resolve=>setTimeout(resolve,120));
+      return route.fulfill({json:{defaultModel:'fixture-default',models:[{id:'deepseek-flash',name:'Flash'}]}});
+    });
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteInputs(page);
+    const catalog=await (await page.request.get(base+'/note-cases.json')).json();
+    await page.evaluate(item=>sessionStorage.setItem('hajimi-note-draft-v1',JSON.stringify({
+      model:'deepseek-flash',department:item.department,caseId:item.id,chapterId:item.chapters[0].id,
+      complaint:'虚构主诉',diagnosis:'虚构诊断',extraScope:'shared',dailyPhase:'post'
+    })),catalog[0]);
+    await page.reload({waitUntil:'networkidle'});
+    assert.equal(await page.locator('#noteModel').inputValue(),'deepseek-flash');
+    assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('hajimi-note-draft-v1')).model),'deepseek-flash');
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
+
+test('note opens on a complete checklist with a direct DeepSeek action in every row',async()=>{
+  for (const width of [390,1280]) {
+    const {page,context,errors}=await pageFor(width);
+    try {
+      const requests=[];
+      await mockNote(page,(route,body)=>{
+        requests.push(body);
+        return route.fulfill({json:{text:'虚构的入院文书',model:'deepseek-flash'}});
+      });
+      await page.goto(base+'/note',{waitUntil:'networkidle'});
+      const rows=page.locator('#noteFrameDirectory .note-frame-row');
+      assert.equal(await rows.count(),26);
+      assert.equal(await rows.getByRole('button',{name:/用 DeepSeek 生成/}).count(),26);
+      assert.match(await rows.first().innerText(),/入院记录[\s\S]*待完善/);
+      assert.match(await rows.last().innerText(),/出院记录/);
+      assert(!/知情同意书|医患沟通/.test(await page.locator('#noteFrameDirectory').innerText()));
+      assert(!await page.locator('[name=complaint]').isVisible());
+      assert.equal(requests.length,0);
+      const admission=rows.first(), deepSeek=admission.getByRole('button',{name:'用 DeepSeek 生成：入院记录'});
+      await deepSeek.click();
+      await page.locator('[name=complaint]').waitFor({state:'visible'});
+      assert(await page.locator('[name=complaint]').evaluate(node=>document.activeElement===node));
+      assert.equal(requests.length,0);
+      await page.locator('[name=complaint]').fill('虚构主诉');
+      await page.locator('[name=diagnosis]').fill('虚构诊断');
+      await page.locator('.note-back-to-checklist').click();
+      await admission.locator('#noteFrameSectionNotes').fill('虚构入院要点');
+      await deepSeek.click();
+      await admission.getByRole('button',{name:'用 DeepSeek 重生成：入院记录'}).waitFor({state:'visible'});
+      assert.equal(requests.length,1);
+      assert.equal(requests[0].chapterTitle,'入院记录');
+      assert.equal(requests[0].sectionNotes,'虚构入院要点');
+      assert.equal(await admission.locator('#noteFrameOutput').inputValue(),'虚构的入院文书');
+      await admission.locator('#noteFrameConfirmed').check();
+      assert.match(await admission.innerText(),/已核对/);
+      assert.match(await rows.nth(1).innerText(),/待完善/);
+      await page.locator('#noteFrameSettings > summary').click();
+      await page.locator('#noteFramePostDays').fill('2');
+      await page.locator('#noteFrameBuild').click();
+      assert.equal(await rows.count(),14);
+      assert.match(await admission.innerText(),/已核对/);
+      assert.equal(await admission.locator('#noteFrameOutput').inputValue(),'虚构的入院文书');
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      assert.deepEqual(errors,[]);
+    } finally {await context.close();}
+  }
+});
+
+test('switching a preset or reference confirms before clearing manually entered checklist text',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try {
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await openNoteFrameSection(page,0);
+    await page.locator('#noteFrameOutput').fill('手动填写的虚构入院记录');
+    await openNoteInputs(page,true);
+    assert.equal(await page.locator('[name=complaint]').inputValue(),'');
+    const prompts=[];
+    page.on('dialog',dialog=>{prompts.push(dialog.message());return dialog.dismiss();});
+    await page.locator('#notePreset').selectOption('0');
+    await page.locator('#noteCase').selectOption('0');
+    assert.equal(prompts.length,2);
+    assert.match(prompts[0],/切换常见病种/);
+    assert.match(prompts[1],/切换参考病例/);
+    assert.equal(await page.locator('#noteFrameOutput').inputValue(),'手动填写的虚构入院记录');
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
+
+test('checklist filters and review shortcuts keep the original AI generator accessible',async()=>{
+  const {page,context,errors}=await pageFor(390);
+  try {
+    const requests=[];
+    await mockNote(page,(route,body)=>{
+      requests.push(body);
+      return route.fulfill({json:{text:'虚构教学正文',model:'deepseek-flash'}});
+    });
+    await page.goto(base+'/note',{waitUntil:'networkidle'});
+    await page.locator('#noteOpenLegacy').click();
+    assert(await page.locator('[data-type=spec]').isVisible());
+    await page.locator('[name=complaint]').fill('虚构主诉');
+    await page.locator('[name=diagnosis]').fill('虚构诊断');
+    await page.locator('.note-back-to-checklist').click();
+    const review=page.locator('[data-frame-filter=review]');
+    await review.click();
+    assert(await page.locator('#noteFrameFilterEmpty').isVisible());
+    await page.locator('[data-frame-filter=missing]').click();
+    await page.getByRole('button',{name:'用 DeepSeek 生成：入院记录',exact:true}).click();
+    await page.getByRole('button',{name:'用 DeepSeek 重生成：入院记录',exact:true}).waitFor();
+    await review.click();
+    assert.equal(await page.locator('.note-frame-row:visible').count(),1);
+    assert.equal(requests.length,1);
+    await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{
+      configurable:true,value:{writeText:async text=>{window.__copiedChapter=text;}}
+    }));
+    await page.locator('#noteFrameCopySection').click();
+    assert.equal(await page.evaluate(()=>window.__copiedChapter),'虚构教学正文');
+    await page.locator('#noteFrameConfirmNext').click();
+    assert.equal(await page.locator('[data-frame-filter=all]').getAttribute('aria-pressed'),'true');
+    assert.equal(await page.locator('.note-frame-row.is-open').getAttribute('data-section'),'first');
+    assert.match(await page.locator('#noteFrameProgress').textContent(),/已核对 1/);
+    assert.equal(requests.length,1,'review does not call AI');
+    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    assert.deepEqual(errors,[]);
+  } finally {await context.close();}
+});
+
 test('custom not-found page keeps navigation usable on mobile and desktop',async()=>{
   for(const width of [390,1280]){
     const {page,context,errors}=await pageFor(width);
@@ -2729,6 +3330,7 @@ test('custom not-found page keeps navigation usable on mobile and desktop',async
       assert(await page.getByRole('heading',{name:'这个页面找不到了'}).isVisible());
       assert.equal(await page.getByRole('link',{name:'返回首页'}).getAttribute('href'),'/');
       assert.equal(await page.getByRole('link',{name:'搜索站内资料'}).getAttribute('href'),'/search');
+      assert.equal(await page.locator('a.skip-link[href="#main"]').count(),1,'skip link to the main content');
       assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal page scroll');
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
