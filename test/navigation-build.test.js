@@ -21,7 +21,7 @@ test('current navigation rendering preserves every byte of the existing pages', 
 
 test('stale source links are replaced from the registry without losing patient or auth controls', () => {
   const source = read('index.html');
-  const stale = source.replaceAll('href="/ecg">心电图</a>', 'href="/old-navigation">old navigation label</a>');
+  const stale = source.replaceAll('<span>资料</span>', '<span>old navigation label</span>');
   assert.notEqual(stale, source);
   assert.equal(renderPageNavigation(stale, 'index.html'), source);
   assert.ok(source.includes('<button id="patientBtn"'));
@@ -80,10 +80,10 @@ test('normal build consumes registry changes from a clean copy without exposing 
     assert.ok(!before.has(file), file + ' stays private');
   }
   const registry = path.join(temporary, 'config/site-modules.mjs');
-  const original = fs.readFileSync(registry, 'utf8'), marker = "label: '心电图'";
+  const original = fs.readFileSync(registry, 'utf8'), marker = "workspace: '资料'";
   assert.equal(original.split(marker).length, 2);
-  const label = '心电图（构建验证）';
-  fs.writeFileSync(registry, original.replace(marker, "label: '" + label + "'"));
+  const label = '资料（构建验证）';
+  fs.writeFileSync(registry, original.replace(marker, "workspace: '" + label + "'"));
   await build();
   const after = new Map(publishedFiles(dist));
   assert.deepEqual([...after.keys()].sort(), [...before.keys()].sort());
@@ -98,9 +98,13 @@ test('normal build consumes registry changes from a clean copy without exposing 
     const searchVersion = /(\/site-search-data\.js\?v=)[0-9a-f]+/;
     const comparable = text => name === 'search.html' ? text.replace(searchVersion, '$1') : text;
     if (name !== 'site-search-data.js') occurrences += html.split(label).length - 1;
-    assert.equal(comparable(html.replaceAll(label, '心电图')), comparable(before.get(name).toString('utf8')),
+    assert.equal(comparable(html.replaceAll(label, '资料')), comparable(before.get(name).toString('utf8')),
       name + ' only changes the navigation label');
   }
-  assert.deepEqual(changed.sort(), ['admin.html', 'classification.html', 'duty-orders.html', 'duty.html', 'ecg.html', 'labs.html', 'library.html', 'note.html', 'pathway.html', 'search.html', 'site-search-data.js', 'tools.html'].sort());
-  assert.equal(occurrences, 11, 'legacy navigation links follow the registered label');
+  // Every page shows the five destinations, so renaming one changes every page with a navigation.
+  assert.deepEqual(changed.sort(), ['404.html', 'admin.html', 'classification.html', 'clinical.html', 'duty-orders.html', 'duty.html',
+    'ecg.html', 'home.html', 'index.html', 'labs.html', 'library.html', 'materials.html', 'note.html', 'pathway.html', 'personal.html',
+    'search.html', 'study.html', 'tools.html']);
+  // One navigation link per page (library.html also carries the hidden workspace header), plus the 资料 page's title.
+  assert.equal(occurrences, 20, 'navigation links follow the registered label');
 });

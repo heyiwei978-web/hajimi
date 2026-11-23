@@ -8,9 +8,12 @@ test('mobile workspace keeps the five tabs above the system gesture area',()=>{
   assert.match(css,/grid-template-columns: repeat\(5, minmax\(0, 1fr\)\)/);
 });
 
-test('mobile clinical navigation is width-constrained and horizontally scrollable inside its own row',()=>{
-  const css=fs.readFileSync(new URL('../styles.css',import.meta.url),'utf8');
-  assert.match(css,/\.official-nav-inner\{[\s\S]*?width:100%;/);
-  assert.match(css,/\.official-links\{[\s\S]*?max-width:100%;[\s\S]*?overflow-x:auto;/);
-  assert.match(css,/\.official-links::\-webkit-scrollbar\{display:none\}/);
+test('every other page uses the same five phone tabs, above the system gesture area',()=>{
+  const css=fs.readFileSync(new URL('../theme.css',import.meta.url),'utf8');
+  const phone=css.slice(css.indexOf('@media screen and (max-width:720px){\n  :root:has(.site-nav)'));
+  assert.match(phone,/\.site-nav\{position:fixed;[^}]*env\(safe-area-inset-bottom,0px\)/);
+  assert.match(phone,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+  // Content and bottom-anchored controls clear the tab bar.
+  assert.match(phone,/body:has\(\.site-nav\)\{padding-bottom:var\(--site-tabbar-height\)\}/);
+  assert.match(fs.readFileSync(new URL('../ecg.css',import.meta.url),'utf8'),/\.ecg-review-footer\{position:fixed;bottom:var\(--site-tabbar-height,0px\)/);
 });

@@ -7,11 +7,13 @@
 // do not add a navigation <script> to index.html — every script listed there is
 // executed by scripts/clinical-compiler.mjs as part of the clinical record chain.
 //
-// Navigation order is a UI contract, not only data. styles.css hides the 4th
-// `.global-links` item below 640px and a later rule in styles.css (formerly ui-polish.css) restores it for official
-// navigation bars; reordering MODULES changes which entry is affected on phones.
+// Main navigation (2026-11-22): every page shows the same five workspace
+// destinations (工作台 / 临床 / 资料 / 学习 / 我的) — a rail or top bar on wide
+// screens and a bottom tab bar on phones. Section modules name the workspace
+// destination they belong to in `hub`; that destination is highlighted while
+// one of its sections is open.
 
-// The build renders every official/tools header brand from these values
+// The build renders every shared site header brand from these values
 // (scripts/navigation-build.mjs); edit here instead of in each page.
 export const SITE_BRAND = Object.freeze({
   mark: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-2.5-1.7-6-2.2-9-1v13c3-1.2 6.5-1 9 1 2.5-2 6-2.2 9-1V5c-3-1.2-6.5-.7-9 1v13M15 11h3m-1.5-1.5v3"/></svg>',
@@ -22,23 +24,23 @@ export const SITE_BRAND = Object.freeze({
 // `routes` mirrors the existing vercel.json rewrite sources for the section.
 // The registry describes routing; it does not generate vercel.json.
 export const MODULES = Object.freeze([
-  {id: 'home', label: '首页', href: '/', nav: true, workspace: '工作台', routes: ['/']},
+  {id: 'home', label: '首页', href: '/', workspace: '工作台', routes: ['/']},
   {id: 'clinical', label: '临床', workspace: '临床', href: '/clinical', routes: ['/clinical', '/clinical/']},
   {id: 'materials', label: '资料', workspace: '资料', href: '/materials', routes: ['/materials', '/materials/']},
   {id: 'study', label: '学习', workspace: '学习', href: '/study', routes: ['/study', '/study/']},
   {id: 'personal', label: '我的', workspace: '我的', href: '/personal', routes: ['/personal', '/personal/']},
-  {id: 'records', label: '病历模板', href: '/bl', nav: true, routes: ['/bl', '/bl/:path*']},
-  {id: 'classification', label: '疾病分型', href: '/classification', nav: true,
+  {id: 'records', label: '病历模板', href: '/bl', hub: 'clinical', routes: ['/bl', '/bl/:path*']},
+  {id: 'classification', label: '疾病分型', href: '/classification', hub: 'clinical',
     routes: ['/classification', '/classification/', '/classification/:path*']},
-  {id: 'ecg', label: '心电图', href: '/ecg', nav: true, routes: ['/ecg', '/ecg/', '/ecg/:path*']},
-  {id: 'labs', label: '检验解读', href: '/labs', nav: true, routes: ['/labs', '/labs/']},
-  {id: 'pathway', label: '临床路径', href: '/pathway', nav: true, routes: ['/pathway', '/pathway/']},
-  {id: 'duty', label: '值班资料', href: '/duty', nav: true, routes: ['/duty', '/duty/', '/duty/orders', '/duty/orders/']},
-  {id: 'tools', label: '临床工具', href: '/tools', nav: true, routes: ['/tools', '/tools/']},
-  {id: 'note', label: 'AI 病历生成', href: '/note', nav: true, routes: ['/note', '/note/']},
-  {id: 'admin', label: '管理入口', href: '/admin', nav: true, routes: ['/admin', '/admin/', '/admin/password']},
-  // Site-wide search is reached from the homepage search box, not the main navigation.
-  {id: 'search', label: '全站搜索', href: '/search', nav: false, routes: ['/search', '/search/']}
+  {id: 'ecg', label: '心电图', href: '/ecg', hub: 'clinical', routes: ['/ecg', '/ecg/', '/ecg/:path*']},
+  {id: 'labs', label: '检验解读', href: '/labs', hub: 'clinical', routes: ['/labs', '/labs/']},
+  {id: 'pathway', label: '临床路径', href: '/pathway', hub: 'clinical', routes: ['/pathway', '/pathway/']},
+  {id: 'duty', label: '值班资料', href: '/duty', hub: 'clinical', routes: ['/duty', '/duty/', '/duty/orders', '/duty/orders/']},
+  {id: 'tools', label: '临床工具', href: '/tools', hub: 'clinical', routes: ['/tools', '/tools/']},
+  {id: 'note', label: 'AI 病历生成', href: '/note', hub: 'clinical', routes: ['/note', '/note/']},
+  {id: 'admin', label: '管理入口', href: '/admin', hub: 'personal', routes: ['/admin', '/admin/', '/admin/password']},
+  // Site-wide search is reached from the search boxes, not the main navigation.
+  {id: 'search', label: '全站搜索', href: '/search', routes: ['/search', '/search/']}
 ].map(Object.freeze));
 
 // Departments and which sections already have material for them.
@@ -78,30 +80,41 @@ export const DEPARTMENTS = Object.freeze([
 
 // Every hand-written main navigation in the source HTML.
 // `variant` names the markup family:
-//   official  <nav class="global-links official-links" aria-label="主导航">, active = a.active
-//   tools     <header class="nav"><div class="navin">…<nav aria-label="主导航">, active = a.active
-//   workstation  Five workspace destinations, rendered as a rail or phone tabs
-//   library   <div class="top-actions library-top-actions">, active = a.library-active-link
-// All registered surfaces use the same navigation entries and brand tagline.
-// The builder marks each active entry with aria-current="page".
+//   workstation  the workspace pages' own header, rail and phone tabs (<nav class="ws-nav">)
+//   site         the shared header, rendered whole from one template:
+//                <header class="site-header …"><div class="site-header-inner">brand,
+//                <nav class="site-nav" aria-label="主导航">, optional .site-header-right</div></header>
+//   library      the record library keeps its own header (department branding,
+//                patient and sign-in controls); only its <nav class="site-nav"> is rendered
+// `active` is the module whose page this is; the navigation highlights its
+// workspace destination (`navActive`). The builder marks the destination with
+// aria-current="page" on its own page and aria-current="true" inside a section.
 export const NAV_SURFACES = Object.freeze([
   {file: 'index.html', region: 'portalHome', variant: 'workstation', active: 'home'},
   {file: 'home.html', variant: 'workstation', active: 'home', generatedFrom: 'index.html'},
-  {file: 'classification.html', variant: 'official', active: 'classification'},
-  {file: 'ecg.html', variant: 'official', active: 'ecg'},
-  {file: 'labs.html', variant: 'official', active: 'labs'},
-  {file: 'pathway.html', variant: 'official', active: 'pathway'},
-  {file: 'duty.html', variant: 'official', active: 'duty'},
-  {file: 'duty-orders.html', variant: 'official', active: 'duty'},
-  {file: 'admin.html', variant: 'official', active: 'admin'},
-  {file: 'search.html', variant: 'official', active: null},
-  {file: 'note.html', variant: 'official', active: 'note'},
-  {file: 'tools.html', variant: 'tools', active: 'tools'},
+  {file: 'classification.html', variant: 'site', active: 'classification'},
+  {file: 'ecg.html', variant: 'site', active: 'ecg'},
+  {file: 'labs.html', variant: 'site', active: 'labs'},
+  {file: 'pathway.html', variant: 'site', active: 'pathway'},
+  {file: 'duty.html', variant: 'site', active: 'duty'},
+  {file: 'duty-orders.html', variant: 'site', active: 'duty'},
+  {file: 'admin.html', variant: 'site', active: 'admin'},
+  {file: 'search.html', variant: 'site', active: null},
+  {file: 'note.html', variant: 'site', active: 'note'},
+  {file: 'tools.html', variant: 'site', active: 'tools'},
+  {file: '404.html', variant: 'site', active: null},
   {file: 'index.html', region: 'libraryShell', variant: 'library', active: 'records'}
 ].map(Object.freeze));
 
-export function navModules(surface) {
-  if (surface.variant === 'workstation') return MODULES.filter(module => module.workspace);
-  const excluded = new Set(surface.exclude || []);
-  return MODULES.filter(module => module.nav && !excluded.has(module.id));
+export function navModules() {
+  return MODULES.filter(module => module.workspace);
+}
+
+// The workspace destination highlighted for a page: the page itself when it is
+// a destination, otherwise the destination its section belongs to.
+export function navActive(active) {
+  if (!active) return null;
+  const module = MODULES.find(entry => entry.id === active);
+  if (!module) throw new Error(`Unknown navigation module: ${active}`);
+  return module.workspace ? module.id : module.hub || null;
 }

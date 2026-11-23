@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import {MODULES, DEPARTMENTS, NAV_SURFACES, SITE_BRAND, navModules} from '../config/site-modules.mjs';
+import {MODULES, DEPARTMENTS, NAV_SURFACES, SITE_BRAND, navModules, navActive} from '../config/site-modules.mjs';
 import {renderPageNavigation} from '../scripts/navigation-build.mjs';
 import {clinicalDepartmentSlugs} from '../scripts/clinical-compiler.mjs';
 import {renderHomeDepartments,renderRouterDepartments,renderClassificationDepartments} from '../scripts/department-build.mjs';
@@ -24,22 +24,17 @@ function regionSource(file, region) {
   return source.slice(start, ends.length ? Math.min(...ends) : source.length);
 }
 
-const NAV_PATTERNS = {
-  official: /<nav\b[^>]*aria-label="主导航"[^>]*>([\s\S]*?)<\/nav>/g,
-  workstation: /<nav\b[^>]*aria-label="主导航"[^>]*>([\s\S]*?)<\/nav>/g,
-  tools: /<nav\b[^>]*aria-label="主导航"[^>]*>([\s\S]*?)<\/nav>/g,
-  library: /<div class="top-actions library-top-actions">([\s\S]*?)<\/div>/g
-};
-const ACTIVE_CLASS = {official: 'active', workstation: 'active', tools: 'active', library: 'library-active-link'};
+const MAIN_NAV = /<nav\b[^>]*aria-label="主导航"[^>]*>([\s\S]*?)<\/nav>/g;
 
 function navLinks(surface) {
   const source = regionSource(surface.file, surface.region);
-  const blocks = [...source.matchAll(NAV_PATTERNS[surface.variant])];
+  const blocks = [...source.matchAll(MAIN_NAV)];
   assert.equal(blocks.length, 1, `${describe(surface)} has exactly one ${surface.variant} navigation`);
   return [...blocks[0][1].matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)].map(([, attributes, inner]) => ({
     href: /\bhref="([^"]*)"/.exec(attributes)?.[1],
     label: inner.replace(/<[^>]+>/g, '').trim(),
-    classes: (/\bclass="([^"]*)"/.exec(attributes)?.[1] || '').split(/\s+/).filter(Boolean)
+    classes: (/\bclass="([^"]*)"/.exec(attributes)?.[1] || '').split(/\s+/).filter(Boolean),
+    current: /\baria-current="([^"]*)"/.exec(attributes)?.[1] || null
   }));
 }
 
@@ -61,9 +56,15 @@ test('registry entries are unique and internally consistent', () => {
   for (const department of DEPARTMENTS) assert.match(department.slug, /^[a-z]+$/);
   for (const surface of NAV_SURFACES) {
     assert.ok(surface.active === null || ids.includes(surface.active), `${describe(surface)} active module exists`);
-    for (const id of surface.exclude || []) assert.ok(ids.includes(id), `${describe(surface)} excludes a known module`);
-    if (surface.active) assert.ok(!(surface.exclude || []).includes(surface.active), `${describe(surface)} does not hide its own entry`);
+    assert.ok(['workstation', 'site', 'library'].includes(surface.variant), `${describe(surface)} variant`);
   }
+  // Five workspace destinations; every other page belongs to one of them, except search.
+  const destinations = MODULES.filter(module => module.workspace).map(module => module.id);
+  assert.deepEqual(destinations, ['home', 'clinical', 'materials', 'study', 'personal']);
+  for (const module of MODULES.filter(module => !module.workspace && module.id !== 'search')) {
+    assert.ok(destinations.includes(module.hub), `${module.id} belongs to a workspace destination`);
+  }
+  assert.equal(MODULES.find(module => module.id === 'search').hub, undefined, 'search highlights no destination');
 });
 
 test('every page with a main navigation is described by the registry', () => {
@@ -75,19 +76,17 @@ test('every page with a main navigation is described by the registry', () => {
 for (const surface of NAV_SURFACES) {
   test(`navigation in ${describe(surface)} matches the registry`, () => {
     const links = navLinks(surface);
-    const expected = navModules(surface);
     assert.deepEqual(links.map(({href, label}) => ({href, label})),
-      expected.map(({href, label, workspace}) => ({href, label: surface.variant === 'workstation' ? workspace : label})), 'links, labels and order');
-    const active = links.filter(link => link.classes.includes(ACTIVE_CLASS[surface.variant]));
-    if (surface.active === null) assert.equal(active.length, 0, 'no active entry');
-    else assert.deepEqual(active.map(link => link.href), [MODULES.find(module => module.id === surface.active).href], 'one active entry');
-    const current = [...regionSource(surface.file, surface.region).matchAll(/<a\b[^>]*aria-current="page"[^>]*href="([^"]*)"|<a\b[^>]*href="([^"]*)"[^>]*aria-current="page"/g)]
-      .map(match => match[1] || match[2]);
-    assert.deepEqual(current, surface.active ? [MODULES.find(module => module.id === surface.active).href] : [], 'one current navigation entry');
-    if (surface.variant === 'official' || surface.variant === 'tools') {
-      const tagline = SITE_BRAND.tagline;
-      const brand = `<strong>${SITE_BRAND.name}</strong><small>${tagline}</small>`;
-      assert.ok(regionSource(surface.file, surface.region).includes(brand), `brand reads ${SITE_BRAND.name} / ${tagline}`);
+      navModules().map(({href, workspace}) => ({href, label: workspace})), 'the five workspace destinations, in order');
+    const hub = navActive(surface.active);
+    const active = links.filter(link => link.classes.includes('active'));
+    assert.deepEqual(active.map(link => link.href), hub ? [MODULES.find(module => module.id === hub).href] : [], 'one highlighted destination');
+    assert.deepEqual(links.filter(link => link.current).map(link => [link.href, link.current]),
+      hub ? [[MODULES.find(module => module.id === hub).href, hub === surface.active ? 'page' : 'true']] : [],
+      'aria-current="page" on the destination itself, "true" inside one of its sections');
+    if (surface.variant === 'site') {
+      const brand = `<strong>${SITE_BRAND.name}</strong><small>${SITE_BRAND.tagline}</small>`;
+      assert.ok(regionSource(surface.file, surface.region).includes(brand), `brand reads ${SITE_BRAND.name} / ${SITE_BRAND.tagline}`);
     }
   });
 }
@@ -133,20 +132,13 @@ test('registry stays build-only and outside the clinical script chain', () => {
   assert.ok(!fs.existsSync(new URL('site-modules.mjs', root)), 'registry is not in the published root directory');
 });
 
-test('mobile navigation order guard still holds', () => {
-  // The 4th official navigation entry is hidden by a generic rule and restored
-  // by an equal-specificity override. Removing the override, or reordering the
-  // registry, changes what phones see; this test makes that coupling explicit.
-  // ui-polish.css was merged into the end of styles.css (2026-11-18); the
-  // restoring override must still come after the generic hiding rule.
-  const styles = read('styles.css');
-  const hide = styles.search(/\.global-links a:nth-child\(4\)\{display:none\}/);
-  if (hide >= 0) {
-    const restore = styles.search(/\.official-nav \.official-links a\{display:flex/);
-    assert.ok(restore > hide, 'official navigation restores every entry after the generic rule');
+test('pages with the shared navigation load the stylesheet that lays it out', () => {
+  // theme.css holds the shared header and the phone tab bar (统一顶栏与主导航).
+  for (const surface of NAV_SURFACES.filter(surface => surface.variant !== 'workstation')) {
+    assert.match(readPage(surface.file), /href="\/theme\.css\?/, `${surface.file} loads theme.css`);
   }
-  const official = NAV_SURFACES.filter(surface => surface.variant === 'official');
-  for (const surface of official) {
-    assert.match(readPage(surface.file), /href="\/styles\.css\?/, `${surface.file} loads styles.css`);
-  }
+  const theme = read('theme.css');
+  assert.match(theme, /\.site-nav\{position:fixed;[^}]*grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/, 'phones: five equal tabs');
+  assert.match(theme, /:root:has\(\.site-nav\)\{--site-tabbar-height:calc\(61px \+ env\(safe-area-inset-bottom,0px\)\)\}/);
+  assert.doesNotMatch(read('styles.css'), /nth-child\(4\)\{display:none\}/, 'no navigation entry is hidden on phones');
 });

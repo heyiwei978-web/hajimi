@@ -57,7 +57,7 @@
   .orders-table tr.orders-note td::before{content:none}
 }
 @media print{
-  .orders-search,.orders-toc,.orders-breadcrumb,.skip-link,.official-nav{display:none!important}
+  .orders-search,.orders-toc,.orders-breadcrumb,.skip-link{display:none!important}
   .orders-table{width:100%;border-collapse:collapse;font-size:10pt}
   .orders-table th,.orders-table td{border:1px solid #999;padding:3pt 4pt;vertical-align:top;white-space:pre-wrap}
   .orders-table tr[hidden],.orders-sheet[hidden]{display:none}

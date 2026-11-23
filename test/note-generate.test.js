@@ -213,14 +213,15 @@ test('other specialties and case names are carried as context, not as current ca
 test('note page is published, routed and part of the main navigation', () => {
   for (const file of ['note.html', 'note.css', 'note.js']) assert.ok(PUBLIC_FILES.includes(file), file);
   const note = MODULES.find(module => module.id === 'note');
-  assert.equal(note.nav, true);
+  assert.equal(note.hub, 'clinical', 'reached from 临床 in the main navigation');
   assert.ok(NAV_SURFACES.some(surface => surface.file === 'note.html'));
   const vercel = JSON.parse(read('vercel.json'));
   for (const route of note.routes) assert.ok(vercel.rewrites.some(rule => rule.source === route && rule.destination === '/note.html'), route);
   assert.equal(vercel.functions?.['api/note-generate.js']?.maxDuration, 60);
   const page = read('note.html');
   assert.doesNotMatch(page, /<script>(?!<)|\son[a-z]+=/i);
-  assert.match(page, /<a class="active" href="\/note" aria-current="page">AI 病历生成<\/a>/);
+  assert.match(page, /<a class="active" href="\/clinical" aria-current="true">[\s\S]*?<span>临床<\/span><\/a>/);
+  assert.match(read('workstation-sections.html'), /<a class="ws-row" href="\/note">/, '临床 links to the note page');
   assert.doesNotMatch(read('js/note.js'), /localStorage/);
   assert.match(read('js/note.js'), /sessionStorage/);
   assert.match(read('tools.html'), /href="\/note"/);
