@@ -71,6 +71,17 @@ test('invalid days and arbitrary framework extras are rejected',()=>{
   assert.throws(()=>Core.build({mode:'medical',stayDays:1,extras:['anesthesiaConsult']}));
   assert.throws(()=>Core.build({mode:'medical',stayDays:1,extras:['communication']}));
 });
+test('the orthopedic template choice is saved without changing canonical chapters or AI inputs',()=>{
+  const generic=body();
+  for(const {id:template} of Core.templates){
+    const settings={...generic.settings,template};
+    assert.equal(validateCompletedCase({...generic,settings}).settings.template,template);
+    assert.deepEqual(Core.build(settings),Core.build(generic.settings));
+    assert(!Object.hasOwn(Core.inputFor(Core.build(settings)[0],facts),'template'));
+  }
+  assert.throws(()=>validateCompletedCase({...generic,settings:{...generic.settings,template:'unknown'}}),/病种框架选择无效/);
+  assert(!Object.hasOwn(validateCompletedCase(generic).settings,'template'));
+});
 test('chapter input contains only its own notes and never earlier generated text',()=>{
   const sections=Core.build({mode:'medical',stayDays:2,extras:[]});
   const one=Core.inputFor(sections[0],facts,'仅入院要点','deepseek-flash');

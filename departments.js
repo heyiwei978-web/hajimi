@@ -858,6 +858,8 @@
       };
       const pathwayKey=currentDept==='骨科'?pathwayKeyByGroup[state.group]:null;
       const pathwayHref=pathwayKey?(pathwayKey==='tka'?'/pathway':'/pathway?p='+encodeURIComponent(pathwayKey)):'';
+      const frameLink=currentDept==='骨科'&&['TKA','股骨转子间骨折'].includes(state.group)
+        ? '<a class="btn ghost" href="/note?template='+encodeURIComponent(state.group)+'">按章节用 DeepSeek 写病历</a>' : '';
 
       const hero=`
         <section class="disease-hero record-book-hero">
@@ -865,7 +867,7 @@
             <span>${currentDept==='骨科'?'ORTHOPAEDICS':'CLINICAL RECORD'} · COMPLETE MEDICAL RECORD</span>
             <h2>${labelFor(state.group)} · ${utility?'通用记录':'完整病历模板'}</h2>
             <p>${utility?'通用检查理由、会诊及沟通记录单独整理，按实际临床场景选用。':'一套模板包含入院、术前、手术、术后和出院章节，可连续阅读、整套复制，也可单独复制某一章节。特殊病例另行归档。'}</p>
-            <div class="record-book-hero-actions"><button id="copyWholeRecord" class="btn primary" type="button">${utility?'复制全部通用记录':'复制完整病历'}</button><button id="printWholeRecord" class="btn ghost" type="button">${utility?'打印通用记录':'打印整套病历'}</button><button id="favoriteDisease" class="btn ghost" type="button" aria-pressed="false">☆ 收藏病种</button>${pathwayHref?'<a class="btn ghost" href="'+pathwayHref+'">查看临床路径</a>':''}</div>
+            <div class="record-book-hero-actions"><button id="copyWholeRecord" class="btn primary" type="button">${utility?'复制全部通用记录':'复制完整病历'}</button><button id="printWholeRecord" class="btn ghost" type="button">${utility?'打印通用记录':'打印整套病历'}</button><button id="favoriteDisease" class="btn ghost" type="button" aria-pressed="false">☆ 收藏病种</button>${pathwayHref?'<a class="btn ghost" href="'+pathwayHref+'">查看临床路径</a>':''}${frameLink}</div>
           </div>
           <strong><small>${utility?'1 组通用记录 · '+list.length+' 条记录':'1 套标准模板 · '+units.length+' 个章节 · '+list.length+' 份文书'}${specialBundle.groups.length?' · 另有 '+specialBundle.groups.length+' 套特殊病例':''}</small></strong>
         </section>`;
