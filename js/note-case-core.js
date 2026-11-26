@@ -2,6 +2,13 @@
 globalThis.HajimiNoteCaseCore = (() => {
   const reference = '个人教学病例框架';
   const baseFields = ['department','sex','age','complaint','diagnosis','history','secondary','operation','anesthesia','extra','extraScope','allergies','checks','operativeFacts'];
+  const templates = Object.freeze([
+    {id:'TKA',label:'全膝关节置换',category:'关节置换',keywords:'膝骨关节炎 人工全膝关节置换',
+      postoperative:'填写当天实际观察。可记录切口、引流量、膝关节活动度（ROM）及测量方式、步行辅助和已完成的康复训练。'},
+    {id:'股骨转子间骨折',label:'股骨粗隆间骨折',category:'创伤骨科',keywords:'股骨转子间骨折 转子间 粗隆间 髋部骨折 PFNA',
+      postoperative:'填写当天实际观察。可记录切口、引流量、患肢远端血运与感觉运动、已明确的负重要求及实际活动情况。'}
+  ].map(Object.freeze));
+  const templateFor = id => templates.find(item => item.id === id);
   const optional = Object.freeze([
     {id:'specialExam',title:'专科检查',type:'spec',stage:'入院'},
     {id:'internalConsult',title:'内科会诊申请单',type:'caseChapter',stage:'术前 / 诊疗'},
@@ -23,9 +30,11 @@ globalThis.HajimiNoteCaseCore = (() => {
     const extras = value.extras === undefined ? [] : value.extras;
     if (!Array.isArray(extras) || extras.length > optional.length || new Set(extras).size !== extras.length
       || extras.some(id => !optional.some(item => item.id === id && (!item.surgery || value.mode === 'surgery')))) throw new Error('附加文书选择无效');
+    const template = value.template;
+    if (template !== undefined && !templateFor(template)) throw new Error('病种框架选择无效');
     return {mode:value.mode,preDays:value.mode === 'surgery' ? number('preDays',30) : 1,
       postDays:value.mode === 'surgery' ? number('postDays',90) : 1,
-      stayDays:value.mode === 'medical' ? number('stayDays',90) : 1,extras:[...extras]};
+      stayDays:value.mode === 'medical' ? number('stayDays',90) : 1,extras:[...extras],...(template ? {template} : {})};
   }
   function build(value) {
     const config = settings(value);
@@ -81,5 +90,5 @@ globalThis.HajimiNoteCaseCore = (() => {
   function combine(title, sections) {
     return [title,...sections.map(section => section.title+'\n'+section.text)].join('\n\n');
   }
-  return Object.freeze({reference,baseFields,optional,settings,build,facts,inputFor,combine});
+  return Object.freeze({reference,baseFields,templates,templateFor,optional,settings,build,facts,inputFor,combine});
 })();

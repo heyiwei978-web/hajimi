@@ -88,6 +88,72 @@ async function openNoteFrameSection(page, index) {
   if (await toggle.getAttribute('aria-expanded')==='false') await toggle.click();
 }
 
+test('orthopedic checklist supports mobile disease search and direct chapter writing from either template',async()=>{
+  for (const [width,group,label,keyword,hint] of [
+    [390,'TKA','全膝关节置换','tka','测量方式'],
+    [1280,'股骨转子间骨折','股骨粗隆间骨折','转子间','实际活动']
+  ]) {
+    const {page,context,errors}=await pageFor(width);
+    try {
+      await page.route('**/api/session',route=>route.fulfill({json:{authenticated:true,user:'fixture'}}));
+      await page.route('**/api/note-generate?resource=cases',route=>route.fulfill({json:{items:[]}}));
+      const requests=[];
+      await mockNote(page,(route,body)=>{
+        requests.push(body);
+        return route.fulfill({json:{text:'虚构教学病程。活动度【按实际填写】。',model:'deepseek-flash'}});
+      });
+      await page.goto(base+'/note');
+      await page.locator('#noteFrameTemplatePicker summary').click();
+      await page.locator('#noteFrameTemplateSearch').fill('无匹配');
+      assert(await page.locator('#noteFrameTemplateEmpty').isVisible());
+      await page.locator('#noteFrameTemplateSearch').fill(keyword);
+      assert.equal(await page.locator('#noteFrameTemplates button:visible').count(),1);
+      await page.getByRole('button',{name:label,exact:true}).click();
+      const templateLink=page.locator('#noteFrameTemplateLink');
+      assert.equal(await templateLink.getAttribute('href'),'/bl/guke/'+encodeURIComponent(group));
+      await templateLink.click();
+      await page.getByRole('link',{name:'按章节用 DeepSeek 写病历'}).click();
+      await page.getByRole('heading',{name:label+'病历清单',exact:true}).waitFor();
+      assert.equal(await page.locator('[name=diagnosis]').inputValue(),'');
+      assert.equal(requests.length,0);
+      await openNoteInputs(page);
+      await page.locator('#noteModel').selectOption('deepseek-flash');
+      await page.locator('[name=complaint]').fill('虚构主诉');
+      await page.locator('[name=diagnosis]').fill('虚构诊断');
+      await page.locator('[name=operation]').fill('虚构手术');
+      await page.locator('.note-back-to-checklist').click();
+      await page.locator('#noteFrameChapter').selectOption('post-2');
+      assert.equal(await page.locator('.note-frame-row.is-open').getAttribute('data-section'),'post-2');
+      assert((await page.locator('#noteFrameNotesHint').textContent()).includes(hint));
+      await page.locator('#noteFrameSectionNotes').fill('当日虚构记录要点');
+      const row=page.locator('[data-section=post-2]');
+      await row.getByRole('button',{name:'用 DeepSeek 生成：术后第2天病程记录'}).click();
+      await row.getByRole('button',{name:'用 DeepSeek 重生成：术后第2天病程记录'}).waitFor();
+      assert.equal(requests.length,1);
+      assert.equal(requests[0].daily,'当日虚构记录要点');
+      assert.equal(requests[0].day,'2');
+      assert.equal(requests[0].model,'deepseek-flash');
+      assert(!Object.hasOwn(requests[0],'template'));
+      const output=page.locator('#noteFrameOutput');
+      assert(await page.locator('#noteFrameReviewHint').isVisible());
+      await output.fill('人工核对后的虚构病程');
+      assert(!(await page.locator('#noteFrameReviewHint').isVisible()));
+      await page.locator('#noteFrameConfirmed').check();
+      await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{
+        value:{writeText:async text=>{window.copiedChapter=text;}}
+      }));
+      await page.locator('#noteFrameCopySection').click();
+      assert.equal(await page.evaluate(()=>window.copiedChapter),'人工核对后的虚构病程');
+      await page.reload();
+      await page.getByRole('heading',{name:label+'病历清单',exact:true}).waitFor();
+      assert.equal(await output.inputValue(),'人工核对后的虚构病程');
+      assert.equal(requests.length,1);
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+});
+
 test('note draft preserves edited output and manual selection, and reports copy failure',async()=>{
   for(const width of [390,1280]){
     const {page,context,errors}=await pageFor(width);

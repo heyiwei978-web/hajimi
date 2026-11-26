@@ -5,6 +5,9 @@
   const key = 'hajimi-note-case-frame-v1';
   const model = get('noteModel'), form = get('noteForm');
   const directory = get('noteFrameDirectory'), editor = get('noteFrameEditor');
+  const picker = get('noteFrameTemplatePicker'), templateSearch = get('noteFrameTemplateSearch');
+  const templateButtons = new Map();
+  const chapter = get('noteFrameChapter');
   const rows = new Map();
   const filters = [...root.querySelectorAll('[data-frame-filter]')];
   let filter = 'all';
@@ -52,7 +55,7 @@
     render();
   }
   function readConfig() {
-    return Core.settings({mode:get('noteFrameMode').value,preDays:get('noteFramePreDays').value,
+    return Core.settings({template:state?.settings.template,mode:get('noteFrameMode').value,preDays:get('noteFramePreDays').value,
       postDays:get('noteFramePostDays').value,stayDays:get('noteFrameStayDays').value,
       extras:[...get('noteFrameExtras').querySelectorAll('input:checked')].map(input=>input.value)});
   }
@@ -108,6 +111,41 @@
         ...section,text:'',notes:'',model:'',confirmed:false,stale:false,factsKey:''
       }))
     };
+  }
+
+  function filterTemplates() {
+    const query=templateSearch.value.trim().toLowerCase().split(/\s+/);
+    let found=false;
+    for (const item of Core.templates) {
+      const searchable=[item.id,item.label,item.category,item.keywords].join(' ').toLowerCase();
+      const match=query.every(word=>searchable.includes(word));
+      templateButtons.get(item.id).hidden=!match;
+      found=found||match;
+    }
+    get('noteFrameTemplateEmpty').hidden=found;
+  }
+
+  function chooseTemplate(template) {
+    if (busy||page.isBusy()) return;
+    if (state.settings.template!==template.id) {
+      if (page.hasCaseDraft()&&!window.confirm('更换病种会开始一套新病历。当前填写内容和未保存的章节将被清空，确定继续吗？')) return;
+      page.loadFacts({department:'骨科'});
+      state=emptyDraft(Core.settings({mode:'surgery',preDays:3,postDays:14,template:template.id}));
+      dirty=false;filter='all';
+      get('noteFrameSaveStatus').hidden=true;
+      applyConfig(state.settings);
+      persist();
+      const url=new URL(location.href);
+      url.searchParams.delete('case');
+      url.searchParams.set('template',template.id);
+      history.replaceState(null,'',url);
+      render();
+      say('已打开'+template.label+'的病历清单。可按就诊过程调整路径和天数。');
+    }
+    templateSearch.value='';
+    filterTemplates();
+    picker.open=false;
+    get('noteFrameHeading').focus();
   }
 
   function matchesFilter(section) {
@@ -172,6 +210,7 @@
       get('noteFrameWorkspace').append(editor);
       directory.replaceChildren();
       rows.clear();
+      chapter.replaceChildren(new Option('选择文书',''),...state.sections.map(item=>new Option(item.title,item.id)));
       let stage, list;
       for (const section of state.sections) {
         const group = ['internalConsult','mdt'].includes(section.id)
@@ -244,12 +283,20 @@
     get('noteFrameWorkspace').hidden=!state;
     if (!state) return;
     const section=current(), completed=state.sections.filter(ready).length;
+    const template=Core.templateFor(state.settings.template);
+    get('noteFrameHeading').textContent=template ? template.label+'病历清单' : '病历文书清单';
+    get('noteFrameTemplatePicker').querySelector('summary').textContent=template ? '切换病种' : '按病种开始';
+    const templateLink=get('noteFrameTemplateLink');
+    templateLink.hidden=!template;
+    if (template) templateLink.href='/bl/guke/'+encodeURIComponent(template.id);
+    for (const [id,button] of templateButtons) button.setAttribute('aria-pressed',String(id===template?.id));
     get('noteFrameProgress').textContent='已核对 '+completed+' / '+state.sections.length+' 项';
     const {mode,preDays,postDays,stayDays}=state.settings;
     get('noteFrameSettingsSummary').textContent=mode==='surgery'
       ? '手术 · 住院第 '+preDays+' 天手术 · 术后 '+postDays+' 天'
       : '非手术 · 住院 '+stayDays+' 天';
     renderRows();
+    chapter.value=section?.id || '';
     const missing=renderFilters();
     get('noteFrameNext').disabled=busy||completed===state.sections.length;
     editor.hidden=!section;
@@ -261,6 +308,7 @@
     displayedSection=section;
     if (!keepEditor) get('noteFrameTitle').value=state.title;
     get('noteFrameOutput').readOnly=busy;
+    get('noteFrameReviewHint').hidden=!/【(?:按实际填写|待核实|待填写|需补充)[^】\n]*】/.test(section?.text || '');
     get('noteFrameConfirmed').checked=!!section?.confirmed;
     get('noteFrameConfirmed').disabled=busy||!section?.text.trim();
     get('noteFrameConfirmNext').disabled=get('noteFrameConfirmed').disabled;
@@ -269,6 +317,9 @@
     get('noteFrameSectionNotes').placeholder=section?.day
       ? '填写本日症状、查体、检查结果或处理变化'
       : '填写希望写入本章的事实与要点';
+    const hint=get('noteFrameNotesHint');
+    hint.textContent=section?.type==='postDaily' ? template?.postoperative || '' : '';
+    hint.hidden=!hint.textContent;
     const sectionModel = get('noteFrameSectionModel');
     sectionModel.hidden=!section?.model;
     sectionModel.textContent=section?.model ? '本章生成模型：'+section.model : '';
@@ -413,7 +464,7 @@
       next.active ||= next.sections[0].id;
       page.loadFacts(next.facts);
       state=next;dirty=false;filter='all';get('noteFrameSaveStatus').hidden=true;applyConfig(state.settings);persist();render();
-      const url=new URL(location.href);url.searchParams.set('case',state.id);history.replaceState(null,'',url);
+      const url=new URL(location.href);url.searchParams.delete('template');url.searchParams.set('case',state.id);history.replaceState(null,'',url);
       say('已打开网站保存的整套病历，可连续阅读、复制或继续编辑。');
       get('noteFrameHeading').focus();
     } catch (error) {say(error.message,true);}
@@ -439,7 +490,7 @@
         facts:state.facts,sections:state.sections,confirmed:true,revision:state.revision});
       if (typeof data?.revision!=='string'||data?.record?.id!==state.id) throw new Error('保存结果待确认，请通过病历链接核对');
       state.revision=data.revision;dirty=false;persist();
-      const url=new URL(location.href);url.searchParams.set('case',state.id);history.replaceState(null,'',url);
+      const url=new URL(location.href);url.searchParams.delete('template');url.searchParams.set('case',state.id);history.replaceState(null,'',url);
       saveFeedback(data.warning||'完整病历已保存到网站，仅本人登录后可见。');
       await reloadSaved();
     } catch (error) {saveFeedback(error.message+' 当前编辑内容已保留。',true);}
@@ -482,6 +533,22 @@
     } catch (error) {status.textContent=error.message+'；可继续使用原配置默认模型。';}
   }
   page.setFrameDraftCheck(hasFrameWork);
+  for (const template of Core.templates) {
+    const button=document.createElement('button');
+    button.type='button';
+    button.className='note-button note-secondary';
+    button.textContent=template.label;
+    button.addEventListener('click',()=>chooseTemplate(template));
+    templateButtons.set(template.id,button);
+    get('noteFrameTemplates').append(button);
+  }
+  templateSearch.addEventListener('input',filterTemplates);
+  chapter.addEventListener('change',()=>{
+    if (busy||page.isBusy()||!chapter.value) return;
+    const target=state.sections.find(item=>item.id===chapter.value);
+    if (!matchesFilter(target)) filter='all';
+    selectSection(target.id,{jump:true});
+  });
   filters.forEach(button=>button.addEventListener('click',()=>{
     filter=button.dataset.frameFilter;
     if (current()&&!matchesFilter(current())) selectSection('');
@@ -569,7 +636,14 @@
     const section=current();
     if (busy||!section?.text.trim()) return;
     try {await navigator.clipboard.writeText(section.text);say('已复制本章正文。',false,section.id);}
-    catch {say('复制失败，请选中正文后使用系统复制。',true,section.id);}
+    catch {
+      if (current()!==section) return;
+      const output=get('noteFrameOutput');
+      output.focus({preventScroll:true});
+      output.select();
+      output.setSelectionRange(0,output.value.length);
+      say('浏览器未授权自动复制。已选中本章正文，请使用系统复制。',true,section.id);
+    }
   });
   get('noteFrameTitle').addEventListener('input',()=>{if (!state||busy) return;state.title=get('noteFrameTitle').value;touch();render({keepEditor:true});});
   get('noteFrameFinalConfirm').addEventListener('change',()=>{if (!state||busy) return;state.finalConfirmed=get('noteFrameFinalConfirm').checked;persist();render({keepEditor:true});});
@@ -596,6 +670,15 @@
     if (draft) {state=hydrate(draft,draft.revision);dirty=draft.dirty!==false;applyConfig(state.settings);syncFacts();render();say('已恢复本标签页的病历框架，未自动发送生成请求。');}
   } catch {say('框架草稿无法恢复，网站已保存的病历仍可从列表打开。',true);}
   if (!state) {state=emptyDraft(readConfig());render();}
+  const requestedTemplate=Core.templateFor(new URL(location.href).searchParams.get('template'));
+  if (requestedTemplate&&requestedTemplate.id!==state.settings.template) {
+    if (page.hasCaseDraft()) {
+      picker.open=true;
+      templateSearch.value=requestedTemplate.label;
+      filterTemplates();
+      say('本标签页还有一份病历草稿。点击病种可开始新病历。');
+    } else chooseTemplate(requestedTemplate);
+  }
   modeChanged();
   fetch('/api/session',{credentials:'same-origin'}).then(response=>response.json()).then(session=>{
     if (session.authenticated) {

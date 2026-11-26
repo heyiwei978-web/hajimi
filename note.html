@@ -31,7 +31,7 @@
     <span>示例内容会发送给第三方 AI 服务。请勿输入真实患者身份或病情，生成后请逐项核对。</span>
   </section>
 
-  <p id="noteLogin" class="note-login" hidden>需要先<a href="/admin">登录管理入口</a>才能使用 AI 生成；登录后回到本页，本标签页已填写的草稿会保留。</p>
+  <p id="noteLogin" class="note-login" hidden>请先<a href="/admin?next=/note">登录管理入口</a>，登录后会返回本页并保留已填写的草稿。</p>
 
   <details id="noteSharedInputs" class="note-card note-shared">
     <summary>共用病情与 DeepSeek 模型</summary>
@@ -167,10 +167,17 @@
   </details>
 
   <section id="noteCaseFrame" class="note-card note-frame" aria-labelledby="noteFrameHeading">
+    <details id="noteFrameTemplatePicker" class="note-details note-frame-template-picker">
+      <summary>按病种开始</summary>
+      <label class="note-field">搜索病种<input id="noteFrameTemplateSearch" type="search" maxlength="50" autocomplete="off" placeholder="例如 TKA、粗隆间、转子间"></label>
+      <div id="noteFrameTemplates" class="note-frame-templates" role="group" aria-label="可用病种"></div>
+      <p id="noteFrameTemplateEmpty" class="note-tip" role="status" hidden>没有找到匹配的病种。</p>
+    </details>
     <div class="note-frame-heading">
       <h2 id="noteFrameHeading" tabindex="-1">病历文书清单</h2>
       <p id="noteFrameProgress" class="note-frame-progress" role="status"></p>
     </div>
+    <a id="noteFrameTemplateLink" class="note-inline-link" hidden>查看整套原始模板和签字沟通文书</a>
     <details id="noteFrameSettings" class="note-details note-frame-settings">
       <summary>路径与天数 <span id="noteFrameSettingsSummary"></span></summary>
       <div class="note-frame-config">
@@ -198,11 +205,14 @@
           <a class="note-inline-link" href="#noteFrameCompletion">跳到整套保存 ↓</a>
         </div>
       </div>
+      <label class="note-field">跳转到章节<select id="noteFrameChapter"><option value="">选择文书</option></select></label>
       <p id="noteFrameFilterEmpty" class="note-tip" role="status" hidden></p>
       <div id="noteFrameDirectory" class="note-frame-directory"></div>
       <div id="noteFrameEditor" class="note-frame-editor" hidden>
-        <label class="note-field"><span id="noteFrameNotesLabel">本章补充要点</span><textarea id="noteFrameSectionNotes" maxlength="600" rows="3"></textarea></label>
-        <label class="note-field">本章正文<textarea id="noteFrameOutput" rows="12" maxlength="16000" spellcheck="false"></textarea></label>
+        <label class="note-field"><span id="noteFrameNotesLabel">本章补充要点</span><textarea id="noteFrameSectionNotes" maxlength="600" rows="3" aria-describedby="noteFrameNotesHint"></textarea></label>
+        <p id="noteFrameNotesHint" class="note-tip" hidden></p>
+        <p id="noteFrameReviewHint" class="note-status note-error" role="status" hidden>正文中还有待补录或核实的标记，请对照本章资料检查后再复制。</p>
+        <label class="note-field">本章正文<textarea id="noteFrameOutput" rows="8" maxlength="16000" spellcheck="false"></textarea></label>
         <label class="note-frame-confirm"><input id="noteFrameConfirmed" type="checkbox">我已核对本章内容</label>
         <p id="noteFrameSectionModel" class="note-tip" hidden></p>
         <div class="note-frame-shortcuts">
