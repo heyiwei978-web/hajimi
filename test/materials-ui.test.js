@@ -58,7 +58,7 @@ test('pinyin runtime build helper generates a working browser initials lookup', 
   const ctx = {window: {}};
   vm.runInNewContext(code, ctx, {filename: 'pinyin-initials.js'});
   assert.ok(ctx.window.HAJIMI_PINYIN_INITIALS.initialsOf('股骨颈骨折').includes('ggjgz'));
-  assert.match(ctx.window.HAJIMI_PINYIN_INITIALS.textInitials('髋关节置换抗凝要点'), /kgjzhkgyd|ggjzhkgyd|hgjzhkgyd/);
+  assert.equal(ctx.window.HAJIMI_PINYIN_INITIALS.textInitials('髋关节置换抗凝要点'), 'kgjzhknyd');
 });
 
 test('pdfjs-dist build helper copies runtime, worker, cmaps and standard fonts when installed', t => {
