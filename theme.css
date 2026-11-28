@@ -739,3 +739,55 @@ main:focus{outline:none}
   .site-nav svg{width:20px;height:20px}
 }
 @media print{.site-header,.site-nav{display:none}}
+
+/* Shared orthopedic exam dialog on the tools and record pages. */
+.ortho-exam-dialog {
+  box-sizing:border-box;
+  width:min(700px,calc(100% - 24px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));
+  max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+  padding:clamp(12px,3vw,24px);
+  border:1px solid var(--ds-line);
+  border-radius:14px;
+  color:var(--ds-text);
+  background:var(--ds-surface);
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+.ortho-exam-dialog::backdrop { background:var(--ds-ink); opacity:.54; }
+.ortho-exam-dialog header,.ortho-exam-dialog footer { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.ortho-exam-dialog header { justify-content:space-between; }
+.ortho-exam-dialog h2 { margin:0; font-size:1.25rem; }
+.ortho-exam-dialog p { margin:8px 0; color:var(--ds-muted); }
+.ortho-exam-dialog label { display:block; min-width:0; margin:8px 0; font-size:.9375rem; }
+.ortho-exam-dialog input:not([type="checkbox"]),.ortho-exam-dialog select,.ortho-exam-dialog textarea {
+  box-sizing:border-box;
+  display:block;
+  width:100%;
+  min-height:44px;
+  margin-top:4px;
+  padding:8px 10px;
+  border:1px solid var(--ds-line-strong);
+  border-radius:8px;
+  background:var(--ds-surface);
+  color:var(--ds-ink);
+  font:inherit;
+}
+.ortho-exam-dialog textarea { resize:vertical; }
+.ortho-exam-dialog fieldset { min-width:0; margin:12px 0; padding:8px 12px; border:1px solid var(--ds-line); border-radius:10px; }
+.ortho-exam-dialog legend { font-weight:650; }
+.ortho-exam-quick { display:flex; flex-wrap:wrap; gap:4px 12px; }
+.ortho-exam-quick label { display:inline-flex; align-items:center; gap:4px; min-height:40px; margin:0; }
+.ortho-exam-quick input { accent-color:var(--ds-blue); }
+.ortho-exam-dialog button {
+  min-height:44px;
+  padding:8px 14px;
+  border:1px solid var(--ds-line-strong);
+  border-radius:8px;
+  background:var(--ds-bg);
+  color:var(--ds-ink);
+  font:inherit;
+  font-weight:650;
+  cursor:pointer;
+}
+.ortho-exam-dialog footer button:last-child { background:var(--ds-blue-50); }
+.ortho-exam-dialog button:disabled { opacity:.55; cursor:default; }

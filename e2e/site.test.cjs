@@ -3383,3 +3383,71 @@ test('custom not-found page keeps navigation usable on mobile and desktop',async
     }finally{await context.close();}
   }
 });
+
+test('orthopedic exam keeps sides and templates separate and fills only the exam chapter',async()=>{
+  for (const width of [390,1280]) {
+    const {page,context,errors}=await pageFor(width);
+    try {
+      let generated=0;
+      await mockNote(page,route=>{generated++;return route.fulfill({json:{text:'虚构生成结果'}});});
+      await page.goto(base+'/tools');
+      await page.locator('#openOrthoExam').click();
+      const dialog=page.getByRole('dialog',{name:'骨科专科查体'});
+      const preset=dialog.getByLabel('查体模板');
+      const side=dialog.getByLabel('检查侧别');
+      const output=dialog.getByLabel('生成正文');
+      const copy=dialog.getByRole('button',{name:'复制正文'});
+      assert(await dialog.isVisible());
+      assert(await copy.isDisabled());
+      assert(await dialog.evaluate(el=>el.scrollWidth<=el.clientWidth));
+      await preset.selectOption('ankle-fracture');
+      await side.selectOption('left');
+      await dialog.locator('fieldset[data-exam-side="left"]').getByLabel('远端动脉搏动').selectOption('减弱');
+      assert.equal(await output.inputValue(),'左侧踝部查体：远端动脉搏动：减弱。');
+      await side.selectOption('right');
+      assert.equal(await output.inputValue(),'');
+      await side.selectOption('both');
+      assert(await copy.isDisabled());
+      await dialog.locator('fieldset[data-exam-side="right"]').getByLabel('局部肿胀').check();
+      const bilateral='左侧踝部查体：远端动脉搏动：减弱。\n右侧踝部查体：视诊：局部肿胀。';
+      assert.equal(await output.inputValue(),bilateral);
+      await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{
+        configurable:true,value:{writeText:async value=>{window.__copiedExam=value;}}
+      }));
+      await copy.click();
+      assert.equal(await page.evaluate(()=>window.__copiedExam),bilateral);
+      page.once('dialog',prompt=>prompt.accept());
+      await preset.selectOption('distal-radius');
+      assert.equal(await output.inputValue(),'');
+      await dialog.getByRole('button',{name:'关闭'}).click();
+      await dialog.waitFor({state:'hidden'});
+
+      await page.goto(base+'/note');
+      await page.locator('#noteFrameSettings > summary').click();
+      await page.locator('#noteFrameExtras input[value=specialExam]').check();
+      await page.locator('#noteFrameBuild').click();
+      const section=page.locator('#noteFrameDirectory .note-frame-row').filter({
+        has:page.getByRole('heading',{name:'专科检查',exact:true})
+      });
+      await section.locator('button[aria-expanded]').click();
+      const chapter=page.locator('#noteFrameOutput');
+      await chapter.fill('原有虚构正文');
+      await page.locator('#noteFrameConfirmed').check();
+      await page.locator('#noteFrameOrthoExam').click();
+      await preset.selectOption('knee-replacement');
+      await side.selectOption('right');
+      await dialog.locator('fieldset[data-exam-side="right"]').getByLabel('屈曲（主动 ROM）').fill('0°–90°');
+      const insert=dialog.getByRole('button',{name:'填入本章'});
+      page.once('dialog',prompt=>prompt.dismiss());
+      await insert.click();
+      assert.equal(await chapter.inputValue(),'原有虚构正文');
+      page.once('dialog',prompt=>prompt.accept());
+      await insert.click();
+      await dialog.waitFor({state:'hidden'});
+      assert.equal(await chapter.inputValue(),'右侧膝关节查体：活动度屈曲：主动0°–90°。');
+      assert.equal(await page.locator('#noteFrameConfirmed').isChecked(),false);
+      assert.equal(generated,0);
+      assert.deepEqual(errors,[]);
+    } finally {await context.close();}
+  }
+});
