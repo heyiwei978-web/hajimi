@@ -10,6 +10,7 @@ import {renderWorkspaceNav, writeBuiltNavigation} from './navigation-build.mjs';
 import {writeBuiltDepartmentPages} from './department-build.mjs';
 import {writeAssetVersions} from './asset-versions.mjs';
 import {writeSiteSearch} from './site-search-build.mjs';
+import {copyPdfjsAssets, writePinyinRuntime} from './pdfjs-build.mjs';
 
 // Keep homepage markup in index.html as the single source for both entry points.
 export function buildHome(source) {
@@ -34,6 +35,7 @@ ${scripts}</body></html>
 }
 
 function workspaceScripts(id) {
+  if (id === 'materials') return '<script defer src="/materials-hub.js?v=1"></script>\n';
   if (id !== 'home' && id !== 'personal') return '';
   return '<script defer src="/library-personal.js?v=1"></script>\n'
     + '<script defer src="/workstation-cases.js?v=1"></script>\n'
@@ -88,8 +90,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     });
     writeFileSync(new URL('note-cases.json',directory),JSON.stringify(noteCases));
     const ecg=compileEcg(directory);
-    // Written before asset versioning so /search picks up a content-hashed URL.
+    // Written before asset versioning so /search and /materials/library pick up content-hashed URLs.
     const search=writeSiteSearch(directory,manifest,publication.published);
+    writePinyinRuntime(directory);
+    const pdfjs=copyPdfjsAssets(directory);
     writeBuiltNavigation(directory);
     writeBuiltDepartmentPages(directory);
     writeWorkspaceSections(directory, readFileSync(new URL('home.html',directory), 'utf8'),
@@ -99,6 +103,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     assertPublicResources(directory,JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8')),manifest);
     console.log('Built lightweight homepage and clinical library in dist/');
     console.log('Built site search index ('+search.documents.length+' entries)');
+    if(pdfjs.copied)console.log('Copied PDF.js assets ('+pdfjs.files+' files)');
     console.log('Built ECG shell assets/'+ecg.name+' ('+Math.round(ecg.bytes/1024)+' KB) and data assets/'+ecg.dataName+' ('+ecg.entries+' entries, '+Math.round(ecg.dataBytes/1024)+' KB)');
   }
 }

@@ -18,6 +18,7 @@
     "perf:baseline": "node scripts/perf-baseline.mjs"
   },
   "devDependencies": {
+    "pdfjs-dist": "4.10.38",
     "playwright": "1.65.1"
   },
   "overrides": {

@@ -38,6 +38,7 @@ export const MODULES = Object.freeze([
   {id: 'duty', label: '值班资料', href: '/duty', hub: 'clinical', routes: ['/duty', '/duty/', '/duty/orders', '/duty/orders/']},
   {id: 'tools', label: '临床工具', href: '/tools', hub: 'clinical', routes: ['/tools', '/tools/']},
   {id: 'note', label: 'AI 病历生成', href: '/note', hub: 'clinical', routes: ['/note', '/note/']},
+  {id: 'materials-library', label: '个人资料库', href: '/materials/library', hub: 'materials', routes: ['/materials/library', '/materials/library/']},
   {id: 'admin', label: '管理入口', href: '/admin', hub: 'personal', routes: ['/admin', '/admin/', '/admin/password']},
   // Site-wide search is reached from the search boxes, not the main navigation.
   {id: 'search', label: '全站搜索', href: '/search', routes: ['/search', '/search/']}
@@ -101,6 +102,7 @@ export const NAV_SURFACES = Object.freeze([
   {file: 'admin.html', variant: 'site', active: 'admin'},
   {file: 'search.html', variant: 'site', active: null},
   {file: 'note.html', variant: 'site', active: 'note'},
+  {file: 'materials-library.html', variant: 'site', active: 'materials-library'},
   {file: 'tools.html', variant: 'site', active: 'tools'},
   {file: '404.html', variant: 'site', active: null},
   {file: 'index.html', region: 'libraryShell', variant: 'library', active: 'records'}

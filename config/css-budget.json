@@ -37,6 +37,10 @@
       "important": 1,
       "colorLiterals": 1
     },
+    "materials-library.css": {
+      "important": 0,
+      "colorLiterals": 0
+    },
     "note-case.css": {
       "important": 0,
       "colorLiterals": 8

@@ -70,3 +70,20 @@ DATA FILES OR SOFTWARE.
 not be used in advertising or otherwise to promote the sale, use or other
 dealings in these Data Files or Software without prior written authorization
 of the copyright holder.
+
+## PDF.js (`pdfjs-dist`) — Apache License 2.0
+
+The personal materials library (`/materials/library`) uses Mozilla
+[PDF.js](https://github.com/mozilla/pdf.js) (`pdfjs-dist`) copied into
+`dist/assets/pdfjs/` at build time for same-origin PDF page rendering, outline
+reading, and local text extraction under strict `script-src 'self'`.
+
+Copyright 2024 Mozilla Foundation
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at <https://www.apache.org/licenses/LICENSE-2.0>. Unless required by
+applicable law or agreed to in writing, software distributed under the License
+is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.
+
