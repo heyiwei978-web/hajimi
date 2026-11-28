@@ -261,6 +261,9 @@
     displayedSection=section;
     if (!keepEditor) get('noteFrameTitle').value=state.title;
     get('noteFrameOutput').readOnly=busy;
+    const examButton = get('noteFrameOrthoExam');
+    examButton.hidden = section?.id !== 'specialExam' || !globalThis.HajimiOrthoExam;
+    examButton.disabled = busy;
     get('noteFrameConfirmed').checked=!!section?.confirmed;
     get('noteFrameConfirmed').disabled=busy||!section?.text.trim();
     get('noteFrameConfirmNext').disabled=get('noteFrameConfirmed').disabled;
@@ -546,6 +549,21 @@
     if (!state||busy) return;
     const section=current();section.text=get('noteFrameOutput').value;section.confirmed=false;
     section.stale=false;section.factsKey=signature(state.facts);touch();render({keepEditor:true});
+  });
+  get('noteFrameOrthoExam').addEventListener('click', () => {
+    const draft = state;
+    const section = current();
+    if (busy || section?.id !== 'specialExam') return;
+    globalThis.HajimiOrthoExam.open({apply(text) {
+      if (busy || state !== draft || current() !== section) return false;
+      if (section.text.trim() && !window.confirm('用查体书写器生成的正文替换当前专科检查？')) return false;
+      const output = get('noteFrameOutput');
+      section.model = '';
+      output.value = text;
+      output.dispatchEvent(new Event('input', {bubbles: true}));
+      say('已填入专科检查，请核对本章正文。', false, section.id);
+      return true;
+    }});
   });
   get('noteFrameSectionNotes').addEventListener('input',()=>{
     if (!state||busy) return;
