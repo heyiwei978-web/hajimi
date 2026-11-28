@@ -45,6 +45,10 @@
       "important": 1,
       "colorLiterals": 26
     },
+    "ortho-exam.css": {
+      "important": 0,
+      "colorLiterals": 0
+    },
     "pathway.css": {
       "important": 2,
       "colorLiterals": 60

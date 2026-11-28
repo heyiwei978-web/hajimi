@@ -1,0 +1,276 @@
+.ortho-exam {
+  margin: 0;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font-family: system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.ortho-exam [hidden] {
+  display: none;
+}
+
+.exam-main {
+  max-width: 1240px;
+  margin-inline: auto;
+  padding: 26px clamp(16px, 4vw, 46px) calc(32px + var(--site-tabbar-height, 0px));
+}
+
+.exam-heading h1 {
+  margin: 0;
+  color: var(--ds-ink);
+  font-size: clamp(24px, 4vw, 36px);
+}
+
+.exam-main :where(p) {
+  margin: 0;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.exam-heading p {
+  margin-top: 6px;
+  color: var(--ds-muted);
+}
+
+.exam-modes,
+.exam-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.exam-modes {
+  margin-block: 18px 12px;
+}
+
+.exam-modes a,
+.exam-main button {
+  min-height: 44px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border: 1px solid var(--ds-line-strong);
+  border-radius: 8px;
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font: inherit;
+  line-height: 1.35;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.exam-modes a[aria-current],
+.exam-main button.exam-primary {
+  border-color: var(--ds-blue-strong);
+  background: var(--ds-blue-strong);
+  color: var(--ds-surface);
+}
+
+.exam-main button:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+.exam-source,
+.exam-panel,
+.exam-dialog {
+  min-width: 0;
+  border: 1px solid var(--ds-line);
+  border-radius: 14px;
+  background: var(--ds-surface);
+}
+
+.exam-source {
+  padding: 8px 14px;
+}
+
+.exam-source summary,
+.exam-reference summary {
+  min-height: 38px;
+  align-content: center;
+  color: var(--ds-blue-strong);
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.exam-source .exam-field {
+  margin-top: 10px;
+}
+
+.exam-panel {
+  padding: clamp(14px, 3vw, 22px);
+  box-shadow: var(--ds-shadow-xs);
+}
+
+.exam-panel > * + *,
+.exam-dialog p + p {
+  margin-top: 12px;
+}
+
+.exam-panel h2,
+.exam-dialog h2,
+.exam-panel h3,
+.exam-panel h4 {
+  margin-block: 0;
+  overflow-wrap: anywhere;
+  color: var(--ds-ink);
+}
+
+.exam-panel h2,
+.exam-dialog h2 {
+  font-size: 1.18rem;
+}
+
+.exam-panel h3 {
+  font-size: 1.05rem;
+}
+
+.exam-workspace,
+.exam-stack,
+.exam-grid {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.exam-workspace {
+  align-items: start;
+}
+
+.exam-field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+
+.exam-field input,
+.exam-field select,
+.exam-field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--ds-line-strong);
+  border-radius: 8px;
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-weight: 400;
+}
+
+.exam-field textarea {
+  resize: vertical;
+}
+
+.exam-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  min-height: 44px;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  background: var(--ds-bg);
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+.exam-choice input {
+  flex: none;
+  margin-top: 4px;
+  accent-color: var(--ds-blue-strong);
+}
+
+.exam-controls {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.exam-controls legend {
+  margin-bottom: 6px;
+  padding: 0;
+  font-weight: 650;
+}
+
+.exam-test,
+.exam-reveal {
+  padding: 10px;
+  border: 1px solid var(--ds-line);
+  border-radius: 8px;
+}
+
+.exam-test > * + * {
+  margin-top: 6px;
+}
+
+.exam-test .exam-actions {
+  justify-content: space-between;
+}
+
+.exam-rom {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+}
+
+.exam-rom strong {
+  grid-column: 1 / -1;
+}
+
+.exam-notice {
+  margin-block: 8px;
+  color: var(--ds-blue-strong);
+}
+
+.exam-notice:empty {
+  display: none;
+}
+
+.exam-muted,
+.exam-reference {
+  color: var(--ds-muted);
+}
+
+.exam-study {
+  max-width: 900px;
+}
+
+.exam-dialog {
+  box-sizing: border-box;
+  width: min(600px, calc(100% - 28px));
+  max-height: 78vh;
+  padding: 16px;
+  color: var(--ds-text);
+}
+
+.exam-dialog .exam-actions {
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+@media (min-width: 610px) {
+  .exam-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .exam-rom {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 940px) {
+  .exam-workspace {
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  }
+  .exam-result {
+    position: sticky;
+    top: 80px;
+  }
+}

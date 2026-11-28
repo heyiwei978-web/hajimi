@@ -3383,3 +3383,113 @@ test('custom not-found page keeps navigation usable on mobile and desktop',async
     }finally{await context.close();}
   }
 });
+
+test('orthopedic exam writes independent findings by side and restores the session draft', async () => {
+  for (const width of [390, 1280]) {
+    const {page, context, errors} = await pageFor(width, {permissions: ['clipboard-read', 'clipboard-write']});
+    try {
+      await page.goto(base + '/clinical');
+      await page.getByRole('link', {name: /骨科专科查体/}).click();
+      const output = page.locator('#examOutput');
+      assert.equal(await output.inputValue(), '');
+      assert.equal(await page.locator('#examSide').inputValue(), '');
+      assert(await page.locator('#examCopy').isDisabled());
+      await page.locator('#examTemplate').selectOption('region-knee');
+      await page.locator('#examSide').selectOption('双侧');
+      const left = page.getByRole('region', {name: '左侧查体所见', exact: true});
+      const right = page.getByRole('region', {name: '右侧查体所见', exact: true});
+      await left.getByText('肿胀', {exact: true}).click();
+      await left.getByLabel('主动', {exact: true}).first().fill('0–90°');
+      await right.getByLabel('远端动脉搏动', {exact: true}).fill('足背动脉可触及');
+      const written = await output.inputValue();
+      assert.match(written, /^专科查体：\n左侧：视诊：肿胀；关节活动度：膝关节屈曲 主动0–90°。\n右侧：神经、血运及皮肤：远端动脉搏动 足背动脉可触及。$/);
+      await page.locator('#examCopy').click();
+      assert.equal(await page.evaluate(() => navigator.clipboard.readText()), written);
+      const downloading = page.waitForEvent('download');
+      await page.locator('#examExport').click();
+      const download = await downloading;
+      assert.equal(download.suggestedFilename(), '骨科专科查体.txt');
+      assert.equal(fs.readFileSync(await download.path(), 'utf8'), '\uFEFF' + written);
+      await page.locator('#examSave').click();
+      assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+      await page.reload();
+      assert.equal(await output.inputValue(), '');
+      await page.locator('#examLoad').click();
+      assert.equal(await output.inputValue(), written);
+      page.once('dialog', dialog => dialog.accept());
+      await page.locator('#examReset').click();
+      assert.equal(await output.inputValue(), '');
+      assert.equal(await page.evaluate(() => sessionStorage.getItem('hajimi.ortho-exam.draft.v1')), null);
+      assert.deepEqual(errors, []);
+    } finally {
+      await context.close();
+    }
+  }
+});
+
+test('orthopedic exam imports only v10 data, shares guided results by side and runs a case', async () => {
+  const {page, context, errors} = await pageFor(390);
+  try {
+    const source = {
+      JOINTS: {knee: {name: '示例关节', dirs: [['屈曲', '参考值']]}},
+      SPECIAL: {'示例试验阳性': {how: '操作说明', meaning: '临床意义', positive: '判定说明'}},
+      DECISION_GUIDES: {knee: {name: '示例流程', stages: [
+        {title: '核对', why: '检查范围', checks: [['完成核对', '同侧检查']]},
+        {title: '试验', why: '试验记录', tests: [['示例试验阳性', '按实际选择']]}
+      ]}},
+      diseases: [{
+        id: 'example', category: '示例', name: '示例模板', head: '膝部', tip: '查体提示',
+        template: '<b>资料按纯文本显示</b>', joints: ['knee'], inspect: ['肿胀'], palp: [], special: ['示例试验阳性']
+      }],
+      OPTS: {},
+      KNEE_KNOWLEDGE: [{
+        id: 'topic', name: '示例主题', subtitle: '示例简介', pearl: '复习要点',
+        sections: [['主题', ['示例段落']]], exams: ['示例试验阳性']
+      }],
+      KNEE_CASES: [{
+        id: 'case', title: '示例病例', disease: '病例标签', level: '初级', story: '合成病例资料',
+        reveals: ['复盘文字'], questions: [{q: '选择示例答案', why: '解析说明', opts: ['选项一', '选项二'], answer: 1}]
+      }]
+    };
+    for (const region of ['SHOULDER', 'HIP', 'WRIST', 'ANKLE', 'ELBOW']) {
+      source[region + '_KNOWLEDGE'] = [];
+      source[region + '_CASES'] = [];
+    }
+    const declarations = Object.entries(source).map(([key, value]) => 'const ' + key + ' = ' + JSON.stringify(value) + ';');
+    const html = ['<script>', ...declarations, 'window.importedFileExecuted = true;', '</script>'].join('\n');
+    await page.goto(base + '/study');
+    await page.getByRole('link', {name: /骨科查体与病例训练/}).click();
+    await page.getByRole('button', {name: '选择资料文件'}).click();
+    const input = page.locator('#examImport');
+    await input.setInputFiles({name: 'invalid.html', mimeType: 'text/html', buffer: Buffer.from('<html></html>')});
+    await page.getByText(/导入失败/).waitFor();
+    await input.setInputFiles({name: 'exam-v10.html', mimeType: 'text/html', buffer: Buffer.from(html)});
+    await page.getByRole('heading', {name: '示例主题', exact: true}).waitFor();
+    assert.equal(await page.evaluate(() => window.importedFileExecuted), undefined);
+    await page.getByRole('button', {name: '练习相关病例'}).click();
+    await page.getByText('选项二', {exact: true}).click();
+    await page.getByRole('button', {name: '提交答案'}).click();
+    assert.match(await page.locator('#examCaseFeedback').textContent(), /回答正确.*解析说明/);
+    await page.getByRole('button', {name: '查看病例总结'}).click();
+    assert.match(await page.locator('#examStudyBody').textContent(), /本病例得分 1 \/ 1/);
+
+    await page.getByRole('link', {name: '分步查体', exact: true}).click();
+    await page.locator('#examSide').selectOption('双侧');
+    await page.locator('#examGuideRegion').selectOption('knee');
+    await page.getByText('完成核对', {exact: true}).click();
+    assert.equal(await page.locator('#examOutput').inputValue(), '');
+    await page.getByRole('button', {name: '下一步'}).click();
+    await page.getByLabel('左侧 · 示例试验', {exact: true}).selectOption('阳性');
+    await page.getByLabel('右侧 · 示例试验', {exact: true}).selectOption('阴性');
+    await page.getByRole('link', {name: '查体书写', exact: true}).click();
+    await page.locator('#examTemplate').selectOption('example');
+    await page.getByText('查看附件中的参考范例', {exact: true}).click();
+    assert.equal(await page.locator('#examReferenceText').textContent(), '<b>资料按纯文本显示</b>');
+    assert.equal(await page.locator('#examReferenceText b').count(), 0);
+    assert.match(await page.locator('#examOutput').inputValue(), /左侧：特殊试验：示例试验（阳性）。\n右侧：特殊试验：示例试验（阴性）。/);
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    assert.deepEqual(errors, []);
+  } finally {
+    await context.close();
+  }
+});

@@ -103,8 +103,8 @@ test('normal build consumes registry changes from a clean copy without exposing 
   }
   // Every page shows the five destinations, so renaming one changes every page with a navigation.
   assert.deepEqual(changed.sort(), ['404.html', 'admin.html', 'classification.html', 'clinical.html', 'duty-orders.html', 'duty.html',
-    'ecg.html', 'home.html', 'index.html', 'labs.html', 'library.html', 'materials.html', 'note.html', 'pathway.html', 'personal.html',
+    'ecg.html', 'home.html', 'index.html', 'labs.html', 'library.html', 'materials.html', 'note.html', 'ortho-exam.html', 'pathway.html', 'personal.html',
     'search.html', 'study.html', 'tools.html']);
   // One navigation link per page (library.html also carries the hidden workspace header), plus the 资料 page's title.
-  assert.equal(occurrences, 20, 'navigation links follow the registered label');
+  assert.equal(occurrences, changed.length + 2, 'navigation links follow the registered label');
 });
