@@ -37,6 +37,7 @@ export const MODULES = Object.freeze([
   {id: 'pathway', label: '临床路径', href: '/pathway', hub: 'clinical', routes: ['/pathway', '/pathway/']},
   {id: 'duty', label: '值班资料', href: '/duty', hub: 'clinical', routes: ['/duty', '/duty/', '/duty/orders', '/duty/orders/']},
   {id: 'tools', label: '临床工具', href: '/tools', hub: 'clinical', routes: ['/tools', '/tools/']},
+  {id: 'ortho-exam', label: '骨科专科查体', href: '/ortho-exam', hub: 'clinical', routes: ['/ortho-exam', '/ortho-exam/']},
   {id: 'note', label: 'AI 病历生成', href: '/note', hub: 'clinical', routes: ['/note', '/note/']},
   {id: 'admin', label: '管理入口', href: '/admin', hub: 'personal', routes: ['/admin', '/admin/', '/admin/password']},
   // Site-wide search is reached from the search boxes, not the main navigation.
@@ -101,6 +102,7 @@ export const NAV_SURFACES = Object.freeze([
   {file: 'admin.html', variant: 'site', active: 'admin'},
   {file: 'search.html', variant: 'site', active: null},
   {file: 'note.html', variant: 'site', active: 'note'},
+  {file: 'ortho-exam.html', variant: 'site', active: 'ortho-exam'},
   {file: 'tools.html', variant: 'site', active: 'tools'},
   {file: '404.html', variant: 'site', active: null},
   {file: 'index.html', region: 'libraryShell', variant: 'library', active: 'records'}

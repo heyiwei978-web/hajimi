@@ -89,6 +89,14 @@
       "destination": "/note.html"
     },
     {
+      "source": "/ortho-exam",
+      "destination": "/ortho-exam.html"
+    },
+    {
+      "source": "/ortho-exam/",
+      "destination": "/ortho-exam.html"
+    },
+    {
       "source": "/tools",
       "destination": "/tools.html"
     },

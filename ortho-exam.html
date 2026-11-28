@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f8f8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%228%22%20fill%3D%22%2311697a%22%2F%3E%3Cg%20transform%3D%22translate(4%204)%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.65%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%206c-2.5-1.7-6-2.2-9-1v13c3-1.2%206.5-1%209%201%202.5-2%206-2.2%209-1V5c-3-1.2-6.5-.7-9%201v13M15%2011h3m-1.5-1.5v3%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<title>骨科专科查体 · 哈基米工作站</title>
+<link rel="stylesheet" href="/theme.css?v=1">
+<link rel="stylesheet" href="/ortho-exam.css?v=1">
+<script defer src="/ortho-exam-import.js?v=1"></script>
+<script defer src="/ortho-exam.js?v=1"></script>
+</head>
+<body class="ortho-exam">
+<a class="skip-link" href="#examMain">跳到主要内容</a>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="site-brand" href="/"><span class="site-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-2.5-1.7-6-2.2-9-1v13c3-1.2 6.5-1 9 1 2.5-2 6-2.2 9-1V5c-3-1.2-6.5-.7-9 1v13M15 11h3m-1.5-1.5v3"/></svg></span><span class="site-brand-text"><strong>哈基米工作站</strong><small>个人医学工作台</small></span></a>
+    <nav class="site-nav" aria-label="主导航"><a href="/"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l-2 0l9 -9l9 9l-2 0M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1 -1v-7M9 20v-6h6v6"/></svg><span>工作台</span></a><a class="active" href="/clinical" aria-current="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h-2v5a5 5 0 0 0 10 0V4h-2m-3 10v3a4 4 0 0 0 8 0v-2"/><circle cx="17" cy="12" r="3"/></svg><span>临床</span></a><a href="/materials"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14m-9 -3c3.3 -1.5 6.3 -1.5 9 0c2.7 -1.5 5.7 -1.5 9 0V5c-3.3 -1.5 -6.3 -1.5 -9 0c-2.7 -1.5 -5.7 -1.5 -9 0z"/></svg><span>资料</span></a><a href="/study"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 9l-10 -5l-10 5l10 5l10 -5v6M6 11v6a6 3 0 0 0 12 0v-6"/></svg><span>学习</span></a><a href="/personal"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></svg><span>我的</span></a></nav>
+  </div>
+</header>
+<main id="examMain" class="exam-main">
+  <div class="exam-heading">
+    <h1>骨科专科查体</h1>
+    <p>记录实际所见，生成可直接复制的专科查体段落。</p>
+  </div>
+  <nav class="exam-modes" aria-label="查体工具模式">
+    <a href="#write" data-exam-mode="write" aria-current="page">查体书写</a>
+    <a href="#guide" data-exam-mode="guide">分步查体</a>
+    <a href="#study" data-exam-mode="study">疾病学习与病例训练</a>
+  </nav>
+  <details id="examSource" class="exam-source">
+    <summary>导入查体书写器 v10</summary>
+    <p>选择原 HTML 文件，可载入病种参考、分步查体、疾病知识和病例题。资料仅在当前标签页读取，刷新后需要重新导入。</p>
+    <label class="exam-field" for="examImport">查体书写器 HTML 文件
+      <input id="examImport" type="file" accept=".html,.htm,text/html">
+    </label>
+  </details>
+  <p id="examNotice" class="exam-notice" role="status" aria-live="polite"></p>
+  <div id="examWorkspace" class="exam-workspace">
+    <div class="exam-stack">
+      <section class="exam-panel" aria-labelledby="examSetupTitle">
+        <div class="exam-actions">
+          <h2 id="examSetupTitle">检查范围</h2>
+          <button type="button" id="examJump">查看生成记录</button>
+        </div>
+        <div class="exam-grid">
+          <label class="exam-field">检查部位或参考病种
+            <select id="examTemplate"></select>
+          </label>
+          <label class="exam-field">实际检查部位
+            <input id="examSite" maxlength="80" placeholder="例如 小腿远端">
+          </label>
+          <label class="exam-field">检查侧别
+            <select id="examSide"><option value="">未选择</option><option>左侧</option><option>右侧</option><option>双侧</option><option>不分侧</option></select>
+          </label>
+          <label class="exam-field">实际做过的对比
+            <select id="examCompare"><option value="">未记录</option><option>与健侧对比</option><option>双侧对比</option></select>
+          </label>
+        </div>
+        <details id="examReference" class="exam-reference" hidden>
+          <summary>查看附件中的参考范例</summary>
+          <p id="examReferenceTip"></p>
+          <p id="examReferenceText"></p>
+        </details>
+        <p id="examWriteEmpty">选定检查侧别后开始记录。</p>
+      </section>
+      <div id="examWrite" class="exam-stack">
+        <div id="examForms" class="exam-stack"></div>
+      </div>
+      <section id="examGuide" class="exam-panel" aria-labelledby="examGuideTitle" hidden>
+        <h2 id="examGuideTitle">分步查体</h2>
+        <div id="examGuideBody" class="exam-stack"></div>
+      </section>
+    </div>
+    <section id="examResult" class="exam-panel exam-result" aria-labelledby="examResultTitle">
+      <h2 id="examResultTitle">专科查体记录</h2>
+      <label class="exam-field" for="examOutput">按已填写的项目实时生成
+        <textarea id="examOutput" rows="9" readonly placeholder="填写实际检查所见后生成"></textarea>
+      </label>
+      <div class="exam-actions">
+        <button type="button" class="exam-primary" id="examCopy" disabled>复制查体记录</button>
+        <button type="button" id="examExport" disabled>导出 TXT</button>
+      </div>
+      <div class="exam-actions">
+        <button type="button" id="examSave">保存会话草稿</button>
+        <button type="button" id="examLoad">读取草稿</button>
+        <button type="button" id="examReset">清空</button>
+      </div>
+      <p id="examResultNotice" class="exam-notice" role="status" aria-live="polite"></p>
+      <p class="exam-muted">查体记录在本机生成。草稿保存在当前标签页，请勿录入姓名、住院号等身份信息。</p>
+    </section>
+  </div>
+  <section id="examStudy" class="exam-panel exam-study" aria-labelledby="examStudyTitle" hidden>
+    <h2 id="examStudyTitle">疾病学习与病例训练</h2>
+    <div id="examStudyBody" class="exam-stack"></div>
+  </section>
+  <dialog id="examTeaching" aria-labelledby="examTeachingTitle" class="exam-dialog">
+    <div class="exam-actions"><h2 id="examTeachingTitle"></h2><form method="dialog"><button>关闭</button></form></div>
+    <div id="examTeachingBody"></div>
+  </dialog>
+</main>
+</body>
+</html>
