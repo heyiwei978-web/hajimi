@@ -21,6 +21,14 @@
       "destination": "/materials.html"
     },
     {
+      "source": "/materials/library",
+      "destination": "/materials-library.html"
+    },
+    {
+      "source": "/materials/library/",
+      "destination": "/materials-library.html"
+    },
+    {
       "source": "/study",
       "destination": "/study.html"
     },

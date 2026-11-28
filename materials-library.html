@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f8f8">
+<title>个人资料库 · 哈基米工作站</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%228%22%20fill%3D%22%2311697a%22%2F%3E%3Cg%20transform%3D%22translate(4%204)%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.65%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%206c-2.5-1.7-6-2.2-9-1v13c3-1.2%206.5-1%209%201%202.5-2%206-2.2%209-1V5c-3-1.2-6.5-.7-9%201v13M15%2011h3m-1.5-1.5v3%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="/styles.css?v=20261128-ml1">
+<link rel="stylesheet" href="/theme.css?v=20261128-ml1">
+<link rel="stylesheet" href="/materials-library.css?v=20261128-ml1">
+</head>
+<body class="ml-page">
+<a class="skip-link" href="#materialsMain">跳到主要内容</a>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="site-brand" href="/"><span class="site-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-2.5-1.7-6-2.2-9-1v13c3-1.2 6.5-1 9 1 2.5-2 6-2.2 9-1V5c-3-1.2-6.5-.7-9 1v13M15 11h3m-1.5-1.5v3"/></svg></span><span class="site-brand-text"><strong>哈基米工作站</strong><small>个人医学工作台</small></span></a>
+    <nav class="site-nav" aria-label="主导航"><a href="/"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l-2 0l9 -9l9 9l-2 0M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1 -1v-7M9 20v-6h6v6"/></svg><span>工作台</span></a><a href="/clinical"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h-2v5a5 5 0 0 0 10 0V4h-2m-3 10v3a4 4 0 0 0 8 0v-2"/><circle cx="17" cy="12" r="3"/></svg><span>临床</span></a><a class="active" href="/materials" aria-current="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14m-9 -3c3.3 -1.5 6.3 -1.5 9 0c2.7 -1.5 5.7 -1.5 9 0V5c-3.3 -1.5 -6.3 -1.5 -9 0c-2.7 -1.5 -5.7 -1.5 -9 0z"/></svg><span>资料</span></a><a href="/study"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 9l-10 -5l-10 5l10 5l10 -5v6M6 11v6a6 3 0 0 0 12 0v-6"/></svg><span>学习</span></a><a href="/personal"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></svg><span>我的</span></a></nav>
+    <div class="site-header-right"><a class="site-header-action" href="/materials">资料工作台 →</a></div>
+  </div>
+</header>
+
+<main id="materialsMain" class="ml-main">
+  <section id="mlAuthGate" class="ml-gate" aria-labelledby="mlGateTitle">
+    <p class="ml-kicker">PRIVATE LIBRARY</p>
+    <h1 id="mlGateTitle">个人资料库</h1>
+    <p id="mlGateMessage" class="ml-gate-text">正在确认管理员会话…</p>
+    <div id="mlGateActions" class="ml-gate-actions" hidden>
+      <a class="ml-btn ml-btn-primary" href="/admin">前往管理员登录</a>
+      <a class="ml-btn ml-btn-ghost" href="/materials">返回资料工作台</a>
+    </div>
+  </section>
+
+  <div id="mlWorkspace" class="ml-workspace" hidden>
+    <section class="ml-hero" aria-labelledby="mlHeading">
+      <div class="ml-hero-copy">
+        <p class="ml-kicker">PRIVATE LIBRARY</p>
+        <h1 id="mlHeading">个人资料库</h1>
+        <p class="ml-hero-lead">指南、共识、医学教材与个人笔记集中存放；支持大体积 PDF 分片上传、页内翻页、全文检索与引用收藏。</p>
+      </div>
+      <div class="ml-hero-actions">
+        <button id="mlOpenUpload" class="ml-btn ml-btn-primary" type="button">上传 PDF</button>
+        <button id="mlOpenNote" class="ml-btn ml-btn-ghost" type="button">新建笔记</button>
+        <button id="mlRefreshBtn" class="ml-btn ml-btn-ghost" type="button">刷新</button>
+      </div>
+    </section>
+
+    <section class="ml-stats" aria-label="资料库概览">
+      <div class="ml-stat"><strong id="mlStatItems">0</strong><span>在库资料</span></div>
+      <div class="ml-stat"><strong id="mlStatQuotes">0</strong><span>引用收藏</span></div>
+      <div class="ml-stat"><strong id="mlStatSize">0 MB</strong><span>PDF 已用空间</span></div>
+    </section>
+
+    <nav class="ml-tabs" aria-label="资料库视图">
+      <button id="mlTabShelf" class="ml-tab" type="button" data-ml-view="shelf" aria-pressed="true">资料书架</button>
+      <button id="mlTabSearch" class="ml-tab" type="button" data-ml-view="search" aria-pressed="false">跨书全文检索</button>
+      <button id="mlTabQuotes" class="ml-tab" type="button" data-ml-view="quotes" aria-pressed="false">引用收藏</button>
+      <button id="mlTabReader" class="ml-tab" type="button" data-ml-view="reader" aria-pressed="false" hidden>正在阅读</button>
+    </nav>
+
+    <p id="mlErrorBanner" class="ml-alert" role="alert" hidden></p>
+
+    <section id="mlShelfView" class="ml-panel" aria-labelledby="mlShelfTitle">
+      <div class="ml-panel-head">
+        <h2 id="mlShelfTitle">资料书架</h2>
+        <span id="mlShelfCount" class="ml-count" role="status" aria-live="polite">0 份资料</span>
+      </div>
+      <div class="ml-filters">
+        <label class="ml-field ml-field-search">
+          <span>筛选资料（支持标题、标签与拼音首字母）</span>
+          <input id="mlShelfQuery" type="search" placeholder="输入书名、标签或拼音首字母，按 / 聚焦" autocomplete="off">
+        </label>
+        <label class="ml-field">
+          <span>分类</span>
+          <select id="mlFilterCategory">
+            <option value="">全部分类</option>
+            <option value="指南">指南</option>
+            <option value="共识">共识</option>
+            <option value="教材书籍">教材书籍</option>
+            <option value="文献">文献</option>
+            <option value="个人笔记">个人笔记</option>
+          </select>
+        </label>
+        <label class="ml-field">
+          <span>科室</span>
+          <select id="mlFilterDepartment">
+            <option value="">全部科室</option>
+            <option value="骨科">骨科</option>
+            <option value="普外科">普外科</option>
+            <option value="肾内科">肾内科</option>
+            <option value="妇科">妇科</option>
+            <option value="内科">内科</option>
+            <option value="外科">外科</option>
+            <option value="通用">通用</option>
+          </select>
+        </label>
+        <label class="ml-field">
+          <span>年份</span>
+          <select id="mlFilterYear">
+            <option value="">全部年份</option>
+          </select>
+        </label>
+      </div>
+      <div id="mlList" class="ml-grid"></div>
+      <p id="mlShelfEmpty" class="ml-empty" hidden>暂无资料。点击上方「上传 PDF」或「新建笔记」开始建立你的个人资料库。</p>
+    </section>
+
+    <section id="mlSearchView" class="ml-panel" aria-labelledby="mlCrossSearchTitle" hidden>
+      <div class="ml-panel-head">
+        <h2 id="mlCrossSearchTitle">跨书全文检索</h2>
+        <span id="mlCrossStatus" class="ml-count" role="status" aria-live="polite"></span>
+      </div>
+      <form id="mlCrossSearchForm" class="ml-search-form">
+        <label class="ml-field ml-field-grow">
+          <span>在全部资料的逐页正文中检索（支持中文、英文与拼音首字母）</span>
+          <input id="mlCrossQuery" type="search" placeholder="例如：抗凝、DVT、ggjgz" autocomplete="off" required>
+        </label>
+        <button id="mlCrossSubmit" class="ml-btn ml-btn-primary" type="submit">全文检索</button>
+      </form>
+      <div id="mlCrossResults" class="ml-hit-list"></div>
+      <p id="mlCrossEmpty" class="ml-empty">输入关键词后将在你已入库的资料正文中检索，点击命中项可直接定位到对应页码。</p>
+    </section>
+
+    <section id="mlQuotesView" class="ml-panel" aria-labelledby="mlQuotesTitle" hidden>
+      <div class="ml-panel-head">
+        <h2 id="mlQuotesTitle">引用收藏</h2>
+        <span id="mlQuotesCount" class="ml-count" role="status" aria-live="polite">0 条引用</span>
+      </div>
+      <div class="ml-filters">
+        <label class="ml-field ml-field-search">
+          <span>筛选引用（摘录、批注、出处或拼音首字母）</span>
+          <input id="mlQuoteFilterQuery" type="search" placeholder="输入关键词筛选引用" autocomplete="off">
+        </label>
+        <label class="ml-field">
+          <span>按资料筛选</span>
+          <select id="mlQuoteFilterMaterial">
+            <option value="">全部资料</option>
+          </select>
+        </label>
+      </div>
+      <div id="mlQuoteList" class="ml-quote-list"></div>
+      <p id="mlQuotesEmpty" class="ml-empty" hidden>还没有引用收藏。打开任意资料阅读时，可选中段落或点击「收藏当前页」保存出处和批注。</p>
+    </section>
+
+    <section id="mlReaderView" class="ml-reader" aria-labelledby="mlReaderTitle" hidden>
+      <div class="ml-reader-bar">
+        <div class="ml-reader-meta">
+          <button id="mlBackShelf" class="ml-btn ml-btn-ghost" type="button">← 返回书架</button>
+          <div class="ml-reader-heading">
+            <h2 id="mlReaderTitle">阅读器</h2>
+            <p id="mlReaderSubtitle" class="ml-reader-sub"></p>
+          </div>
+        </div>
+        <div class="ml-reader-controls">
+          <button id="mlToggleAside" class="ml-btn ml-btn-ghost" type="button" aria-expanded="false" aria-controls="mlReaderAside">目录与搜页</button>
+          <div class="ml-pager" role="group" aria-label="翻页控制">
+            <button id="mlPrevPage" class="ml-btn ml-btn-ghost" type="button">上一页</button>
+            <label class="ml-page-jump">
+              <span class="ml-sr-only">跳转到页码</span>
+              <input id="mlPageInput" type="number" min="1" value="1">
+            </label>
+            <span id="mlPageTotal" class="ml-page-total">/ 1</span>
+            <button id="mlNextPage" class="ml-btn ml-btn-ghost" type="button">下一页</button>
+          </div>
+          <label class="ml-zoom">
+            <span class="ml-sr-only">缩放比例</span>
+            <select id="mlZoomSelect">
+              <option value="fit">适应宽度</option>
+              <option value="1">100%</option>
+              <option value="1.25">125%</option>
+              <option value="1.5">150%</option>
+            </select>
+          </label>
+          <button id="mlAddQuoteBtn" class="ml-btn ml-btn-primary" type="button">收藏当前页</button>
+          <button id="mlDownloadPdfBtn" class="ml-btn ml-btn-ghost" type="button" hidden>下载原 PDF</button>
+        </div>
+      </div>
+
+      <div class="ml-reader-body">
+        <aside id="mlReaderAside" class="ml-aside" aria-label="目录、页内检索与本书引用">
+          <div class="ml-aside-tabs" role="tablist">
+            <button class="ml-aside-tab" type="button" data-aside-tab="outline" aria-pressed="true">目录</button>
+            <button class="ml-aside-tab" type="button" data-aside-tab="find" aria-pressed="false">页内搜索</button>
+            <button class="ml-aside-tab" type="button" data-aside-tab="book-quotes" aria-pressed="false">本书引用</button>
+          </div>
+          <div id="mlAsideOutline" class="ml-aside-pane"></div>
+          <div id="mlAsideFind" class="ml-aside-pane" hidden>
+            <form id="mlInBookForm" class="ml-inbook-form">
+              <label class="ml-sr-only" for="mlInBookQuery">在本书中搜索</label>
+              <input id="mlInBookQuery" type="search" placeholder="搜本书正文或拼音首字母" autocomplete="off">
+              <button class="ml-btn ml-btn-primary" type="submit">搜索</button>
+            </form>
+            <p id="mlInBookStatus" class="ml-count" role="status" aria-live="polite"></p>
+            <div id="mlInBookHits" class="ml-inbook-hits"></div>
+          </div>
+          <div id="mlAsideQuotes" class="ml-aside-pane" hidden></div>
+        </aside>
+
+        <div id="mlStage" class="ml-stage">
+          <p id="mlReaderStatus" class="ml-reader-status" role="status" aria-live="polite"></p>
+          <div id="mlSelectionBar" class="ml-selection-bar" hidden>
+            <span id="mlSelectionPreview"></span>
+            <button id="mlQuoteSelectionBtn" class="ml-btn ml-btn-primary" type="button">将选中内容存为引用</button>
+          </div>
+          <div id="mlPdfStage" class="ml-pdf-stage" hidden>
+            <div id="mlPdfCanvasWrap" class="ml-canvas-wrap">
+              <canvas id="mlPdfCanvas"></canvas>
+              <div id="mlTextLayer" class="ml-text-layer"></div>
+            </div>
+          </div>
+          <article id="mlNoteStage" class="ml-note-stage" hidden></article>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<dialog id="mlUploadDialog" class="ml-dialog" aria-labelledby="mlUploadTitle">
+  <div class="ml-dialog-head">
+    <h2 id="mlUploadTitle">上传 PDF 资料</h2>
+    <button class="ml-icon-btn" type="button" data-close-dialog="mlUploadDialog" aria-label="关闭上传窗口">×</button>
+  </div>
+  <form id="mlUploadForm" class="ml-form">
+    <label class="ml-field">
+      <span>选择 PDF 文件（单份最大 100 MB，将自动按 2 MB 分片上传并在本地提取目录与逐页文本）</span>
+      <input id="mlPdfFile" name="file" type="file" accept="application/pdf,.pdf" required>
+    </label>
+    <p id="mlInspectStatus" class="ml-inspect-status" role="status" aria-live="polite"></p>
+    <div class="ml-form-grid">
+      <label class="ml-field ml-field-span"><span>资料标题</span><input name="title" maxlength="160" required placeholder="例如：中国骨科大手术静脉血栓栓塞症预防指南"></label>
+      <label class="ml-field"><span>作者 / 发布机构（可选）</span><input name="author" maxlength="120" placeholder="例如：中华医学会骨科学分会"></label>
+      <label class="ml-field"><span>年份（可选）</span><input name="year" type="number" min="1900" max="2100" placeholder="2025"></label>
+      <label class="ml-field">
+        <span>分类</span>
+        <select name="category" required>
+          <option value="指南">指南</option>
+          <option value="共识">共识</option>
+          <option value="教材书籍">教材书籍</option>
+          <option value="文献">文献</option>
+          <option value="个人笔记">个人笔记</option>
+        </select>
+      </label>
+      <label class="ml-field">
+        <span>科室</span>
+        <select name="department" required>
+          <option value="骨科">骨科</option>
+          <option value="普外科">普外科</option>
+          <option value="肾内科">肾内科</option>
+          <option value="妇科">妇科</option>
+          <option value="内科">内科</option>
+          <option value="外科">外科</option>
+          <option value="通用">通用</option>
+        </select>
+      </label>
+      <label class="ml-field ml-field-span"><span>标签（用空格或逗号分隔，最多 12 个）</span><input name="tags" maxlength="200" placeholder="抗凝 围手术期 VTE"></label>
+      <label class="ml-field ml-field-span"><span>摘要或备注（可选；扫描版 PDF 可在此补充关键词方便检索）</span><textarea name="notes" rows="3" maxlength="4000"></textarea></label>
+    </div>
+    <p id="mlUploadProgress" class="ml-progress" role="status" aria-live="polite"></p>
+    <p id="mlUploadError" class="ml-alert" role="alert" hidden></p>
+    <div class="ml-dialog-actions">
+      <button id="mlUploadSubmit" class="ml-btn ml-btn-primary" type="submit" disabled>开始上传并入库</button>
+      <button class="ml-btn ml-btn-ghost" type="button" data-close-dialog="mlUploadDialog">取消</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="mlNoteDialog" class="ml-dialog" aria-labelledby="mlNoteTitle">
+  <div class="ml-dialog-head">
+    <h2 id="mlNoteTitle">新建个人文本笔记</h2>
+    <button class="ml-icon-btn" type="button" data-close-dialog="mlNoteDialog" aria-label="关闭新建笔记窗口">×</button>
+  </div>
+  <form id="mlNoteForm" class="ml-form">
+    <div class="ml-form-grid">
+      <label class="ml-field ml-field-span"><span>标题</span><input name="title" maxlength="160" required></label>
+      <label class="ml-field"><span>出处 / 作者（可选）</span><input name="author" maxlength="120"></label>
+      <label class="ml-field"><span>年份（可选）</span><input name="year" type="number" min="1900" max="2100"></label>
+      <label class="ml-field">
+        <span>分类</span>
+        <select name="category" required>
+          <option value="个人笔记">个人笔记</option>
+          <option value="指南">指南</option>
+          <option value="共识">共识</option>
+          <option value="文献">文献</option>
+          <option value="教材书籍">教材书籍</option>
+        </select>
+      </label>
+      <label class="ml-field">
+        <span>科室</span>
+        <select name="department" required>
+          <option value="骨科">骨科</option>
+          <option value="普外科">普外科</option>
+          <option value="肾内科">肾内科</option>
+          <option value="妇科">妇科</option>
+          <option value="内科">内科</option>
+          <option value="外科">外科</option>
+          <option value="通用">通用</option>
+        </select>
+      </label>
+      <label class="ml-field ml-field-span"><span>标签（空格或逗号分隔）</span><input name="tags" maxlength="200"></label>
+      <label class="ml-field ml-field-span"><span>正文（可单独一行写 --- 进行分页）</span><textarea name="body" rows="10" maxlength="80000" required></textarea></label>
+    </div>
+    <p id="mlNoteError" class="ml-alert" role="alert" hidden></p>
+    <div class="ml-dialog-actions">
+      <button id="mlNoteSubmit" class="ml-btn ml-btn-primary" type="submit">保存笔记</button>
+      <button class="ml-btn ml-btn-ghost" type="button" data-close-dialog="mlNoteDialog">取消</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="mlMetaDialog" class="ml-dialog" aria-labelledby="mlMetaTitle">
+  <div class="ml-dialog-head">
+    <h2 id="mlMetaTitle">编辑资料信息</h2>
+    <button class="ml-icon-btn" type="button" data-close-dialog="mlMetaDialog" aria-label="关闭编辑窗口">×</button>
+  </div>
+  <form id="mlMetaForm" class="ml-form">
+    <input name="id" type="hidden">
+    <div class="ml-form-grid">
+      <label class="ml-field ml-field-span"><span>标题</span><input name="title" maxlength="160" required></label>
+      <label class="ml-field"><span>作者 / 机构</span><input name="author" maxlength="120"></label>
+      <label class="ml-field"><span>年份</span><input name="year" type="number" min="1900" max="2100"></label>
+      <label class="ml-field">
+        <span>分类</span>
+        <select name="category" required>
+          <option value="指南">指南</option>
+          <option value="共识">共识</option>
+          <option value="教材书籍">教材书籍</option>
+          <option value="文献">文献</option>
+          <option value="个人笔记">个人笔记</option>
+        </select>
+      </label>
+      <label class="ml-field">
+        <span>科室</span>
+        <select name="department" required>
+          <option value="骨科">骨科</option>
+          <option value="普外科">普外科</option>
+          <option value="肾内科">肾内科</option>
+          <option value="妇科">妇科</option>
+          <option value="内科">内科</option>
+          <option value="外科">外科</option>
+          <option value="通用">通用</option>
+        </select>
+      </label>
+      <label class="ml-field ml-field-span"><span>标签（空格或逗号分隔）</span><input name="tags" maxlength="200"></label>
+      <label class="ml-field ml-field-span"><span>摘要或备注</span><textarea name="notes" rows="4" maxlength="4000"></textarea></label>
+    </div>
+    <p id="mlMetaError" class="ml-alert" role="alert" hidden></p>
+    <div class="ml-dialog-actions">
+      <button class="ml-btn ml-btn-primary" type="submit">保存修改</button>
+      <button id="mlArchiveBtn" class="ml-btn ml-btn-danger" type="button">归档隐藏</button>
+      <button class="ml-btn ml-btn-ghost" type="button" data-close-dialog="mlMetaDialog">取消</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="mlQuoteDialog" class="ml-dialog" aria-labelledby="mlQuoteTitle">
+  <div class="ml-dialog-head">
+    <h2 id="mlQuoteTitle">收藏引用</h2>
+    <button class="ml-icon-btn" type="button" data-close-dialog="mlQuoteDialog" aria-label="关闭引用窗口">×</button>
+  </div>
+  <form id="mlQuoteForm" class="ml-form">
+    <input name="id" type="hidden">
+    <input name="materialId" type="hidden">
+    <p id="mlQuoteSourceLabel" class="ml-inspect-status"></p>
+    <div class="ml-form-grid">
+      <label class="ml-field"><span>页码</span><input name="page" type="number" min="1" max="5000" required></label>
+      <label class="ml-field"><span>章节名（可选）</span><input name="section" maxlength="160" placeholder="例如：第三章 术后抗凝"></label>
+      <label class="ml-field ml-field-span"><span>摘录正文</span><textarea name="excerpt" rows="4" maxlength="3000" required placeholder="粘贴或编辑需要收藏的原文摘录"></textarea></label>
+      <label class="ml-field ml-field-span"><span>个人批注（可选）</span><textarea name="note" rows="3" maxlength="2000" placeholder="记录临床要点或使用场景"></textarea></label>
+      <label class="ml-field ml-field-span"><span>标签（空格或逗号分隔，最多 8 个）</span><input name="tags" maxlength="160"></label>
+    </div>
+    <p id="mlQuoteError" class="ml-alert" role="alert" hidden></p>
+    <div class="ml-dialog-actions">
+      <button class="ml-btn ml-btn-primary" type="submit">保存引用</button>
+      <button class="ml-btn ml-btn-ghost" type="button" data-close-dialog="mlQuoteDialog">取消</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="mlToast" class="portal-toast" role="status" aria-live="polite" aria-atomic="true"></div>
+<script defer src="/pinyin-initials.js?v=20261128-ml1"></script>
+<script defer src="/ecg-search.js?v=20261128-ml1"></script>
+<script defer src="/materials-pdf.js?v=20261128-ml1"></script>
+<script defer src="/materials-library.js?v=20261128-ml1"></script>
+<script defer src="/workspace.js?v=20261128-ml1"></script>
+</body>
+</html>
