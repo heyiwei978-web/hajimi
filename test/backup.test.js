@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {backupBlobs, verifyBackup, safeRelative, EXCLUDED_PREFIXES} from '../scripts/backup-blob.mjs';
+import {backupBlobs, verifyBackup, safeRelative, EXCLUDED_PREFIXES, LARGE_BINARY_EXCLUDED_PREFIXES} from '../scripts/backup-blob.mjs';
 import {restoreBlobs} from '../scripts/restore-blob.mjs';
 
 // 异地备份（docs/backup.md）。全部使用内存模拟的 Blob，不访问生产数据。
@@ -27,17 +27,23 @@ function fakeBlob(entries, pageSize = 2) {
 const temp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'hajimi-backup-'));
 const DATA = {
   'cms/content.json': '{"cases":[]}', 'cms/history/a.json': '{}', 'private-gallery/images/x.webp': 'RIFF....WEBP',
+  'personal-materials/index.json': '{"items":[]}', 'personal-materials/quotes.json': '{"quotes":[]}',
+  'personal-materials/text/a-p000.json': '{"pages":[]}', 'personal-materials/chunks/a/0000.bin': '%PDF-1.7',
   'security/login-log.json': '{"success":[]}', 'monitoring/rate/abc.json': '{"count":1}', 'security/login-rate/x.json': '{}', 'security/note-rate/y.json': '{}'
 };
 
-test('完整下载（跨分页）、跳过限流计数器、生成可校验的清单', async () => {
+test('完整下载（跨分页）、跳过限流计数器与大 PDF 分片、生成可校验的清单', async () => {
   const dir = temp();
   try {
     const manifest = await backupBlobs({sdk: fakeBlob(DATA), token: 'tok', outDir: dir, now: () => new Date('2026-11-18T03:17:00Z')});
-    assert.deepEqual(manifest.files.map(f => f.pathname), ['cms/content.json', 'cms/history/a.json', 'private-gallery/images/x.webp', 'security/login-log.json']);
+    assert.deepEqual(manifest.files.map(f => f.pathname), [
+      'cms/content.json', 'cms/history/a.json',
+      'personal-materials/index.json', 'personal-materials/quotes.json', 'personal-materials/text/a-p000.json',
+      'private-gallery/images/x.webp', 'security/login-log.json'
+    ]);
     assert.equal(manifest.createdAt, '2026-11-18T03:17:00.000Z');
     assert.equal(fs.readFileSync(path.join(dir, 'files/cms/content.json'), 'utf8'), '{"cases":[]}');
-    assert.ok(EXCLUDED_PREFIXES.every(prefix => !manifest.files.some(f => f.pathname.startsWith(prefix))));
+    assert.ok([...EXCLUDED_PREFIXES, ...LARGE_BINARY_EXCLUDED_PREFIXES].every(prefix => !manifest.files.some(f => f.pathname.startsWith(prefix))));
     assert.deepEqual(verifyBackup(dir).problems, []);
     assert.ok(!JSON.stringify(manifest).includes('tok'), 'token is never written');
   } finally { fs.rmSync(dir, {recursive: true, force: true}); }
@@ -85,9 +91,11 @@ test('恢复默认只校验不写入；写回必须确认备份时间', async ()
     await assert.rejects(restoreBlobs({sdk: target, token: 'tok', dir, apply: true, confirm: 'wrong'}), /--confirm/);
     assert.equal(target.puts.length, 0);
     const {written} = await restoreBlobs({sdk: target, token: 'tok', dir, apply: true, confirm: '2026-11-18T03:17:00.000Z'});
-    assert.equal(written, 4);
+    assert.equal(written, 7);
     assert.deepEqual(target.puts.map(p => [p.pathname, p.options.access, p.options.contentType]).sort(), [
       ['cms/content.json', 'private', 'application/json; charset=utf-8'], ['cms/history/a.json', 'private', 'application/json; charset=utf-8'],
+      ['personal-materials/index.json', 'private', 'application/json; charset=utf-8'], ['personal-materials/quotes.json', 'private', 'application/json; charset=utf-8'],
+      ['personal-materials/text/a-p000.json', 'private', 'application/json; charset=utf-8'],
       ['private-gallery/images/x.webp', 'private', 'image/webp'], ['security/login-log.json', 'private', 'application/json; charset=utf-8']]);
     fs.writeFileSync(path.join(dir, 'files/cms/content.json'), 'tampered');
     await assert.rejects(restoreBlobs({sdk: target, token: 'tok', dir}), /verification/);

@@ -9,8 +9,12 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 
-// 限流计数器是临时数据，不需要备份。
+// 限流计数器是临时数据，不需要备份（清理脚本据此核对限流前缀）。
 export const EXCLUDED_PREFIXES = ['monitoring/rate/', 'security/login-rate/', 'security/note-rate/'];
+// 个人资料库的大体积 PDF 二进制分片不进入每周 GitHub Actions 备份，避免构件体积和出口流量暴涨；
+// 元数据（index.json）、引用收藏（quotes.json）、修改历史和逐页文本索引（text/）照常纳入备份。
+export const LARGE_BINARY_EXCLUDED_PREFIXES = ['personal-materials/chunks/'];
+const ALL_EXCLUDED_PREFIXES = [...EXCLUDED_PREFIXES, ...LARGE_BINARY_EXCLUDED_PREFIXES];
 const sha256 = buffer => crypto.createHash('sha256').update(buffer).digest('hex');
 
 // 备份里的路径来自 Blob 的 pathname，写盘前确认它不会跳出备份目录。
@@ -37,7 +41,7 @@ export async function backupBlobs({sdk, token, outDir, now = () => new Date(), l
     const page = await sdk.list({token, cursor, limit: 1000});
     for (const item of page.blobs || []) {
       const pathname = item.pathname;
-      if (EXCLUDED_PREFIXES.some(prefix => String(pathname).startsWith(prefix))) continue;
+      if (ALL_EXCLUDED_PREFIXES.some(prefix => String(pathname).startsWith(prefix))) continue;
       const relative = safeRelative(pathname);
       if (!relative) { skipped.push({pathname: String(pathname).slice(0, 200), reason: 'unsafe pathname'}); continue; }
       let body = await readBody(await sdk.get(pathname, {access: 'private', token, useCache: false}).catch(() => null));
@@ -53,7 +57,7 @@ export async function backupBlobs({sdk, token, outDir, now = () => new Date(), l
   } while (cursor);
   files.sort((a, b) => a.pathname.localeCompare(b.pathname, 'en'));
   const manifest = {schemaVersion: 1, createdAt: now().toISOString(), count: files.length,
-    totalBytes: files.reduce((sum, file) => sum + file.size, 0), excludedPrefixes: EXCLUDED_PREFIXES, skipped, files};
+    totalBytes: files.reduce((sum, file) => sum + file.size, 0), excludedPrefixes: ALL_EXCLUDED_PREFIXES, skipped, files};
   fs.writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify(manifest, null, 1) + '\n');
   return manifest;
 }
